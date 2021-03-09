@@ -1,0 +1,55 @@
+name: "merged"
+display_name: "Merged"
+version: 0.0.0
+column_kind: "utf16"
+unicode_newlines: true
+file_types:
+  - name: javascript
+    display_name: JavaScript
+    extensions:
+      - .js
+      - .jsx
+  - name: ecmascript
+    display_name: ECMAScript
+    extensions:
+      - .es
+      - .es6
+      - .mjs
+  - name: typescript
+    display_name: TypeScript
+    extensions:
+      - .ts
+      - .tsx
+  - name: html
+    display_name: HTML
+    extensions:
+      - .html
+      - .htm
+      - .xhtm
+      - .xhtml
+  - name: vue
+    display_name: Vue.js component
+    extensions:
+      - .vue
+  - name: data
+    display_name: Data or configuration files
+    extensions:
+      - .json
+      - .yml
+      - .yaml
+      - .raml
+  - name: c
+    display_name: C sources
+    extensions:
+      - .c
+      - .h
+  - name: cpp
+    display_name: C++ sources
+    extensions:
+      - .cc
+      - .cpp
+      - .cxx
+      - .hh
+      - .hpp
+      - .hxx
+legacy_qltest_extraction: true
