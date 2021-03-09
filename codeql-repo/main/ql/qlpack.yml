@@ -1,0 +1,5 @@
+name: codeql-merged
+version: 0.0.0
+dbscheme: my.merged.dbscheme
+suites: codeql-suites
+extractor: merged

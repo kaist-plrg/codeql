@@ -1,0 +1,10 @@
+# Base ignores
+*.DS_Store
+node_modules
+*.log
+
+# DB
+db-cpp
+db-js
+db-java
+db-merged

@@ -1,0 +1,3315 @@
+/*** Standard fragments ***/
+
+/** Files and folders **/
+
+@js_location = @js_location_default;
+ 
+js_locations_default(unique int id: @js_location_default,
+          int file: @js_file ref,
+          int beginLine: int ref,
+          int beginColumn: int ref,
+          int endLine: int ref,
+          int endColumn: int ref
+         );
+ 
+@js_sourceline = @js_locatable;
+ 
+js_numlines(int element_id: @js_sourceline ref,
+         int num_lines: int ref,
+         int num_code: int ref,
+         int num_comment: int ref
+        );
+ 
+ 
+/*
+  fromSource(0) = unknown,
+  fromSource(1) = from source,
+  fromSource(2) = from library
+*/
+js_files(unique int id: @js_file,
+      varchar(900) name: string ref,
+      varchar(900) simple: string ref,
+      varchar(900) ext: string ref,
+      int fromSource: int ref);
+ 
+js_folders(unique int id: @js_folder,
+        varchar(900) name: string ref,
+        varchar(900) simple: string ref);
+ 
+ 
+@js_container = @js_folder | @js_file ;
+ 
+ 
+js_containerparent(int parent: @js_container ref,
+                unique int child: @js_container ref);
+
+/** Duplicate code **/
+
+js_duplicateCode(
+  unique int id : @js_duplication,
+  varchar(900) relativePath : string ref,
+  int equivClass : int ref);
+ 
+js_similarCode(
+  unique int id : @js_similarity,
+  varchar(900) relativePath : string ref,
+  int equivClass : int ref);
+ 
+@js_duplication_or_similarity = @js_duplication | @js_similarity;
+ 
+js_tokens(
+  int id : @js_duplication_or_similarity ref,
+  int offset : int ref,
+  int beginLine : int ref,
+  int beginColumn : int ref,
+  int endLine : int ref,
+  int endColumn : int ref);
+
+/** External data **/
+
+js_externalData(
+  int id : @js_externalDataElement,
+  varchar(900) path : string ref,
+  int column: int ref,
+  varchar(900) value : string ref
+);
+ 
+js_snapshotDate(unique date snapshotDate : date ref);
+ 
+sourceLocationPrefix(varchar(900) prefix : string ref);
+
+/** Version control data **/
+
+js_svnentries(
+  int id : @js_svnentry,
+  varchar(500) revision : string ref,
+  varchar(500) author : string ref,
+  date revisionDate : date ref,
+  int changeSize : int ref
+);
+ 
+js_svnaffectedfiles(
+  int id : @js_svnentry ref,
+  int file : @js_file ref,
+  varchar(500) action : string ref
+);
+ 
+js_svnentrymsg(
+  int id : @js_svnentry ref,
+  varchar(500) message : string ref
+);
+ 
+js_svnchurn(
+  int commit : @js_svnentry ref,
+  int file : @js_file ref,
+  int addedLines : int ref,
+  int deletedLines : int ref
+);
+
+
+/*** JavaScript-specific part ***/
+
+js_filetype(
+  int file: @js_file ref,
+  string filetype: string ref
+)
+
+// top-level code fragments
+js_toplevels (unique int id: @js_toplevel,
+           int kind: int ref);
+
+js_is_externs (int toplevel: @js_toplevel ref);
+
+case @js_toplevel.kind of
+   0 = @js_script
+|  1 = @js_inline_script
+|  2 = @js_event_handler
+|  3 = @js_javascript_url;
+
+js_is_module (int tl: @js_toplevel ref);
+js_is_nodejs (int tl: @js_toplevel ref);
+js_is_es2015_module (int tl: @js_toplevel ref);
+js_is_closure_module (int tl: @js_toplevel ref);
+
+// statements
+#keyset[parent, idx]
+js_stmts (unique int id: @js_stmt, 
+       int kind: int ref,
+       int parent: @js_stmt_parent ref, 
+       int idx: int ref,
+       varchar(900) tostring: string ref);
+
+js_stmt_containers (unique int stmt: @js_stmt ref,
+       int container: @js_stmt_container ref);
+       
+js_jump_targets (unique int jump: @js_stmt ref,
+       int target: @js_stmt ref);
+
+@js_stmt_parent = @js_stmt | @js_toplevel | @js_function_expr | @js_arrow_function_expr;
+@js_stmt_container = @js_toplevel | @js_function | @js_namespace_declaration | @js_external_module_declaration | @js_global_augmentation_declaration;
+
+case @js_stmt.kind of
+   0 = @js_empty_stmt
+|  1 = @js_block_stmt
+|  2 = @js_expr_stmt
+|  3 = @js_if_stmt
+|  4 = @js_labeled_stmt
+|  5 = @js_break_stmt
+|  6 = @js_continue_stmt
+|  7 = @js_with_stmt
+|  8 = @js_switch_stmt
+|  9 = @js_return_stmt
+| 10 = @js_throw_stmt
+| 11 = @js_try_stmt
+| 12 = @js_while_stmt
+| 13 = @js_do_while_stmt
+| 14 = @js_for_stmt
+| 15 = @js_for_in_stmt
+| 16 = @js_debugger_stmt
+| 17 = @js_function_decl_stmt
+| 18 = @js_var_decl_stmt
+| 19 = @js_case
+| 20 = @js_catch_clause
+| 21 = @js_for_of_stmt
+| 22 = @js_const_decl_stmt
+| 23 = @js_let_stmt
+| 24 = @js_legacy_let_stmt
+| 25 = @js_for_each_stmt
+| 26 = @js_class_decl_stmt
+| 27 = @js_import_declaration
+| 28 = @js_export_all_declaration
+| 29 = @js_export_default_declaration
+| 30 = @js_export_named_declaration
+| 31 = @js_namespace_declaration
+| 32 = @js_import_equals_declaration
+| 33 = @js_export_assign_declaration
+| 34 = @js_interface_declaration
+| 35 = @js_type_alias_declaration
+| 36 = @js_enum_declaration
+| 37 = @js_external_module_declaration
+| 38 = @js_export_as_namespace_declaration
+| 39 = @js_global_augmentation_declaration
+;
+
+@js_decl_stmt = @js_var_decl_stmt | @js_const_decl_stmt | @js_let_stmt | @js_legacy_let_stmt;
+
+@js_export_declaration = @js_export_all_declaration | @js_export_default_declaration | @js_export_named_declaration;
+
+@js_namespace_definition = @js_namespace_declaration | @js_enum_declaration;
+@js_type_definition = @js_class_definition | @js_interface_declaration | @js_enum_declaration | @js_type_alias_declaration | @js_enum_member;
+
+js_is_instantiated(unique int decl: @js_namespace_declaration ref);
+
+@js_declarable_node = @js_decl_stmt | @js_namespace_declaration | @js_class_decl_stmt | @js_function_decl_stmt | @js_enum_declaration | @js_external_module_declaration | @js_global_augmentation_declaration | @js_field;
+js_has_declare_keyword(unique int stmt: @js_declarable_node ref);
+
+js_is_for_await_of(unique int forof: @js_for_of_stmt ref);
+
+// expressions
+#keyset[parent, idx]
+js_exprs (unique int id: @js_expr,
+       int kind: int ref,
+       int parent: @js_expr_parent ref,
+       int idx: int ref,
+       varchar(900) tostring: string ref);
+
+js_literals (varchar(900) value: string ref,
+       varchar(900) raw: string ref,
+       unique int expr: @js_expr_or_type ref);
+       
+js_enclosing_stmt (unique int expr: @js_expr_or_type ref,
+       int stmt: @js_stmt ref);
+
+js_expr_containers (unique int expr: @js_expr_or_type ref,
+       int container: @js_stmt_container ref);
+
+js_array_size (unique int ae: @js_arraylike ref,
+       int sz: int ref);
+
+js_is_delegating (int yield: @js_yield_expr ref);
+
+@js_expr_or_stmt = @js_expr | @js_stmt;
+@js_expr_or_type = @js_expr | @js_typeexpr;
+@js_expr_parent = @js_expr_or_stmt | @js_property | @js_function_typeexpr;
+@js_arraylike = @js_array_expr | @js_array_pattern;
+@js_type_annotation = @js_typeexpr | @js_jsdoc_type_expr;
+@js_node_in_stmt_container = @js_cfg_node | @js_type_annotation | @js_toplevel;
+
+case @js_expr.kind of
+   0 = @js_label
+|  1 = @js_null_literal
+|  2 = @js_boolean_literal
+|  3 = @js_number_literal
+|  4 = @js_string_literal
+|  5 = @js_regexp_literal
+|  6 = @js_this_expr
+|  7 = @js_array_expr
+|  8 = @js_obj_expr
+|  9 = @js_function_expr
+| 10 = @js_seq_expr
+| 11 = @js_conditional_expr
+| 12 = @js_new_expr
+| 13 = @js_call_expr
+| 14 = @js_dot_expr
+| 15 = @js_index_expr
+| 16 = @js_neg_expr
+| 17 = @js_plus_expr
+| 18 = @js_log_not_expr
+| 19 = @js_bit_not_expr
+| 20 = @js_typeof_expr
+| 21 = @js_void_expr
+| 22 = @js_delete_expr
+| 23 = @js_eq_expr
+| 24 = @js_neq_expr
+| 25 = @js_eqq_expr
+| 26 = @js_neqq_expr
+| 27 = @js_lt_expr
+| 28 = @js_le_expr
+| 29 = @js_gt_expr
+| 30 = @js_ge_expr
+| 31 = @js_lshift_expr
+| 32 = @js_rshift_expr
+| 33 = @js_urshift_expr
+| 34 = @js_add_expr
+| 35 = @js_sub_expr
+| 36 = @js_mul_expr
+| 37 = @js_div_expr
+| 38 = @js_mod_expr
+| 39 = @js_bitor_expr
+| 40 = @js_xor_expr
+| 41 = @js_bitand_expr
+| 42 = @js_in_expr
+| 43 = @js_instanceof_expr
+| 44 = @js_logand_expr
+| 45 = @js_logor_expr
+| 47 = @js_assign_expr
+| 48 = @js_assign_add_expr
+| 49 = @js_assign_sub_expr
+| 50 = @js_assign_mul_expr
+| 51 = @js_assign_div_expr
+| 52 = @js_assign_mod_expr
+| 53 = @js_assign_lshift_expr
+| 54 = @js_assign_rshift_expr
+| 55 = @js_assign_urshift_expr
+| 56 = @js_assign_or_expr
+| 57 = @js_assign_xor_expr
+| 58 = @js_assign_and_expr
+| 59 = @js_preinc_expr
+| 60 = @js_postinc_expr
+| 61 = @js_predec_expr
+| 62 = @js_postdec_expr
+| 63 = @js_par_expr
+| 64 = @js_var_declarator
+| 65 = @js_arrow_function_expr
+| 66 = @js_spread_element
+| 67 = @js_array_pattern
+| 68 = @js_object_pattern
+| 69 = @js_yield_expr
+| 70 = @js_tagged_template_expr
+| 71 = @js_template_literal
+| 72 = @js_template_element
+| 73 = @js_array_comprehension_expr
+| 74 = @js_generator_expr
+| 75 = @js_for_in_comprehension_block
+| 76 = @js_for_of_comprehension_block
+| 77 = @js_legacy_letexpr
+| 78 = @js_var_decl
+| 79 = @js_proper_varaccess
+| 80 = @js_class_expr
+| 81 = @js_super_expr
+| 82 = @js_newtarget_expr
+| 83 = @js_named_import_specifier
+| 84 = @js_import_default_specifier
+| 85 = @js_import_namespace_specifier
+| 86 = @js_named_export_specifier
+| 87 = @js_exp_expr
+| 88 = @js_assign_exp_expr
+| 89 = @js_jsx_element
+| 90 = @js_jsx_qualified_name
+| 91 = @js_jsx_empty_expr
+| 92 = @js_await_expr
+| 93 = @js_function_sent_expr
+| 94 = @js_decorator
+| 95 = @js_export_default_specifier
+| 96 = @js_export_namespace_specifier
+| 97 = @js_bind_expr
+| 98 = @js_external_module_reference
+| 99 = @js_dynamic_import
+| 100 = @js_expression_with_type_arguments
+| 101 = @js_prefix_type_assertion
+| 102 = @js_as_type_assertion
+| 103 = @js_export_varaccess
+| 104 = @js_decorator_list
+| 105 = @js_non_null_assertion
+| 106 = @js_bigint_literal
+| 107 = @js_nullishcoalescing_expr
+| 108 = @js_e4x_xml_anyname
+| 109 = @js_e4x_xml_static_attribute_selector
+| 110 = @js_e4x_xml_dynamic_attribute_selector
+| 111 = @js_e4x_xml_filter_expression
+| 112 = @js_e4x_xml_static_qualident
+| 113 = @js_e4x_xml_dynamic_qualident
+| 114 = @js_e4x_xml_dotdotexpr
+| 115 = @js_import_meta_expr
+| 116 = @js_assignlogandexpr
+| 117 = @js_assignlogorexpr
+| 118 = @js_assignnullishcoalescingexpr
+;
+
+@js_varaccess = @js_proper_varaccess | @js_export_varaccess;
+@js_varref = @js_var_decl | @js_varaccess;
+
+@js_identifier = @js_label | @js_varref | @js_type_identifier;
+
+@js_literal = @js_null_literal | @js_boolean_literal | @js_number_literal | @js_string_literal | @js_regexp_literal | @js_bigint_literal;
+
+@js_propaccess = @js_dot_expr | @js_index_expr;
+
+@js_invokeexpr = @js_new_expr | @js_call_expr;
+
+@js_unaryexpr = @js_neg_expr | @js_plus_expr | @js_log_not_expr | @js_bit_not_expr | @js_typeof_expr | @js_void_expr | @js_delete_expr | @js_spread_element;
+
+@js_equality_test = @js_eq_expr | @js_neq_expr | @js_eqq_expr | @js_neqq_expr;
+
+@js_comparison = @js_equality_test | @js_lt_expr | @js_le_expr | @js_gt_expr | @js_ge_expr;
+
+@js_binaryexpr = @js_comparison | @js_lshift_expr | @js_rshift_expr | @js_urshift_expr | @js_add_expr | @js_sub_expr | @js_mul_expr | @js_div_expr | @js_mod_expr | @js_exp_expr | @js_bitor_expr | @js_xor_expr | @js_bitand_expr | @js_in_expr | @js_instanceof_expr | @js_logand_expr | @js_logor_expr | @js_nullishcoalescing_expr;
+
+@js_assignment = @js_assign_expr | @js_assign_add_expr | @js_assign_sub_expr | @js_assign_mul_expr | @js_assign_div_expr | @js_assign_mod_expr | @js_assign_exp_expr | @js_assign_lshift_expr | @js_assign_rshift_expr | @js_assign_urshift_expr | @js_assign_or_expr | @js_assign_xor_expr | @js_assign_and_expr | @js_assignlogandexpr | @js_assignlogorexpr | @js_assignnullishcoalescingexpr;
+
+@js_updateexpr = @js_preinc_expr | @js_postinc_expr | @js_predec_expr | @js_postdec_expr;
+
+@js_pattern = @js_varref | @js_array_pattern | @js_object_pattern;
+
+@js_comprehension_expr = @js_array_comprehension_expr | @js_generator_expr;
+
+@js_comprehension_block = @js_for_in_comprehension_block | @js_for_of_comprehension_block;
+
+@js_import_specifier = @js_named_import_specifier | @js_import_default_specifier | @js_import_namespace_specifier;
+
+@js_exportspecifier = @js_named_export_specifier | @js_export_default_specifier | @js_export_namespace_specifier;
+
+@js_import_or_export_declaration = @js_import_declaration | @js_export_declaration;
+
+@js_type_assertion = @js_as_type_assertion | @js_prefix_type_assertion;
+
+@js_class_definition = @js_class_decl_stmt | @js_class_expr;
+@js_interface_definition = @js_interface_declaration | @js_interface_typeexpr;
+@js_class_or_interface = @js_class_definition | @js_interface_definition;
+
+@js_lexical_decl = @js_var_decl | @js_type_decl;
+@js_lexical_access = @js_varaccess | @js_local_type_access | @js_local_var_type_access | @js_local_namespace_access;
+@js_lexical_ref = @js_lexical_decl | @js_lexical_access;
+
+@js_e4x_xml_attribute_selector = @js_e4x_xml_static_attribute_selector | @js_e4x_xml_dynamic_attribute_selector;
+@js_e4x_xml_qualident = @js_e4x_xml_static_qualident | @js_e4x_xml_dynamic_qualident;
+
+// scopes
+js_scopes (unique int id: @js_scope,
+        int kind: int ref);
+
+case @js_scope.kind of
+   0 = @js_global_scope
+|  1 = @js_function_scope
+|  2 = @js_catch_scope
+|  3 = @js_module_scope
+|  4 = @js_block_scope
+|  5 = @js_for_scope
+|  6 = @js_for_in_scope // for-of scopes work the same as for-in scopes
+|  7 = @js_comprehension_block_scope
+|  8 = @js_class_expr_scope
+|  9 = @js_namespace_scope
+| 10 = @js_class_decl_scope
+| 11 = @js_interface_scope
+| 12 = @js_type_alias_scope
+| 13 = @js_mapped_type_scope
+| 14 = @js_enum_scope
+| 15 = @js_external_module_scope
+| 16 = @js_conditional_type_scope;
+
+js_scopenodes (unique int node: @js_ast_node ref,
+            int scope: @js_scope ref);
+            
+js_scopenesting (unique int inner: @js_scope ref,
+              int outer: @js_scope ref);
+
+// functions
+@js_function = @js_function_decl_stmt | @js_function_expr | @js_arrow_function_expr;
+
+@js_parameterized = @js_function | @js_catch_clause;
+@js_type_parameterized = @js_function | @js_class_or_interface | @js_type_alias_declaration | @js_mapped_typeexpr | @js_infer_typeexpr;
+
+js_is_generator (int fun: @js_function ref);
+js_has_rest_parameter (int fun: @js_function ref);
+js_is_async (int fun: @js_function ref);
+
+// variables and lexically scoped type names
+#keyset[scope, name]
+js_variables (unique int id: @js_variable,
+           varchar(900) name: string ref,
+           int scope: @js_scope ref);
+
+#keyset[scope, name]
+js_local_type_names (unique int id: @js_local_type_name,
+                  varchar(900) name: string ref,
+                  int scope: @js_scope ref);
+
+#keyset[scope, name]
+js_local_namespace_names (unique int id: @js_local_namespace_name,
+                       varchar(900) name: string ref,
+                       int scope: @js_scope ref);
+
+js_is_arguments_object (int id: @js_variable ref);
+
+@js_lexical_name = @js_variable | @js_local_type_name | @js_local_namespace_name;
+
+@js_bind_id = @js_varaccess | @js_local_var_type_access;
+js_bind (unique int id: @js_bind_id ref,
+      int decl: @js_variable ref);
+
+js_decl (unique int id: @js_var_decl ref,
+      int decl: @js_variable ref);
+
+@js_typebind_id = @js_local_type_access | @js_export_varaccess;
+js_typebind (unique int id: @js_typebind_id ref,
+          int decl: @js_local_type_name ref);
+
+@js_typedecl_id = @js_type_decl | @js_var_decl;
+js_typedecl (unique int id: @js_typedecl_id ref,
+          int decl: @js_local_type_name ref);
+
+js_namespacedecl (unique int id: @js_var_decl ref,
+               int decl: @js_local_namespace_name ref);
+
+@js_namespacebind_id = @js_local_namespace_access | @js_export_varaccess;
+js_namespacebind (unique int id: @js_namespacebind_id ref,
+               int decl: @js_local_namespace_name ref);
+
+
+// properties in object literals, property patterns in object patterns, and method declarations in classes
+#keyset[parent, index]
+js_properties (unique int id: @js_property,
+            int parent: @js_property_parent ref,
+            int index: int ref,
+            int kind: int ref,
+            varchar(900) tostring: string ref);
+
+case @js_property.kind of
+  0 = @js_value_property
+| 1 = @js_property_getter
+| 2 = @js_property_setter
+| 3 = @js_jsx_attribute
+| 4 = @js_function_call_signature
+| 5 = @js_constructor_call_signature
+| 6 = @js_index_signature
+| 7 = @js_enum_member
+| 8 = @js_proper_field
+| 9 = @js_parameter_field
+;
+
+@js_property_parent = @js_obj_expr | @js_object_pattern | @js_class_definition | @js_jsx_element | @js_interface_definition | @js_enum_declaration;
+@js_property_accessor = @js_property_getter | @js_property_setter;
+@js_call_signature = @js_function_call_signature | @js_constructor_call_signature;
+@js_field = @js_proper_field | @js_parameter_field;
+@js_field_or_vardeclarator = @js_field | @js_var_declarator;
+
+js_is_computed (int id: @js_property ref);
+js_is_method   (int id: @js_property ref);
+js_is_static   (int id: @js_property ref);
+js_is_abstract_member (int id: @js_property ref);
+js_is_const_enum (int id: @js_enum_declaration ref);
+js_is_abstract_class (int id: @js_class_decl_stmt ref);
+
+js_has_public_keyword (int id: @js_property ref);
+js_has_private_keyword (int id: @js_property ref);
+js_has_protected_keyword (int id: @js_property ref);
+js_has_readonly_keyword (int id: @js_property ref);
+js_has_type_keyword (int id: @js_import_or_export_declaration ref);
+js_is_optional_member (int id: @js_property ref);
+js_has_definite_assignment_assertion (int id: @js_field_or_vardeclarator ref);
+js_is_optional_parameter_declaration (unique int parameter: @js_pattern ref);
+
+#keyset[constructor, param_index]
+js_parameter_fields(
+  unique int field: @js_parameter_field ref,
+  int constructor: @js_function_expr ref,
+  int param_index: int ref
+);
+
+// types
+#keyset[parent, idx]
+js_typeexprs (
+  unique int id: @js_typeexpr,
+  int kind: int ref,
+  int parent: @js_typeexpr_parent ref,
+  int idx: int ref,
+  varchar(900) tostring: string ref
+);
+
+case @js_typeexpr.kind of
+  0 = @js_local_type_access
+| 1 = @js_type_decl
+| 2 = @js_keyword_typeexpr
+| 3 = @js_string_literal_typeexpr
+| 4 = @js_number_literal_typeexpr
+| 5 = @js_boolean_literal_typeexpr
+| 6 = @js_array_typeexpr
+| 7 = @js_union_typeexpr
+| 8 = @js_indexed_access_typeexpr
+| 9 = @js_intersection_typeexpr
+| 10 = @js_parenthesized_typeexpr
+| 11 = @js_tuple_typeexpr
+| 12 = @js_keyof_typeexpr
+| 13 = @js_qualified_type_access
+| 14 = @js_generic_typeexpr
+| 15 = @js_type_label
+| 16 = @js_typeof_typeexpr
+| 17 = @js_local_var_type_access
+| 18 = @js_qualified_var_type_access
+| 19 = @js_this_var_type_access
+| 20 = @js_predicate_typeexpr
+| 21 = @js_interface_typeexpr
+| 22 = @js_type_parameter
+| 23 = @js_plain_function_typeexpr
+| 24 = @js_constructor_typeexpr
+| 25 = @js_local_namespace_access
+| 26 = @js_qualified_namespace_access
+| 27 = @js_mapped_typeexpr
+| 28 = @js_conditional_typeexpr
+| 29 = @js_infer_typeexpr
+| 30 = @js_import_type_access
+| 31 = @js_import_namespace_access
+| 32 = @js_import_var_type_access
+| 33 = @js_optional_typeexpr
+| 34 = @js_rest_typeexpr
+| 35 = @js_bigint_literal_typeexpr
+| 36 = @js_readonly_typeexpr
+| 37 = @js_template_literal_typeexpr
+;
+
+@js_typeref = @js_typeaccess | @js_type_decl;
+@js_type_identifier = @js_type_decl | @js_local_type_access | @js_type_label | @js_local_var_type_access | @js_local_namespace_access;
+@js_typeexpr_parent = @js_expr | @js_stmt | @js_property | @js_typeexpr;
+@js_literal_typeexpr = @js_string_literal_typeexpr | @js_number_literal_typeexpr | @js_boolean_literal_typeexpr | @js_bigint_literal_typeexpr;
+@js_typeaccess = @js_local_type_access | @js_qualified_type_access | @js_import_type_access;
+@js_vartypeaccess = @js_local_var_type_access | @js_qualified_var_type_access | @js_this_var_type_access | @js_import_var_type_access;
+@js_namespace_access = @js_local_namespace_access | @js_qualified_namespace_access | @js_import_namespace_access;
+@js_import_typeexpr = @js_import_type_access | @js_import_namespace_access | @js_import_var_type_access;
+
+@js_function_typeexpr = @js_plain_function_typeexpr | @js_constructor_typeexpr;
+
+// types
+js_types (
+  unique int id: @js_type,
+  int kind: int ref,
+  varchar(900) tostring: string ref
+);
+
+#keyset[parent, idx]
+js_type_child (
+  int child: @js_type ref,
+  int parent: @js_type ref,
+  int idx: int ref
+);
+
+case @js_type.kind of
+  0 = @js_any_type
+| 1 = @js_string_type
+| 2 = @js_number_type
+| 3 = @js_union_type
+| 4 = @js_true_type
+| 5 = @js_false_type
+| 6 = @js_type_reference
+| 7 = @js_object_type
+| 8 = @js_canonical_type_variable_type
+| 9 = @js_typeof_type
+| 10 = @js_void_type
+| 11 = @js_undefined_type
+| 12 = @js_null_type
+| 13 = @js_never_type
+| 14 = @js_plain_symbol_type
+| 15 = @js_unique_symbol_type
+| 16 = @js_objectkeyword_type
+| 17 = @js_intersection_type
+| 18 = @js_tuple_type
+| 19 = @js_lexical_type_variable_type
+| 20 = @js_this_type
+| 21 = @js_number_literal_type
+| 22 = @js_string_literal_type
+| 23 = @js_unknown_type
+| 24 = @js_bigint_type
+| 25 = @js_bigint_literal_type
+;
+
+@js_boolean_literal_type = @js_true_type | @js_false_type;
+@js_symbol_type = @js_plain_symbol_type | @js_unique_symbol_type;
+@js_union_or_intersection_type = @js_union_type | @js_intersection_type;
+@js_typevariable_type = @js_canonical_type_variable_type | @js_lexical_type_variable_type;
+
+js_has_asserts_keyword(int node: @js_predicate_typeexpr ref);
+
+@js_typed_ast_node = @js_expr | @js_typeexpr | @js_function;
+js_ast_node_type(
+  unique int node: @js_typed_ast_node ref, 
+  int typ: @js_type ref);
+
+js_declared_function_signature(
+  unique int node: @js_function ref,
+  int sig: @js_signature_type ref
+);
+
+js_invoke_expr_signature(
+  unique int node: @js_invokeexpr ref,
+  int sig: @js_signature_type ref
+);
+
+js_invoke_expr_overload_index(
+  unique int node: @js_invokeexpr ref,
+  int index: int ref
+);
+
+js_symbols (
+  unique int id: @js_symbol,
+  int kind: int ref,
+  varchar(900) name: string ref
+);
+
+js_symbol_parent (
+  unique int symbol: @js_symbol ref,
+  int parent: @js_symbol ref
+);
+
+js_symbol_module (
+  int symbol: @js_symbol ref,
+  varchar(900) moduleName: string ref
+);
+
+js_symbol_global (
+  int symbol: @js_symbol ref,
+  varchar(900) globalName: string ref
+);
+
+case @js_symbol.kind of
+  0 = @js_root_symbol
+| 1 = @js_member_symbol
+| 2 = @js_other_symbol
+;
+
+@js_type_with_symbol = @js_type_reference | @js_typevariable_type | @js_typeof_type | @js_unique_symbol_type;
+@js_ast_node_with_symbol = @js_type_definition | @js_namespace_definition | @js_toplevel | @js_typeaccess | @js_namespace_access | @js_var_decl | @js_function | @js_invokeexpr | @js_import_declaration | @js_external_module_reference;
+
+js_ast_node_symbol(
+  unique int node: @js_ast_node_with_symbol ref,
+  int symbol: @js_symbol ref);
+
+js_type_symbol(
+  unique int typ: @js_type_with_symbol ref,
+  int symbol: @js_symbol ref);
+
+#keyset[typ, name]
+js_type_property(
+  int typ: @js_type ref,
+  varchar(900) name: string ref,
+  int propertyType: @js_type ref);
+
+js_type_alias(
+  unique int aliasType: @js_type ref,
+  int underlyingType: @js_type ref);
+
+@js_literal_type = @js_string_literal_type | @js_number_literal_type | @js_boolean_literal_type | @js_bigint_literal_type;
+@js_type_with_literal_value = @js_string_literal_type | @js_number_literal_type | @js_bigint_literal_type;
+js_type_literal_value(
+  unique int typ: @js_type_with_literal_value ref,
+  varchar(900) value: string ref);
+
+js_signature_types (
+  unique int id: @js_signature_type,
+  int kind: int ref,
+  varchar(900) tostring: string ref,
+  int type_parameters: int ref,
+  int required_params: int ref
+);
+
+js_signature_rest_parameter(
+  unique int sig: @js_signature_type ref,
+  int rest_param_arra_type: @js_type ref
+);
+
+case @js_signature_type.kind of
+  0 = @js_function_signature_type
+| 1 = @js_constructor_signature_type
+;
+
+#keyset[typ, kind, index]
+js_type_contains_signature (
+  int typ: @js_type ref,
+  int kind: int ref,  // constructor/call/index
+  int index: int ref, // ordering of overloaded signatures
+  int sig: @js_signature_type ref
+);
+
+#keyset[parent, index]
+js_signature_contains_type (
+  int child: @js_type ref,
+  int parent: @js_signature_type ref,
+  int index: int ref
+);
+
+#keyset[sig, index]
+js_signature_parameter_name (
+  int sig: @js_signature_type ref,
+  int index: int ref,
+  varchar(900) name: string ref
+);
+
+js_number_index_type (
+  unique int baseType: @js_type ref,
+  int propertyType: @js_type ref
+);
+
+js_string_index_type (
+  unique int baseType: @js_type ref,
+  int propertyType: @js_type ref
+);
+
+js_base_type_names(
+  int typeName: @js_symbol ref,
+  int baseTypeName: @js_symbol ref
+);
+
+js_self_types(
+  int typeName: @js_symbol ref,
+  int selfType: @js_type_reference ref
+);
+
+js_tuple_type_min_length(
+  unique int typ: @js_type ref,
+  int minLength: int ref
+);
+
+js_tuple_type_rest(
+  unique int typ: @js_type ref
+);
+
+// comments
+js_comments (unique int id: @js_comment,
+          int kind: int ref,
+          int toplevel: @js_toplevel ref,
+          varchar(900) text: string ref,
+          varchar(900) tostring: string ref);
+
+case @js_comment.kind of
+  0 = @js_slashslash_comment
+| 1 = @js_slashstar_comment
+| 2 = @js_doc_comment
+| 3 = @js_html_comment_start
+| 4 = @js_htmlcommentend;
+
+@js_html_comment = @js_html_comment_start | @js_htmlcommentend;
+@js_line_comment = @js_slashslash_comment | @js_html_comment;
+@js_block_comment = @js_slashstar_comment | @js_doc_comment;
+
+// source lines
+js_lines (unique int id: @js_line,
+       int toplevel: @js_toplevel ref,
+       varchar(900) text: string ref,
+       varchar(2) terminator: string ref);
+js_indentation (int file: @js_file ref,
+            int lineno: int ref,
+            varchar(1) indentChar: string ref,
+            int indentDepth: int ref);
+
+// JavaScript parse errors
+js_js_parse_errors (unique int id: @js_js_parse_error,
+        int toplevel: @js_toplevel ref,
+        varchar(900) message: string ref,
+        varchar(900) line: string ref);
+  
+// regular expressions
+#keyset[parent, idx]
+js_regexpterm (unique int id: @js_regexpterm,
+        int kind: int ref,
+        int parent: @js_regexpparent ref,
+        int idx: int ref,
+        varchar(900) tostring: string ref);
+        
+@js_regexpparent = @js_regexpterm | @js_regexp_literal | @js_string_literal;
+
+case @js_regexpterm.kind of
+   0 = @js_regexp_alt
+|  1 = @js_regexp_seq
+|  2 = @js_regexp_caret
+|  3 = @js_regexp_dollar
+|  4 = @js_regexp_wordboundary
+|  5 = @js_regexp_nonwordboundary
+|  6 = @js_regexp_positive_lookahead
+|  7 = @js_regexp_negative_lookahead
+|  8 = @js_regexp_star
+|  9 = @js_regexp_plus
+| 10 = @js_regexp_opt
+| 11 = @js_regexp_range
+| 12 = @js_regexp_dot
+| 13 = @js_regexp_group
+| 14 = @js_regexp_normal_constant
+| 15 = @js_regexp_hex_escape
+| 16 = @js_regexp_unicode_escape
+| 17 = @js_regexp_dec_escape
+| 18 = @js_regexp_oct_escape
+| 19 = @js_regexp_ctrl_escape
+| 20 = @js_regexp_char_class_escape
+| 21 = @js_regexp_id_escape
+| 22 = @js_regexp_backref
+| 23 = @js_regexp_char_class
+| 24 = @js_regexp_char_range
+| 25 = @js_regexp_positive_lookbehind
+| 26 = @js_regexp_negative_lookbehind
+| 27 = @js_regexp_unicode_property_escape;
+
+js_regexp_parse_errors (unique int id: @js_regexp_parse_error,
+    int regexp: @js_regexpterm ref,
+    varchar(900) message: string ref);
+
+@js_regexp_quantifier = @js_regexp_star | @js_regexp_plus | @js_regexp_opt | @js_regexp_range;
+@js_regexp_escape = @js_regexp_char_escape | @js_regexp_char_class_escape | @js_regexp_unicode_property_escape;
+@js_regexp_char_escape = @js_regexp_hex_escape | @js_regexp_unicode_escape | @js_regexp_dec_escape | @js_regexp_oct_escape | @js_regexp_ctrl_escape | @js_regexp_id_escape;
+@js_regexp_constant = @js_regexp_normal_constant | @js_regexp_char_escape;
+@js_regexp_lookahead = @js_regexp_positive_lookahead | @js_regexp_negative_lookahead;
+@js_regexp_lookbehind = @js_regexp_positive_lookbehind | @js_regexp_negative_lookbehind;
+@js_regexp_subpattern = @js_regexp_lookahead | @js_regexp_lookbehind;
+@js_regexp_anchor = @js_regexp_dollar | @js_regexp_caret;
+
+js_is_greedy (int id: @js_regexp_quantifier ref);
+js_range_quantifier_lower_bound (unique int id: @js_regexp_range ref, int lo: int ref);
+js_range_quantifier_upper_bound (unique int id: @js_regexp_range ref, int hi: int ref);
+js_is_capture (unique int id: @js_regexp_group ref, int number: int ref);
+js_is_named_capture (unique int id: @js_regexp_group ref, string name: string ref);
+js_is_inverted (int id: @js_regexp_char_class ref);
+js_regexp_const_value (unique int id: @js_regexp_constant ref, varchar(1) value: string ref);
+js_char_class_escape (unique int id: @js_regexp_char_class_escape ref, varchar(1) value: string ref);
+js_backref (unique int id: @js_regexp_backref ref, int value: int ref);
+js_named_backref (unique int id: @js_regexp_backref ref, string name: string ref);
+js_unicode_property_escapename (unique int id: @js_regexp_unicode_property_escape ref, string name: string ref);
+js_unicode_property_escapevalue (unique int id: @js_regexp_unicode_property_escape ref, string value: string ref);
+
+// tokens
+#keyset[toplevel, idx]
+js_tokeninfo (unique int id: @js_token,
+    int kind: int ref,
+    int toplevel: @js_toplevel ref,
+    int idx: int ref,
+    varchar(900) value: string ref);
+
+case @js_token.kind of
+  0 = @js_token_eof
+| 1 = @js_token_null_literal
+| 2 = @js_token_boolean_literal
+| 3 = @js_token_numeric_literal
+| 4 = @js_token_string_literal
+| 5 = @js_token_regular_expression
+| 6 = @js_token_identifier
+| 7 = @js_token_keyword
+| 8 = @js_token_punctuator;
+
+// associate comments with the token immediately following them (which may be EOF)
+js_next_token (int comment: @js_comment ref, int token: @js_token ref);
+
+// JSON
+#keyset[parent, idx]
+js_json (unique int id: @js_json_value,
+      int kind: int ref,
+      int parent: @js_json_parent ref,
+      int idx: int ref,
+      varchar(900) tostring: string ref);
+
+js_json_literals (varchar(900) value: string ref,
+      varchar(900) raw: string ref,
+      unique int expr: @js_json_value ref);
+
+js_json_properties (int obj: @js_json_object ref,
+      varchar(900) property: string ref,
+      int value: @js_json_value ref);
+
+js_json_errors (unique int id: @js_json_parse_error,
+      varchar(900) message: string ref);
+
+js_json_locations(unique int locatable: @js_json_locatable ref,
+      int location: @js_location_default ref);
+
+case @js_json_value.kind of
+  0 = @js_json_null
+| 1 = @js_json_boolean
+| 2 = @js_json_number
+| 3 = @js_json_string
+| 4 = @js_json_array
+| 5 = @js_json_object;
+
+@js_json_parent = @js_json_object | @js_json_array | @js_file;
+
+@js_json_locatable = @js_json_value | @js_json_parse_error;
+
+// locations
+@js_ast_node = @js_toplevel | @js_stmt | @js_expr | @js_property | @js_typeexpr;
+
+@js_locatable = @js_file 
+    | @js_ast_node
+    | @js_comment
+    | @js_line
+    | @js_js_parse_error | @js_regexp_parse_error
+    | @js_regexpterm
+    | @js_json_locatable
+    | @js_token
+    | @js_cfg_node
+    | @js_jsdoc | @js_jsdoc_type_expr | @js_jsdoc_tag
+    | @js_yaml_locatable
+    | @js_xmllocatable
+    | @js_configLocatable;
+
+js_hasLocation (unique int locatable: @js_locatable ref,
+    int location: @js_location ref);
+
+// CFG
+js_entry_cfg_node (unique int id: @js_entry_node, int container: @js_stmt_container ref);
+js_exit_cfg_node (unique int id: @js_exit_node, int container: @js_stmt_container ref);
+js_guard_node (unique int id: @js_guard_node, int kind: int ref, int test: @js_expr ref);
+case @js_guard_node.kind of
+  0 = @js_falsy_guard
+| 1 = @js_truthy_guard;
+@js_condition_guard = @js_falsy_guard | @js_truthy_guard;
+
+@js_synthetic_cfg_node = @js_entry_node | @js_exit_node | @js_guard_node;
+@js_cfg_node = @js_synthetic_cfg_node | @js_expr_parent;
+
+js_successor (int pred: @js_cfg_node ref, int succ: @js_cfg_node ref);
+
+// JSDoc comments
+js_jsdoc (unique int id: @js_jsdoc, varchar(900) description: string ref, int comment: @js_comment ref);
+#keyset[parent, idx]
+js_jsdoc_tags (unique int id: @js_jsdoc_tag, varchar(900) title: string ref,
+            int parent: @js_jsdoc ref, int idx: int ref, varchar(900) tostring: string ref);
+js_jsdoc_tag_descriptions (unique int tag: @js_jsdoc_tag ref, varchar(900) text: string ref);
+js_jsdoc_tag_names (unique int tag: @js_jsdoc_tag ref, varchar(900) text: string ref);
+
+#keyset[parent, idx]
+js_jsdoc_type_exprs (unique int id: @js_jsdoc_type_expr,
+                  int kind: int ref,
+                  int parent: @js_jsdoc_type_expr_parent ref,
+                  int idx: int ref,
+                  varchar(900) tostring: string ref);
+case @js_jsdoc_type_expr.kind of
+    0 = @js_jsdoc_any_type_expr
+|   1 = @js_jsdoc_null_type_expr
+|   2 = @js_jsdoc_undefined_type_expr
+|   3 = @js_jsdoc_unknown_type_expr
+|   4 = @js_jsdoc_void_type_expr
+|   5 = @js_jsdoc_named_type_expr
+|   6 = @js_jsdoc_applied_type_expr
+|   7 = @js_jsdoc_nullable_type_expr
+|   8 = @js_jsdoc_non_nullable_type_expr
+|   9 = @js_jsdoc_record_type_expr
+|  10 = @js_jsdoc_array_type_expr
+|  11 = @js_jsdoc_union_type_expr
+|  12 = @js_jsdoc_function_type_expr
+|  13 = @js_jsdoc_optional_type_expr
+|  14 = @js_jsdoc_rest_type_expr
+;
+
+#keyset[id, idx]
+js_jsdoc_record_field_name (int id: @js_jsdoc_record_type_expr ref, int idx: int ref, varchar(900) name: string ref);
+js_jsdoc_prefix_qualifier (int id: @js_jsdoc_type_expr ref);
+js_jsdoc_has_new_parameter (int fn: @js_jsdoc_function_type_expr ref);
+
+@js_jsdoc_type_expr_parent = @js_jsdoc_type_expr | @js_jsdoc_tag;
+
+js_jsdoc_errors (unique int id: @js_jsdoc_error, int tag: @js_jsdoc_tag ref, varchar(900) message: string ref, varchar(900) tostring: string ref);
+
+// YAML
+#keyset[parent, idx]
+js_yaml (unique int id: @js_yaml_node,
+      int kind: int ref,
+      int parent: @js_yaml_node_parent ref,
+      int idx: int ref,
+      varchar(900) tag: string ref,
+      varchar(900) tostring: string ref);
+
+case @js_yaml_node.kind of
+  0 = @js_yaml_scalar_node
+| 1 = @js_yaml_mapping_node
+| 2 = @js_yaml_sequence_node
+| 3 = @js_yaml_alias_node
+;
+
+@js_yaml_collection_node = @js_yaml_mapping_node | @js_yaml_sequence_node;
+
+@js_yaml_node_parent = @js_yaml_collection_node | @js_file;
+
+js_yaml_anchors (unique int node: @js_yaml_node ref,
+              varchar(900) anchor: string ref);
+
+js_yaml_aliases (unique int alias: @js_yaml_alias_node ref,
+              varchar(900) target: string ref);
+
+js_yaml_scalars (unique int scalar: @js_yaml_scalar_node ref,
+              int style: int ref,
+              varchar(900) value: string ref);
+
+js_yaml_errors (unique int id: @js_yaml_error,
+             varchar(900) message: string ref);
+
+js_yaml_locations(unique int locatable: @js_yaml_locatable ref,
+             int location: @js_location_default ref);
+
+@js_yaml_locatable = @js_yaml_node | @js_yaml_error;
+
+/* XML Files */
+
+js_xmlEncoding(
+  unique int id: @js_file ref,
+  varchar(900) encoding: string ref
+);
+
+js_xmlDTDs(
+  unique int id: @js_xmldtd,
+  varchar(900) root: string ref,
+  varchar(900) publicId: string ref,
+  varchar(900) systemId: string ref,
+  int fileid: @js_file ref
+);
+
+js_xmlElements(
+  unique int id: @js_xmlelement,
+  varchar(900) name: string ref,
+  int parentid: @js_xmlparent ref,
+  int idx: int ref,
+  int fileid: @js_file ref
+);
+
+js_xmlAttrs(
+  unique int id: @js_xmlattribute,
+  int elementid: @js_xmlelement ref,
+  varchar(900) name: string ref,
+  varchar(3600) value: string ref,
+  int idx: int ref,
+  int fileid: @js_file ref
+);
+
+js_xmlNs(
+  int id: @js_xmlnamespace,
+  varchar(900) prefixName: string ref,
+  varchar(900) URI: string ref,
+  int fileid: @js_file ref
+);
+
+js_xmlHasNs(
+  int elementId: @js_xmlnamespaceable ref,
+  int nsId: @js_xmlnamespace ref,
+  int fileid: @js_file ref
+);
+
+js_xmlComments(
+  unique int id: @js_xmlcomment,
+  varchar(3600) text: string ref,
+  int parentid: @js_xmlparent ref,
+  int fileid: @js_file ref
+);
+
+js_xmlChars(
+  unique int id: @js_xmlcharacters,
+  varchar(3600) text: string ref,
+  int parentid: @js_xmlparent ref,
+  int idx: int ref,
+  int isCDATA: int ref,
+  int fileid: @js_file ref
+);
+
+@js_xmlparent = @js_file | @js_xmlelement;
+@js_xmlnamespaceable = @js_xmlelement | @js_xmlattribute;
+
+js_xmllocations(
+  int xmlElement: @js_xmllocatable ref,
+  int location: @js_location_default ref
+);
+
+@js_xmllocatable = @js_xmlcharacters | @js_xmlelement | @js_xmlcomment | @js_xmlattribute | @js_xmldtd | @js_file | @js_xmlnamespace;
+
+@js_dataflownode = @js_expr | @js_function_decl_stmt | @js_class_decl_stmt | @js_namespace_declaration | @js_enum_declaration | @js_property;
+
+@js_optionalchainable = @js_call_expr | @js_propaccess;
+
+js_isOptionalChaining(int id: @js_optionalchainable ref);
+
+/*
+ * configuration files with key value pairs
+ */
+
+js_configs(
+  unique int id: @js_config
+);
+
+js_configNames(
+  unique int id: @js_configName,
+  int config: @js_config ref,
+  string name: string ref
+);
+
+js_configValues(
+  unique int id: @js_configValue,
+  int config: @js_config ref,
+  string value: string ref
+);
+
+js_configLocations(
+  int locatable: @js_configLocatable ref,
+  int location: @js_location_default ref
+);
+
+@js_configLocatable = @js_config | @js_configName | @js_configValue;
+
+/**
+ * The time taken for the extraction of a file.
+ * This table contains non-deterministic content.
+ *
+ * The sum of the `time` column for each (`file`, `timerKind`) pair
+ * is the total time taken for extraction of `file`.  The `extractionPhase`
+ * column provides a granular view of the extraction time of the file.
+ */
+js_extraction_time(
+   int file : @js_file ref,
+   // see `com.semmle.js.extractor.ExtractionMetrics.ExtractionPhase`.
+   int extractionPhase: int ref,
+   // 0 for the elapsed CPU time in nanoseconds, 1 for the elapsed wallclock time in nanoseconds
+   int timerKind: int ref,
+   float time: float ref
+)
+
+/**
+ * Non-timing related data for the extraction of a single file.
+ * This table contains non-deterministic content.
+ */
+js_extraction_data(
+   int file : @js_file ref,
+   // the absolute path to the cache file
+   varchar(900) cacheFile: string ref,
+   boolean fromCache: boolean ref,
+   int length: int ref
+)
+
+
+/**
+ * An invocation of the compiler. Note that more than one file may be
+ * compiled per invocation. For example, this command compiles three
+ * source files:
+ *
+ *   gcc -c f1.c f2.c f3.c
+ *
+ * The `id` simply identifies the invocation, while `cwd` is the working
+ * directory from which the compiler was invoked.
+ */
+cpp_compilations(
+    /**
+     * An invocation of the compiler. Note that more than one file may
+     * be compiled per invocation. For example, this command compiles
+     * three source files:
+     *
+     *   gcc -c f1.c f2.c f3.c
+     */
+    unique int id : @cpp_compilation,
+    string cwd : string ref
+);
+
+/**
+ * The arguments that were passed to the extractor for a compiler
+ * invocation. If `id` is for the compiler invocation
+ *
+ *   gcc -c f1.c f2.c f3.c
+ *
+ * then typically there will be rows for
+ *
+ * num | arg
+ * --- | ---
+ * 0   | *path to extractor*
+ * 1   | `--mimic`
+ * 2   | `/usr/bin/gcc`
+ * 3   | `-c`
+ * 4   | f1.c
+ * 5   | f2.c
+ * 6   | f3.c
+ */
+#keyset[id, num]
+cpp_compilation_args(
+    int id : @cpp_compilation ref,
+    int num : int ref,
+    string arg : string ref
+);
+
+/**
+ * The source files that are compiled by a compiler invocation.
+ * If `id` is for the compiler invocation
+ *
+ *   gcc -c f1.c f2.c f3.c
+ *
+ * then there will be rows for
+ *
+ * num | arg
+ * --- | ---
+ * 0   | f1.c
+ * 1   | f2.c
+ * 2   | f3.c
+ *
+ * Note that even if those files `#include` headers, those headers
+ * do not appear as rows.
+ */
+#keyset[id, num]
+cpp_compilation_compiling_files(
+    int id : @cpp_compilation ref,
+    int num : int ref,
+    int file : @cpp_file ref
+);
+
+/**
+ * The time taken by the extractor for a compiler invocation.
+ *
+ * For each file `num`, there will be rows for
+ *
+ * kind | seconds
+ * ---- | ---
+ * 1    | CPU seconds used by the extractor frontend
+ * 2    | Elapsed seconds during the extractor frontend
+ * 3    | CPU seconds used by the extractor backend
+ * 4    | Elapsed seconds during the extractor backend
+ */
+#keyset[id, num, kind]
+cpp_compilation_time(
+    int id : @cpp_compilation ref,
+    int num : int ref,
+    /* kind:
+       1 = frontend_cpu_seconds
+       2 = frontend_elapsed_seconds
+       3 = extractor_cpu_seconds
+       4 = extractor_elapsed_seconds
+    */
+    int kind : int ref,
+    float seconds : float ref
+);
+
+/**
+ * An error or warning generated by the extractor.
+ * The diagnostic message `diagnostic` was generated during compiler
+ * invocation `compilation`, and is the `file_number_diagnostic_number`th
+ * message generated while extracting the `file_number`th file of that
+ * invocation.
+ */
+#keyset[compilation, file_number, file_number_diagnostic_number]
+cpp_diagnostic_for(
+    int diagnostic : @cpp_diagnostic ref,
+    int compilation : @cpp_compilation ref,
+    int file_number : int ref,
+    int file_number_diagnostic_number : int ref
+);
+
+/**
+ * If extraction was successful, then `cpu_seconds` and
+ * `elapsed_seconds` are the CPU time and elapsed time (respectively)
+ * that extraction took for compiler invocation `id`.
+ */
+cpp_compilation_finished(
+    unique int id : @cpp_compilation ref,
+    float cpu_seconds : float ref,
+    float elapsed_seconds : float ref
+);
+
+
+/**
+ * External data, loaded from CSV files during snapshot creation. See
+ * [Tutorial: Incorporating external data](https://help.semmle.com/wiki/display/SD/Tutorial%3A+Incorporating+external+data)
+ * for more information.
+ */
+cpp_externalData(
+    int id : @cpp_externalDataElement,
+    string path : string ref,
+    int column: int ref,
+    string value : string ref
+);
+
+/**
+ * The date of the snapshot.
+ */
+cpp_snapshotDate(unique date snapshotDate : date ref);
+
+/**
+ * Data used by the 'duplicate code' detection.
+ */
+cpp_duplicateCode(
+    unique int id : @cpp_duplication,
+    string relativePath : string ref,
+    int equivClass : int ref
+);
+
+/**
+ * Data used by the 'similar code' detection.
+ */
+cpp_similarCode(
+    unique int id : @cpp_similarity,
+    string relativePath : string ref,
+    int equivClass : int ref
+);
+
+/**
+ * Data used by the 'duplicate code' and 'similar code' detection.
+ */
+@cpp_duplication_or_similarity = @cpp_duplication | @cpp_similarity
+
+/**
+ * Data used by the 'duplicate code' and 'similar code' detection.
+ */
+#keyset[id, offset]
+cpp_tokens(
+    int id : @cpp_duplication_or_similarity ref,
+    int offset : int ref,
+    int beginLine : int ref,
+    int beginColumn : int ref,
+    int endLine : int ref,
+    int endColumn : int ref
+);
+
+/**
+ * Information about packages that provide code used during compilation.
+ * The `id` is just a unique identifier.
+ * The `namespace` is typically the name of the package manager that
+ * provided the package (e.g. "dpkg" or "yum").
+ * The `package_name` is the name of the package, and `version` is its
+ * version (as a string).
+ */
+cpp_external_packages(
+    unique int id: @cpp_external_package,
+    string namespace : string ref,
+    string package_name : string ref,
+    string version : string ref
+);
+
+/**
+ * Holds if File `fileid` was provided by package `package`.
+ */
+cpp_header_to_external_package(
+    int fileid : @cpp_file ref,
+    int package : @cpp_external_package ref
+);
+
+/*
+ * Version history
+ */
+
+cpp_svnentries(
+    unique int id : @cpp_svnentry,
+    string revision : string ref,
+    string author : string ref,
+    date revisionDate : date ref,
+    int changeSize : int ref
+)
+
+cpp_svnaffectedfiles(
+    int id : @cpp_svnentry ref,
+    int file : @cpp_file ref,
+    string action : string ref
+)
+
+cpp_svnentrymsg(
+    unique int id : @cpp_svnentry ref,
+    string message : string ref
+)
+
+cpp_svnchurn(
+    int commit : @cpp_svnentry ref,
+    int file : @cpp_file ref,
+    int addedLines : int ref,
+    int deletedLines : int ref
+)
+
+/*
+ * C++ dbscheme
+ */
+
+@cpp_location = @cpp_location_stmt | @cpp_location_expr | @cpp_location_default ;
+
+/**
+ * The location of an element that is not an expression or a statement.
+ * The location spans column `startcolumn` of line `startline` to
+ * column `endcolumn` of line `endline` in file `file`.
+ * For more information, see
+ * [Locations](https://help.semmle.com/QL/learn-ql/ql/locations.html).
+ */
+cpp_locations_default(
+    /** The location of an element that is not an expression or a statement. */
+    unique int id: @cpp_location_default,
+    int container: @cpp_container ref,
+    int startLine: int ref,
+    int startColumn: int ref,
+    int endLine: int ref,
+    int endColumn: int ref
+);
+
+/**
+ * The location of a statement.
+ * The location spans column `startcolumn` of line `startline` to
+ * column `endcolumn` of line `endline` in file `file`.
+ * For more information, see
+ * [Locations](https://help.semmle.com/QL/learn-ql/ql/locations.html).
+ */
+cpp_locations_stmt(
+    /** The location of a statement. */
+    unique int id: @cpp_location_stmt,
+    int container: @cpp_container ref,
+    int startLine: int ref,
+    int startColumn: int ref,
+    int endLine: int ref,
+    int endColumn: int ref
+);
+
+/**
+ * The location of an expression.
+ * The location spans column `startcolumn` of line `startline` to
+ * column `endcolumn` of line `endline` in file `file`.
+ * For more information, see
+ * [Locations](https://help.semmle.com/QL/learn-ql/ql/locations.html).
+ */
+cpp_locations_expr(
+    /** The location of an expression. */
+    unique int id: @cpp_location_expr,
+    int container: @cpp_container ref,
+    int startLine: int ref,
+    int startColumn: int ref,
+    int endLine: int ref,
+    int endColumn: int ref
+);
+
+/** An element for which line-count information is available. */
+@cpp_sourceline = @cpp_file | @cpp_function | @cpp_variable | @cpp_enumconstant | @cpp_xmllocatable;
+
+cpp_numlines(
+    int element_id: @cpp_sourceline ref,
+    int num_lines: int ref,
+    int num_code: int ref,
+    int num_comment: int ref
+);
+
+cpp_diagnostics(
+    unique int id: @cpp_diagnostic,
+    int severity: int ref,
+    string error_tag: string ref,
+    string error_message: string ref,
+    string full_error_message: string ref,
+    int location: @cpp_location_default ref
+);
+
+/*
+  fromSource(0) = unknown,
+  fromSource(1) = from source,
+  fromSource(2) = from library
+*/
+cpp_files(
+    unique int id: @cpp_file,
+    string name: string ref,
+    string simple: string ref,
+    string ext: string ref,
+    int fromSource: int ref
+);
+
+cpp_folders(
+    unique int id: @cpp_folder,
+    string name: string ref,
+    string simple: string ref
+);
+
+@cpp_container = @cpp_folder | @cpp_file
+
+cpp_containerparent(
+    int parent: @cpp_container ref,
+    unique int child: @cpp_container ref
+);
+
+cpp_fileannotations(
+    int id: @cpp_file ref,
+    int kind: int ref,
+    string name: string ref,
+    string value: string ref
+);
+
+cpp_inmacroexpansion(
+    int id: @cpp_element ref,
+    int inv: @cpp_macroinvocation ref
+);
+
+cpp_affectedbymacroexpansion(
+    int id: @cpp_element ref,
+    int inv: @cpp_macroinvocation ref
+);
+
+/*
+  case @cpp_macroinvocations.kind of
+    1 = macro expansion
+  | 2 = other macro reference
+  ;
+*/
+cpp_macroinvocations(
+    unique int id: @cpp_macroinvocation,
+    int macro_id: @cpp_ppd_define ref,
+    int location: @cpp_location_default ref,
+    int kind: int ref
+);
+
+cpp_macroparent(
+    unique int id: @cpp_macroinvocation ref,
+    int parent_id: @cpp_macroinvocation ref
+);
+
+// a macroinvocation may be part of another location
+// the way to find a constant expression that uses a macro
+// is thus to find a constant expression that has a location
+// to which a macro invocation is bound
+cpp_macrolocationbind(
+    int id: @cpp_macroinvocation ref,
+    int location: @cpp_location ref
+);
+
+#keyset[invocation, argument_index]
+cpp_macro_argument_unexpanded(
+    int invocation: @cpp_macroinvocation ref,
+    int argument_index: int ref,
+    string text: string ref
+);
+
+#keyset[invocation, argument_index]
+cpp_macro_argument_expanded(
+    int invocation: @cpp_macroinvocation ref,
+    int argument_index: int ref,
+    string text: string ref
+);
+
+/*
+  case @cpp_function.kind of
+    1 = normal
+  | 2 = constructor
+  | 3 = destructor
+  | 4 = conversion
+  | 5 = operator
+  | 6 = builtin     // GCC built-in functions, e.g. __builtin___memcpy_chk
+  ;
+*/
+cpp_functions(
+    unique int id: @cpp_function,
+    string name: string ref,
+    int kind: int ref
+);
+
+cpp_function_entry_point(int id: @cpp_function ref, unique int entry_point: @cpp_stmt ref);
+
+cpp_function_return_type(int id: @cpp_function ref, int return_type: @cpp_type ref);
+
+/** If `function` is a coroutine, then this gives the
+    std::experimental::resumable_traits instance associated with it,
+    and the variables representing the `handle` and `promise` for it. */
+cpp_coroutine(
+  unique int function: @cpp_function ref,
+  int traits: @cpp_type ref,
+  int handle: @cpp_variable ref,
+  int promise: @cpp_variable ref
+);
+
+/** The `new` function used for allocating the coroutine state, if any. */
+cpp_coroutine_new(
+  unique int function: @cpp_function ref,
+  int new: @cpp_function ref
+);
+
+/** The `delete` function used for deallocating the coroutine state, if any. */
+cpp_coroutine_delete(
+  unique int function: @cpp_function ref,
+  int delete: @cpp_function ref
+);
+
+cpp_purefunctions(unique int id: @cpp_function ref);
+
+cpp_function_deleted(unique int id: @cpp_function ref);
+
+cpp_function_defaulted(unique int id: @cpp_function ref);
+
+cpp_member_function_this_type(unique int id: @cpp_function ref, int this_type: @cpp_type ref);
+
+#keyset[id, type_id]
+cpp_fun_decls(
+    int id: @cpp_fun_decl,
+    int function: @cpp_function ref,
+    int type_id: @cpp_type ref,
+    string name: string ref,
+    int location: @cpp_location_default ref
+);
+cpp_fun_def(unique int id: @cpp_fun_decl ref);
+cpp_fun_specialized(unique int id: @cpp_fun_decl ref);
+cpp_fun_implicit(unique int id: @cpp_fun_decl ref);
+cpp_fun_decl_specifiers(
+    int id: @cpp_fun_decl ref,
+    string name: string ref
+)
+#keyset[fun_decl, index]
+cpp_fun_decl_throws(
+    int fun_decl: @cpp_fun_decl ref,
+    int index: int ref,
+    int type_id: @cpp_type ref
+);
+/* an empty throw specification is different from none */
+cpp_fun_decl_empty_throws(unique int fun_decl: @cpp_fun_decl ref);
+cpp_fun_decl_noexcept(
+    int fun_decl: @cpp_fun_decl ref,
+    int constant: @cpp_expr ref
+);
+cpp_fun_decl_empty_noexcept(int fun_decl: @cpp_fun_decl ref);
+cpp_fun_decl_typedef_type(
+    unique int fun_decl: @cpp_fun_decl ref,
+    int typedeftype_id: @cpp_usertype ref
+);
+
+cpp_param_decl_bind(
+    unique int id: @cpp_var_decl ref,
+    int index: int ref,
+    int fun_decl: @cpp_fun_decl ref
+);
+
+#keyset[id, type_id]
+cpp_var_decls(
+    int id: @cpp_var_decl,
+    int variable: @cpp_variable ref,
+    int type_id: @cpp_type ref,
+    string name: string ref,
+    int location: @cpp_location_default ref
+);
+cpp_var_def(unique int id: @cpp_var_decl ref);
+cpp_var_decl_specifiers(
+    int id: @cpp_var_decl ref,
+    string name: string ref
+)
+
+cpp_type_decls(
+    unique int id: @cpp_type_decl,
+    int type_id: @cpp_type ref,
+    int location: @cpp_location_default ref
+);
+cpp_type_def(unique int id: @cpp_type_decl ref);
+cpp_type_decl_top(
+    unique int type_decl: @cpp_type_decl ref
+);
+
+cpp_namespace_decls(
+    unique int id: @cpp_namespace_decl,
+    int namespace_id: @cpp_namespace ref,
+    int location: @cpp_location_default ref,
+    int bodylocation: @cpp_location_default ref
+);
+
+cpp_usings(
+    unique int id: @cpp_using,
+    int element_id: @cpp_element ref,
+    int location: @cpp_location_default ref
+);
+
+/** The element which contains the `using` declaration. */
+cpp_using_container(
+    int parent: @cpp_element ref,
+    int child: @cpp_using ref
+);
+
+cpp_static_asserts(
+    unique int id: @cpp_static_assert,
+    int condition : @cpp_expr ref,
+    string message : string ref,
+    int location: @cpp_location_default ref,
+    int enclosing : @cpp_element ref
+);
+
+// each function has an ordered list of parameters
+#keyset[id, type_id]
+#keyset[function, index, type_id]
+cpp_params(
+    int id: @cpp_parameter,
+    int function: @cpp_functionorblock ref,
+    int index: int ref,
+    int type_id: @cpp_type ref
+);
+
+cpp_overrides(int new: @cpp_function ref, int old: @cpp_function ref);
+
+#keyset[id, type_id]
+cpp_membervariables(
+    int id: @cpp_membervariable,
+    int type_id: @cpp_type ref,
+    string name: string ref
+);
+
+#keyset[id, type_id]
+cpp_globalvariables(
+    int id: @cpp_globalvariable,
+    int type_id: @cpp_type ref,
+    string name: string ref
+);
+
+#keyset[id, type_id]
+cpp_localvariables(
+    int id: @cpp_localvariable,
+    int type_id: @cpp_type ref,
+    string name: string ref
+);
+
+cpp_autoderivation(
+    unique int var: @cpp_variable ref,
+    int derivation_type: @cpp_type ref
+);
+
+cpp_enumconstants(
+    unique int id: @cpp_enumconstant,
+    int parent: @cpp_usertype ref,
+    int index: int ref,
+    int type_id: @cpp_type ref,
+    string name: string ref,
+    int location: @cpp_location_default ref
+);
+
+@cpp_variable = @cpp_localscopevariable | @cpp_globalvariable | @cpp_membervariable;
+
+@cpp_localscopevariable = @cpp_localvariable | @cpp_parameter;
+
+/*
+  Built-in types are the fundamental types, e.g., integral, floating, and void.
+
+  case @cpp_builtintype.kind of
+    1 = error
+  | 2 = unknown
+  | 3 = void
+  | 4 = boolean
+  | 5 = char
+  | 6 = unsigned_char
+  | 7 = signed_char
+  | 8 = short
+  | 9 = unsigned_short
+  | 10 = signed_short
+  | 11 = int
+  | 12 = unsigned_int
+  | 13 = signed_int
+  | 14 = long
+  | 15 = unsigned_long
+  | 16 = signed_long
+  | 17 = long_long
+  | 18 = unsigned_long_long
+  | 19 = signed_long_long
+  | 20 = __int8                 // Microsoft-specific
+  | 21 = __int16                // Microsoft-specific
+  | 22 = __int32                // Microsoft-specific
+  | 23 = __int64                // Microsoft-specific
+  | 24 = float
+  | 25 = double
+  | 26 = long_double
+  | 27 = _Complex_float         // C99-specific
+  | 28 = _Complex_double        // C99-specific
+  | 29 = _Complex_long double   // C99-specific
+  | 30 = _Imaginary_float       // C99-specific
+  | 31 = _Imaginary_double      // C99-specific
+  | 32 = _Imaginary_long_double // C99-specific
+  | 33 = wchar_t                // Microsoft-specific
+  | 34 = decltype_nullptr       // C++11
+  | 35 = __int128
+  | 36 = unsigned___int128
+  | 37 = signed___int128
+  | 38 = __float128
+  | 39 = _Complex___float128
+  | 40 = _Decimal32
+  | 41 = _Decimal64
+  | 42 = _Decimal128
+  | 43 = char16_t
+  | 44 = char32_t
+  | 45 = _Float32
+  | 46 = _Float32x
+  | 47 = _Float64
+  | 48 = _Float64x
+  | 49 = _Float128
+  | 50 = _Float128x
+  | 51 = char8_t
+  ;
+*/
+cpp_builtintypes(
+    unique int id: @cpp_builtintype,
+    string name: string ref,
+    int kind: int ref,
+    int size: int ref,
+    int sign: int ref,
+    int alignment: int ref
+);
+
+/*
+  Derived types are types that are directly derived from existing types and
+  point to, refer to, transform type data to return a new type.
+
+  case @cpp_derivedtype.kind of
+    1 = pointer
+  | 2 = reference
+  | 3 = type_with_specifiers
+  | 4 = array
+  | 5 = gnu_vector
+  | 6 = routineptr
+  | 7 = routinereference
+  | 8 = rvalue_reference // C++11
+// ... 9 type_conforming_to_protocols deprecated
+  | 10 = block
+  ;
+*/
+cpp_derivedtypes(
+    unique int id: @cpp_derivedtype,
+    string name: string ref,
+    int kind: int ref,
+    int type_id: @cpp_type ref
+);
+
+cpp_pointerishsize(unique int id: @cpp_derivedtype ref,
+    int size: int ref,
+    int alignment: int ref);
+
+cpp_arraysizes(
+    unique int id: @cpp_derivedtype ref,
+    int num_elements: int ref,
+    int bytesize: int ref,
+    int alignment: int ref
+);
+
+cpp_typedefbase(
+    unique int id: @cpp_usertype ref,
+    int type_id: @cpp_type ref
+);
+
+cpp_decltypes(
+    unique int id: @cpp_decltype,
+    int expr: @cpp_expr ref,
+    int base_type: @cpp_type ref,
+    boolean parentheses_would_change_meaning: boolean ref
+);
+
+/*
+  case @cpp_usertype.kind of
+    1 = struct
+  | 2 = class
+  | 3 = union
+  | 4 = enum
+  | 5 = typedef                       // classic C: typedef typedef type name
+  | 6 = template
+  | 7 = template_parameter
+  | 8 = template_template_parameter
+  | 9 = proxy_class                   // a proxy class associated with a template parameter
+// ... 10 objc_class deprecated
+// ... 11 objc_protocol deprecated
+// ... 12 objc_category deprecated
+  | 13 = scoped_enum
+  | 14 = using_alias                  // a using name = type style typedef
+  ;
+*/
+cpp_usertypes(
+    unique int id: @cpp_usertype,
+    string name: string ref,
+    int kind: int ref
+);
+
+cpp_usertypesize(
+    unique int id: @cpp_usertype ref,
+    int size: int ref,
+    int alignment: int ref
+);
+
+cpp_usertype_final(unique int id: @cpp_usertype ref);
+
+cpp_usertype_uuid(
+    unique int id: @cpp_usertype ref,
+    unique string uuid: string ref
+);
+
+cpp_mangled_name(
+    unique int id: @cpp_declaration ref,
+    int mangled_name : @cpp_mangledname
+);
+
+cpp_is_pod_class(unique int id: @cpp_usertype ref);
+cpp_is_standard_layout_class(unique int id: @cpp_usertype ref);
+
+cpp_is_complete(unique int id: @cpp_usertype ref);
+
+cpp_is_class_template(unique int id: @cpp_usertype ref);
+cpp_class_instantiation(
+    int to: @cpp_usertype ref,
+    int from: @cpp_usertype ref
+);
+cpp_class_template_argument(
+    int type_id: @cpp_usertype ref,
+    int index: int ref,
+    int arg_type: @cpp_type ref
+);
+cpp_class_template_argument_value(
+    int type_id: @cpp_usertype ref,
+    int index: int ref,
+    int arg_value: @cpp_expr ref
+);
+
+cpp_is_proxy_class_for(
+    unique int id: @cpp_usertype ref,
+    unique int templ_param_id: @cpp_usertype ref
+);
+
+cpp_type_mentions(
+    unique int id: @cpp_type_mention,
+    int type_id: @cpp_type ref,
+    int location: @cpp_location ref,
+    // a_symbol_reference_kind from the EDG frontend.  See symbol_ref.h there.
+    int kind: int ref
+);
+
+cpp_is_function_template(unique int id: @cpp_function ref);
+cpp_function_instantiation(
+    unique int to: @cpp_function ref,
+    int from: @cpp_function ref
+);
+cpp_function_template_argument(
+    int function_id: @cpp_function ref,
+    int index: int ref,
+    int arg_type: @cpp_type ref
+);
+cpp_function_template_argument_value(
+    int function_id: @cpp_function ref,
+    int index: int ref,
+    int arg_value: @cpp_expr ref
+);
+
+cpp_is_variable_template(unique int id: @cpp_variable ref);
+cpp_variable_instantiation(
+    unique int to: @cpp_variable ref,
+    int from: @cpp_variable ref
+);
+cpp_variable_template_argument(
+    int variable_id: @cpp_variable ref,
+    int index: int ref,
+    int arg_type: @cpp_type ref
+);
+cpp_variable_template_argument_value(
+    int variable_id: @cpp_variable ref,
+    int index: int ref,
+    int arg_value: @cpp_expr ref
+);
+
+/*
+  Fixed point types
+  precision(1) = short, precision(2) = default, precision(3) = long
+  is_unsigned(1) = unsigned is_unsigned(2) = signed
+  is_fract_type(1) = declared with _Fract
+  saturating(1) = declared with _Sat
+*/
+/* TODO
+cpp_fixedpointtypes(
+    unique int id: @cpp_fixedpointtype,
+    int precision: int ref,
+    int is_unsigned: int ref,
+    int is_fract_type: int ref,
+    int saturating: int ref);
+*/
+
+cpp_routinetypes(
+    unique int id: @cpp_routinetype,
+    int return_type: @cpp_type ref
+);
+
+cpp_routinetypeargs(
+    int routine: @cpp_routinetype ref,
+    int index: int ref,
+    int type_id: @cpp_type ref
+);
+
+cpp_ptrtomembers(
+    unique int id: @cpp_ptrtomember,
+    int type_id: @cpp_type ref,
+    int class_id: @cpp_type ref
+);
+
+/*
+ specifiers for types, functions, and variables
+
+    "public",
+    "protected",
+    "private",
+
+    "const",
+    "volatile",
+    "static",
+
+    "pure",
+    "virtual",
+    "sealed", // Microsoft
+    "__interface", // Microsoft
+    "inline",
+    "explicit",
+
+    "near", // near far extension
+    "far", // near far extension
+    "__ptr32", // Microsoft
+    "__ptr64", // Microsoft
+    "__sptr", // Microsoft
+    "__uptr", // Microsoft
+    "dllimport", // Microsoft
+    "dllexport", // Microsoft
+    "thread", // Microsoft
+    "naked", // Microsoft
+    "microsoft_inline", // Microsoft
+    "forceinline", // Microsoft
+    "selectany", // Microsoft
+    "nothrow", // Microsoft
+    "novtable", // Microsoft
+    "noreturn", // Microsoft
+    "noinline", // Microsoft
+    "noalias", // Microsoft
+    "restrict", // Microsoft
+*/
+
+cpp_specifiers(
+    unique int id: @cpp_specifier,
+    unique string str: string ref
+);
+
+cpp_typespecifiers(
+    int type_id: @cpp_type ref,
+    int spec_id: @cpp_specifier ref
+);
+
+cpp_funspecifiers(
+    int func_id: @cpp_function ref,
+    int spec_id: @cpp_specifier ref
+);
+
+cpp_varspecifiers(
+    int var_id: @cpp_accessible ref,
+    int spec_id: @cpp_specifier ref
+);
+
+cpp_attributes(
+    unique int id: @cpp_attribute,
+    int kind: int ref,
+    string name: string ref,
+    string name_space: string ref,
+    int location: @cpp_location_default ref
+);
+
+case @cpp_attribute.kind of
+  0 = @cpp_gnuattribute
+| 1 = @cpp_stdattribute
+| 2 = @cpp_declspec
+| 3 = @cpp_msattribute
+| 4 = @cpp_alignas
+// ... 5 @cpp_objc_propertyattribute deprecated
+;
+
+cpp_attribute_args(
+    unique int id: @cpp_attribute_arg,
+    int kind: int ref,
+    int attribute: @cpp_attribute ref,
+    int index: int ref,
+    int location: @cpp_location_default ref
+);
+
+case @cpp_attribute_arg.kind of
+  0 = @cpp_attribute_arg_empty
+| 1 = @cpp_attribute_arg_token
+| 2 = @cpp_attribute_arg_constant
+| 3 = @cpp_attribute_arg_type
+;
+
+cpp_attribute_arg_value(
+    unique int arg: @cpp_attribute_arg ref,
+    string value: string ref
+);
+cpp_attribute_arg_type(
+    unique int arg: @cpp_attribute_arg ref,
+    int type_id: @cpp_type ref
+);
+cpp_attribute_arg_name(
+    unique int arg: @cpp_attribute_arg ref,
+    string name: string ref
+);
+
+cpp_typeattributes(
+    int type_id: @cpp_type ref,
+    int spec_id: @cpp_attribute ref
+);
+
+cpp_funcattributes(
+    int func_id: @cpp_function ref,
+    int spec_id: @cpp_attribute ref
+);
+
+cpp_varattributes(
+    int var_id: @cpp_accessible ref,
+    int spec_id: @cpp_attribute ref
+);
+
+cpp_stmtattributes(
+    int stmt_id: @cpp_stmt ref,
+    int spec_id: @cpp_attribute ref
+);
+
+@cpp_type = @cpp_builtintype
+      | @cpp_derivedtype
+      | @cpp_usertype
+      /* TODO | @cpp_fixedpointtype */
+      | @cpp_routinetype
+      | @cpp_ptrtomember
+      | @cpp_decltype;
+
+cpp_unspecifiedtype(
+    unique int type_id: @cpp_type ref,
+    int unspecified_type_id: @cpp_type ref
+);
+
+cpp_member(
+    int parent: @cpp_type ref,
+    int index: int ref,
+    int child: @cpp_member ref
+);
+
+@cpp_enclosingfunction_child = @cpp_usertype | @cpp_variable | @cpp_namespace
+
+cpp_enclosingfunction(
+    unique int child: @cpp_enclosingfunction_child ref,
+    int parent: @cpp_function ref
+);
+
+cpp_derivations(
+    unique int derivation: @cpp_derivation,
+    int sub: @cpp_type ref,
+    int index: int ref,
+    int super: @cpp_type ref,
+    int location: @cpp_location_default ref
+);
+
+cpp_derspecifiers(
+    int der_id: @cpp_derivation ref,
+    int spec_id: @cpp_specifier ref
+);
+
+/**
+ * Contains the byte offset of the base class subobject within the derived
+ * class. Only holds for non-virtual base classes, but see table
+ * `virtual_base_offsets` for offsets of virtual base class subobjects.
+ */
+cpp_direct_base_offsets(
+    unique int der_id: @cpp_derivation ref,
+    int offset: int ref
+);
+
+/**
+ * Contains the byte offset of the virtual base class subobject for class
+ * `super` within a most-derived object of class `sub`. `super` can be either a
+ * direct or indirect base class.
+ */
+#keyset[sub, super]
+cpp_virtual_base_offsets(
+    int sub: @cpp_usertype ref,
+    int super: @cpp_usertype ref,
+    int offset: int ref
+);
+
+cpp_frienddecls(
+    unique int id: @cpp_frienddecl,
+    int type_id: @cpp_type ref,
+    int decl_id: @cpp_declaration ref,
+    int location: @cpp_location_default ref
+);
+
+@cpp_declaredtype = @cpp_usertype ;
+
+@cpp_declaration = @cpp_function
+             | @cpp_declaredtype
+             | @cpp_variable
+             | @cpp_enumconstant
+             | @cpp_frienddecl;
+
+@cpp_member = @cpp_membervariable
+        | @cpp_function
+        | @cpp_declaredtype
+        | @cpp_enumconstant;
+
+@cpp_locatable = @cpp_diagnostic
+           | @cpp_declaration
+           | @cpp_ppd_include
+           | @cpp_ppd_define
+           | @cpp_macroinvocation
+           /*| @cpp_funcall*/
+           | @cpp_xmllocatable
+           | @cpp_attribute
+           | @cpp_attribute_arg;
+
+@cpp_namedscope = @cpp_namespace | @cpp_usertype;
+
+@cpp_element = @cpp_locatable
+         | @cpp_file
+         | @cpp_folder
+         | @cpp_specifier
+         | @cpp_type
+         | @cpp_expr
+         | @cpp_namespace
+         | @cpp_initialiser
+         | @cpp_stmt
+         | @cpp_derivation
+         | @cpp_comment
+         | @cpp_preprocdirect
+         | @cpp_fun_decl
+         | @cpp_var_decl
+         | @cpp_type_decl
+         | @cpp_namespace_decl
+         | @cpp_using
+         | @cpp_namequalifier
+         | @cpp_specialnamequalifyingelement
+         | @cpp_static_assert
+         | @cpp_type_mention
+         | @cpp_lambdacapture;
+
+@cpp_exprparent = @cpp_element;
+
+cpp_comments(
+    unique int id: @cpp_comment,
+    string contents: string ref,
+    int location: @cpp_location_default ref
+);
+
+cpp_commentbinding(
+    int id: @cpp_comment ref,
+    int element: @cpp_element ref
+);
+
+cpp_exprconv(
+    int converted: @cpp_expr ref,
+    unique int conversion: @cpp_expr ref
+);
+
+cpp_compgenerated(unique int id: @cpp_element ref);
+
+/**
+ * `destructor_call` destructs the `i`'th entity that should be
+ * destructed following `element`. Note that entities should be
+ * destructed in reverse construction order, so for a given `element`
+ * these should be called from highest to lowest `i`.
+ */
+#keyset[element, destructor_call]
+#keyset[element, i]
+cpp_synthetic_destructor_call(
+    int element: @cpp_element ref,
+    int i: int ref,
+    int destructor_call: @cpp_routineexpr ref
+);
+
+cpp_namespaces(
+    unique int id: @cpp_namespace,
+    string name: string ref
+);
+
+cpp_namespace_inline(
+    unique int id: @cpp_namespace ref
+);
+
+cpp_namespacembrs(
+    int parentid: @cpp_namespace ref,
+    unique int memberid: @cpp_namespacembr ref
+);
+
+@cpp_namespacembr = @cpp_declaration | @cpp_namespace;
+
+cpp_exprparents(
+    int expr_id: @cpp_expr ref,
+    int child_index: int ref,
+    int parent_id: @cpp_exprparent ref
+);
+
+cpp_expr_isload(unique int expr_id: @cpp_expr ref);
+
+@cpp_cast = @cpp_c_style_cast
+      | @cpp_const_cast
+      | @cpp_dynamic_cast
+      | @cpp_reinterpret_cast
+      | @cpp_static_cast
+      ;
+
+/*
+case @cpp_conversion.kind of
+  0 = @cpp_simple_conversion           // a numeric conversion, qualification conversion, or a reinterpret_cast
+| 1 = @cpp_bool_conversion             // conversion to 'bool'
+| 2 = @cpp_base_class_conversion       // a derived-to-base conversion
+| 3 = @cpp_derived_class_conversion    // a base-to-derived conversion
+| 4 = @cpp_pm_base_class_conversion    // a derived-to-base conversion of a pointer to member
+| 5 = @cpp_pm_derived_class_conversion // a base-to-derived conversion of a pointer to member
+| 6 = @cpp_glvalue_adjust              // an adjustment of the type of a glvalue
+| 7 = @cpp_prvalue_adjust              // an adjustment of the type of a prvalue
+;
+*/
+/**
+ * Describes the semantics represented by a cast expression. This is largely
+ * independent of the source syntax of the cast, so it is separate from the
+ * regular expression kind.
+ */
+cpp_conversionkinds(
+    unique int expr_id: @cpp_cast ref,
+    int kind: int ref
+);
+
+@cpp_conversion = @cpp_cast
+            | @cpp_array_to_pointer
+            | @cpp_parexpr
+            | @cpp_reference_to
+            | @cpp_ref_indirect
+            | @cpp_temp_init
+            ;
+
+/*
+case @cpp_funbindexpr.kind of
+  0 = @cpp_normal_call  // a normal call
+| 1 = @cpp_virtual_call // a virtual call
+| 2 = @cpp_adl_call     // a call whose target is only found by ADL
+;
+*/
+cpp_iscall(unique int caller: @cpp_funbindexpr ref, int kind: int ref);
+
+cpp_numtemplatearguments(
+    unique int expr_id: @cpp_expr ref,
+    int num: int ref
+);
+
+cpp_specialnamequalifyingelements(
+    unique int id: @cpp_specialnamequalifyingelement,
+    unique string name: string ref
+);
+
+@cpp_namequalifiableelement = @cpp_expr | @cpp_namequalifier;
+@cpp_namequalifyingelement = @cpp_namespace
+                       | @cpp_specialnamequalifyingelement
+                       | @cpp_usertype;
+
+cpp_namequalifiers(
+    unique int id: @cpp_namequalifier,
+    unique int qualifiableelement: @cpp_namequalifiableelement ref,
+    int qualifyingelement: @cpp_namequalifyingelement ref,
+    int location: @cpp_location_default ref
+);
+
+cpp_varbind(
+    int expr: @cpp_varbindexpr ref,
+    int var: @cpp_accessible ref
+);
+
+cpp_funbind(
+    int expr: @cpp_funbindexpr ref,
+    int fun: @cpp_function ref
+);
+
+@cpp_any_new_expr = @cpp_new_expr
+              | @cpp_new_array_expr;
+
+@cpp_new_or_delete_expr = @cpp_any_new_expr
+                    | @cpp_delete_expr
+                    | @cpp_delete_array_expr;
+
+@cpp_prefix_crement_expr = @cpp_preincrexpr | @cpp_predecrexpr;
+
+@cpp_postfix_crement_expr = @cpp_postincrexpr | @cpp_postdecrexpr;
+
+@cpp_increment_expr = @cpp_preincrexpr | @cpp_postincrexpr;
+
+@cpp_decrement_expr = @cpp_predecrexpr | @cpp_postdecrexpr;
+
+@cpp_crement_expr = @cpp_increment_expr | @cpp_decrement_expr;
+
+@cpp_un_arith_op_expr = @cpp_arithnegexpr
+                  | @cpp_unaryplusexpr
+                  | @cpp_conjugation
+                  | @cpp_realpartexpr
+                  | @cpp_imagpartexpr
+                  | @cpp_crement_expr
+                  ;
+
+@cpp_un_bitwise_op_expr = @cpp_complementexpr;
+
+@cpp_un_log_op_expr = @cpp_notexpr;
+
+@cpp_un_op_expr = @cpp_address_of
+            | @cpp_indirect
+            | @cpp_un_arith_op_expr
+            | @cpp_un_bitwise_op_expr
+            | @cpp_builtinaddressof
+            | @cpp_vec_fill
+            | @cpp_un_log_op_expr
+            | @cpp_co_await
+            | @cpp_co_yield
+            ;
+
+@cpp_bin_log_op_expr = @cpp_andlogicalexpr | @cpp_orlogicalexpr;
+
+@cpp_cmp_op_expr = @cpp_eq_op_expr | @cpp_rel_op_expr;
+
+@cpp_eq_op_expr = @cpp_eqexpr | @cpp_neexpr;
+
+@cpp_rel_op_expr = @cpp_gtexpr
+             | @cpp_ltexpr
+             | @cpp_geexpr
+             | @cpp_leexpr
+             | @cpp_spaceshipexpr
+             ;
+
+@cpp_bin_bitwise_op_expr = @cpp_lshiftexpr
+                     | @cpp_rshiftexpr
+                     | @cpp_andexpr
+                     | @cpp_orexpr
+                     | @cpp_xorexpr
+                     ;
+
+@cpp_p_arith_op_expr = @cpp_paddexpr
+                 | @cpp_psubexpr
+                 | @cpp_pdiffexpr
+                 ;
+
+@cpp_bin_arith_op_expr = @cpp_addexpr
+                   | @cpp_subexpr
+                   | @cpp_mulexpr
+                   | @cpp_divexpr
+                   | @cpp_remexpr
+                   | @cpp_jmulexpr
+                   | @cpp_jdivexpr
+                   | @cpp_fjaddexpr
+                   | @cpp_jfaddexpr
+                   | @cpp_fjsubexpr
+                   | @cpp_jfsubexpr
+                   | @cpp_minexpr
+                   | @cpp_maxexpr
+                   | @cpp_p_arith_op_expr
+                   ;
+
+@cpp_bin_op_expr = @cpp_bin_arith_op_expr
+             | @cpp_bin_bitwise_op_expr
+             | @cpp_cmp_op_expr
+             | @cpp_bin_log_op_expr
+             ;
+
+@cpp_op_expr = @cpp_un_op_expr
+         | @cpp_bin_op_expr
+         | @cpp_assign_expr
+         | @cpp_conditionalexpr
+         ;
+
+@cpp_assign_arith_expr = @cpp_assignaddexpr
+                   | @cpp_assignsubexpr
+                   | @cpp_assignmulexpr
+                   | @cpp_assigndivexpr
+                   | @cpp_assignremexpr
+                   ;
+
+@cpp_assign_bitwise_expr = @cpp_assignandexpr
+                     | @cpp_assignorexpr
+                     | @cpp_assignxorexpr
+                     | @cpp_assignlshiftexpr
+                     | @cpp_assignrshiftexpr
+                     | @cpp_assignpaddexpr
+                     | @cpp_assignpsubexpr
+                     ;
+
+@cpp_assign_op_expr = @cpp_assign_arith_expr | @cpp_assign_bitwise_expr
+
+@cpp_assign_expr = @cpp_assignexpr | @cpp_assign_op_expr
+
+/*
+  case @cpp_allocator.form of
+    0 = plain
+  | 1 = alignment
+  ;
+*/
+
+/**
+ * The allocator function associated with a `new` or `new[]` expression.
+ * The `form` column specified whether the allocation call contains an alignment
+ * argument.
+ */
+cpp_expr_allocator(
+    unique int expr: @cpp_any_new_expr ref,
+    int func: @cpp_function ref,
+    int form: int ref
+);
+
+/*
+  case @cpp_deallocator.form of
+    0 = plain
+  | 1 = size
+  | 2 = alignment
+  | 3 = size_and_alignment
+  ;
+*/
+
+/**
+ * The deallocator function associated with a `delete`, `delete[]`, `new`, or
+ * `new[]` expression. For a `new` or `new[]` expression, the deallocator is the
+ * one used to free memory if the initialization throws an exception.
+ * The `form` column specifies whether the deallocation call contains a size
+ * argument, and alignment argument, or both.
+ */
+cpp_expr_deallocator(
+    unique int expr: @cpp_new_or_delete_expr ref,
+    int func: @cpp_function ref,
+    int form: int ref
+);
+
+/**
+ * Holds if the `@cpp_conditionalexpr` is of the two operand form
+ * `guard ? : false`.
+ */
+cpp_expr_cond_two_operand(
+    unique int cond: @cpp_conditionalexpr ref
+);
+
+/**
+ * The guard of `@cpp_conditionalexpr` `guard ? true : false`
+ */
+cpp_expr_cond_guard(
+    unique int cond: @cpp_conditionalexpr ref,
+    int guard: @cpp_expr ref
+);
+
+/**
+ * The expression used when the guard of `@cpp_conditionalexpr`
+ * `guard ? true : false` holds. For the two operand form
+ * `guard ?: false` consider using `expr_cond_guard` instead.
+ */
+cpp_expr_cond_true(
+    unique int cond: @cpp_conditionalexpr ref,
+    int true: @cpp_expr ref
+);
+
+/**
+ * The expression used when the guard of `@cpp_conditionalexpr`
+ * `guard ? true : false` does not hold.
+ */
+cpp_expr_cond_false(
+    unique int cond: @cpp_conditionalexpr ref,
+    int false: @cpp_expr ref
+);
+
+/** A string representation of the value. */
+cpp_values(
+    unique int id: @cpp_value,
+    string str: string ref
+);
+
+/** The actual text in the source code for the value, if any. */
+cpp_valuetext(
+    unique int id: @cpp_value ref,
+    string text: string ref
+);
+
+cpp_valuebind(
+    int val: @cpp_value ref,
+    unique int expr: @cpp_expr ref
+);
+
+cpp_fieldoffsets(
+    unique int id: @cpp_variable ref,
+    int byteoffset: int ref,
+    int bitoffset: int ref
+);
+
+cpp_bitfield(
+    unique int id: @cpp_variable ref,
+    int bits: int ref,
+    int declared_bits: int ref
+);
+
+/* TODO
+cpp_memberprefix(
+    int member: @cpp_expr ref,
+    int prefix: @cpp_expr ref
+);
+*/
+
+/*
+   kind(1) = mbrcallexpr
+   kind(2) = mbrptrcallexpr
+   kind(3) = mbrptrmbrcallexpr
+   kind(4) = ptrmbrptrmbrcallexpr
+   kind(5) = mbrreadexpr // x.y
+   kind(6) = mbrptrreadexpr // p->y
+   kind(7) = mbrptrmbrreadexpr // x.*pm
+   kind(8) = mbrptrmbrptrreadexpr // x->*pm
+   kind(9) = staticmbrreadexpr // static x.y
+   kind(10) = staticmbrptrreadexpr // static p->y
+*/
+/* TODO
+cpp_memberaccess(
+    int member: @cpp_expr ref,
+    int kind: int ref
+);
+*/
+
+cpp_initialisers(
+    unique int init: @cpp_initialiser,
+    int var: @cpp_accessible ref,
+    unique int expr: @cpp_expr ref,
+    int location: @cpp_location_expr ref
+);
+
+/**
+ * An ancestor for the expression, for cases in which we cannot
+ * otherwise find the expression's parent.
+ */
+cpp_expr_ancestor(
+    int exp: @cpp_expr ref,
+    int ancestor: @cpp_element ref
+);
+
+cpp_exprs(
+    unique int id: @cpp_expr,
+    int kind: int ref,
+    int location: @cpp_location_expr ref
+);
+
+/*
+  case @cpp_value.category of
+    1 = prval
+  | 2 = xval
+  | 3 = lval
+  ;
+*/
+cpp_expr_types(
+    int id: @cpp_expr ref,
+    int typeid: @cpp_type ref,
+    int value_category: int ref
+);
+
+case @cpp_expr.kind of
+    1 = @cpp_errorexpr
+|   2 = @cpp_address_of // & AddressOfExpr
+|   3 = @cpp_reference_to // ReferenceToExpr (implicit?)
+|   4 = @cpp_indirect // * PointerDereferenceExpr
+|   5 = @cpp_ref_indirect // ReferenceDereferenceExpr (implicit?)
+// ...
+|   8 = @cpp_array_to_pointer // (???)
+|   9 = @cpp_vacuous_destructor_call // VacuousDestructorCall
+// ...
+|  11 = @cpp_assume // Microsoft
+|  12 = @cpp_parexpr
+|  13 = @cpp_arithnegexpr
+|  14 = @cpp_unaryplusexpr
+|  15 = @cpp_complementexpr
+|  16 = @cpp_notexpr
+|  17 = @cpp_conjugation // GNU ~ operator
+|  18 = @cpp_realpartexpr // GNU __real
+|  19 = @cpp_imagpartexpr // GNU __imag
+|  20 = @cpp_postincrexpr
+|  21 = @cpp_postdecrexpr
+|  22 = @cpp_preincrexpr
+|  23 = @cpp_predecrexpr
+|  24 = @cpp_conditionalexpr
+|  25 = @cpp_addexpr
+|  26 = @cpp_subexpr
+|  27 = @cpp_mulexpr
+|  28 = @cpp_divexpr
+|  29 = @cpp_remexpr
+|  30 = @cpp_jmulexpr // C99 mul imaginary
+|  31 = @cpp_jdivexpr // C99 div imaginary
+|  32 = @cpp_fjaddexpr // C99 add real + imaginary
+|  33 = @cpp_jfaddexpr // C99 add imaginary + real
+|  34 = @cpp_fjsubexpr // C99 sub real - imaginary
+|  35 = @cpp_jfsubexpr // C99 sub imaginary - real
+|  36 = @cpp_paddexpr // pointer add (pointer + int or int + pointer)
+|  37 = @cpp_psubexpr // pointer sub (pointer - integer)
+|  38 = @cpp_pdiffexpr // difference between two pointers
+|  39 = @cpp_lshiftexpr
+|  40 = @cpp_rshiftexpr
+|  41 = @cpp_andexpr
+|  42 = @cpp_orexpr
+|  43 = @cpp_xorexpr
+|  44 = @cpp_eqexpr
+|  45 = @cpp_neexpr
+|  46 = @cpp_gtexpr
+|  47 = @cpp_ltexpr
+|  48 = @cpp_geexpr
+|  49 = @cpp_leexpr
+|  50 = @cpp_minexpr // GNU minimum
+|  51 = @cpp_maxexpr // GNU maximum
+|  52 = @cpp_assignexpr
+|  53 = @cpp_assignaddexpr
+|  54 = @cpp_assignsubexpr
+|  55 = @cpp_assignmulexpr
+|  56 = @cpp_assigndivexpr
+|  57 = @cpp_assignremexpr
+|  58 = @cpp_assignlshiftexpr
+|  59 = @cpp_assignrshiftexpr
+|  60 = @cpp_assignandexpr
+|  61 = @cpp_assignorexpr
+|  62 = @cpp_assignxorexpr
+|  63 = @cpp_assignpaddexpr // assign pointer add
+|  64 = @cpp_assignpsubexpr // assign pointer sub
+|  65 = @cpp_andlogicalexpr
+|  66 = @cpp_orlogicalexpr
+|  67 = @cpp_commaexpr
+|  68 = @cpp_subscriptexpr // access to member of an array, e.g., a[5]
+// ...  69 @cpp_objc_subscriptexpr deprecated
+// ...  70 @cpp_cmdaccess deprecated
+// ...
+|  73 = @cpp_virtfunptrexpr
+|  74 = @cpp_callexpr
+// ...  75 @cpp_msgexpr_normal deprecated
+// ...  76 @cpp_msgexpr_super deprecated
+// ...  77 @cpp_atselectorexpr deprecated
+// ...  78 @cpp_atprotocolexpr deprecated
+|  79 = @cpp_vastartexpr
+|  80 = @cpp_vaargexpr
+|  81 = @cpp_vaendexpr
+|  82 = @cpp_vacopyexpr
+// ...  83 @cpp_atencodeexpr deprecated
+|  84 = @cpp_varaccess
+|  85 = @cpp_thisaccess
+// ...  86 @cpp_objc_box_expr deprecated
+|  87 = @cpp_new_expr
+|  88 = @cpp_delete_expr
+|  89 = @cpp_throw_expr
+|  90 = @cpp_condition_decl // a variable declared in a condition, e.g., if(int x = y > 2)
+|  91 = @cpp_braced_init_list
+|  92 = @cpp_type_id
+|  93 = @cpp_runtime_sizeof
+|  94 = @cpp_runtime_alignof
+|  95 = @cpp_sizeof_pack
+|  96 = @cpp_expr_stmt // GNU extension
+|  97 = @cpp_routineexpr
+|  98 = @cpp_type_operand // used to access a type in certain contexts (haven't found any examples yet....)
+|  99 = @cpp_offsetofexpr // offsetof ::= type and field
+| 100 = @cpp_hasassignexpr // __has_assign ::= type
+| 101 = @cpp_hascopyexpr // __has_copy ::= type
+| 102 = @cpp_hasnothrowassign // __has_nothrow_assign ::= type
+| 103 = @cpp_hasnothrowconstr // __has_nothrow_constructor ::= type
+| 104 = @cpp_hasnothrowcopy // __has_nothrow_copy ::= type
+| 105 = @cpp_hastrivialassign // __has_trivial_assign ::= type
+| 106 = @cpp_hastrivialconstr // __has_trivial_constructor ::= type
+| 107 = @cpp_hastrivialcopy // __has_trivial_copy ::= type
+| 108 = @cpp_hasuserdestr // __has_user_destructor ::= type
+| 109 = @cpp_hasvirtualdestr // __has_virtual_destructor ::= type
+| 110 = @cpp_isabstractexpr // __is_abstract ::= type
+| 111 = @cpp_isbaseofexpr // __is_base_of ::= type type
+| 112 = @cpp_isclassexpr // __is_class ::= type
+| 113 = @cpp_isconvtoexpr // __is_convertible_to ::= type type
+| 114 = @cpp_isemptyexpr // __is_empty ::= type
+| 115 = @cpp_isenumexpr // __is_enum ::= type
+| 116 = @cpp_ispodexpr // __is_pod ::= type
+| 117 = @cpp_ispolyexpr // __is_polymorphic ::= type
+| 118 = @cpp_isunionexpr // __is_union ::= type
+| 119 = @cpp_typescompexpr // GNU __builtin_types_compatible ::= type type
+| 120 = @cpp_intaddrexpr // EDG internal builtin, used to implement offsetof
+// ...
+| 122 = @cpp_hastrivialdestructor // __has_trivial_destructor ::= type
+| 123 = @cpp_literal
+| 124 = @cpp_uuidof
+| 127 = @cpp_aggregateliteral
+| 128 = @cpp_delete_array_expr
+| 129 = @cpp_new_array_expr
+// ... 130 @cpp_objc_array_literal deprecated
+// ... 131 @cpp_objc_dictionary_literal deprecated
+| 132 = @cpp_foldexpr
+// ...
+| 200 = @cpp_ctordirectinit
+| 201 = @cpp_ctorvirtualinit
+| 202 = @cpp_ctorfieldinit
+| 203 = @cpp_ctordelegatinginit
+| 204 = @cpp_dtordirectdestruct
+| 205 = @cpp_dtorvirtualdestruct
+| 206 = @cpp_dtorfielddestruct
+// ...
+| 210 = @cpp_static_cast
+| 211 = @cpp_reinterpret_cast
+| 212 = @cpp_const_cast
+| 213 = @cpp_dynamic_cast
+| 214 = @cpp_c_style_cast
+| 215 = @cpp_lambdaexpr
+| 216 = @cpp_param_ref
+| 217 = @cpp_noopexpr
+// ...
+| 294 = @cpp_istriviallyconstructibleexpr
+| 295 = @cpp_isdestructibleexpr
+| 296 = @cpp_isnothrowdestructibleexpr
+| 297 = @cpp_istriviallydestructibleexpr
+| 298 = @cpp_istriviallyassignableexpr
+| 299 = @cpp_isnothrowassignableexpr
+| 300 = @cpp_istrivialexpr
+| 301 = @cpp_isstandardlayoutexpr
+| 302 = @cpp_istriviallycopyableexpr
+| 303 = @cpp_isliteraltypeexpr
+| 304 = @cpp_hastrivialmoveconstructorexpr
+| 305 = @cpp_hastrivialmoveassignexpr
+| 306 = @cpp_hasnothrowmoveassignexpr
+| 307 = @cpp_isconstructibleexpr
+| 308 = @cpp_isnothrowconstructibleexpr
+| 309 = @cpp_hasfinalizerexpr
+| 310 = @cpp_isdelegateexpr
+| 311 = @cpp_isinterfaceclassexpr
+| 312 = @cpp_isrefarrayexpr
+| 313 = @cpp_isrefclassexpr
+| 314 = @cpp_issealedexpr
+| 315 = @cpp_issimplevalueclassexpr
+| 316 = @cpp_isvalueclassexpr
+| 317 = @cpp_isfinalexpr
+| 319 = @cpp_noexceptexpr
+| 320 = @cpp_builtinshufflevector
+| 321 = @cpp_builtinchooseexpr
+| 322 = @cpp_builtinaddressof
+| 323 = @cpp_vec_fill
+| 324 = @cpp_builtinconvertvector
+| 325 = @cpp_builtincomplex
+| 326 = @cpp_spaceshipexpr
+| 327 = @cpp_co_await
+| 328 = @cpp_co_yield
+| 329 = @cpp_temp_init
+;
+
+@cpp_var_args_expr = @cpp_vastartexpr
+               | @cpp_vaendexpr
+               | @cpp_vaargexpr
+               | @cpp_vacopyexpr
+               ;
+
+@cpp_builtin_op = @cpp_var_args_expr
+            | @cpp_noopexpr
+            | @cpp_offsetofexpr
+            | @cpp_intaddrexpr
+            | @cpp_hasassignexpr
+            | @cpp_hascopyexpr
+            | @cpp_hasnothrowassign
+            | @cpp_hasnothrowconstr
+            | @cpp_hasnothrowcopy
+            | @cpp_hastrivialassign
+            | @cpp_hastrivialconstr
+            | @cpp_hastrivialcopy
+            | @cpp_hastrivialdestructor
+            | @cpp_hasuserdestr
+            | @cpp_hasvirtualdestr
+            | @cpp_isabstractexpr
+            | @cpp_isbaseofexpr
+            | @cpp_isclassexpr
+            | @cpp_isconvtoexpr
+            | @cpp_isemptyexpr
+            | @cpp_isenumexpr
+            | @cpp_ispodexpr
+            | @cpp_ispolyexpr
+            | @cpp_isunionexpr
+            | @cpp_typescompexpr
+            | @cpp_builtinshufflevector
+            | @cpp_builtinconvertvector
+            | @cpp_builtinaddressof
+            | @cpp_istriviallyconstructibleexpr
+            | @cpp_isdestructibleexpr
+            | @cpp_isnothrowdestructibleexpr
+            | @cpp_istriviallydestructibleexpr
+            | @cpp_istriviallyassignableexpr
+            | @cpp_isnothrowassignableexpr
+            | @cpp_isstandardlayoutexpr
+            | @cpp_istriviallycopyableexpr
+            | @cpp_isliteraltypeexpr
+            | @cpp_hastrivialmoveconstructorexpr
+            | @cpp_hastrivialmoveassignexpr
+            | @cpp_hasnothrowmoveassignexpr
+            | @cpp_isconstructibleexpr
+            | @cpp_isnothrowconstructibleexpr
+            | @cpp_hasfinalizerexpr
+            | @cpp_isdelegateexpr
+            | @cpp_isinterfaceclassexpr
+            | @cpp_isrefarrayexpr
+            | @cpp_isrefclassexpr
+            | @cpp_issealedexpr
+            | @cpp_issimplevalueclassexpr
+            | @cpp_isvalueclassexpr
+            | @cpp_isfinalexpr
+            | @cpp_builtinchooseexpr
+            | @cpp_builtincomplex
+            ;
+
+cpp_new_allocated_type(
+    unique int expr: @cpp_new_expr ref,
+    int type_id: @cpp_type ref
+);
+
+cpp_new_array_allocated_type(
+    unique int expr: @cpp_new_array_expr ref,
+    int type_id: @cpp_type ref
+);
+
+/**
+ * The field being initialized by an initializer expression within an aggregate
+ * initializer for a class/struct/union.
+ */
+#keyset[aggregate, field]
+cpp_aggregate_field_init(
+    int aggregate: @cpp_aggregateliteral ref,
+    int initializer: @cpp_expr ref,
+    int field: @cpp_membervariable ref
+);
+
+/**
+ * The index of the element being initialized by an initializer expression
+ * within an aggregate initializer for an array.
+ */
+#keyset[aggregate, element_index]
+cpp_aggregate_array_init(
+    int aggregate: @cpp_aggregateliteral ref,
+    int initializer: @cpp_expr ref,
+    int element_index: int ref
+);
+
+@cpp_ctorinit = @cpp_ctordirectinit
+          | @cpp_ctorvirtualinit
+          | @cpp_ctorfieldinit
+          | @cpp_ctordelegatinginit;
+@cpp_dtordestruct = @cpp_dtordirectdestruct
+              | @cpp_dtorvirtualdestruct
+              | @cpp_dtorfielddestruct;
+
+
+cpp_condition_decl_bind(
+    unique int expr: @cpp_condition_decl ref,
+    unique int decl: @cpp_declaration ref
+);
+
+cpp_typeid_bind(
+    unique int expr: @cpp_type_id ref,
+    int type_id: @cpp_type ref
+);
+
+cpp_uuidof_bind(
+    unique int expr: @cpp_uuidof ref,
+    int type_id: @cpp_type ref
+);
+
+@cpp_runtime_sizeof_or_alignof = @cpp_runtime_sizeof | @cpp_runtime_alignof;
+
+cpp_sizeof_bind(
+    unique int expr: @cpp_runtime_sizeof_or_alignof ref,
+    int type_id: @cpp_type ref
+);
+
+cpp_code_block(
+    unique int block: @cpp_literal ref,
+    unique int routine: @cpp_function ref
+);
+
+cpp_lambdas(
+    unique int expr: @cpp_lambdaexpr ref,
+    string default_capture: string ref,
+    boolean has_explicit_return_type: boolean ref
+);
+
+cpp_lambda_capture(
+    unique int id: @cpp_lambdacapture,
+    int lambda: @cpp_lambdaexpr ref,
+    int index: int ref,
+    int field: @cpp_membervariable ref,
+    boolean captured_by_reference: boolean ref,
+    boolean is_implicit: boolean ref,
+    int location: @cpp_location_default ref
+);
+
+@cpp_funbindexpr = @cpp_routineexpr
+             | @cpp_new_expr
+             | @cpp_delete_expr
+             | @cpp_delete_array_expr
+             | @cpp_ctordirectinit
+             | @cpp_ctorvirtualinit
+             | @cpp_ctordelegatinginit
+             | @cpp_dtordirectdestruct
+             | @cpp_dtorvirtualdestruct;
+
+@cpp_varbindexpr = @cpp_varaccess | @cpp_ctorfieldinit | @cpp_dtorfielddestruct;
+@cpp_addressable = @cpp_function | @cpp_variable ;
+@cpp_accessible = @cpp_addressable | @cpp_enumconstant ;
+
+@cpp_access = @cpp_varaccess | @cpp_routineexpr ;
+
+cpp_fold(
+    int expr: @cpp_foldexpr ref,
+    string operator: string ref,
+    boolean is_left_fold: boolean ref
+);
+
+cpp_stmts(
+    unique int id: @cpp_stmt,
+    int kind: int ref,
+    int location: @cpp_location_stmt ref
+);
+
+case @cpp_stmt.kind of
+    1 = @cpp_stmt_expr
+|   2 = @cpp_stmt_if
+|   3 = @cpp_stmt_while
+|   4 = @cpp_stmt_goto
+|   5 = @cpp_stmt_label
+|   6 = @cpp_stmt_return
+|   7 = @cpp_stmt_block
+|   8 = @cpp_stmt_end_test_while // do { ... } while ( ... )
+|   9 = @cpp_stmt_for
+|  10 = @cpp_stmt_switch_case
+|  11 = @cpp_stmt_switch
+|  13 = @cpp_stmt_asm // "asm" statement or the body of an asm function
+|  15 = @cpp_stmt_try_block
+|  16 = @cpp_stmt_microsoft_try // Microsoft
+|  17 = @cpp_stmt_decl
+|  18 = @cpp_stmt_set_vla_size // C99
+|  19 = @cpp_stmt_vla_decl // C99
+|  25 = @cpp_stmt_assigned_goto // GNU
+|  26 = @cpp_stmt_empty
+|  27 = @cpp_stmt_continue
+|  28 = @cpp_stmt_break
+|  29 = @cpp_stmt_range_based_for // C++11
+// ...  30 @cpp_stmt_at_autoreleasepool_block deprecated
+// ...  31 @cpp_stmt_objc_for_in deprecated
+// ...  32 @cpp_stmt_at_synchronized deprecated
+|  33 = @cpp_stmt_handler
+// ...  34 @cpp_stmt_finally_end deprecated
+|  35 = @cpp_stmt_constexpr_if
+|  37 = @cpp_stmt_co_return
+;
+
+cpp_type_vla(
+    int type_id: @cpp_type ref,
+    int decl: @cpp_stmt_vla_decl ref
+);
+
+cpp_variable_vla(
+    int var: @cpp_variable ref,
+    int decl: @cpp_stmt_vla_decl ref
+);
+
+cpp_if_then(
+    unique int if_stmt: @cpp_stmt_if ref,
+    int then_id: @cpp_stmt ref
+);
+
+cpp_if_else(
+    unique int if_stmt: @cpp_stmt_if ref,
+    int else_id: @cpp_stmt ref
+);
+
+cpp_constexpr_if_then(
+    unique int constexpr_if_stmt: @cpp_stmt_constexpr_if ref,
+    int then_id: @cpp_stmt ref
+);
+
+cpp_constexpr_if_else(
+    unique int constexpr_if_stmt: @cpp_stmt_constexpr_if ref,
+    int else_id: @cpp_stmt ref
+);
+
+cpp_while_body(
+    unique int while_stmt: @cpp_stmt_while ref,
+    int body_id: @cpp_stmt ref
+);
+
+cpp_do_body(
+    unique int do_stmt: @cpp_stmt_end_test_while ref,
+    int body_id: @cpp_stmt ref
+);
+
+#keyset[switch_stmt, index]
+cpp_switch_case(
+    int switch_stmt: @cpp_stmt_switch ref,
+    int index: int ref,
+    int case_id: @cpp_stmt_switch_case ref
+);
+
+cpp_switch_body(
+    unique int switch_stmt: @cpp_stmt_switch ref,
+    int body_id: @cpp_stmt ref
+);
+
+cpp_for_initialization(
+    unique int for_stmt: @cpp_stmt_for ref,
+    int init_id: @cpp_stmt ref
+);
+
+cpp_for_condition(
+    unique int for_stmt: @cpp_stmt_for ref,
+    int condition_id: @cpp_expr ref
+);
+
+cpp_for_update(
+    unique int for_stmt: @cpp_stmt_for ref,
+    int update_id: @cpp_expr ref
+);
+
+cpp_for_body(
+    unique int for_stmt: @cpp_stmt_for ref,
+    int body_id: @cpp_stmt ref
+);
+
+@cpp_stmtparent = @cpp_stmt | @cpp_expr_stmt ;
+cpp_stmtparents(
+    unique int id: @cpp_stmt ref,
+    int index: int ref,
+    int parent: @cpp_stmtparent ref
+);
+
+cpp_ishandler(unique int block: @cpp_stmt_block ref);
+
+@cpp_cfgnode = @cpp_stmt | @cpp_expr | @cpp_function | @cpp_initialiser ;
+
+cpp_stmt_decl_bind(
+    int stmt: @cpp_stmt_decl ref,
+    int num: int ref,
+    int decl: @cpp_declaration ref
+);
+
+cpp_stmt_decl_entry_bind(
+    int stmt: @cpp_stmt_decl ref,
+    int num: int ref,
+    int decl_entry: @cpp_element ref
+);
+
+@cpp_functionorblock = @cpp_function | @cpp_stmt_block;
+
+cpp_blockscope(
+    unique int block: @cpp_stmt_block ref,
+    int enclosing: @cpp_functionorblock ref
+);
+
+@cpp_jump = @cpp_stmt_goto | @cpp_stmt_break | @cpp_stmt_continue;
+
+@cpp_jumporlabel = @cpp_jump | @cpp_stmt_label | @cpp_literal;
+
+cpp_jumpinfo(
+    unique int id: @cpp_jumporlabel ref,
+    string str: string ref,
+    int target: @cpp_stmt ref
+);
+
+cpp_preprocdirects(
+    unique int id: @cpp_preprocdirect,
+    int kind: int ref,
+    int location: @cpp_location_default ref
+);
+case @cpp_preprocdirect.kind of
+   0 = @cpp_ppd_if
+|  1 = @cpp_ppd_ifdef
+|  2 = @cpp_ppd_ifndef
+|  3 = @cpp_ppd_elif
+|  4 = @cpp_ppd_else
+|  5 = @cpp_ppd_endif
+|  6 = @cpp_ppd_plain_include
+|  7 = @cpp_ppd_define
+|  8 = @cpp_ppd_undef
+|  9 = @cpp_ppd_line
+| 10 = @cpp_ppd_error
+| 11 = @cpp_ppd_pragma
+| 12 = @cpp_ppd_objc_import
+| 13 = @cpp_ppd_include_next
+| 18 = @cpp_ppd_warning
+;
+
+@cpp_ppd_include = @cpp_ppd_plain_include | @cpp_ppd_objc_import | @cpp_ppd_include_next;
+
+@cpp_ppd_branch = @cpp_ppd_if | @cpp_ppd_ifdef | @cpp_ppd_ifndef | @cpp_ppd_elif;
+
+cpp_preprocpair(
+    int begin : @cpp_ppd_branch ref,
+    int elseelifend : @cpp_preprocdirect ref
+);
+
+cpp_preproctrue(int branch : @cpp_ppd_branch ref);
+cpp_preprocfalse(int branch : @cpp_ppd_branch ref);
+
+cpp_preproctext(
+    unique int id: @cpp_preprocdirect ref,
+    string head: string ref,
+    string body: string ref
+);
+
+cpp_includes(
+    unique int id: @cpp_ppd_include ref,
+    int included: @cpp_file ref
+);
+
+cpp_link_targets(
+    unique int id: @cpp_link_target,
+    int binary: @cpp_file ref
+);
+
+cpp_link_parent(
+    int element : @cpp_element ref,
+    int link_target : @cpp_link_target ref
+);
+
+/* XML Files */
+
+cpp_xmlEncoding(unique int id: @cpp_file ref, string encoding: string ref);
+
+cpp_xmlDTDs(
+    unique int id: @cpp_xmldtd,
+    string root: string ref,
+    string publicId: string ref,
+    string systemId: string ref,
+    int fileid: @cpp_file ref
+);
+
+cpp_xmlElements(
+    unique int id: @cpp_xmlelement,
+    string name: string ref,
+    int parentid: @cpp_xmlparent ref,
+    int idx: int ref,
+    int fileid: @cpp_file ref
+);
+
+cpp_xmlAttrs(
+    unique int id: @cpp_xmlattribute,
+    int elementid: @cpp_xmlelement ref,
+    string name: string ref,
+    string value: string ref,
+    int idx: int ref,
+    int fileid: @cpp_file ref
+);
+
+cpp_xmlNs(
+    int id: @cpp_xmlnamespace,
+    string prefixName: string ref,
+    string URI: string ref,
+    int fileid: @cpp_file ref
+);
+
+cpp_xmlHasNs(
+    int elementId: @cpp_xmlnamespaceable ref,
+    int nsId: @cpp_xmlnamespace ref,
+    int fileid: @cpp_file ref
+);
+
+cpp_xmlComments(
+    unique int id: @cpp_xmlcomment,
+    string text: string ref,
+    int parentid: @cpp_xmlparent ref,
+    int fileid: @cpp_file ref
+);
+
+cpp_xmlChars(
+    unique int id: @cpp_xmlcharacters,
+    string text: string ref,
+    int parentid: @cpp_xmlparent ref,
+    int idx: int ref,
+    int isCDATA: int ref,
+    int fileid: @cpp_file ref
+);
+
+@cpp_xmlparent = @cpp_file | @cpp_xmlelement;
+@cpp_xmlnamespaceable = @cpp_xmlelement | @cpp_xmlattribute;
+
+cpp_xmllocations(
+    int xmlElement: @cpp_xmllocatable ref,
+    int location: @cpp_location_default ref
+);
+
+@cpp_xmllocatable = @cpp_xmlcharacters
+              | @cpp_xmlelement
+              | @cpp_xmlcomment
+              | @cpp_xmlattribute
+              | @cpp_xmldtd
+              | @cpp_file
+              | @cpp_xmlnamespace;
