@@ -7,17 +7,16 @@ function write(filename, data) { fs.writeFileSync(filename, data); }
 function writeLines(filename, lines) { write(filename, lines.join('\n')); }
 
 // variables
-const JS_DBSCHEME = "my.javascript.dbscheme";
+const JAVA_DBSCHEME = "my.java.dbscheme";
 const CPP_DBSCHEME = "my.cpp.dbscheme";
-const JS_STAT = JS_DBSCHEME + ".stats";
+const JAVA_STAT = JAVA_DBSCHEME + ".stats";
 const CPP_STAT = CPP_DBSCHEME + ".stats";
 const MERGED_DBSCHEME = "my.merged.dbscheme";
 const MERGED_STAT = MERGED_DBSCHEME + ".stats";
 
 // dbscheme
-var js_dbscheme = readLines(JS_DBSCHEME);
+var java_dbscheme = readLines(JS_DBSCHEME);
 var cpp_dbscheme = readLines(CPP_DBSCHEME);
-var idx = cpp_dbscheme.findIndex((l) => l.includes("sourceLocationPrefix"));
 var lastOpen = -1;
 var startIdx, endIdx;
 for (let i = 0; i < cpp_dbscheme.length; ++i) {
@@ -32,10 +31,10 @@ for (let i = 0; i < cpp_dbscheme.length; ++i) {
   }
 }
 cpp_dbscheme.splice(startIdx, endIdx - startIdx + 1);
-writeLines(MERGED_DBSCHEME, js_dbscheme.concat(cpp_dbscheme));
+writeLines(MERGED_DBSCHEME, java_dbscheme.concat(cpp_dbscheme));
 
 // dbscheme.stat
-var js_stat = readLines(JS_STAT);
+var java_stat = readLines(JS_STAT);
 var cpp_stat = readLines(CPP_STAT);
 /* TODO */
-writeLines(MERGED_STAT, js_stat);
+writeLines(MERGED_STAT, java_stat);

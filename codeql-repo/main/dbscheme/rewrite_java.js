@@ -14,12 +14,12 @@ function readModifyWrite(from, to, ...funcs) {
 // variables
 var from = "";
 var to = "";
-const PREFIX = "js_";
+const PREFIX = "java_";
 var typePrefixAdder = str => str.replaceAll("@", "@"+PREFIX);
 
 // dbscheme
-from = "semmlecode.javascript.dbscheme"
-to = "my.javascript.dbscheme"
+from = "semmlecode.java.dbscheme"
+to = "my.java.dbscheme"
 
 readModifyWrite(from, to,
   l => {
