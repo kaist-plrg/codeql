@@ -8,6 +8,16 @@ db-cpp
 db-js
 db-java
 db-merged
+db
 
 #dbscheme
 my.*.dbscheme*
+
+#gradle
+build
+gradlew
+gradle
+.gradle
+
+#library file
+*.dylib
