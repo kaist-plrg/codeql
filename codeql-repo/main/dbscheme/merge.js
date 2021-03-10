@@ -15,7 +15,7 @@ const MERGED_DBSCHEME = "my.merged.dbscheme";
 const MERGED_STAT = MERGED_DBSCHEME + ".stats";
 
 // dbscheme
-var java_dbscheme = readLines(JS_DBSCHEME);
+var java_dbscheme = readLines(JAVA_DBSCHEME);
 var cpp_dbscheme = readLines(CPP_DBSCHEME);
 var lastOpen = -1;
 var startIdx, endIdx;
@@ -34,7 +34,7 @@ cpp_dbscheme.splice(startIdx, endIdx - startIdx + 1);
 writeLines(MERGED_DBSCHEME, java_dbscheme.concat(cpp_dbscheme));
 
 // dbscheme.stat
-var java_stat = readLines(JS_STAT);
+var java_stat = readLines(JAVA_STAT);
 var cpp_stat = readLines(CPP_STAT);
 /* TODO */
 writeLines(MERGED_STAT, java_stat);

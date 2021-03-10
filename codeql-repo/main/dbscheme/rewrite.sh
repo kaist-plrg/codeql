@@ -1,2 +1,2 @@
-node rewrite_js.js
+node rewrite_java.js
 node rewrite_cpp.js

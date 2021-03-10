@@ -39,9 +39,9 @@ var to;
 var lines;
 var rewritten;
 
-const JS_PREFIX = "js_";
+const JAVA_PREFIX = "java_";
 const CPP_PREFIX = "cpp_";
-const JS_DIR = "db-js/trap/javascript";
+const JAVA_DIR = "db-java/trap/java";
 const CPP_DIR = "db-cpp/trap/cpp";
 const MERGED_DIR = "db-merged/trap/merged";
 
@@ -55,11 +55,11 @@ function rewriteLine(PREFIX) {
   };
 }
 
-// js
-walk(JS_DIR, ".trap.gz").forEach(from => {
-  to = from.replace(JS_DIR, MERGED_DIR);
+// java
+walk(JAVA_DIR, ".trap.gz").forEach(from => {
+  to = from.replace(JAVA_DIR, MERGED_DIR);
   lines = readLines_gz(from);
-  rewritten = lines.map(rewriteLine(JS_PREFIX));
+  rewritten = lines.map(rewriteLine(JAVA_PREFIX));
   createParentDir(to);
   write_gz(to, rewritten.join("\n"));
 });
