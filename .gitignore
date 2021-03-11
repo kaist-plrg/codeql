@@ -10,14 +10,18 @@ db-java
 db-merged
 db
 
-#dbscheme
+# dbscheme
 my.*.dbscheme*
 
-#gradle
+# gradle
 build
 gradlew
 gradle
 .gradle
 
-#library file
+# jni library file
 *.dylib
+
+# QL lib
+**/main/ql/cpp
+**/main/ql/java

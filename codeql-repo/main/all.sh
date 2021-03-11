@@ -22,5 +22,8 @@ cd ..
 # Create mereged db from trap files.
 ./merge.sh
 
+# Copy and rewrite the library
+node rewrite-lib.js
+
 # Run the test query.
 ./ql/query.sh
