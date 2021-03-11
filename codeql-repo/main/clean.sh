@@ -1,4 +1,4 @@
-rm -rf db-js
+rm -rf db-java
 rm -rf db-cpp
 rm -rf db-merged
 
