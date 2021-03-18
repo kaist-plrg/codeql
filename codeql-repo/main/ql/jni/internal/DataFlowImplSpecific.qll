@@ -8,6 +8,6 @@ module Private {
 
 module Public {
   //import DataFlowUtil
-  import Class
-  import Predicate
+  import Class::JNI
+  import Predicate::JNI
 }
