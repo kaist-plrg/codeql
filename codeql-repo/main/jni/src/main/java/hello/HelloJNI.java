@@ -6,13 +6,10 @@ public class HelloJNI {
   static{
     System.loadLibrary("HelloJNI");  
   }
-  public native void printHello();
-  public native int add(int a, int b);
+  public native int f(int jparam1, String jparam2);
 
   public static void main(String[] args) throws Exception{
     HelloJNI jni = new HelloJNI();
-    jni.printHello();
-
-    System.out.println(jni.add(3,4));
+    int jreturn = jni.f(42, "java_string");
   }
 }
