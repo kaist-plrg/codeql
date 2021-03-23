@@ -1,10 +1,12 @@
-module CPP {
+private module CPP {
+  import cpp.cpp
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowUtil
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowPrivate
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowDispatch
 }
 
-module JAVA {
+private module JAVA {
+  import java.java
   import java.semmle.code.java.dataflow.internal.DataFlowUtil
   import java.semmle.code.java.dataflow.internal.DataFlowPrivate
   import java.semmle.code.java.dataflow.internal.DataFlowDispatch
@@ -55,6 +57,14 @@ module JNI {
     JAVA::compatibleTypes(t1.asJavaDataFlowType(), t2.asJavaDataFlowType())
     or
     CPP::compatibleTypes(t1.asCppDataFlowType(), t2.asCppDataFlowType())
+    or
+    exists(JAVA::Type jt, CPP::Type ct |
+      (
+        (jt = t1.asJavaDataFlowType() and ct = t2.asCppDataFlowType())
+        or
+        (jt = t2.asJavaDataFlowType() and ct = t1.asCppDataFlowType())
+      )
+    )
   }
   string ppReprType(DataFlowType t) {
     result = JAVA::ppReprType(t.asJavaDataFlowType())
@@ -97,6 +107,18 @@ module JNI {
     result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall())
     or
     result.asCppDataFlowCallable() = CPP::viableCallable(c.asCppDataFlowCall())
+    or
+    (
+      exists(JAVA::Method m, CPP::Function f |
+        m = c.asJavaDataFlowCall().(JAVA::MethodAccess).getMethod()
+        and
+        f = result.asCppDataFlowCallable()
+        and
+        m.isNative()
+        and
+        f.toString().matches("Java_%_" + m.toString() + "%")
+      )
+    )
   }
   DataFlowCallable viableImplInCallContext(DataFlowCall call, DataFlowCall ctx) {
     result.asJavaDataFlowCallable() = JAVA::viableImplInCallContext(call.asJavaDataFlowCall(), ctx.asJavaDataFlowCall())

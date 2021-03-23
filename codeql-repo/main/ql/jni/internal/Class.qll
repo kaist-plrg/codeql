@@ -39,6 +39,10 @@ module JNI {
       or
       result = this.asCppDataFlowCallable().toString()
     }
+
+    predicate isJniFunction() {
+      this.asCppDataFlowCallable().toString().matches("Java_%")
+    }
   }
 
 
@@ -162,7 +166,17 @@ module JNI {
     predicate isParameterOf(DataFlowCallable c, int pos){
       this.asJavaNode().(JAVA::ParameterNode).isParameterOf(c.asJavaDataFlowCallable(), pos)
       or
-      this.asCppNode().(CPP::ParameterNode).isParameterOf(c.asCppDataFlowCallable(), pos)
+      (
+        not c.isJniFunction()
+        and
+        this.asCppNode().(CPP::ParameterNode).isParameterOf(c.asCppDataFlowCallable(), pos)
+      )
+      or
+      (
+        c.isJniFunction()
+        and
+        this.asCppNode().(CPP::ParameterNode).isParameterOf(c.asCppDataFlowCallable(), pos + 2) 
+      )
     }
   }
 
