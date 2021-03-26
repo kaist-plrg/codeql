@@ -1,16 +1,20 @@
 module JAVA {
+  import java.java
   import java.semmle.code.java.dataflow.internal.DataFlowUtil
   import java.semmle.code.java.dataflow.internal.DataFlowPrivate
   import java.semmle.code.java.dataflow.internal.DataFlowDispatch
 }
 
 module CPP {
+  import cpp.cpp
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowUtil
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowPrivate
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowDispatch
 }
 
 module JNI {
+  import jni.internal.Predicate::JNI
+
   private newtype TUnit =
     TJavaUnit(JAVA::Unit u)
     or
@@ -23,6 +27,21 @@ module JNI {
       result = this.asJavaUnit().toString()
       or
       result = this.asCppUnit().toString()
+    }
+  }
+  
+  private newtype TLocation =
+    TJavaLocation(JAVA::Location u)
+    or
+    TCppLocation(CPP::Location u)
+  class Location extends TLocation {
+    JAVA::Location asJavaLocation() { this = TJavaLocation(result) }
+    CPP::Location asCppLocation() { this = TCppLocation(result) }
+
+    string toString() {
+      result = this.asJavaLocation().toString()
+      or
+      result = this.asCppLocation().toString()
     }
   }
 
@@ -132,6 +151,11 @@ module JNI {
     TJavaNode(JAVA::Node n)
     or
     TCppNode(CPP::Node n)
+    or
+    TJavaMethodNode(JAVA::Method m)
+    or
+    TJavaClassNode(JAVA::Class c)
+
   class Node extends TNode {
     JAVA::Node asJavaNode() { this = TJavaNode(result) }
     CPP::Node asCppNode() { this = TCppNode(result) }
@@ -154,6 +178,16 @@ module JNI {
       or
       this.asCppNode().hasLocationInfo(filepath, startline, startcolumn, endline, endcolumn)
     }
+    Location getLocation() {
+      result.asJavaLocation() = this.asJavaNode().getLocation()
+      or
+      result.asCppLocation() = this.asCppNode().getLocation()
+    }
+    DataFlowExpr asExpr() {
+      result.asJavaDataFlowExpr() = this.asJavaNode().asExpr()
+      or
+      result.asCppDataFlowExpr() = this.asCppNode().asExpr()
+    }
   }
 
   class ParameterNode extends Node {
@@ -163,19 +197,13 @@ module JNI {
       this.asCppNode() instanceof CPP::ParameterNode
     }
 
-    predicate isParameterOf(DataFlowCallable c, int pos){
+    predicate isParameterOf(DataFlowCallable c, int pos){ //modified
       this.asJavaNode().(JAVA::ParameterNode).isParameterOf(c.asJavaDataFlowCallable(), pos)
       or
       (
-        not c.isJniFunction()
-        and
-        this.asCppNode().(CPP::ParameterNode).isParameterOf(c.asCppDataFlowCallable(), pos)
-      )
-      or
-      (
-        c.isJniFunction()
-        and
-        this.asCppNode().(CPP::ParameterNode).isParameterOf(c.asCppDataFlowCallable(), pos + 2) 
+        if c.isJniFunction()
+        then this.asCppNode().(CPP::ParameterNode).isParameterOf(c.asCppDataFlowCallable(), pos + 2) 
+        else this.asCppNode().(CPP::ParameterNode).isParameterOf(c.asCppDataFlowCallable(), pos)
       )
     }
   }
@@ -190,7 +218,17 @@ module JNI {
     predicate argumentOf(DataFlowCall call, int pos) {
       this.asJavaNode().(JAVA::ArgumentNode).argumentOf(call.asJavaDataFlowCall(), pos)
       or
-      this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos)
+      (
+        if call.asCppDataFlowCall().(CPP::Call).getTarget().toString().matches("Call%Method")
+        then (
+          pos = -2 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), 1)
+          or
+          pos = -1 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), 0)
+          or
+          pos >= 0 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos + 2)
+        )
+        else this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos)
+      )
     }
   }
 
@@ -245,6 +283,52 @@ module JNI {
       this.asCppNode() instanceof CPP::ExprNode
     }
   }
+
+  /* custom classes */
+
+  class JniCallNode extends ExprNode {
+    CPP::FunctionCall call;
+
+    JniCallNode() {
+      exists(
+        DataFlowCallable jni_function,
+        ParameterNode param, //TOOD: Extract this as special param?
+        Node qualifier |
+        jni_function.isJniFunction() and
+        param.isParameterOf(jni_function, -2) and
+        call = this.asCppNode().asExpr() and
+        localFlow(param, qualifier) and //TODO: make this global flow
+        qualifier.asCppNode().asExpr() = call.getQualifier()
+      )
+    }
+
+    CPP::Function getTarget() { result = call.getTarget() }
+  }
+
+  class JavaMethodNode extends Node, TJavaMethodNode {
+    JAVA::Method method;
+
+    JavaMethodNode() { this = TJavaMethodNode(method) }
+
+    override string toString() { result = method.toString() }
+
+    JAVA::Method getMethod() { result = method }
+
+    DataFlowType getType() { result.asJavaDataFlowType() = method.getDeclaringType() }
+  
+    override Location getLocation() { result.asJavaLocation() = method.getLocation() }
+  }
+  
+  class JavaClassNode extends Node, TJavaClassNode {
+    JAVA::Class clazz;
+
+    JavaClassNode() { this = TJavaClassNode(clazz) }
+
+    override string toString() { result = clazz.toString() }
+
+    JAVA::Class getClass() { result = clazz }
+  }
+
 
   newtype TBarrierGuard =
     TJavaBarrierGuard(JAVA::BarrierGuard g)

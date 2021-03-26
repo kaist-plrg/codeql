@@ -31,11 +31,7 @@ module JNI {
     or
     CPP::localFlowStep(node1.asCppNode(), node2.asCppNode())
   }
-  predicate localFlow(Node node1, Node node2) {
-    JAVA::localFlow(node1.asJavaNode(), node2.asJavaNode())
-    or
-    CPP::localFlow(node1.asCppNode(), node2.asCppNode())
-  }
+  predicate localFlow(Node node1, Node node2) = fastTC(localFlowStep/2)(node1, node2)
 
   /* DataFlowPrivate.qll */
   predicate clearsContent(Node n, Content c) {
@@ -48,10 +44,12 @@ module JNI {
     or
     CPP::isUnreachableInCall(n.asCppNode(), call.asCppDataFlowCall())
   }
-  DataFlowType getNodeType(Node n) {
+  DataFlowType getNodeType(Node n) { //modified
     result.asJavaDataFlowType() = JAVA::getNodeType(n.asJavaNode())
     or
     result.asCppDataFlowType() = CPP::getNodeType(n.asCppNode())
+    or
+    result = n.(JavaMethodNode).getType()
   }
   predicate compatibleTypes(DataFlowType t1, DataFlowType t2) {
     JAVA::compatibleTypes(t1.asJavaDataFlowType(), t2.asJavaDataFlowType())
@@ -81,10 +79,34 @@ module JNI {
     or
     CPP::nodeIsHidden(n.asCppNode())
   }
-  predicate jumpStep(Node n1, Node n2) {
+  predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
+    /*
+    exists(ClassInstacneExpr newExpr | newExpr = callNode.asCppNode().asExpr().
+
+    callNode.getTarget().toString = "GetObjectClass"
+    and
+    */
+    none()
+  }
+  predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
+    callNode.getTarget().toString() = "GetMethodID"
+    and
+    exists(CPP::StringLiteral nameExpr, CPP::ExprNode nameNode, CPP::ArgumentNode argNode |
+      methodNode.getMethod().toString() = nameExpr.toString()
+      and
+      nameNode.asExpr() = nameExpr
+      and
+      CPP::localFlow(nameNode, argNode)
+      and
+      argNode.argumentOf(callNode.asCppNode().asExpr(), 1)
+    ) 
+  }
+  predicate jumpStep(Node n1, Node n2) { //modified
     JAVA::jumpStep(n1.asJavaNode(), n2.asJavaNode())
     or
     CPP::jumpStep(n1.asCppNode(), n2.asCppNode())
+    or
+    jniGetMethodIDStep(n1.(JavaMethodNode), n2.(JniCallNode))
   }
   predicate storeStep(Node node1, Content f, PostUpdateNode node2) {
     JAVA::storeStep(node1.asJavaNode(), f.asJavaContent(), node2.asJavaNode().(JAVA::PostUpdateNode))
@@ -102,22 +124,45 @@ module JNI {
     result.asCppNode().(CPP::OutNode) = CPP::getAnOutNode(call.asCppDataFlowCall(), kind.asCppReturnKind())
   }
 
+  
   /* DataFlowDispatch.qll */
-  DataFlowCallable viableCallable(DataFlowCall c) {
+  private module JavaMethodFlow {
+    private import DataFlowImplLocal
+
+    /**
+     * A configuration for finding java method -> mid flow
+     */
+    private class JavaMethodConfiguration extends Configuration {
+      JavaMethodConfiguration() { this = "JavaMethodConfiguration" }
+
+      override predicate isSource(Node source) { source instanceof JavaMethodNode }
+
+      override predicate isSink(Node sink) { any() }
+    }
+
+    predicate javaMethodFlow(Node node1, Node node2) {
+      exists(JavaMethodConfiguration cfg | cfg.hasFlow(node1, node2))
+    }
+  }
+
+  DataFlowCallable viableCallable(DataFlowCall c) { //modified
     result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall())
     or
     result.asCppDataFlowCallable() = CPP::viableCallable(c.asCppDataFlowCall())
     or
-    (
-      exists(JAVA::Method m, CPP::Function f |
-        m = c.asJavaDataFlowCall().(JAVA::MethodAccess).getMethod()
-        and
-        f = result.asCppDataFlowCallable()
-        and
-        m.isNative()
-        and
-        f.toString().matches("Java_%_" + m.toString() + "%")
-      )
+    exists(JAVA::Method m, CPP::Function f |
+      m = c.asJavaDataFlowCall().(JAVA::MethodAccess).getMethod() and
+      f = result.asCppDataFlowCallable() |
+      m.isNative() and
+      f.toString().matches("Java_%_" + m.toString() + "%")
+    )
+    or
+    exists(JniCallNode callNode, JavaMethodNode methodNode, ArgumentNode midNode |
+      callNode.asCppNode() = c.asCppDataFlowCall().getNode() and
+      callNode.getTarget().toString().matches("Call%Method") and
+      JavaMethodFlow::javaMethodFlow(methodNode, midNode) and
+      result.asJavaDataFlowCallable() = methodNode.getMethod() and
+      midNode.argumentOf(c, -2)
     )
   }
   DataFlowCallable viableImplInCallContext(DataFlowCall call, DataFlowCall ctx) {
