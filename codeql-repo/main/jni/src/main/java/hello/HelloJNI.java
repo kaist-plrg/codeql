@@ -15,5 +15,6 @@ public class HelloJNI {
   public static void main(String[] args) throws Exception{
     HelloJNI jni = new HelloJNI();
     int val = jni.f(42);
+    System.out.println(val);
   }
 }
