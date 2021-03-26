@@ -64,19 +64,15 @@ module JNI {
     }
   }
 
-
-  private newtype TDataFlowCall =
-    TJavaDataFlowCall(JAVA::DataFlowCall c)
-    or
-    TCppDataFlowCall(CPP::DataFlowCall c)
-  class DataFlowCall extends TDataFlowCall {
-    JAVA::DataFlowCall asJavaDataFlowCall() { this = TJavaDataFlowCall(result) }
-    CPP::DataFlowCall asCppDataFlowCall() { this = TCppDataFlowCall(result) }
-
-    string toString() {
-      result = this.asJavaDataFlowCall().toString()
+  /* modified */
+  class DataFlowCall extends DataFlowExpr {
+    JAVA::DataFlowCall asJavaDataFlowCall() { result = this.asJavaDataFlowExpr().(JAVA::DataFlowCall) }
+    CPP::DataFlowCall asCppDataFlowCall() { result = this.asCppDataFlowExpr().(CPP::DataFlowCall) }
+    
+    DataFlowCall() {
+      this.asJavaDataFlowExpr() instanceof JAVA::DataFlowCall
       or
-      result = this.asCppDataFlowCall().toString()
+      this.asCppDataFlowExpr() instanceof CPP::DataFlowCall
     }
 
     DataFlowCallable getEnclosingCallable() {

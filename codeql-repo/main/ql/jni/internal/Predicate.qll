@@ -1,6 +1,11 @@
 private module CPP {
   import cpp.cpp
-  import cpp.semmle.code.cpp.dataflow.internal.DataFlowImpl
+  module IMPL1 {
+    import cpp.semmle.code.cpp.dataflow.internal.DataFlowImpl
+  }
+  module IMPL2 {
+    import cpp.semmle.code.cpp.dataflow.internal.DataFlowImpl2
+  }
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowUtil
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowPrivate
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowDispatch
@@ -89,18 +94,36 @@ module JNI {
     */
     none()
   }
+  private module StringLiteralFlow {
+    /**
+     * A configuration for finding StringLiteralFlow
+     */
+    private class StringLiteralConfiguration extends CPP::IMPL2::Configuration {
+      StringLiteralConfiguration() { this = "StringLiteralConfiguration" }
+
+      override predicate isSource(CPP::Node source) {
+        source.asExpr() instanceof CPP::StringLiteral
+      }
+
+      override predicate isSink(CPP::Node sink) { any() }
+    }
+
+    //TODO: StringLiteral from java?
+
+    predicate stringLiteralFlow(Node node1, Node node2) {
+      exists (StringLiteralConfiguration config |
+        config.hasFlow(node1.asCppNode(), node2.asCppNode())
+      )
+    }
+  }
   predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
     callNode.getTarget().toString() = "GetMethodID"
     and
-    exists(CPP::StringLiteral nameExpr, CPP::ExprNode nameNode, CPP::ArgumentNode argNode |
-      methodNode.getMethod().toString() = nameExpr.toString()
-      and
-      nameNode.asExpr() = nameExpr
-      and
-      CPP::localFlow(nameNode, argNode)
-      and
-      argNode.argumentOf(callNode.asCppNode().asExpr(), 1)
-    ) 
+    exists(ExprNode nameNode, ArgumentNode argNode |
+      methodNode.getMethod().toString() = nameNode.toString() and
+      StringLiteralFlow::stringLiteralFlow(nameNode, argNode) and
+      argNode.argumentOf(callNode.asExpr(), 1)
+    )
   }
   predicate jumpStep(Node n1, Node n2) { //modified
     JAVA::jumpStep(n1.asJavaNode(), n2.asJavaNode())
@@ -133,7 +156,7 @@ module JNI {
     /**
      * A configuration for finding java method -> mid flow
      */
-    private class JavaMethodConfiguration extends CPP::Configuration {
+    private class JavaMethodConfiguration extends CPP::IMPL1::Configuration {
       JavaMethodConfiguration() { this = "JavaMethodConfiguration" }
 
       override predicate isSource(CPP::Node source) {
