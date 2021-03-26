@@ -1,5 +1,6 @@
 private module CPP {
   import cpp.cpp
+  import cpp.semmle.code.cpp.dataflow.internal.DataFlowImpl
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowUtil
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowPrivate
   import cpp.semmle.code.cpp.dataflow.internal.DataFlowDispatch
@@ -127,21 +128,26 @@ module JNI {
   
   /* DataFlowDispatch.qll */
   private module JavaMethodFlow {
-    private import DataFlowImplLocal
-
     /**
      * A configuration for finding java method -> mid flow
      */
-    private class JavaMethodConfiguration extends Configuration {
+    private class JavaMethodConfiguration extends CPP::Configuration {
       JavaMethodConfiguration() { this = "JavaMethodConfiguration" }
 
-      override predicate isSource(Node source) { source instanceof JavaMethodNode }
+      override predicate isSource(CPP::Node source) {
+        exists(JavaMethodNode method, JniCallNode call |
+          call.asCppNode() = source and jniGetMethodIDStep(method, call)
+        )
+      }
 
-      override predicate isSink(Node sink) { any() }
+      override predicate isSink(CPP::Node sink) { any() }
     }
 
     predicate javaMethodFlow(Node node1, Node node2) {
-      exists(JavaMethodConfiguration cfg | cfg.hasFlow(node1, node2))
+      exists(JavaMethodConfiguration config, Node mid |
+        jniGetMethodIDStep(node1, mid) and
+        config.hasFlow(mid.asCppNode(), node2.asCppNode())
+      )
     }
   }
 
