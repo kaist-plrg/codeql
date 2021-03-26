@@ -84,6 +84,12 @@ module JNI {
       or
       result.asCppDataFlowCallable() = this.asCppDataFlowCall().getEnclosingCallable()
     }
+
+    Node getNode() {
+      result.asJavaNode() = this.asJavaDataFlowCall().getNode()
+      or
+      result.asCppNode() = this.asCppDataFlowCall().getNode()
+    }
   }
 
   private newtype TDataFlowType =
@@ -143,6 +149,10 @@ module JNI {
       result = this.asJavaReturnKind().toString()
       or
       result = this.asCppReturnKind().toString()
+    }
+
+    predicate isNormalReturnKind() { //modified
+      this.toString() = "return"
     }
   }
 
@@ -219,15 +229,18 @@ module JNI {
       this.asJavaNode().(JAVA::ArgumentNode).argumentOf(call.asJavaDataFlowCall(), pos)
       or
       (
-        if call.asCppDataFlowCall().(CPP::Call).getTarget().toString().matches("Call%Method")
-        then (
+        if (
+          exists(JniCallNode n | n.getCall() = call) and
+          call.asCppDataFlowCall().(CPP::Call).getTarget().toString().matches("Call%Method")
+        ) then (
           pos = -2 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), 1)
           or
           pos = -1 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), 0)
           or
           pos >= 0 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos + 2)
         )
-        else this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos)
+        else
+          this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos)
       )
     }
   }
@@ -301,6 +314,8 @@ module JNI {
         qualifier.asCppNode().asExpr() = call.getQualifier()
       )
     }
+
+    DataFlowCall getCall() { result.asCppDataFlowCall() = call }
 
     CPP::Function getTarget() { result = call.getTarget() }
   }

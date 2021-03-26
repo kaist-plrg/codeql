@@ -119,10 +119,12 @@ module JNI {
     or
     CPP::readStep(node1.asCppNode(), f.asCppContent(), node2.asCppNode())
   }
-  OutNode getAnOutNode(DataFlowCall call, ReturnKind kind) {
+  OutNode getAnOutNode(DataFlowCall call, ReturnKind kind) { //modified
     result.asJavaNode().(JAVA::OutNode) = JAVA::getAnOutNode(call.asJavaDataFlowCall(), kind.asJavaReturnKind())
     or
     result.asCppNode().(CPP::OutNode) = CPP::getAnOutNode(call.asCppDataFlowCall(), kind.asCppReturnKind())
+    or
+    result = call.getNode() and kind.isNormalReturnKind()
   }
 
   
@@ -164,7 +166,7 @@ module JNI {
     )
     or
     exists(JniCallNode callNode, JavaMethodNode methodNode, ArgumentNode midNode |
-      callNode.asCppNode() = c.asCppDataFlowCall().getNode() and
+      callNode.getCall() = c and
       callNode.getTarget().toString().matches("Call%Method") and
       JavaMethodFlow::javaMethodFlow(methodNode, midNode) and
       result.asJavaDataFlowCallable() = methodNode.getMethod() and
