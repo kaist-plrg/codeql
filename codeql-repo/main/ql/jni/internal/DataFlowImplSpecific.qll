@@ -6,11 +6,14 @@ module Private {
   import DataFlowPrivate
   import DataFlowStep
   import DataFlowType
+  import DataFlowInnerFlow
 }
 
 module Public {
   import DataFlowUtil
   import DataFlowNode
+  
+  import DataFlowStep
 }
 
 module Original {

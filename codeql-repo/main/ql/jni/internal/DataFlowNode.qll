@@ -10,6 +10,8 @@ private newtype TNode =
   TJavaMethodNode(JAVA::Method m)
   or
   TJavaClassNode(JAVA::Class c)
+  or
+  TJavaFieldNode(JAVA::InstanceField f)
 
 class Node extends TNode {
   JAVA::Node asJavaNode() { this = TJavaNode(result) }
@@ -37,6 +39,9 @@ class Node extends TNode {
     result.asJavaLocation() = this.asJavaNode().getLocation()
     or
     result.asCppLocation() = this.asCppNode().getLocation()
+  }
+  DataFlowType getType() {
+    none()
   }
   DataFlowExpr asExpr() {
     result.asJavaDataFlowExpr() = this.asJavaNode().asExpr()
@@ -177,20 +182,6 @@ class JniCallNode extends ExprNode {
   CPP::Function getTarget() { result = call.getTarget() }
 }
 
-class JavaMethodNode extends Node, TJavaMethodNode {
-  JAVA::Method method;
-
-  JavaMethodNode() { this = TJavaMethodNode(method) }
-
-  override string toString() { result = method.toString() }
-
-  JAVA::Method getMethod() { result = method }
-
-  DataFlowType getType() { result.asJavaDataFlowType() = method.getDeclaringType() }
-
-  override Location getLocation() { result.asJavaLocation() = method.getLocation() }
-}
-
 class JavaClassNode extends Node, TJavaClassNode {
   JAVA::Class clazz;
 
@@ -199,4 +190,45 @@ class JavaClassNode extends Node, TJavaClassNode {
   override string toString() { result = clazz.toString() }
 
   JAVA::Class getClass() { result = clazz }
+  
+  override DataFlowType getType() { result.asJavaDataFlowType() = clazz }
+
+  override Location getLocation() { result.asJavaLocation() = clazz.getLocation() }
+}
+
+class JavaMethodNode extends Node, TJavaMethodNode {
+  JAVA::Method method;
+  JAVA::Class clazz;
+
+  JavaMethodNode() {
+    this = TJavaMethodNode(method) and
+    clazz = method.getDeclaringType()
+  }
+
+  override string toString() { result = method.toString() }
+
+  JAVA::Method getMethod() { result = method }
+  JAVA::Class getClass() { result = clazz }
+
+  override DataFlowType getType() { result.asJavaDataFlowType() = clazz }
+
+  override Location getLocation() { result.asJavaLocation() = method.getLocation() }
+}
+
+class JavaFieldNode extends Node, TJavaFieldNode {
+  JAVA::InstanceField field;
+  JAVA::Class clazz;
+
+  JavaFieldNode() {
+    this = TJavaFieldNode(field) and
+    clazz = field.getDeclaringType()
+  }
+
+  override string toString() { result = field.toString() }
+
+  JAVA::InstanceField getField() { result = field }
+  
+  override DataFlowType getType() { result.asJavaDataFlowType() = clazz }
+  
+  override Location getLocation() { result.asJavaLocation() = field.getLocation() }
 }

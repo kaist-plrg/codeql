@@ -92,7 +92,7 @@ DataFlowType getNodeType(Node n) { //modified
   or
   result.asCppDataFlowType() = CPP::getNodeType(n.asCppNode())
   or
-  result = n.(JavaMethodNode).getType()
+  result = n.getType()
 }
 predicate nodeIsHidden(Node n) {
   JAVA::nodeIsHidden(n.asJavaNode())
