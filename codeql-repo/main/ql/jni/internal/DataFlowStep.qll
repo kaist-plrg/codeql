@@ -46,6 +46,17 @@ predicate storeStep(Node node1, Content f, PostUpdateNode node2) {
   JAVA::storeStep(node1.asJavaNode(), f.asJavaContent(), node2.asJavaNode().(JAVA::PostUpdateNode))
   or
   CPP::storeStep(node1.asCppNode(), f.asCppContent(), node2.asCppNode().(CPP::PostUpdateNode))
+  or
+  exists(JniCallNode callNode, ArgumentNode objNode, ArgumentNode fidNode, ArgumentNode valNode |
+    callNode.getTarget().toString().matches("Set%Field") and
+    objNode.argumentOf(callNode.getCall(), 0) and
+    fidNode.argumentOf(callNode.getCall(), 1) and
+    valNode.argumentOf(callNode.getCall(), 2)
+    |
+    node1 = valNode and
+    f.asJavaContent().(JAVA::FieldContent).getField() = CustomNodeFlow::getJavaFieldNode(fidNode).getField() and
+    node2.getPreUpdateNode() = objNode
+  )
 }
 
 predicate readStep(Node node1, Content f, Node node2) {
