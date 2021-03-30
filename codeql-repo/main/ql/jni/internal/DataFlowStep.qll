@@ -17,17 +17,15 @@ predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
 }
 predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
   callNode.getTarget().toString() = "GetMethodID" and
-  exists(ExprNode nameNode, ArgumentNode argNode |
-    methodNode.getMethod().toString() = nameNode.toString() and
-    StringLiteralFlow::stringLiteralFlow(nameNode, argNode) and
+  exists(ArgumentNode argNode |
+    methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(argNode) and
     argNode.argumentOf(callNode.asExpr(), 1)
   )
 }
 predicate jniGetFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
   callNode.getTarget().toString() = "GetFieldID" and
-  exists(ExprNode nameNode, ArgumentNode argNode |
-    fieldNode.getField().toString() = nameNode.toString() and
-    StringLiteralFlow::stringLiteralFlow(nameNode, argNode) and
+  exists(ArgumentNode argNode |
+    fieldNode.getField().toString() = StringLiteralFlow::getStringLiteral(argNode) and
     argNode.argumentOf(callNode.asExpr(), 1)
   )
 }

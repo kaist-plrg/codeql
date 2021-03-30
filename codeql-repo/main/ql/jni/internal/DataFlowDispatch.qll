@@ -14,12 +14,11 @@ DataFlowCallable viableCallable(DataFlowCall c) { //modified
     f.toString().matches("Java_%_" + m.toString() + "%")
   )
   or
-  exists(JniCallNode callNode, JavaMethodNode methodNode, ArgumentNode midNode |
+  exists(JniCallNode callNode, ArgumentNode midNode |
     callNode.getCall() = c and
     callNode.getTarget().toString().matches("Call%Method") and
-    JavaMethodFlow::javaMethodFlow(methodNode, midNode) and
-    result.asJavaDataFlowCallable() = methodNode.getMethod() and
-    midNode.argumentOf(c, -2)
+    midNode.argumentOf(c, -2) and
+    result.asJavaDataFlowCallable() = CustomNodeFlow::getJavaMethodNode(midNode).getMethod()
   )
 }
 

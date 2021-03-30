@@ -2,26 +2,40 @@ import DataFlowImplSpecific::Public
 private import DataFlowImplSpecific::Private
 private import DataFlowImplSpecific::Original
 
-module JavaMethodFlow {
+module CustomNodeFlow {
   /**
    * A configuration for finding flow from custom nodes
    */
-  private class JavaMethodConfiguration extends CPP::Impl1::Configuration {
-    JavaMethodConfiguration() { this = "JavaMethodConfiguration" }
+  private class CustomNodeConfiguration extends CPP::Impl1::Configuration {
+    CustomNodeConfiguration() { this = "CustomNodeConfiguration" }
 
     override predicate isSource(CPP::Node source) {
-      exists(JavaMethodNode method, JniCallNode call |
-        call.asCppNode() = source and jniGetMethodIDStep(method, call)
-      )
+      exists(JniCallNode call | call.asCppNode() = source)
     }
 
-    override predicate isSink(CPP::Node sink) { any() }
+    override predicate isSink(CPP::Node sink) {
+      sink instanceof CPP::ArgumentNode
+    }
   }
 
-  predicate javaMethodFlow(Node node1, Node node2) {
-    exists(JavaMethodConfiguration config, Node mid |
-      jniGetMethodIDStep(node1, mid) and
-      config.hasFlow(mid.asCppNode(), node2.asCppNode())
+  JavaClassNode getJavaClassNode(ArgumentNode arg) {
+    exists(CustomNodeConfiguration config, Node mid |
+      jniGetObjectClassStep(result, mid) and
+      config.hasFlow(mid.asCppNode(), arg.asCppNode())
+    )
+  }
+  
+  JavaMethodNode getJavaMethodNode(ArgumentNode arg) {
+    exists(CustomNodeConfiguration config, Node mid |
+      jniGetMethodIDStep(result, mid) and
+      config.hasFlow(mid.asCppNode(), arg.asCppNode())
+    )
+  }
+  
+  JavaFieldNode getJavaFieldNode(ArgumentNode arg) {
+    exists(CustomNodeConfiguration config, Node mid |
+      jniGetFieldIDStep(result, mid) and
+      config.hasFlow(mid.asCppNode(), arg.asCppNode())
     )
   }
 }
@@ -37,14 +51,17 @@ module StringLiteralFlow {
       source.asExpr() instanceof CPP::StringLiteral
     }
 
-    override predicate isSink(CPP::Node sink) { any() }
+    override predicate isSink(CPP::Node sink) {
+      sink instanceof CPP::ArgumentNode
+    }
   }
 
   //TODO: StringLiteral from java?
 
-  predicate stringLiteralFlow(Node node1, Node node2) {
-    exists (StringLiteralConfiguration config |
-      config.hasFlow(node1.asCppNode(), node2.asCppNode())
+  string getStringLiteral(ArgumentNode arg) {
+    exists (StringLiteralConfiguration config, ExprNode stringNode |
+      config.hasFlow(stringNode.asCppNode(), arg.asCppNode()) and
+      result = stringNode.toString()
     )
   }
 }
