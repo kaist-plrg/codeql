@@ -12,8 +12,6 @@ module Private {
 module Public {
   import DataFlowUtil
   import DataFlowNode
-  
-  import DataFlowStep
 }
 
 module Original {
@@ -35,5 +33,6 @@ module Original {
     import java.semmle.code.java.dataflow.internal.DataFlowUtil
     import java.semmle.code.java.dataflow.internal.DataFlowPrivate
     import java.semmle.code.java.dataflow.internal.DataFlowDispatch
+    import java.semmle.code.java.dataflow.internal.DataFlowImpl
   }
 }

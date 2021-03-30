@@ -257,7 +257,7 @@ abstract class PostUpdateNode extends Node {
   abstract Node getPreUpdateNode();
 }
 
-private class NewExpr extends PostUpdateNode, TExprNode {
+class NewExpr extends PostUpdateNode, TExprNode {
   NewExpr() { exists(ClassInstanceExpr cie | this = TExprNode(cie)) }
 
   override Node getPreUpdateNode() { this = TExprNode(result.(MallocNode).getClassInstanceExpr()) }

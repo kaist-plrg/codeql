@@ -68,7 +68,7 @@ module StringLiteralFlow {
 
 module JniParameterFlow {
   /**
-   * A configuration for finding flow regarding special parameter of jni function (env / obj)
+   * A configuration for finding flow from special parameter of jni function (env / obj)
    */
   private class JniParameterConfiguration extends CPP::Impl2::Configuration {
     JniParameterConfiguration() { this = "JniParameterConfiguration" }
@@ -84,11 +84,41 @@ module JniParameterFlow {
 
     override predicate isSink(CPP::Node sink) { any() }
   }
+  
+  /**
+   * A configuration for finding flow from class instantiation
+   */
+  private class JavaObjectConfiguration extends JAVA::Configuration {
+    JavaObjectConfiguration() { this = "JavaObjectConfiguration" }
+
+    override predicate isSource(JAVA::Node source) {
+      source instanceof JAVA::NewExpr
+    }
+
+    override predicate isSink(JAVA::Node sink) {
+      sink instanceof JAVA::ArgumentNode
+    }
+  }
 
   predicate isJniEnv(CPP::Node node) {
     exists(JniParameterConfiguration config, CPP::ParameterNode paramNode |
       paramNode.isParameterOf(_, 0) and
       config.hasFlow(paramNode, node)
+    )
+  }
+
+  private import DataFlowImplCommon
+
+  JAVA::NewExpr getJavaNewExpr(Node node) {
+    exists(
+      JavaObjectConfiguration config1,
+      ArgumentNode argNode,
+      ParameterNode paramNode,
+      JniParameterConfiguration config2
+      |
+      config1.hasFlow(result, argNode.asJavaNode()) and
+      viableParamArg(_, paramNode, argNode) and
+      config2.hasFlow(paramNode.asCppNode(), node.asCppNode())
     )
   }
 }
