@@ -65,3 +65,31 @@ module StringLiteralFlow {
     )
   }
 }
+
+module JniParameterFlow {
+  /**
+   * A configuration for finding flow regarding special parameter of jni function (env / obj)
+   */
+  private class JniParameterConfiguration extends CPP::Impl2::Configuration {
+    JniParameterConfiguration() { this = "JniParameterConfiguration" }
+
+    override predicate isSource(CPP::Node source) {
+      exists(CPP::Function f |
+        f.toString().matches("Java_%") |
+        source.(CPP::ParameterNode).isParameterOf(f, 0)
+        or
+        source.(CPP::ParameterNode).isParameterOf(f, 1)
+      )
+    }
+
+    override predicate isSink(CPP::Node sink) { any() }
+  }
+
+  predicate isJniEnv(CPP::Node node) {
+    exists(JniParameterConfiguration config, CPP::ParameterNode paramNode |
+      paramNode.isParameterOf(_, 0) and
+      config.hasFlow(paramNode, node)
+    )
+  }
+}
+

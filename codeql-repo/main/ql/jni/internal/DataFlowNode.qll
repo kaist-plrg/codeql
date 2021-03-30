@@ -165,16 +165,8 @@ class JniCallNode extends ExprNode {
   CPP::FunctionCall call;
 
   JniCallNode() {
-    exists(
-      DataFlowCallable jni_function,
-      ParameterNode param, //TOOD: Extract this as special param?
-      Node qualifier |
-      jni_function.isJniFunction() and
-      param.isParameterOf(jni_function, -2) and
-      call = this.asCppNode().asExpr() and
-      localFlow(param, qualifier) and //TODO: make this global flow
-      qualifier.asCppNode().asExpr() = call.getQualifier()
-    )
+    call = this.asCppNode().asExpr() and
+    JniParameterFlow::isJniEnv(CPP::exprNode(call.getQualifier()))
   }
 
   DataFlowCall getCall() { result.asCppDataFlowCall() = call }
