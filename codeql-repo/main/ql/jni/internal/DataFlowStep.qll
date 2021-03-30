@@ -4,29 +4,24 @@ private import DataFlowImplSpecific::Original
 
 // jni get-methods
 predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
-  /*
-  callNode.getTarget().toString() = "GetObjectClass"
-  and
-  exists(ExprNode nameNode, ArgumentNode argNode |
-    methodNode.getMethod().toString() = nameNode.toString() and
-    StringLiteralFlow::stringLiteralFlow(nameNode, argNode) and
-    argNode.argumentOf(callNode.asExpr(), 1)
+  callNode.getTarget().toString() = "GetObjectClass" and
+  exists(ArgumentNode argNode |
+    argNode.argumentOf(callNode.getCall(), 0) |
+    classNode.getClass() = JniParameterFlow::getJavaNewExpr(argNode).asExpr().getType()
   )
-  */
-  none()
 }
 predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
   callNode.getTarget().toString() = "GetMethodID" and
   exists(ArgumentNode argNode |
-    methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(argNode) and
-    argNode.argumentOf(callNode.asExpr(), 1)
+    argNode.argumentOf(callNode.getCall(), 1) |
+    methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(argNode)
   )
 }
 predicate jniGetFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
   callNode.getTarget().toString() = "GetFieldID" and
   exists(ArgumentNode argNode |
-    fieldNode.getField().toString() = StringLiteralFlow::getStringLiteral(argNode) and
-    argNode.argumentOf(callNode.asExpr(), 1)
+    argNode.argumentOf(callNode.getCall(), 1) |
+    fieldNode.getField().toString() = StringLiteralFlow::getStringLiteral(argNode)
   )
 }
 
