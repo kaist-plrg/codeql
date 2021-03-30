@@ -52,4 +52,14 @@ predicate readStep(Node node1, Content f, Node node2) {
   JAVA::readStep(node1.asJavaNode(), f.asJavaContent(), node2.asJavaNode())
   or
   CPP::readStep(node1.asCppNode(), f.asCppContent(), node2.asCppNode())
+  or
+  exists(JniCallNode callNode, ArgumentNode objNode, ArgumentNode fidNode |
+    callNode.getTarget().toString().matches("Get%Field") and
+    objNode.argumentOf(callNode.getCall(), 0) and
+    fidNode.argumentOf(callNode.getCall(), 1)
+    |
+    node1 = objNode and
+    f.asJavaContent().(JAVA::FieldContent).getField() = CustomNodeFlow::getJavaFieldNode(fidNode).getField() and
+    node2 = callNode
+  )
 }
