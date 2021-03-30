@@ -94,21 +94,25 @@ DataFlowType getNodeType(Node n) { //modified
   or
   result = n.getType()
 }
+
 predicate nodeIsHidden(Node n) {
   JAVA::nodeIsHidden(n.asJavaNode())
   or
   CPP::nodeIsHidden(n.asCppNode())
 }
+
 predicate clearsContent(Node n, Content c) {
   JAVA::clearsContent(n.asJavaNode(), c.asJavaContent())
   or
   CPP::clearsContent(n.asCppNode(), c.asCppContent())
 }
+
 predicate isUnreachableInCall(Node n, DataFlowCall call) {
   JAVA::isUnreachableInCall(n.asJavaNode(), call.asJavaDataFlowCall())
   or
   CPP::isUnreachableInCall(n.asCppNode(), call.asCppDataFlowCall())
 }
+
 predicate compatibleTypes(DataFlowType t1, DataFlowType t2) { //modified
   JAVA::compatibleTypes(t1.asJavaDataFlowType(), t2.asJavaDataFlowType())
   or
@@ -122,11 +126,13 @@ predicate compatibleTypes(DataFlowType t1, DataFlowType t2) { //modified
     )
   )
 }
+
 string ppReprType(DataFlowType t) {
   result = JAVA::ppReprType(t.asJavaDataFlowType())
   or
   result = CPP::ppReprType(t.asCppDataFlowType())
 }
+
 int accessPathLimit() {
   result = JAVA::accessPathLimit()
   or
