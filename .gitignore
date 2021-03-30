@@ -21,7 +21,3 @@ gradle
 
 # jni library file
 *.dylib
-
-# QL lib
-**/main/ql/cpp
-**/main/ql/java
