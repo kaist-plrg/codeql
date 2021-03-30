@@ -11,7 +11,7 @@ private newtype TNode =
   or
   TJavaClassNode(JAVA::Class c)
   or
-  TJavaFieldNode(JAVA::InstanceField f)
+  TJavaFieldNode(JAVA::Field f)
 
 class Node extends TNode {
   JAVA::Node asJavaNode() { this = TJavaNode(result) }
@@ -208,7 +208,7 @@ class JavaMethodNode extends Node, TJavaMethodNode {
 }
 
 class JavaFieldNode extends Node, TJavaFieldNode {
-  JAVA::InstanceField field;
+  JAVA::Field field;
   JAVA::Class clazz;
 
   JavaFieldNode() {
@@ -218,7 +218,8 @@ class JavaFieldNode extends Node, TJavaFieldNode {
 
   override string toString() { result = field.toString() }
 
-  JAVA::InstanceField getField() { result = field }
+  JAVA::InstanceField getField() { result = field.(JAVA::InstanceField) }
+  JAVA::Field getStaticField() { result = field and field.isStatic() }
   JAVA::Class getClass() { result = clazz }
   
   override DataFlowType getType() { result.asJavaDataFlowType() = clazz }

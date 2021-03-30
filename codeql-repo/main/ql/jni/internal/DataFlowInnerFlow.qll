@@ -20,21 +20,30 @@ module CustomNodeFlow {
 
   JavaClassNode getJavaClassNode(ArgumentNode arg) {
     exists(CustomNodeConfiguration config, Node mid |
-      jniGetObjectClassStep(result, mid) and
+      (
+        jniGetObjectClassStep(result, mid)
+        or
+        jniFindClassStep(result, mid)
+      )
+      and
       config.hasFlow(mid.asCppNode(), arg.asCppNode())
     )
   }
-  
   JavaMethodNode getJavaMethodNode(ArgumentNode arg) {
     exists(CustomNodeConfiguration config, Node mid |
       jniGetMethodIDStep(result, mid) and
       config.hasFlow(mid.asCppNode(), arg.asCppNode())
     )
   }
-  
   JavaFieldNode getJavaFieldNode(ArgumentNode arg) {
     exists(CustomNodeConfiguration config, Node mid |
       jniGetFieldIDStep(result, mid) and
+      config.hasFlow(mid.asCppNode(), arg.asCppNode())
+    )
+  }
+  JavaFieldNode getJavaStaticFieldNode(ArgumentNode arg) {
+    exists(CustomNodeConfiguration config, Node mid |
+      jniGetStaticFieldIDStep(result, mid) and
       config.hasFlow(mid.asCppNode(), arg.asCppNode())
     )
   }
