@@ -147,7 +147,7 @@ class Content extends TContent {
   }
 }
 
-private class FieldContent extends Content, TFieldContent {
+class FieldContent extends Content, TFieldContent { //modified: was private
   InstanceField f;
 
   FieldContent() { this = TFieldContent(f) }
