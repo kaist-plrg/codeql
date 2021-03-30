@@ -219,6 +219,7 @@ class JavaFieldNode extends Node, TJavaFieldNode {
   override string toString() { result = field.toString() }
 
   JAVA::InstanceField getField() { result = field }
+  JAVA::Class getClass() { result = clazz }
   
   override DataFlowType getType() { result.asJavaDataFlowType() = clazz }
   
