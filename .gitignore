@@ -21,3 +21,10 @@ gradle
 
 # jni library file
 *.dylib
+
+# cxx
+.cxx
+
+# rewritten library
+**/main/ql/java
+**/main/ql/cpp

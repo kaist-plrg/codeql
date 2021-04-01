@@ -51,8 +51,16 @@ function handle(language) {
         return cur_content.replaceAll(pattern, ` ${PREFIX}${rel}(`);
       }, content)
       .replaceAll("@", "@"+PREFIX);
-    if (language === 'java' && file.endsWith('Modifier.qll')) {
-      rewritten = rewritten.replaceAll("java_hasModifier(\"","hasModifier(\"");
+    if (language == 'java') {
+      if (file.endsWith('Modifier.qll')) {
+        rewritten = rewritten.replaceAll("java_hasModifier(\"","hasModifier(\"");
+      }
+      if (file.endsWith('DataFlowPrivate.qll')) {
+        rewritten = rewritten.replace("private class FieldContent ","class FieldContent ");
+      }
+      if (file.endsWith('DataFlowUtil.qll')) {
+        rewritten = rewritten.replace("private class NewExpr ","class NewExpr ");
+      }
     }
     write(file, rewritten);
   })
