@@ -47,6 +47,14 @@ predicate jniGetStaticFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode)
     fieldNode.getStaticField().toString() = StringLiteralFlow::getStringLiteral(name)
   )
 }
+predicate jniStringStep(ArgumentNode argNode, JniCallNode callNode) {
+  (
+    callNode.getTarget().toString() = "GetStringUTFChars"
+    or
+    callNode.getTarget().toString() = "NewStringUTF"
+  ) and
+  argNode.argumentOf(callNode.getCall(), 0)
+}
 
 predicate jumpStep(Node n1, Node n2) { //modified
   JAVA::jumpStep(n1.asJavaNode(), n2.asJavaNode())
