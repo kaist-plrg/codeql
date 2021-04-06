@@ -15,7 +15,6 @@ my.*.dbscheme*
 
 # gradle
 build
-gradlew
 gradle
 .gradle
 
