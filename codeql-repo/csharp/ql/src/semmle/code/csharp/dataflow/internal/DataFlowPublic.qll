@@ -117,24 +117,18 @@ class ExprNode extends Node {
  * flow graph.
  */
 class ParameterNode extends Node {
-  ParameterNode() {
-    // charpred needed to avoid making `ParameterNode` abstract
-    explicitParameterNode(this, _) or
-    this.(SsaDefinitionNode).getDefinition() instanceof
-      ImplicitCapturedParameterNodeImpl::SsaCapturedEntryDefinition or
-    this = TInstanceParameterNode(_) or
-    this = TCilParameterNode(_) or
-    this = TSummaryParameterNode(_, _)
-  }
+  private ParameterNodeImpl p;
+
+  ParameterNode() { this = p }
 
   /** Gets the parameter corresponding to this node, if any. */
-  DotNet::Parameter getParameter() { none() }
+  DotNet::Parameter getParameter() { result = p.getParameter() }
 
   /**
    * Holds if this node is the parameter of callable `c` at the specified
    * (zero-based) position.
    */
-  predicate isParameterOf(DataFlowCallable c, int i) { none() }
+  predicate isParameterOf(DataFlowCallable c, int i) { p.isParameterOf(c, i) }
 }
 
 /** A definition, viewed as a node in a data flow graph. */
@@ -238,7 +232,7 @@ class FieldContent extends Content, TFieldContent {
   /** Gets the field that is referenced. */
   Field getField() { result = f }
 
-  override string toString() { result = f.toString() }
+  override string toString() { result = "field " + f.getName() }
 
   override Location getLocation() { result = f.getLocation() }
 
@@ -258,7 +252,7 @@ class PropertyContent extends Content, TPropertyContent {
   /** Gets the property that is referenced. */
   Property getProperty() { result = p }
 
-  override string toString() { result = p.toString() }
+  override string toString() { result = "property " + p.getName() }
 
   override Location getLocation() { result = p.getLocation() }
 
@@ -271,7 +265,7 @@ class PropertyContent extends Content, TPropertyContent {
 
 /** A reference to an element in a collection. */
 class ElementContent extends Content, TElementContent {
-  override string toString() { result = "[]" }
+  override string toString() { result = "element" }
 
   override Location getLocation() { result instanceof EmptyLocation }
 }

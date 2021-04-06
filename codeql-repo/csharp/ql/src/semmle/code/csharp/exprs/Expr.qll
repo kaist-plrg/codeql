@@ -290,16 +290,31 @@ private predicate hasChildPattern(ControlFlowElement pm, Expr child) {
   or
   exists(Expr mid |
     hasChildPattern(pm, mid) and
-    mid instanceof @recursive_pattern_expr
-  |
-    child = mid.getChild(2).getAChildExpr() or
-    child = mid.getChild(3).getAChildExpr()
+    mid instanceof @property_pattern_expr and
+    child = mid.getAChildExpr()
+  )
+  or
+  exists(Expr mid |
+    hasChildPattern(pm, mid) and
+    mid instanceof @positional_pattern_expr and
+    child = mid.getAChildExpr()
+  )
+  or
+  exists(Expr mid |
+    hasChildPattern(pm, mid) and
+    mid instanceof @recursive_pattern_expr and
+    child = mid.getAChildExpr()
   )
   or
   exists(Expr mid |
     hasChildPattern(pm, mid) and
     mid instanceof @unary_pattern_expr and
-    child = mid.getChild(0)
+    child = mid.getChildExpr(0)
+  )
+  or
+  exists(Expr mid | hasChildPattern(pm, mid) and mid instanceof @binary_pattern_expr |
+    child = mid.getChildExpr(0) or
+    child = mid.getChildExpr(1)
   )
 }
 
@@ -457,7 +472,7 @@ class RecursivePatternExpr extends BindingPatternExpr, @recursive_pattern_expr {
 }
 
 /** A property pattern. For example, `{ Length: 5 }`. */
-class PropertyPatternExpr extends Expr, @property_pattern_expr {
+class PropertyPatternExpr extends PatternExpr, @property_pattern_expr {
   override string toString() { result = "{ ... }" }
 
   /** Gets the `n`th pattern. */
@@ -480,7 +495,7 @@ class LabeledPatternExpr extends PatternExpr {
 }
 
 /** A positional pattern. For example, `(int x, int y)`. */
-class PositionalPatternExpr extends Expr, @positional_pattern_expr {
+class PositionalPatternExpr extends PatternExpr, @positional_pattern_expr {
   override string toString() { result = "( ... )" }
 
   /** Gets the `n`th pattern. */
@@ -500,6 +515,32 @@ class NotPatternExpr extends UnaryPatternExpr, @not_pattern_expr {
   override string toString() { result = "not ..." }
 
   override string getAPrimaryQlClass() { result = "NotPatternExpr" }
+}
+
+/** A binary pattern. For example, `1 or 2`. */
+class BinaryPatternExpr extends PatternExpr, @binary_pattern_expr {
+  /** Gets a pattern. */
+  PatternExpr getAnOperand() { result = getLeftOperand() or result = getRightOperand() }
+
+  /** Gets the left pattern. */
+  PatternExpr getLeftOperand() { result = this.getChild(0) }
+
+  /** Gets the right pattern. */
+  PatternExpr getRightOperand() { result = this.getChild(1) }
+}
+
+/** A binary `or` pattern. For example, `1 or 2`. */
+class OrPatternExpr extends BinaryPatternExpr, @or_pattern_expr {
+  override string toString() { result = "... or ..." }
+
+  override string getAPrimaryQlClass() { result = "OrPatternExpr" }
+}
+
+/** A binary `and` pattern. For example, `< 1 and > 2`. */
+class AndPatternExpr extends BinaryPatternExpr, @and_pattern_expr {
+  override string toString() { result = "... and ..." }
+
+  override string getAPrimaryQlClass() { result = "AndPatternExpr" }
 }
 
 /**
@@ -617,7 +658,7 @@ class Cast extends Expr {
   TypeAccess getTypeAccess() { result = this.getChild(1) }
 
   /** Gets the type that the underlying expression is being cast to. */
-  Type getTargetType() { result = this.getTypeAccess().getTarget() }
+  Type getTargetType() { result = this.getType() }
 
   /** Gets the type of the underlying expression. */
   Type getSourceType() { result = this.getExpr().getType() }
@@ -994,7 +1035,13 @@ class TupleExpr extends Expr, @tuple_expr {
   Expr getAnArgument() { result = getArgument(_) }
 
   /** Holds if this tuple is a read access. */
-  predicate isReadAccess() { not this = getAnAssignOrForeachChild() }
+  deprecated predicate isReadAccess() { not this = getAnAssignOrForeachChild() }
+
+  /** Holds if this expression is a tuple construction. */
+  predicate isConstruction() {
+    not this = getAnAssignOrForeachChild() and
+    not this = any(PatternExpr pe).getAChildExpr*()
+  }
 
   override string getAPrimaryQlClass() { result = "TupleExpr" }
 }
@@ -1092,4 +1139,40 @@ class SuppressNullableWarningExpr extends Expr, @suppress_nullable_warning_expr 
   override string toString() { result = "...!" }
 
   override string getAPrimaryQlClass() { result = "SuppressNullableWarningExpr" }
+}
+
+/**
+ * A preprocessor symbol inside an expression, such as DEBUG in line 2
+ * ```csharp
+ * #define DEBUG
+ * #if (DEBUG == true)
+ *   Console.WriteLine("Debug version");
+ * #endif
+ * ```
+ */
+class DefineSymbolExpr extends Expr, @define_symbol_expr {
+  /** Gets the name of the symbol. */
+  string getName() { directive_define_symbols(this, result) }
+
+  override string toString() { result = getName() }
+
+  override string getAPrimaryQlClass() { result = "DefineSymbolExpr" }
+}
+
+/**
+ * A `with` expression called on a record.
+ */
+class WithExpr extends Expr, @with_expr {
+  /** Gets the object initializer of this `with` expression. */
+  ObjectInitializer getInitializer() { result = this.getChild(1) }
+
+  /** Gets the expression on which this `with` is called. */
+  Expr getExpr() { result = this.getChild(0) }
+
+  /** Gets the clone method of the `record` that is targetted by this `with` expression. */
+  RecordCloneMethod getCloneMethod() { result = this.getExpr().getType().(Record).getCloneMethod() }
+
+  override string toString() { result = "... with { ... }" }
+
+  override string getAPrimaryQlClass() { result = "WithExpr" }
 }

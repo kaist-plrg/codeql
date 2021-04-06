@@ -24,6 +24,7 @@ private import internal.FlowSteps as FlowSteps
 private import internal.DataFlowNode
 private import internal.AnalyzedParameters
 private import internal.PreCallGraphStep
+private import semmle.javascript.internal.CachedStages
 
 module DataFlow {
   /**
@@ -106,7 +107,11 @@ module DataFlow {
 
     /** Holds if this node may evaluate to the Boolean value `b`. */
     predicate mayHaveBooleanValue(boolean b) {
-      b = analyze().getAValue().(AbstractBoolean).getBooleanValue()
+      getAPredecessor().mayHaveBooleanValue(b)
+      or
+      b = true and asExpr().(BooleanLiteral).getValue() = "true"
+      or
+      b = false and asExpr().(BooleanLiteral).getValue() = "false"
     }
 
     /** Gets the integer value of this node, if it is an integer constant. */
@@ -144,6 +149,7 @@ module DataFlow {
      * For more information, see
      * [Locations](https://help.semmle.com/QL/learn-ql/ql/locations.html).
      */
+    cached
     predicate hasLocationInfo(
       string filepath, int startline, int startcolumn, int endline, int endcolumn
     ) {
@@ -166,6 +172,7 @@ module DataFlow {
     int getEndColumn() { hasLocationInfo(_, _, _, _, result) }
 
     /** Gets a textual representation of this element. */
+    cached
     string toString() { none() }
 
     /**
@@ -289,12 +296,13 @@ module DataFlow {
     override predicate hasLocationInfo(
       string filepath, int startline, int startcolumn, int endline, int endcolumn
     ) {
+      Stages::DataFlowStage::ref() and
       astNode.getLocation().hasLocationInfo(filepath, startline, startcolumn, endline, endcolumn)
     }
 
     override File getFile() { result = astNode.getFile() }
 
-    override string toString() { result = astNode.toString() }
+    override string toString() { Stages::DataFlowStage::ref() and result = astNode.toString() }
   }
 
   /**
@@ -484,6 +492,7 @@ module DataFlow {
      * Gets the data flow node corresponding to the base object
      * whose property is read from or written to.
      */
+    cached
     abstract Node getBase();
 
     /**
@@ -522,6 +531,13 @@ module DataFlow {
      */
     predicate isPrivateField() {
       getPropertyName().charAt(0) = "#" and getPropertyNameExpr() instanceof Label
+    }
+
+    /**
+     * Gets an accessor (`get` or `set` method) that may be invoked by this property reference.
+     */
+    final DataFlow::FunctionNode getAnAccessorCallee() {
+      result = CallGraph::getAnAccessorCallee(this)
     }
   }
 
@@ -580,7 +596,10 @@ module DataFlow {
 
     PropLValueAsPropWrite() { astNode instanceof LValue }
 
-    override Node getBase() { result = valueNode(astNode.getBase()) }
+    override Node getBase() {
+      result = valueNode(astNode.getBase()) and
+      Stages::DataFlowStage::ref()
+    }
 
     override Expr getPropertyNameExpr() { result = astNode.getPropertyNameExpr() }
 
@@ -709,7 +728,7 @@ module DataFlow {
     override ParameterField prop;
 
     override Node getBase() {
-      result = thisNode(prop.getDeclaringClass().getConstructor().getBody())
+      thisNode(result, prop.getDeclaringClass().getConstructor().getBody())
     }
 
     override Expr getPropertyNameExpr() {
@@ -743,7 +762,7 @@ module DataFlow {
     }
 
     override Node getBase() {
-      result = thisNode(prop.getDeclaringClass().getConstructor().getBody())
+      thisNode(result, prop.getDeclaringClass().getConstructor().getBody())
     }
 
     override Expr getPropertyNameExpr() { result = prop.getNameExpr() }
@@ -1079,8 +1098,19 @@ module DataFlow {
 
       override DataFlow::Node getCalleeNode() { result = DataFlow::valueNode(astNode.getCallee()) }
 
+      /**
+       * Whether i is an index that occurs after a spread argument.
+       */
+      pragma[nomagic]
+      private predicate isIndexAfterSpread(int i) {
+        astNode.isSpreadArgument(i)
+        or
+        exists(astNode.getArgument(i)) and
+        isIndexAfterSpread(i - 1)
+      }
+
       override DataFlow::Node getArgument(int i) {
-        not astNode.isSpreadArgument([0 .. i]) and
+        not isIndexAfterSpread(i) and
         result = DataFlow::valueNode(astNode.getArgument(i))
       }
 
@@ -1252,6 +1282,7 @@ module DataFlow {
   /**
    * Gets the data flow node corresponding to `e`.
    */
+  pragma[inline]
   ExprNode exprNode(Expr e) { result = valueNode(e) }
 
   /** Gets the data flow node corresponding to `ssa`. */
@@ -1307,6 +1338,20 @@ module DataFlow {
   predicate functionReturnNode(DataFlow::Node nd, Function function) {
     nd = TFunctionReturnNode(function)
   }
+
+  /**
+   * INTERNAL: Do not use outside standard library.
+   *
+   * Gets a data flow node unique to the given field declaration.
+   *
+   * Note that this node defaults to being disconnected from the data flow
+   * graph, as the individual property reads and writes affecting the field are
+   * analyzed independently of the field declaration.
+   *
+   * Certain framework models may need this node to model the behavior of
+   * class and field decorators.
+   */
+  DataFlow::Node fieldDeclarationNode(FieldDeclaration field) { result = TPropNode(field) }
 
   /**
    * Gets the data flow node corresponding the given l-value expression, if
@@ -1463,6 +1508,7 @@ module DataFlow {
    */
   cached
   predicate localFlowStep(Node pred, Node succ) {
+    Stages::DataFlowStage::ref() and
     // flow from RHS into LHS
     lvalueFlowStep(pred, succ)
     or
@@ -1515,7 +1561,9 @@ module DataFlow {
    */
   predicate localFieldStep(DataFlow::Node pred, DataFlow::Node succ) {
     exists(ClassNode cls, string prop |
-      pred = cls.getAReceiverNode().getAPropertyWrite(prop).getRhs() and
+      pred = cls.getAReceiverNode().getAPropertyWrite(prop).getRhs() or
+      pred = cls.getInstanceMethod(prop)
+    |
       succ = cls.getAReceiverNode().getAPropertyRead(prop)
     )
   }
@@ -1592,7 +1640,8 @@ module DataFlow {
       e instanceof E4X::XMLAttributeSelector or
       e instanceof E4X::XMLDotDotExpression or
       e instanceof E4X::XMLFilterExpression or
-      e instanceof E4X::XMLQualifiedIdentifier
+      e instanceof E4X::XMLQualifiedIdentifier or
+      e instanceof Angular2::PipeRefExpr
     )
     or
     exists(Expr e | e = nd.asExpr() |

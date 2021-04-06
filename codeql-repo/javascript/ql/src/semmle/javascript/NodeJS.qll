@@ -33,31 +33,25 @@ class NodeModule extends Module {
    * Gets an abstract value representing one or more values that may flow
    * into this module's `module.exports` property.
    */
+  pragma[noinline]
   DefiniteAbstractValue getAModuleExportsValue() {
-    exists(AbstractProperty moduleExports |
-      moduleExports.getBase().(AbstractModuleObject).getModule() = this and
-      moduleExports.getPropertyName() = "exports"
-    |
-      result = moduleExports.getAValue()
-    )
+    result = getAModuleExportsProperty().getAValue()
+  }
+
+  pragma[noinline]
+  private AbstractProperty getAModuleExportsProperty() {
+    result.getBase().(AbstractModuleObject).getModule() = this and
+    result.getPropertyName() = "exports"
   }
 
   /**
    * Gets an expression that is an alias for `module.exports`.
-   * For performance this predicate only computes relevant expressions.
+   * For performance this predicate only computes relevant expressions (in `getAModuleExportsCandidate`).
    * So if using this predicate - consider expanding the list of relevant expressions.
    */
-  pragma[noinline]
-  DataFlow::Node getAModuleExportsNode() {
-    (
-      // A bit of manual magic
-      result = any(DataFlow::PropWrite w | exists(w.getPropertyName())).getBase()
-      or
-      result = DataFlow::valueNode(any(PropAccess p | exists(p.getPropertyName())).getBase())
-      or
-      result = DataFlow::valueNode(any(ObjectExpr obj))
-    ) and
-    result.analyze().getAValue() = getAModuleExportsValue()
+  DataFlow::AnalyzedNode getAModuleExportsNode() {
+    result = getAModuleExportsCandidate() and
+    result.getAValue() = getAModuleExportsValue()
   }
 
   /** Gets a symbol exported by this module. */
@@ -149,6 +143,21 @@ class NodeModule extends Module {
 }
 
 /**
+ * Gets an expression that syntactically could be a alias for `module.exports`.
+ * This predicate exists to reduce the size of `getAModuleExportsNode`,
+ * while keeping all the tuples that could be relevant in later computations.
+ */
+pragma[noinline]
+private DataFlow::Node getAModuleExportsCandidate() {
+  // A bit of manual magic
+  result = any(DataFlow::PropWrite w | exists(w.getPropertyName())).getBase()
+  or
+  result = DataFlow::valueNode(any(PropAccess p | exists(p.getPropertyName())).getBase())
+  or
+  result = DataFlow::valueNode(any(ObjectExpr obj))
+}
+
+/**
  * Holds if `nodeModules` is a folder of the form `<prefix>/node_modules`, where
  * `<prefix>` is a (not necessarily proper) prefix of `f` and does not end in `/node_modules`,
  * and `distance` is the number of path elements of `f` that are missing from `<prefix>`.
@@ -193,6 +202,42 @@ private class RequireVariable extends Variable {
  */
 private predicate moduleInFile(Module m, File f) { m.getFile() = f }
 
+private predicate isModuleModule(DataFlow::Node nd) {
+  exists(ImportDeclaration imp |
+    imp.getImportedPath().getValue() = "module" and
+    nd =
+      [
+        DataFlow::destructuredModuleImportNode(imp),
+        DataFlow::valueNode(imp.getASpecifier().(ImportNamespaceSpecifier))
+      ]
+  )
+  or
+  isModuleModule(nd.getAPredecessor())
+}
+
+private predicate isCreateRequire(DataFlow::Node nd) {
+  exists(PropAccess prop |
+    isModuleModule(prop.getBase().flow()) and
+    prop.getPropertyName() = "createRequire" and
+    nd = prop.flow()
+  )
+  or
+  exists(PropertyPattern prop |
+    isModuleModule(prop.getObjectPattern().flow()) and
+    prop.getName() = "createRequire" and
+    nd = prop.getValuePattern().flow()
+  )
+  or
+  exists(ImportDeclaration decl, NamedImportSpecifier spec |
+    decl.getImportedPath().getValue() = "module" and
+    spec = decl.getASpecifier() and
+    spec.getImportedName() = "createRequire" and
+    nd = spec.flow()
+  )
+  or
+  isCreateRequire(nd.getAPredecessor())
+}
+
 /**
  * Holds if `nd` may refer to `require`, either directly or modulo local data flow.
  */
@@ -206,16 +251,11 @@ private predicate isRequire(DataFlow::Node nd) {
   or
   // `import { createRequire } from 'module';`.
   // specialized to ES2015 modules to avoid recursion in the `DataFlow::moduleImport()` predicate and to avoid
-  // negative recursion between `Import.getImportedModuleNode()` and `Import.getImportedModule()`.
-  exists(ImportDeclaration imp, DataFlow::SourceNode baseObj |
-    imp.getImportedPath().getValue() = "module"
-  |
-    baseObj =
-      [
-        DataFlow::destructuredModuleImportNode(imp),
-        DataFlow::valueNode(imp.getASpecifier().(ImportNamespaceSpecifier))
-      ] and
-    nd = baseObj.getAPropertyRead("createRequire").getACall()
+  // negative recursion between `Import.getImportedModuleNode()` and `Import.getImportedModule()`, and
+  // to avoid depending on `SourceNode` as this would make `SourceNode::Range` recursive.
+  exists(CallExpr call |
+    isCreateRequire(call.getCallee().flow()) and
+    nd = call.flow()
   )
 }
 

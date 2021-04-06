@@ -693,7 +693,11 @@ private predicate simpleInstructionLocalFlowStep(Operand opFrom, Instruction iTo
   exists(ChiInstruction chi | chi = iTo |
     opFrom.getAnyDef() instanceof WriteSideEffectInstruction and
     chi.getPartialOperand() = opFrom and
-    not chi.isResultConflated()
+    not chi.isResultConflated() and
+    // In a call such as `set_value(&x->val);` we don't want the memory representing `x` to receive
+    // dataflow by a simple step. Instead, this is handled by field flow. If we add a simple step here
+    // we can get field-to-object flow.
+    not chi.isPartialUpdate()
   )
   or
   // Flow through modeled functions
@@ -716,21 +720,15 @@ private predicate modelFlow(Operand opFrom, Instruction iTo) {
       iTo = call
       or
       exists(int index, WriteSideEffectInstruction outNode |
-        modelOut.isParameterDeref(index) and
+        modelOut.isParameterDerefOrQualifierObject(index) and
         iTo = outNode and
         outNode = getSideEffectFor(call, index)
-      )
-      or
-      exists(WriteSideEffectInstruction outNode |
-        modelOut.isQualifierObject() and
-        iTo = outNode and
-        outNode = getSideEffectFor(call, -1)
       )
     ) and
     (
       exists(int index |
-        modelIn.isParameter(index) and
-        opFrom = call.getPositionalArgumentOperand(index)
+        modelIn.isParameterOrQualifierAddress(index) and
+        opFrom = call.getArgumentOperand(index)
       )
       or
       exists(int index, ReadSideEffectInstruction read |
@@ -738,9 +736,6 @@ private predicate modelFlow(Operand opFrom, Instruction iTo) {
         read = getSideEffectFor(call, index) and
         opFrom = read.getSideEffectOperand()
       )
-      or
-      modelIn.isQualifierAddress() and
-      opFrom = call.getThisArgumentOperand()
       or
       exists(ReadSideEffectInstruction read |
         modelIn.isQualifierObject() and

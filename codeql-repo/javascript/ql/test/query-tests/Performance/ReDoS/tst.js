@@ -351,3 +351,16 @@ var bad79 = /(a*)*b/;
 var bad80 = /(a+)*b/;
 var bad81 = /(a*)+b/;
 var bad82 = /(a+)+b/;
+
+// GOOD
+var good40 = /(a|b)+/;
+var good41 = /(?:[\s;,"'<>(){}|[\]@=+*]|:(?![/\\]))+/;
+
+// NOT GOOD
+var bad83 = /^((?:a{|-)|\w\{)+X$/; 
+var bad84 = /^((?:a{0|-)|\w\{\d)+X$/; 
+var bad85 = /^((?:a{0,|-)|\w\{\d,)+X$/; 
+var bad86 = /^((?:a{0,2|-)|\w\{\d,\d)+X$/; 
+
+// GOOD: 
+var good42 = /^((?:a{0,2}|-)|\w\{\d,\d\})+X$/; 

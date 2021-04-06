@@ -239,6 +239,31 @@ class HttpServerHttpResponseTest extends InlineExpectationsTest {
   }
 }
 
+class HttpServerHttpRedirectResponseTest extends InlineExpectationsTest {
+  HttpServerHttpRedirectResponseTest() { this = "HttpServerHttpRedirectResponseTest" }
+
+  override string getARelevantTag() { result in ["HttpRedirectResponse", "redirectLocation"] }
+
+  override predicate hasActualResult(Location location, string element, string tag, string value) {
+    exists(location.getFile().getRelativePath()) and
+    (
+      exists(HTTP::Server::HttpRedirectResponse redirect |
+        location = redirect.getLocation() and
+        element = redirect.toString() and
+        value = "" and
+        tag = "HttpRedirectResponse"
+      )
+      or
+      exists(HTTP::Server::HttpRedirectResponse redirect |
+        location = redirect.getLocation() and
+        element = redirect.toString() and
+        value = value_from_expr(redirect.getRedirectLocation().asExpr()) and
+        tag = "redirectLocation"
+      )
+    )
+  }
+}
+
 class FileSystemAccessTest extends InlineExpectationsTest {
   FileSystemAccessTest() { this = "FileSystemAccessTest" }
 
@@ -290,6 +315,28 @@ class SafeAccessCheckTest extends InlineExpectationsTest {
         element = branch.toString() and
         value = branch.toString() and
         tag = "branch"
+      )
+    )
+  }
+}
+
+class PublicKeyGenerationTest extends InlineExpectationsTest {
+  PublicKeyGenerationTest() { this = "PublicKeyGenerationTest" }
+
+  override string getARelevantTag() { result in ["PublicKeyGeneration", "keySize"] }
+
+  override predicate hasActualResult(Location location, string element, string tag, string value) {
+    exists(location.getFile().getRelativePath()) and
+    exists(Cryptography::PublicKey::KeyGeneration keyGen |
+      location = keyGen.getLocation() and
+      (
+        element = keyGen.toString() and
+        value = "" and
+        tag = "PublicKeyGeneration"
+        or
+        element = keyGen.toString() and
+        value = keyGen.getKeySizeWithOrigin(_).toString() and
+        tag = "keySize"
       )
     )
   }

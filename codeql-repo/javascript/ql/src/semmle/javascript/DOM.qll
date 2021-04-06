@@ -315,6 +315,11 @@ module DOM {
       )
     }
 
+    private InferredType getArgumentTypeFromJQueryMethodGet(JQuery::MethodCall call) {
+      call.getMethodName() = "get" and
+      result = call.getArgument(0).analyze().getAType()
+    }
+
     private class DefaultRange extends Range {
       DefaultRange() {
         this.asExpr().(VarAccess).getVariable() instanceof DOMGlobalVariable
@@ -344,7 +349,7 @@ module DOM {
         or
         exists(JQuery::MethodCall call | this = call and call.getMethodName() = "get" |
           call.getNumArgument() = 1 and
-          forex(InferredType t | t = call.getArgument(0).analyze().getAType() | t = TTNumber())
+          unique(InferredType t | t = getArgumentTypeFromJQueryMethodGet(call)) = TTNumber()
         )
         or
         // A `this` node from a callback given to a `$().each(callback)` call.
@@ -353,8 +358,42 @@ module DOM {
           this = DataFlow::thisNode(eachCall.getCallback(0).getFunction()) or
           this = eachCall.getABoundCallbackParameter(0, 1)
         )
+        or
+        // A receiver node of an event handler on a DOM node
+        exists(DataFlow::SourceNode domNode, DataFlow::FunctionNode eventHandler |
+          // NOTE: we do not use `getABoundFunctionValue()`, since bound functions tend to have
+          // a different receiver anyway
+          eventHandler = domNode.getAPropertySource(any(string n | n.matches("on%")))
+          or
+          eventHandler =
+            domNode.getAMethodCall("addEventListener").getArgument(1).getAFunctionValue()
+        |
+          domNode = domValueRef() and
+          this = eventHandler.getReceiver()
+        )
+        or
+        this = DataFlow::thisNode(any(EventHandlerCode evt))
       }
     }
+  }
+
+  /**
+   * Gets a reference to a DOM event.
+   */
+  private DataFlow::SourceNode domEventSource() {
+    // e.g. <form onSubmit={e => e.target}/>
+    exists(JSXAttribute attr | attr.getName().matches("on%") |
+      result = attr.getValue().flow().getABoundFunctionValue(0).getParameter(0)
+    )
+    or
+    // node.addEventListener("submit", e => e.target)
+    result = domValueRef().getAMethodCall("addEventListener").getABoundCallbackParameter(1, 0)
+    or
+    // node.onSubmit = (e => e.target);
+    exists(DataFlow::PropWrite write | write = domValueRef().getAPropertyWrite() |
+      write.getPropertyName().matches("on%") and
+      result = write.getRhs().getAFunctionValue().getParameter(0)
+    )
   }
 
   /** Gets a data flow node that refers directly to a value from the DOM. */
@@ -367,6 +406,9 @@ module DOM {
     or
     t.start() and
     result = domValueRef().getAMethodCall(["item", "namedItem"])
+    or
+    t.startInProp("target") and
+    result = domEventSource()
     or
     exists(DataFlow::TypeTracker t2 | result = domValueRef(t2).track(t2, t))
   }
@@ -468,5 +510,12 @@ module DOM {
     result = documentRef(DataFlow::TypeTracker::end())
     or
     result.hasUnderlyingType("Document")
+  }
+
+  /**
+   * Holds if a value assigned to property `name` of a DOM node can be interpreted as JavaScript via the `javascript:` protocol.
+   */
+  string getAPropertyNameInterpretedAsJavaScriptUrl() {
+    result = ["action", "formaction", "href", "src", "data"]
   }
 }

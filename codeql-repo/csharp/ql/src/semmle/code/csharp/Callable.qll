@@ -206,7 +206,11 @@ class Callable extends DotNet::Callable, Parameterizable, ExprOrStmtParent, @cal
     exists(ReturnStmt ret | ret.getEnclosingCallable() = this | e = ret.getExpr())
     or
     e = this.getExpressionBody() and
-    not this.getReturnType() instanceof VoidType
+    not this.getReturnType() instanceof VoidType and
+    (
+      not this.(Modifiable).isAsync() or
+      this.getReturnType() instanceof Generic
+    )
   }
 
   /** Holds if this callable can yield return the expression `e`. */
@@ -459,6 +463,15 @@ class Operator extends Callable, Member, Attributable, @operator {
   override string toString() { result = Callable.super.toString() }
 
   override Parameter getRawParameter(int i) { result = getParameter(i) }
+}
+
+/** A clone method on a record. */
+class RecordCloneMethod extends Method, DotNet::RecordCloneCallable {
+  override Constructor getConstructor() {
+    result = DotNet::RecordCloneCallable.super.getConstructor()
+  }
+
+  override string toString() { result = Method.super.toString() }
 }
 
 /**

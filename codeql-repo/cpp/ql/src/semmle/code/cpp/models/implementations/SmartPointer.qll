@@ -1,17 +1,24 @@
 import semmle.code.cpp.models.interfaces.Taint
+import semmle.code.cpp.models.interfaces.PointerWrapper
 
 /**
  * The `std::shared_ptr` and `std::unique_ptr` template classes.
  */
-private class UniqueOrSharedPtr extends Class {
-  UniqueOrSharedPtr() { this.hasQualifiedName("std", ["shared_ptr", "unique_ptr"]) }
+private class UniqueOrSharedPtr extends Class, PointerWrapper {
+  UniqueOrSharedPtr() { this.hasQualifiedName(["std", "bsl"], ["shared_ptr", "unique_ptr"]) }
+
+  override MemberFunction getAnUnwrapperFunction() {
+    result.(OverloadedPointerDereferenceFunction).getDeclaringType() = this
+    or
+    result.getClassAndName(["operator->", "get"]) = this
+  }
 }
 
 /**
  * The `std::make_shared` and `std::make_unique` template functions.
  */
 private class MakeUniqueOrShared extends TaintFunction {
-  MakeUniqueOrShared() { this.hasQualifiedName("std", ["make_shared", "make_unique"]) }
+  MakeUniqueOrShared() { this.hasQualifiedName(["bsl", "std"], ["make_shared", "make_unique"]) }
 
   override predicate hasTaintFlow(FunctionInput input, FunctionOutput output) {
     // Exclude the specializations of `std::make_shared` and `std::make_unique` that allocate arrays

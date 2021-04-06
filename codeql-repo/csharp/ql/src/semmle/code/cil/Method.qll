@@ -19,7 +19,7 @@ class MethodImplementation extends EntryPoint, @cil_method_implementation {
   override MethodImplementation getImplementation() { result = this }
 
   /** Gets the location of this implementation. */
-  Assembly getLocation() { cil_method_implementation(this, _, result) }
+  override Assembly getLocation() { cil_method_implementation(this, _, result) }
 
   /** Gets the instruction at index `index`. */
   Instruction getInstruction(int index) { cil_instruction(result, _, index, this) }
@@ -67,7 +67,7 @@ class MethodImplementation extends EntryPoint, @cil_method_implementation {
  * destructors, operators, accessors and so on.
  */
 class Method extends DotNet::Callable, Element, Member, TypeContainer, DataFlowNode,
-  CustomModifierReceiver, @cil_method {
+  CustomModifierReceiver, Parameterizable, @cil_method {
   /**
    * Gets a method implementation, if any. Note that there can
    * be several implementations in different assemblies.
@@ -89,9 +89,7 @@ class Method extends DotNet::Callable, Element, Member, TypeContainer, DataFlowN
 
   override Location getALocation() { cil_method_location(this.getUnboundDeclaration(), result) }
 
-  override Parameter getRawParameter(int n) { cil_parameter(result, this, n, _) }
-
-  override Parameter getParameter(int n) {
+  override MethodParameter getParameter(int n) {
     if isStatic() then result = getRawParameter(n) else (result = getRawParameter(n + 1) and n >= 0)
   }
 

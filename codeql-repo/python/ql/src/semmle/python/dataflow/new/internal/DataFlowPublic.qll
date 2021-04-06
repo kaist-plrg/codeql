@@ -6,6 +6,7 @@ private import python
 private import DataFlowPrivate
 import semmle.python.dataflow.new.TypeTracker
 import Attributes
+import LocalSources
 private import semmle.python.essa.SsaCompute
 
 /**
@@ -58,9 +59,18 @@ newtype TNode =
    * That is, `call` contains argument `**{"foo": bar}` which is passed
    * to parameter `foo` of `callable`.
    */
-  TKwUnpacked(CallNode call, CallableValue callable, string name) {
+  TKwUnpackedNode(CallNode call, CallableValue callable, string name) {
     call_unpacks(call, _, callable, name, _)
-  }
+  } or
+  /**
+   * A synthetic node representing that an iterable sequence flows to consumer.
+   */
+  TIterableSequenceNode(UnpackingAssignmentSequenceTarget consumer) or
+  /**
+   * A synthetic node representing that there may be an iterable element
+   * for `consumer` to consume.
+   */
+  TIterableElementNode(UnpackingAssignmentTarget consumer)
 
 /** Helper for `Node::getEnclosingCallable`. */
 private DataFlowCallable getCallableScope(Scope s) {
@@ -100,13 +110,13 @@ class Node extends TNode {
     this.getLocation().hasLocationInfo(filepath, startline, startcolumn, endline, endcolumn)
   }
 
-  /** Convenience method for casting to EssaNode and calling getVar. */
+  /** Gets the ESSA variable corresponding to this node, if any. */
   EssaVariable asVar() { none() }
 
-  /** Convenience method for casting to CfgNode and calling getNode. */
+  /** Gets the control-flow node corresponding to this node, if any. */
   ControlFlowNode asCfgNode() { none() }
 
-  /** Convenience method for casting to ExprNode and calling getNode and getNode again. */
+  /** Gets the expression corresponding to this node, if any. */
   Expr asExpr() { none() }
 
   /**
@@ -116,6 +126,19 @@ class Node extends TNode {
    */
   pragma[inline]
   Node track(TypeTracker t2, TypeTracker t) { t = t2.step(this, result) }
+
+  /**
+   * Gets a node that may flow into this one using one heap and/or interprocedural step.
+   *
+   * See `TypeBackTracker` for more details about how to use this.
+   */
+  pragma[inline]
+  LocalSourceNode backtrack(TypeBackTracker t2, TypeBackTracker t) { t2 = t.step(result, this) }
+
+  /**
+   * Gets a local source node from which data may flow to this node in zero or more local data-flow steps.
+   */
+  LocalSourceNode getALocalSource() { result.flowsTo(this) }
 }
 
 /** A data-flow node corresponding to an SSA variable. */
@@ -134,7 +157,7 @@ class EssaNode extends Node, TEssaNode {
 
   override Scope getScope() { result = var.getScope() }
 
-  override Location getLocation() { result = var.getDefinition().getLocation() }
+  override Location getLocation() { result = var.getLocation() }
 }
 
 /** A data-flow node corresponding to a control-flow node. */
@@ -154,6 +177,23 @@ class CfgNode extends Node, TCfgNode {
   override Scope getScope() { result = node.getScope() }
 
   override Location getLocation() { result = node.getLocation() }
+}
+
+/** A data-flow node corresponding to a `CallNode` in the control-flow graph. */
+class CallCfgNode extends CfgNode {
+  override CallNode node;
+
+  /**
+   * Gets the data-flow node for the function component of the call corresponding to this data-flow
+   * node.
+   */
+  Node getFunction() { result.asCfgNode() = node.getFunction() }
+
+  /** Gets the data-flow node corresponding to the i'th argument of the call corresponding to this data-flow node */
+  Node getArg(int i) { result.asCfgNode() = node.getArg(i) }
+
+  /** Gets the data-flow node corresponding to the named argument of the call corresponding to this data-flow node */
+  Node getArgByName(string name) { result.asCfgNode() = node.getArgByName(name) }
 }
 
 /**
@@ -176,10 +216,15 @@ ExprNode exprNode(DataFlowExpr e) { result.getNode().getNode() = e }
  * The value of a parameter at function entry, viewed as a node in a data
  * flow graph.
  */
-class ParameterNode extends CfgNode {
+class ParameterNode extends CfgNode, LocalSourceNode {
   ParameterDefinition def;
 
-  ParameterNode() { node = def.getDefiningNode() }
+  ParameterNode() {
+    node = def.getDefiningNode() and
+    // Disregard parameters that we cannot resolve
+    // TODO: Make this unnecessary
+    exists(DataFlowCallable c | node = c.getParameter(_))
+  }
 
   /**
    * Holds if this node is the parameter of callable `c` at the
@@ -191,6 +236,20 @@ class ParameterNode extends CfgNode {
 
   /** Gets the `Parameter` this `ParameterNode` represents. */
   Parameter getParameter() { result = def.getParameter() }
+}
+
+/** Gets a node corresponding to parameter `p`. */
+ParameterNode parameterNode(Parameter p) { result.getParameter() = p }
+
+/** A data flow node that represents a call argument. */
+class ArgumentNode extends Node {
+  ArgumentNode() { this = any(DataFlowCall c).getArg(_) }
+
+  /** Holds if this argument occurs at the given position in the given call. */
+  predicate argumentOf(DataFlowCall call, int pos) { this = call.getArg(pos) }
+
+  /** Gets the call in which this node is an argument. */
+  final DataFlowCall getCall() { this.argumentOf(result, _) }
 }
 
 /**
@@ -322,11 +381,11 @@ class KwOverflowNode extends Node, TKwOverflowNode {
  * The node representing the synthetic argument of a call that is unpacked from a dictionary
  * argument.
  */
-class KwUnpacked extends Node, TKwUnpacked {
+class KwUnpackedNode extends Node, TKwUnpackedNode {
   CallNode call;
   string name;
 
-  KwUnpacked() { this = TKwUnpacked(call, _, name) }
+  KwUnpackedNode() { this = TKwUnpackedNode(call, _, name) }
 
   override string toString() { result = "KwUnpacked " + name }
 
@@ -338,6 +397,42 @@ class KwUnpacked extends Node, TKwUnpacked {
   }
 
   override Location getLocation() { result = call.getLocation() }
+}
+
+/**
+ * A synthetic node representing an iterable sequence. Used for changing content type
+ * for instance from a `ListElement` to a `TupleElement`, especially if the content is
+ * transferred via a read step which cannot be broken up into a read and a store. The
+ * read step then targets TIterableSequence, and the conversion can happen via a read
+ * step to TIterableElement followed by a store step to the target.
+ */
+class IterableSequenceNode extends Node, TIterableSequenceNode {
+  CfgNode consumer;
+
+  IterableSequenceNode() { this = TIterableSequenceNode(consumer.getNode()) }
+
+  override string toString() { result = "IterableSequence" }
+
+  override DataFlowCallable getEnclosingCallable() { result = consumer.getEnclosingCallable() }
+
+  override Location getLocation() { result = consumer.getLocation() }
+}
+
+/**
+ * A synthetic node representing an iterable element. Used for changing content type
+ * for instance from a `ListElement` to a `TupleElement`. This would happen via a
+ * read step from the list to IterableElement followed by a store step to the tuple.
+ */
+class IterableElementNode extends Node, TIterableElementNode {
+  CfgNode consumer;
+
+  IterableElementNode() { this = TIterableElementNode(consumer.getNode()) }
+
+  override string toString() { result = "IterableElement" }
+
+  override DataFlowCallable getEnclosingCallable() { result = consumer.getEnclosingCallable() }
+
+  override Location getLocation() { result = consumer.getLocation() }
 }
 
 /**
@@ -377,19 +472,6 @@ class BarrierGuard extends GuardNode {
 }
 
 /**
- * A data flow node that is a source of local flow. This includes things like
- * - Expressions
- * - Function parameters
- */
-class LocalSourceNode extends Node {
-  LocalSourceNode() { not simpleLocalFlowStep(_, this) }
-
-  /** Holds if this `LocalSourceNode` can flow to `nodeTo` in one or more local flow steps. */
-  cached
-  predicate flowsTo(Node nodeTo) { simpleLocalFlowStep*(this, nodeTo) }
-}
-
-/**
  * Algebraic datatype for tracking data content associated with values.
  * Content can be collection elements or object attributes.
  */
@@ -399,7 +481,12 @@ newtype TContent =
   /** An element of a set. */
   TSetElementContent() or
   /** An element of a tuple at a specific index. */
-  TTupleElementContent(int index) { exists(any(TupleNode tn).getElement(index)) } or
+  TTupleElementContent(int index) {
+    exists(any(TupleNode tn).getElement(index))
+    or
+    // Arguments can overflow and end up in the starred parameter tuple.
+    exists(any(CallNode cn).getArg(index))
+  } or
   /** An element of a dictionary under a specific key. */
   TDictionaryElementContent(string key) {
     key = any(KeyValuePair kvp).getKey().(StrConst).getS()

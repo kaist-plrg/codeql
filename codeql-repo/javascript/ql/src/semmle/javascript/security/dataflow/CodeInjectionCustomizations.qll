@@ -33,13 +33,6 @@ module CodeInjection {
   }
 
   /**
-   * An access to a property that may hold (parts of) the document URL.
-   */
-  class LocationSource extends Source {
-    LocationSource() { this = DOM::locationSource() }
-  }
-
-  /**
    * An expression which may be interpreted as an AngularJS expression.
    */
   class AngularJSExpressionSink extends Sink, DataFlow::ValueNode {
@@ -108,6 +101,17 @@ module CodeInjection {
         or
         // argument to `injectJavascript` method of React Native `WebView`
         this = webView.getAMethodCall("injectJavaScript").getArgument(0)
+      )
+    }
+  }
+
+  /**
+   * A body element from a script tag inside React code.
+   */
+  class ReactScriptTag extends Sink {
+    ReactScriptTag() {
+      exists(JSXElement element | element.getName() = "script" |
+        this = element.getBodyElement(_).flow()
       )
     }
   }

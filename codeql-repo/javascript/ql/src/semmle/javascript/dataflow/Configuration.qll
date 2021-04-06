@@ -72,6 +72,8 @@ private import javascript
 private import internal.FlowSteps
 private import internal.AccessPaths
 private import internal.CallGraphs
+private import internal.Unit
+private import semmle.javascript.internal.CachedStages
 
 /**
  * A data flow tracking configuration for finding inter-procedural paths from
@@ -474,18 +476,27 @@ pragma[nomagic]
 private predicate barrierGuardBlocksEdge(
   BarrierGuardNode guard, DataFlow::Node pred, DataFlow::Node succ, string label
 ) {
-  barrierGuardIsRelevant(guard) and
   exists(
     SsaVariable input, SsaPhiNode phi, BasicBlock bb, ConditionGuardNode cond, boolean outcome
   |
+    bb = getADominatedBasicBlock(guard, cond) and
     pred = DataFlow::ssaDefinitionNode(input) and
     succ = DataFlow::ssaDefinitionNode(phi) and
     input = phi.getInputFromBlock(bb) and
-    guard.getEnclosingExpr() = cond.getTest() and
     outcome = cond.getOutcome() and
-    barrierGuardBlocksExpr(guard, outcome, input.getAUse(), label) and
-    cond.dominates(bb)
+    barrierGuardBlocksExpr(guard, outcome, input.getAUse(), label)
   )
+}
+
+/**
+ * Gets a basicblock that is dominated by `cond`, where the test for `cond` cond is `guard`.
+ *
+ * This predicate exists to get a better join-order for the `barrierGuardBlocksEdge` predicate above.
+ */
+private BasicBlock getADominatedBasicBlock(BarrierGuardNode guard, ConditionGuardNode cond) {
+  barrierGuardIsRelevant(guard) and
+  guard.getEnclosingExpr() = cond.getTest() and
+  cond.dominates(result)
 }
 
 /**
@@ -533,6 +544,12 @@ abstract class LabeledBarrierGuardNode extends BarrierGuardNode {
 }
 
 /**
+ * DEPRECATED. Subclasses should extend `SharedFlowStep` instead, unless the subclass
+ * is part of a query, in which case it should be moved into the `isAdditionalFlowStep` predicate
+ * of the relevant data-flow configuration.
+ * Other uses of the predicate in this class should instead reference the predicates in the
+ * `SharedFlowStep::` module, such as `SharedFlowStep::step`.
+ *
  * A data flow edge that should be added to all data flow configurations in
  * addition to standard data flow edges.
  *
@@ -540,19 +557,19 @@ abstract class LabeledBarrierGuardNode extends BarrierGuardNode {
  * of the standard library. Override `Configuration::isAdditionalFlowStep`
  * for analysis-specific flow steps.
  */
-cached
-abstract class AdditionalFlowStep extends DataFlow::Node {
+deprecated class AdditionalFlowStep = LegacyAdditionalFlowStep;
+
+// Internal version of AdditionalFlowStep that we can reference without deprecation warnings.
+abstract private class LegacyAdditionalFlowStep extends DataFlow::Node {
   /**
    * Holds if `pred` &rarr; `succ` should be considered a data flow edge.
    */
-  cached
   predicate step(DataFlow::Node pred, DataFlow::Node succ) { none() }
 
   /**
    * Holds if `pred` &rarr; `succ` should be considered a data flow edge
    * transforming values with label `predlbl` to have label `succlbl`.
    */
-  cached
   predicate step(
     DataFlow::Node pred, DataFlow::Node succ, DataFlow::FlowLabel predlbl,
     DataFlow::FlowLabel succlbl
@@ -566,7 +583,6 @@ abstract class AdditionalFlowStep extends DataFlow::Node {
    * Holds if `pred` should be stored in the object `succ` under the property `prop`.
    * The object `succ` must be a `DataFlow::SourceNode` for the object wherein the value is stored.
    */
-  cached
   predicate storeStep(DataFlow::Node pred, DataFlow::SourceNode succ, string prop) { none() }
 
   /**
@@ -574,7 +590,6 @@ abstract class AdditionalFlowStep extends DataFlow::Node {
    *
    * Holds if the property `prop` of the object `pred` should be loaded into `succ`.
    */
-  cached
   predicate loadStep(DataFlow::Node pred, DataFlow::Node succ, string prop) { none() }
 
   /**
@@ -582,7 +597,6 @@ abstract class AdditionalFlowStep extends DataFlow::Node {
    *
    * Holds if the property `prop` should be copied from the object `pred` to the object `succ`.
    */
-  cached
   predicate loadStoreStep(DataFlow::Node pred, DataFlow::Node succ, string prop) { none() }
 
   /**
@@ -590,12 +604,166 @@ abstract class AdditionalFlowStep extends DataFlow::Node {
    *
    * Holds if the property `loadProp` should be copied from the object `pred` to the property `storeProp` of object `succ`.
    */
+  predicate loadStoreStep(
+    DataFlow::Node pred, DataFlow::Node succ, string loadProp, string storeProp
+  ) {
+    none()
+  }
+}
+
+/**
+ * A data flow edge that should be added to all data flow configurations in
+ * addition to standard data flow edges.
+ *
+ * This class is a singleton, and thus subclasses do not need to specify a characteristic predicate.
+ *
+ * Note: For performance reasons, all subclasses of this class should be part
+ * of the standard library. Override `Configuration::isAdditionalFlowStep`
+ * for analysis-specific flow steps.
+ */
+class SharedFlowStep extends Unit {
+  /**
+   * Holds if `pred` &rarr; `succ` should be considered a data flow edge.
+   */
+  predicate step(DataFlow::Node pred, DataFlow::Node succ) { none() }
+
+  /**
+   * Holds if `pred` &rarr; `succ` should be considered a data flow edge
+   * transforming values with label `predlbl` to have label `succlbl`.
+   */
+  predicate step(
+    DataFlow::Node pred, DataFlow::Node succ, DataFlow::FlowLabel predlbl,
+    DataFlow::FlowLabel succlbl
+  ) {
+    none()
+  }
+
+  /**
+   * Holds if `pred` should be stored in the object `succ` under the property `prop`.
+   * The object `succ` must be a `DataFlow::SourceNode` for the object wherein the value is stored.
+   */
+  predicate storeStep(DataFlow::Node pred, DataFlow::SourceNode succ, string prop) { none() }
+
+  /**
+   * Holds if the property `prop` of the object `pred` should be loaded into `succ`.
+   */
+  predicate loadStep(DataFlow::Node pred, DataFlow::Node succ, string prop) { none() }
+
+  /**
+   * Holds if the property `prop` should be copied from the object `pred` to the object `succ`.
+   */
+  predicate loadStoreStep(DataFlow::Node pred, DataFlow::Node succ, string prop) { none() }
+
+  /**
+   * Holds if the property `loadProp` should be copied from the object `pred` to the property `storeProp` of object `succ`.
+   */
+  predicate loadStoreStep(
+    DataFlow::Node pred, DataFlow::Node succ, string loadProp, string storeProp
+  ) {
+    none()
+  }
+}
+
+/**
+ * Contains predicates for accessing the steps contributed by `SharedFlowStep` subclasses.
+ */
+cached
+module SharedFlowStep {
+  cached
+  private module Internal {
+    // Forces this to be part of the `FlowSteps` stage.
+    // We use a public predicate in a private module to avoid warnings about this being unused.
+    cached
+    predicate forceStage() { Stages::FlowSteps::ref() }
+  }
+
+  /**
+   * Holds if `pred` &rarr; `succ` should be considered a data flow edge.
+   */
+  cached
+  predicate step(DataFlow::Node pred, DataFlow::Node succ) {
+    any(SharedFlowStep s).step(pred, succ)
+  }
+
+  /**
+   * Holds if `pred` &rarr; `succ` should be considered a data flow edge
+   * transforming values with label `predlbl` to have label `succlbl`.
+   */
+  cached
+  predicate step(
+    DataFlow::Node pred, DataFlow::Node succ, DataFlow::FlowLabel predlbl,
+    DataFlow::FlowLabel succlbl
+  ) {
+    any(SharedFlowStep s).step(pred, succ, predlbl, succlbl)
+  }
+
+  /**
+   * Holds if `pred` should be stored in the object `succ` under the property `prop`.
+   * The object `succ` must be a `DataFlow::SourceNode` for the object wherein the value is stored.
+   */
+  cached
+  predicate storeStep(DataFlow::Node pred, DataFlow::SourceNode succ, string prop) {
+    any(SharedFlowStep s).storeStep(pred, succ, prop)
+  }
+
+  /**
+   * Holds if the property `prop` of the object `pred` should be loaded into `succ`.
+   */
+  cached
+  predicate loadStep(DataFlow::Node pred, DataFlow::Node succ, string prop) {
+    any(SharedFlowStep s).loadStep(pred, succ, prop)
+  }
+
+  /**
+   * Holds if the property `prop` should be copied from the object `pred` to the object `succ`.
+   */
+  cached
+  predicate loadStoreStep(DataFlow::Node pred, DataFlow::Node succ, string prop) {
+    any(SharedFlowStep s).loadStoreStep(pred, succ, prop)
+  }
+
+  /**
+   * Holds if the property `loadProp` should be copied from the object `pred` to the property `storeProp` of object `succ`.
+   */
   cached
   predicate loadStoreStep(
     DataFlow::Node pred, DataFlow::Node succ, string loadProp, string storeProp
   ) {
-    loadProp = storeProp and
-    loadStoreStep(pred, succ, loadProp)
+    any(SharedFlowStep s).loadStoreStep(pred, succ, loadProp, storeProp)
+  }
+}
+
+/**
+ * Contributes subclasses of `AdditionalFlowStep` to `SharedFlowStep`.
+ */
+private class AdditionalFlowStepAsSharedStep extends SharedFlowStep {
+  override predicate step(DataFlow::Node pred, DataFlow::Node succ) {
+    any(LegacyAdditionalFlowStep s).step(pred, succ)
+  }
+
+  override predicate step(
+    DataFlow::Node pred, DataFlow::Node succ, DataFlow::FlowLabel predlbl,
+    DataFlow::FlowLabel succlbl
+  ) {
+    any(LegacyAdditionalFlowStep s).step(pred, succ, predlbl, succlbl)
+  }
+
+  override predicate storeStep(DataFlow::Node pred, DataFlow::SourceNode succ, string prop) {
+    any(LegacyAdditionalFlowStep s).storeStep(pred, succ, prop)
+  }
+
+  override predicate loadStep(DataFlow::Node pred, DataFlow::Node succ, string prop) {
+    any(LegacyAdditionalFlowStep s).loadStep(pred, succ, prop)
+  }
+
+  override predicate loadStoreStep(DataFlow::Node pred, DataFlow::Node succ, string prop) {
+    any(LegacyAdditionalFlowStep s).loadStoreStep(pred, succ, prop)
+  }
+
+  override predicate loadStoreStep(
+    DataFlow::Node pred, DataFlow::Node succ, string loadProp, string storeProp
+  ) {
+    any(LegacyAdditionalFlowStep s).loadStoreStep(pred, succ, loadProp, storeProp)
   }
 }
 
@@ -604,7 +772,7 @@ abstract class AdditionalFlowStep extends DataFlow::Node {
  *
  * A pseudo-property represents the location where some value is stored in an object.
  *
- * For use with load/store steps in `DataFlow::AdditionalFlowStep` and TypeTracking.
+ * For use with load/store steps in `DataFlow::SharedFlowStep` and TypeTracking.
  */
 module PseudoProperties {
   bindingset[s]
@@ -659,8 +827,14 @@ module PseudoProperties {
    */
   pragma[inline]
   string mapValueKnownKey(DataFlow::Node key) {
-    result = pseudoProperty("mapValue", any(string s | key.mayHaveStringValue(s)))
+    result = mapValueKey(any(string s | key.mayHaveStringValue(s)))
   }
+
+  /**
+   * Gets a pseudo-property for the location of a map value where the key is `key`.
+   */
+  bindingset[key]
+  string mapValueKey(string key) { result = pseudoProperty("mapValue", key) }
 
   /**
    * Gets a pseudo-property for the location of a map value where the key is `key`.
@@ -714,12 +888,12 @@ abstract class AdditionalSink extends DataFlow::Node {
  * Additional flow step to model flow from import specifiers into the SSA variable
  * corresponding to the imported variable.
  */
-private class FlowStepThroughImport extends AdditionalFlowStep, DataFlow::ValueNode {
-  override ImportSpecifier astNode;
-
+private class FlowStepThroughImport extends SharedFlowStep {
   override predicate step(DataFlow::Node pred, DataFlow::Node succ) {
-    pred = this and
-    succ = DataFlow::ssaDefinitionNode(SSA::definition(astNode))
+    exists(ImportSpecifier specifier |
+      pred = DataFlow::valueNode(specifier) and
+      succ = DataFlow::ssaDefinitionNode(SSA::definition(specifier))
+    )
   }
 }
 
@@ -1133,7 +1307,7 @@ private predicate reachesReturn(
 private predicate isAdditionalLoadStep(
   DataFlow::Node pred, DataFlow::Node succ, string prop, DataFlow::Configuration cfg
 ) {
-  any(AdditionalFlowStep s).loadStep(pred, succ, prop)
+  SharedFlowStep::loadStep(pred, succ, prop)
   or
   cfg.isAdditionalLoadStep(pred, succ, prop)
 }
@@ -1144,7 +1318,7 @@ private predicate isAdditionalLoadStep(
 private predicate isAdditionalStoreStep(
   DataFlow::Node pred, DataFlow::Node succ, string prop, DataFlow::Configuration cfg
 ) {
-  any(AdditionalFlowStep s).storeStep(pred, succ, prop)
+  SharedFlowStep::storeStep(pred, succ, prop)
   or
   cfg.isAdditionalStoreStep(pred, succ, prop)
 }
@@ -1156,13 +1330,13 @@ private predicate isAdditionalLoadStoreStep(
   DataFlow::Node pred, DataFlow::Node succ, string loadProp, string storeProp,
   DataFlow::Configuration cfg
 ) {
-  any(AdditionalFlowStep s).loadStoreStep(pred, succ, loadProp, storeProp)
+  SharedFlowStep::loadStoreStep(pred, succ, loadProp, storeProp)
   or
   cfg.isAdditionalLoadStoreStep(pred, succ, loadProp, storeProp)
   or
   loadProp = storeProp and
   (
-    any(AdditionalFlowStep s).loadStoreStep(pred, succ, loadProp)
+    SharedFlowStep::loadStoreStep(pred, succ, loadProp)
     or
     cfg.isAdditionalLoadStoreStep(pred, succ, loadProp)
   )
@@ -1287,27 +1461,43 @@ private predicate summarizedHigherOrderCall(
   DataFlow::Node arg, DataFlow::Node cb, int i, DataFlow::Configuration cfg, PathSummary summary
 ) {
   exists(
-    Function f, DataFlow::InvokeNode outer, DataFlow::InvokeNode inner, int j,
-    DataFlow::Node innerArg, DataFlow::SourceNode cbParm, PathSummary oldSummary
+    Function f, DataFlow::InvokeNode inner, int j, DataFlow::Node innerArg,
+    DataFlow::SourceNode cbParm, PathSummary oldSummary
   |
-    reachableFromInput(f, outer, arg, innerArg, cfg, oldSummary) and
-    // Only track actual parameter flow.
     // Captured flow does not need to be summarized - it is handled by the local case in `higherOrderCall`.
-    not arg = DataFlow::capturedVariableNode(_) and
-    argumentPassing(outer, cb, f, cbParm) and
-    innerArg = inner.getArgument(j)
+    not arg = DataFlow::capturedVariableNode(_)
   |
     // direct higher-order call
-    cbParm.flowsTo(inner.getCalleeNode()) and
+    summarizedHigherOrderCallAux(f, arg, innerArg, cfg, oldSummary, cbParm, inner, j, cb) and
+    inner = cbParm.getAnInvocation() and
     i = j and
     summary = oldSummary
     or
     // indirect higher-order call
+    summarizedHigherOrderCallAux(f, arg, innerArg, cfg, oldSummary, cbParm, inner, j, cb) and
     exists(DataFlow::Node cbArg, PathSummary newSummary |
       cbParm.flowsTo(cbArg) and
       summarizedHigherOrderCall(innerArg, cbArg, i, cfg, newSummary) and
       summary = oldSummary.append(PathSummary::call()).append(newSummary)
     )
+  )
+}
+
+/**
+ * @see `summarizedHigherOrderCall`.
+ */
+pragma[noinline]
+private predicate summarizedHigherOrderCallAux(
+  Function f, DataFlow::Node arg, DataFlow::Node innerArg, DataFlow::Configuration cfg,
+  PathSummary oldSummary, DataFlow::SourceNode cbParm, DataFlow::InvokeNode inner, int j,
+  DataFlow::Node cb
+) {
+  exists(DataFlow::Node outer1, DataFlow::Node outer2 |
+    reachableFromInput(f, outer1, arg, innerArg, cfg, oldSummary) and
+    outer1 = pragma[only_bind_into](outer2) and
+    // Only track actual parameter flow.
+    argumentPassing(outer2, cb, f, cbParm) and
+    innerArg = inner.getArgument(j)
   )
 }
 

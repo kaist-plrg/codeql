@@ -6,10 +6,10 @@
 
 import csharp
 private import Completion
-private import PreSsa as PreSsa
 private import ControlFlowGraphImpl
 private import SuccessorTypes
 private import semmle.code.csharp.controlflow.ControlFlowGraph::ControlFlow
+private import semmle.code.csharp.controlflow.internal.PreSsa
 
 /** The maximum number of splits allowed for a given node. */
 private int maxSplits() { result = 5 }
@@ -464,6 +464,24 @@ module ConditionalCompletionSplitting {
         completion = c
         or
         last(succ.(SwitchCaseExpr).getBody(), pred, c) and
+        completion = c
+        or
+        last(succ.(NotPatternExpr).getPattern(), pred, c) and
+        completion.(MatchingCompletion).getDual() = c
+        or
+        last(succ.(IsExpr).getPattern(), pred, c) and
+        completion.(BooleanCompletion).getValue() = c.(MatchingCompletion).getValue()
+        or
+        last(succ.(AndPatternExpr).getAnOperand(), pred, c) and
+        completion = c
+        or
+        last(succ.(OrPatternExpr).getAnOperand(), pred, c) and
+        completion = c
+        or
+        last(succ.(RecursivePatternExpr).getAChildExpr(), pred, c) and
+        completion = c
+        or
+        last(succ.(PropertyPatternExpr).getPattern(_), pred, c) and
         completion = c
       )
     }
@@ -1125,9 +1143,7 @@ module BooleanSplitting {
      * another condition that reads the same SSA variable.
      */
     private predicate firstDefCondition(ConditionBlock cb) {
-      exists(AssignableRead read | this.defConditionReachableFromRead(cb, read) |
-        PreSsa::firstReadSameVar(def, read)
-      )
+      this.defConditionReachableFromRead(cb, def.getAFirstRead())
     }
 
     override predicate correlatesConditions(ConditionBlock cb1, ConditionBlock cb2, boolean inverted) {
@@ -1150,9 +1166,9 @@ module BooleanSplitting {
       )
     }
 
-    override Callable getEnclosingCallable() { result = def.getCallable() }
+    override Callable getEnclosingCallable() { result = def.getBasicBlock().getEnclosingCallable() }
 
-    override string toString() { result = def.getAssignable().toString() }
+    override string toString() { result = def.getSourceVariable().toString() }
 
     override Location getLocation() { result = def.getLocation() }
   }
@@ -1303,7 +1319,6 @@ module BooleanSplitting {
 module LoopSplitting {
   private import semmle.code.csharp.controlflow.Guards as Guards
   private import PreBasicBlocks
-  private import PreSsa
 
   /** Holds if `ce` is guarded by a (non-)empty check, as specified by `v`. */
   private predicate emptinessGuarded(
@@ -1529,11 +1544,7 @@ predicate succEntrySplits(CfgScope pred, ControlFlowElement succ, Splits succSpl
   exists(int rnk |
     scopeFirst(pred, succ) and
     t instanceof NormalSuccessor and
-    succEntrySplitsFromRank(pred, succ, succSplits, rnk) and
-    // Attribute arguments in assemblies are represented as expressions, even though
-    // they are not from source. We are not interested in constructing a CFG for such
-    // expressions.
-    succ.fromSource()
+    succEntrySplitsFromRank(pred, succ, succSplits, rnk)
   |
     rnk = 0 and
     not any(SplitImpl split).hasEntryScope(pred, succ)

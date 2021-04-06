@@ -79,7 +79,13 @@ class MissingValue extends InstructionViolation {
  * A call that does not have exactly one `getTarget()`.
  */
 class MissingCallTarget extends InstructionViolation {
-  MissingCallTarget() { exists(Call c | c = instruction | count(c.getTarget()) != 1) }
+  MissingCallTarget() {
+    exists(Call c | c = instruction |
+      count(c.getTarget()) != 1 and not c instanceof Opcodes::Calli
+      or
+      count(c.(Opcodes::Calli).getTargetType()) != 1 and c instanceof Opcodes::Calli
+    )
+  }
 
   override string getMessage() { result = "Call has invalid target" }
 }
@@ -473,7 +479,7 @@ class InvalidOverride extends MethodViolation {
   InvalidOverride() {
     base = getMethod().getOverriddenMethod() and
     not getMethod().getDeclaringType().getABaseType+() = base.getDeclaringType() and
-    base.getDeclaringType().isSourceDeclaration() // Bases classes of constructed types aren't extracted properly.
+    base.getDeclaringType().isUnboundDeclaration() // Bases classes of constructed types aren't extracted properly.
   }
 
   override string getMessage() {
@@ -664,7 +670,7 @@ class MissingCilDeclaration extends ConsistencyViolation, MissingCSharpCheck {
   override string getMessage() {
     result =
       "Cannot locate CIL for " + getDeclaration().toStringWithTypes() + " of class " +
-        getDeclaration().getAQlClass()
+        getDeclaration().getAPrimaryQlClass()
   }
 
   override string toString() { result = getDeclaration().toStringWithTypes() }
@@ -753,7 +759,7 @@ class DeclarationWithMultipleLabels extends DeclarationViolation {
 class DeclarationWithoutLabel extends DeclarationViolation {
   DeclarationWithoutLabel() {
     exists(Declaration d | this = DeclarationCheck(d) |
-      d.isSourceDeclaration() and
+      d.isUnboundDeclaration() and
       not d instanceof TypeParameter and
       not exists(d.getLabel()) and
       (d instanceof Callable or d instanceof Type)
