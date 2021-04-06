@@ -1,10 +1,8 @@
 "use strict";
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
@@ -243,7 +241,7 @@ var astMetaProperties = [
     "ast",
     "type",
 ];
-var astPropertySet = new Set(__spreadArrays(astProperties, astMetaProperties));
+var astPropertySet = new Set(__spreadArray(__spreadArray([], astProperties), astMetaProperties));
 function stringifyAST(obj) {
     return JSON.stringify(obj, function (k, v) {
         return (+k === +k || astPropertySet.has(k)) ? v : undefined;
@@ -345,7 +343,7 @@ function loadTsConfig(command) {
     var parseConfigHost = {
         useCaseSensitiveFileNames: true,
         readDirectory: function (rootDir, extensions, excludes, includes, depth) {
-            var exclusions = excludes == null ? [] : __spreadArrays(excludes);
+            var exclusions = excludes == null ? [] : __spreadArray([], excludes);
             if (virtualSourceRoot.virtualSourceRoot != null) {
                 exclusions.push(virtualSourceRoot.virtualSourceRoot);
             }
@@ -354,10 +352,10 @@ function loadTsConfig(command) {
             if (virtualDir == null) {
                 return originalResults;
             }
-            var virtualExclusions = excludes == null ? [] : __spreadArrays(excludes);
+            var virtualExclusions = excludes == null ? [] : __spreadArray([], excludes);
             virtualExclusions.push('**/node_modules/**/*');
             var virtualResults = ts.sys.readDirectory(virtualDir, extensions, virtualExclusions, includes, depth);
-            return __spreadArrays(originalResults, virtualResults);
+            return __spreadArray(__spreadArray([], originalResults), virtualResults);
         },
         fileExists: function (path) {
             return ts.sys.fileExists(path)

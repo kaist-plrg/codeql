@@ -1,4 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/env python2.7
+# As outlined in https://github.com/github/codeql-tracer/issues/38, `/usr/bin/python`
+# mangles argv on OSX 10.14 (Mojave).
+# To work around this, we invoke python 2.7 directly.
+#
+# This works on Mojave, Catalina (10.15) and Big Sur, as they still ship python 2.
+# Catalina is the first version to also ship python 3.
+# Once apple stops shipping python 2 (presumably in the next major OS upgrade)
+# we need to re-evaluate what to do here.
+# This is tracked in https://github.com/github/codeql-tracer/issues/8
+
 import errno
 import os
 import re
@@ -17,6 +27,7 @@ try:
   binary = sys.argv[3]
   dest = sys.argv[4]
 
+  orig_file_stat = os.stat(orig_file)
 
   # Dereference all symlinks.
   real_file = os.path.realpath(orig_file)
@@ -79,6 +90,7 @@ try:
                   raise
 
   # And put the binary in place
+  os.chmod(unsigned_binary, orig_file_stat.st_mode)
   os.rename(unsigned_binary, real_dest)
 
 except:

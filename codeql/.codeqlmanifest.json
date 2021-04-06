@@ -1,6 +1,8 @@
 {
     "provide": [
         "*/codeql-extractor.yml",
-        "legacy-upgrades/qlpack.yml"
+        "legacy-upgrades/qlpack.yml",
+        "qlpacks/*/qlpack.yml"
     ]
 }
+

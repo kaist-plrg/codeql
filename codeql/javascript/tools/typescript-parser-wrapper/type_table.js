@@ -308,7 +308,14 @@ var TypeTable = (function () {
                 ? tupleType.minLength
                 : this.typeChecker.getTypeArguments(tupleReference).length;
             var hasRestElement = tupleType.hasRestElement ? 't' : 'f';
-            var prefix = "tuple;" + minLength + ";" + hasRestElement;
+            var restIndex = -1;
+            for (var i = 0; i < tupleType.elementFlags.length; i++) {
+                if (tupleType.elementFlags[i] & ts.ElementFlags.Rest) {
+                    restIndex = i;
+                    break;
+                }
+            }
+            var prefix = "tuple;" + minLength + ";" + restIndex;
             return this.makeTypeStringVectorFromTypeReferenceArguments(prefix, type);
         }
         if (objectFlags & ts.ObjectFlags.Anonymous) {
@@ -562,6 +569,9 @@ var TypeTable = (function () {
         return id;
     };
     TypeTable.prototype.getSignatureString = function (kind, signature) {
+        var _a;
+        var modifiers = (_a = signature.getDeclaration()) === null || _a === void 0 ? void 0 : _a.modifiers;
+        var isAbstract = modifiers && modifiers.filter(function (modifier) { return modifier.kind == ts.SyntaxKind.AbstractKeyword; }).length > 0;
         var parameters = signature.getParameters();
         var numberOfTypeParameters = signature.typeParameters == null
             ? 0
@@ -594,9 +604,9 @@ var TypeTable = (function () {
         if (returnTypeId == null) {
             return null;
         }
-        var tag = kind + ";" + numberOfTypeParameters + ";" + requiredParameters + ";" + restParameterTag + ";" + returnTypeId;
-        for (var _i = 0, _a = signature.typeParameters || []; _i < _a.length; _i++) {
-            var typeParameter = _a[_i];
+        var tag = kind + ";" + (isAbstract ? "t" : "f") + ";" + numberOfTypeParameters + ";" + requiredParameters + ";" + restParameterTag + ";" + returnTypeId;
+        for (var _i = 0, _b = signature.typeParameters || []; _i < _b.length; _i++) {
+            var typeParameter = _b[_i];
             tag += ";" + typeParameter.symbol.name;
             var constraint = typeParameter.getConstraint();
             var constraintId = void 0;

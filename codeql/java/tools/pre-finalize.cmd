@@ -6,6 +6,7 @@ IF [%LGTM_INDEX_XML_MODE%]==[default] (
 type NUL && "%CODEQL_DIST%\codeql" database index-files ^
     --include "**/AndroidManifest.xml" ^
     --include "**/pom.xml" ^
+    --include "**/struts.xml" ^
     --include "**/web.xml" ^
     --size-limit 10m ^
     --language xml ^
