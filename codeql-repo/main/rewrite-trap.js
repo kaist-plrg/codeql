@@ -67,38 +67,48 @@ walk(JAVA_DIR, ".trap.gz").forEach(from => {
 // cpp
 
 /// compile trap
-from = walk(CPP_DIR + '/compilations','.br')[0];
-to = from.replace(CPP_DIR, MERGED_DIR);
-lines = readLines_br(from);
-rewritten = lines.map(rewriteLine(CPP_PREFIX));
-createParentDir(to);
-write_br(to, rewritten.join("\n"));
-
-/// source trap
-var tar_br = walk(CPP_DIR + '/tarballs','.br')[0];
-var tar_content = readLines_br(tar_br);
-write('temp.tar', tar_content.join('\n'));
-if(!fs.existsSync('temp'))
-  fs.mkdirSync('temp');
-tar.x({file: 'temp.tar', cwd: 'temp', sync: true});
-
-walk('temp','.trap').forEach(from => {
-  to = from;
-  lines = readLines(from);
+walk(CPP_DIR + '/compilations','.br').forEach(from => {
+  to = from.replace(CPP_DIR, MERGED_DIR);
+  lines = readLines_br(from);
   rewritten = lines.map(rewriteLine(CPP_PREFIX));
-  write(to, rewritten.join("\n"));
+  createParentDir(to);
+  write_br(to, rewritten.join("\n"));
 });
 
-tar.c({file: 'temp.tar', cwd:'temp', sync: true}, fs.readdirSync('temp'));
-var new_tar_content = readLines('temp.tar');
-var new_tar_br = tar_br.replace(CPP_DIR, MERGED_DIR);
-createParentDir(new_tar_br);
-write_br(new_tar_br, new_tar_content.join("\n"));
+/// source trap
+walk(CPP_DIR + '/tarballs','.br').forEach(tar_br => {
+  var tar_content = readLines_br(tar_br);
+  write('__temp__.tar', tar_content.join('\n'));
+  if(!fs.existsSync('__temp__'))
+    fs.mkdirSync('__temp__');
+  try {
+    tar.x({file: '__temp__.tar', cwd: '__temp__', sync: true});
+  }
+  catch{
+    console.log(tar_br);
+    fs.unlinkSync('__temp__.tar');
+    fs.rmdirSync('__temp__', {recursive:true});
+    return;
+  }
 
-fs.unlinkSync('temp.tar');
-fs.rmdirSync('temp', {recursive:true});
+  walk('__temp__','.trap').forEach(from => {
+    to = from;
+    lines = readLines(from);
+    rewritten = lines.map(rewriteLine(CPP_PREFIX));
+    write(to, rewritten.join("\n"));
+  });
 
-// manifest
-from = tar_br + ".manifest";
-to = new_tar_br + ".manifest";
-write(to,read(from).toString());
+  tar.c({file: '__temp__.tar', cwd:'__temp__', sync: true}, fs.readdirSync('__temp__'));
+  var new_tar_content = readLines('__temp__.tar');
+  var new_tar_br = tar_br.replace(CPP_DIR, MERGED_DIR);
+  createParentDir(new_tar_br);
+  write_br(new_tar_br, new_tar_content.join("\n"));
+
+  fs.unlinkSync('__temp__.tar');
+  fs.rmdirSync('__temp__', {recursive:true});
+
+  // manifest
+  from = tar_br + ".manifest";
+  to = new_tar_br + ".manifest";
+  write(to,read(from).toString());
+});
