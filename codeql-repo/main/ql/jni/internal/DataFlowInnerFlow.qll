@@ -77,7 +77,7 @@ module StringLiteralFlow {
 
 module JniParameterFlow {
   /**
-   * A configuration for finding flow from special parameter of jni function (env / obj)
+   * A configuration for finding flow from parameter of jni function
    */
   private class JniParameterConfiguration extends CPP::Impl2::Configuration {
     JniParameterConfiguration() { this = "JniParameterConfiguration" }
@@ -85,9 +85,7 @@ module JniParameterFlow {
     override predicate isSource(CPP::Node source) {
       exists(CPP::Function f |
         f.toString().matches("Java_%") |
-        source.(CPP::ParameterNode).isParameterOf(f, 0)
-        or
-        source.(CPP::ParameterNode).isParameterOf(f, 1)
+        source.(CPP::ParameterNode).isParameterOf(f, _)
       )
     }
 
