@@ -9,7 +9,9 @@ string handleMethodSignature(string sig) {
 
 bindingset[args]
 string handleArgs(string args) {
-  result = concat(string arg, int n | arg = args.splitAt(",", n) | handleType(arg) order by n)
+  if args = ""
+  then result = ""
+  else result = concat(string arg, int n | arg = args.splitAt(",", n) | handleType(arg) order by n)
 }
 
 bindingset[ty]
