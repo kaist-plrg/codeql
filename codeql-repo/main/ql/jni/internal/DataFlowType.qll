@@ -16,6 +16,12 @@ class DataFlowCallable extends TDataFlowCallable {
     result = this.asCppDataFlowCallable().toString()
   }
 
+  Location getLocation() {
+    result.asJavaLocation() = this.asJavaDataFlowCallable().getLocation()
+    or
+    result.asCppLocation() = this.asCppDataFlowCallable().getLocation()
+  }
+
   predicate isJniFunction() { //modified
     this.asCppDataFlowCallable().toString().matches("Java_%")
   }

@@ -19,14 +19,18 @@ predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
     classNode.getClass() = JniParameterFlow::getJavaNewExpr(obj).asExpr().getType()
   )
 }
+
+private import Signature
 //TODO: Static method?
 predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
   callNode.getTarget().toString() = "GetMethodID" and
-  exists(ArgumentNode cls, ArgumentNode name |
+  exists(ArgumentNode cls, ArgumentNode name, ArgumentNode sig|
     cls.argumentOf(callNode.getCall(), 0) and
-    name.argumentOf(callNode.getCall(), 1) |
+    name.argumentOf(callNode.getCall(), 1) and
+    sig.argumentOf(callNode.getCall(), 2) |
     methodNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
-    methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name)
+    methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
+    StringLiteralFlow::getStringLiteral(sig).matches(handleMethodSignature(methodNode.getMethod().getSignature()) + "%")
   )
 }
 predicate jniGetFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {

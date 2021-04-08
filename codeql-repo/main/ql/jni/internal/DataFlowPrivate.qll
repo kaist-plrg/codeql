@@ -17,6 +17,21 @@ class Unit extends TUnit {
   }
 }
 
+private newtype TFile =
+  TJavaFile(JAVA::File u)
+  or
+  TCppFile(CPP::File u)
+class File extends TFile {
+  JAVA::File asJavaFile() { this = TJavaFile(result) }
+  CPP::File asCppFile() { this = TCppFile(result) }
+
+  string toString() {
+    result = this.asJavaFile().getAbsolutePath()
+    or
+    result = this.asCppFile().toString()
+  }
+}
+
 private newtype TLocation =
   TJavaLocation(JAVA::Location u)
   or
@@ -29,6 +44,12 @@ class Location extends TLocation {
     result = this.asJavaLocation().toString()
     or
     result = this.asCppLocation().toString()
+  }
+
+  File getFile() {
+    result.asJavaFile() = this.asJavaLocation().getFile()
+    or
+    result.asCppFile() = this.asCppLocation().getFile()
   }
 }
 

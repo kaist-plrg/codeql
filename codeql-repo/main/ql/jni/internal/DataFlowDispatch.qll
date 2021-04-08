@@ -5,6 +5,7 @@ private import DataFlowImplSpecific::Original
 DataFlowCallable viableCallable(DataFlowCall c) { //modified
   result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall())
   or
+  not exists(JniCallNode callNode | callNode.getCall() = c) and
   result.asCppDataFlowCallable() = CPP::viableCallable(c.asCppDataFlowCall())
   or
   exists(JAVA::Method m, CPP::Function f |
