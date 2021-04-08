@@ -12,7 +12,14 @@ DataFlowCallable viableCallable(DataFlowCall c) { //modified
     m = c.asJavaDataFlowCall().(JAVA::MethodAccess).getMethod() and
     f = result.asCppDataFlowCallable() |
     m.isNative() and
-    f.toString().matches("Java_%_" + m.toString() + "%")
+    f.toString().matches(
+      "Java_"
+      + m.getDeclaringType().getQualifiedName().replaceAll("_", "_1").replaceAll(".", "_")
+      + "_"
+      + m.toString()
+      + "%"
+    )
+    //TODO: Signature
   )
   or
   exists(JniCallNode callNode, ArgumentNode midNode |
