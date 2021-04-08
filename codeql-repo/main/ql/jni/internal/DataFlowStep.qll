@@ -1,15 +1,14 @@
 import DataFlowImplSpecific::Public
 private import DataFlowImplSpecific::Private
 private import DataFlowImplSpecific::Original
+private import Signature
 
 // jni functions
 predicate jniFindClassStep(JavaClassNode classNode, JniCallNode callNode) {
   callNode.getTarget().toString() = "FindClass" and
-  exists(ArgumentNode name, int i |
-    name.argumentOf(callNode.getCall(), 0) and
-    i in [1 .. 32] | //maximum class name is 32
-    classNode.getClass().toString() = StringLiteralFlow::getStringLiteral(name).suffix(i)
-    //TODO: consider package information
+  exists(ArgumentNode name |
+    name.argumentOf(callNode.getCall(), 0) |
+    classNode.getClass().getQualifiedName().replaceAll(".", "/") = StringLiteralFlow::getStringLiteral(name) 
   )
 }
 predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
@@ -19,8 +18,6 @@ predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
     classNode.getClass() = JniParameterFlow::getJavaNewExpr(obj).asExpr().getType()
   )
 }
-
-private import Signature
 //TODO: Static method?
 predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
   callNode.getTarget().toString() = "GetMethodID" and
