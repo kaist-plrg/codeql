@@ -3,7 +3,7 @@ string handleMethodSignature(string sig) {
   exists(int st, int fn |
     "(" = sig.charAt(st) and
     ")" = sig.charAt(fn) |
-    result = "(" + handleArgs(sig.substring(st + 1, fn)) + ")"
+    result = handleArgs(sig.substring(st + 1, fn))
   )
 }
 

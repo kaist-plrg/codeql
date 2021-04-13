@@ -27,7 +27,9 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
     sig.argumentOf(callNode.getCall(), 2) |
     methodNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
     methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
-    StringLiteralFlow::getStringLiteral(sig).matches(handleMethodSignature(methodNode.getMethod().getSignature()) + "%")
+    StringLiteralFlow::getStringLiteral(sig).matches(
+      "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
+    )
   )
 }
 predicate jniGetFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {

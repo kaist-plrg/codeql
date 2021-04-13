@@ -1,6 +1,7 @@
 import DataFlowImplSpecific::Public
 private import DataFlowImplSpecific::Private
 private import DataFlowImplSpecific::Original
+private import Signature
 
 DataFlowCallable viableCallable(DataFlowCall c) { //modified
   result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall())
@@ -8,18 +9,24 @@ DataFlowCallable viableCallable(DataFlowCall c) { //modified
   not exists(JniCallNode callNode | callNode.getCall() = c) and
   result.asCppDataFlowCallable() = CPP::viableCallable(c.asCppDataFlowCall())
   or
-  exists(JAVA::Method m, CPP::Function f |
+  exists(JAVA::Method m, CPP::Function f, string name |
     m = c.asJavaDataFlowCall().(JAVA::MethodAccess).getMethod() and
-    f = result.asCppDataFlowCallable() |
-    m.isNative() and
-    f.toString().matches(
+    f = result.asCppDataFlowCallable() and
+    name = 
       "Java_"
       + m.getDeclaringType().getQualifiedName().replaceAll("_", "_1").replaceAll(".", "_")
       + "_"
-      + m.toString()
-      + "%"
+      + m.toString() | 
+    m.isNative() and
+    (
+      f.toString() = name
+      or
+      f.toString() = name + "__" + handleMethodSignature(m.getSignature())
+        .replaceAll("_", "_1")
+        .replaceAll("/", "_")
+        .replaceAll(";", "_2")
+        .replaceAll("[", "_3")
     )
-    //TODO: Signature
   )
   or
   exists(JniCallNode callNode, ArgumentNode midNode |
