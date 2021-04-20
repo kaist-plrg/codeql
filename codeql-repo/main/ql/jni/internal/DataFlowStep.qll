@@ -15,7 +15,7 @@ predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
   callNode.getTarget().toString() = "GetObjectClass" and
   exists(ArgumentNode obj |
     obj.argumentOf(callNode.getCall(), 0) |
-    classNode.getClass() = JniParameterFlow::getJavaNewExpr(obj).asExpr().getType()
+    classNode.getClass() = getJavaNewExpr(obj).asExpr().getType()
   )
 }
 //TODO: Static method?
@@ -26,9 +26,15 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
     name.argumentOf(callNode.getCall(), 1) and
     sig.argumentOf(callNode.getCall(), 2) |
     methodNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
-    methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
-    StringLiteralFlow::getStringLiteral(sig).matches(
-      "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
+    (
+      methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
+      StringLiteralFlow::getStringLiteral(sig).matches(
+        "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
+      )
+      or
+      StringLiteralFlow::getStringLiteral(name) = "<init>" and
+      StringLiteralFlow::getStringLiteral(sig) = "()V" and
+      methodNode.isConstructor()
     )
   )
 }

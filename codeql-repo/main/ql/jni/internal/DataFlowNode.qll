@@ -7,7 +7,7 @@ private newtype TNode =
   or
   TCppNode(CPP::Node n)
   or
-  TJavaMethodNode(JAVA::Method m)
+  TJavaMethodNode(JAVA::Callable c)
   or
   TJavaClassNode(JAVA::Class c)
   or
@@ -166,7 +166,7 @@ class JniCallNode extends ExprNode {
 
   JniCallNode() {
     call = this.asCppNode().asExpr() and
-    JniParameterFlow::isJniEnv(CPP::exprNode(call.getQualifier()))
+    isJniEnv(CPP::exprNode(call.getQualifier()))
   }
 
   DataFlowCall getCall() { result.asCppDataFlowCall() = call }
@@ -189,22 +189,24 @@ class JavaClassNode extends Node, TJavaClassNode {
 }
 
 class JavaMethodNode extends Node, TJavaMethodNode {
-  JAVA::Method method;
+  JAVA::Callable callable;
   JAVA::Class clazz;
 
   JavaMethodNode() {
-    this = TJavaMethodNode(method) and
-    clazz = method.getDeclaringType()
+    this = TJavaMethodNode(callable) and
+    clazz = callable.getDeclaringType()
   }
 
-  override string toString() { result = method.toString() }
+  predicate isConstructor() { callable instanceof JAVA::Constructor }
 
-  JAVA::Method getMethod() { result = method }
+  override string toString() { result = callable.toString() }
+
+  JAVA::Callable getMethod() { result = callable }
   JAVA::Class getClass() { result = clazz }
 
   override DataFlowType getType() { result.asJavaDataFlowType() = clazz }
 
-  override Location getLocation() { result.asJavaLocation() = method.getLocation() }
+  override Location getLocation() { result.asJavaLocation() = callable.getLocation() }
 }
 
 class JavaFieldNode extends Node, TJavaFieldNode {
