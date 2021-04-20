@@ -8,6 +8,7 @@ db-cpp
 db-js
 db-java
 db-merged
+db-native
 db
 
 # dbscheme

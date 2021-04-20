@@ -43,7 +43,8 @@ const JAVA_PREFIX = "java_";
 const CPP_PREFIX = "cpp_";
 const JAVA_DIR = "db-java/trap/java";
 const CPP_DIR = "db-cpp/trap/cpp";
-const MERGED_DIR = "db-merged/trap/merged";
+const MERGED_ROOT = process.argv[2] || "db-merged"
+const MERGED_DIR = MERGED_ROOT + "/trap/merged";
 
 function rewriteLine(PREFIX) {
   return l => {
@@ -56,6 +57,7 @@ function rewriteLine(PREFIX) {
 }
 
 // java
+console.log("Rewriting java trap..");
 walk(JAVA_DIR, ".trap.gz").forEach(from => {
   to = from.replace(JAVA_DIR, MERGED_DIR);
   lines = readLines_gz(from);
@@ -65,6 +67,7 @@ walk(JAVA_DIR, ".trap.gz").forEach(from => {
 });
 
 // cpp
+console.log("Rewriting cpp trap..");
 
 /// compile trap
 walk(CPP_DIR + '/compilations','.br').forEach(from => {
