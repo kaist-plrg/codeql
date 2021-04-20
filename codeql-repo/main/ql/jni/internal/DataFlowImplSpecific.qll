@@ -12,6 +12,9 @@ module Private {
 module Public {
   import DataFlowUtil
   import DataFlowNode
+
+  import DataFlowStep
+  import DataFlowType
 }
 
 module Original {
