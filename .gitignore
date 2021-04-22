@@ -4,11 +4,7 @@ node_modules
 *.log
 
 # DB
-db-cpp
-db-js
-db-java
-db-merged
-db-native
+db-*
 db
 
 # dbscheme

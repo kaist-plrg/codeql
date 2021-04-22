@@ -26,14 +26,26 @@ apps=(
   "native_source_clean"
 )
 
+rm -rf db-native
+mkdir db-native
+
+# Extract common libraries
+echo '[Creating database for java library]'
+rm -rf db-java-lib
+echo '[init]'
+codeql database init -l=java --source-root=$root db-java-lib
+echo '[trace-command]'
+codeql database trace-command --working-dir=$root db-java-lib ./gradlew -- \
+  --no-daemon :native_noleak:clean native_noleak:compileDebugJavaWithJavac
+
+echo '[Executing clean build]'
 cd $root
 ./gradlew clean > /dev/null 2> /dev/null
 cd ..
 
-rm -rf db-native
-mkdir db-native
-
 for app in ${apps[@]}; do
+  echo "========$app========"
+
   echo '[Creating database for java]'
   rm -rf db-java
   echo '[init]'

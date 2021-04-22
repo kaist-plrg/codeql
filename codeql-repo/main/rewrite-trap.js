@@ -42,6 +42,7 @@ var rewritten;
 const JAVA_PREFIX = "java_";
 const CPP_PREFIX = "cpp_";
 const JAVA_DIR = "db-java/trap/java";
+const JAVA_LIB_DIR = "db-java-lib/trap/java";
 const CPP_DIR = "db-cpp/trap/cpp";
 const MERGED_ROOT = process.argv[2] || "db-merged"
 const MERGED_DIR = MERGED_ROOT + "/trap/merged";
@@ -60,6 +61,13 @@ function rewriteLine(PREFIX) {
 console.log("Rewriting java trap..");
 walk(JAVA_DIR, ".trap.gz").forEach(from => {
   to = from.replace(JAVA_DIR, MERGED_DIR);
+  lines = readLines_gz(from);
+  rewritten = lines.map(rewriteLine(JAVA_PREFIX));
+  createParentDir(to);
+  write_gz(to, rewritten.join("\n"));
+});
+walk(JAVA_LIB_DIR+"/classes/android",".trap.gz").forEach(from => {
+  to = from.replace(JAVA_LIB_DIR, MERGED_DIR);
   lines = readLines_gz(from);
   rewritten = lines.map(rewriteLine(JAVA_PREFIX));
   createParentDir(to);
