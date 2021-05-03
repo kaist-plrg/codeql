@@ -1,3 +1,5 @@
+set -e
+
 root=NativeFlowBench
 
 apps=(
