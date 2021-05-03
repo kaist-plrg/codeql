@@ -38,7 +38,7 @@ function handle(language) {
 
   // copy library
   console.log("copying library..");
-  fs.rmdirSync(MY_LIB_DIR, {recursive: true});
+  fs.rmSync(MY_LIB_DIR, {recursive: true, force: true});
   copydir.sync(ORIG_LIB_DIR, MY_LIB_DIR);
 
   // rewrite
