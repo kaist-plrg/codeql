@@ -24,5 +24,6 @@ build
 **/main/ql/java
 **/main/ql/cpp
 
-# Download
+# fdroid
 download
+extracted
