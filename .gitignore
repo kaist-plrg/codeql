@@ -23,3 +23,6 @@ build
 # rewritten library
 **/main/ql/java
 **/main/ql/cpp
+
+# Download
+download
