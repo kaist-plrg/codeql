@@ -1,0 +1,1 @@
+grep buildToolsVersion **/build.gradle -h | grep -Eo "\d\d\.\d\.\d" | sort -u
