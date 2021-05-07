@@ -22,6 +22,6 @@ while read line; do
     continue
   fi
 
-  scmdline-tools/bin/sdkmanager --sdk_root=sdk --install "ndk;$1"
+  cmdline-tools/bin/sdkmanager --sdk_root=sdk --install "ndk;$1"
   ln -fs ../sdk/ndk/$1 ndk/$2
 done < ndk.txt
