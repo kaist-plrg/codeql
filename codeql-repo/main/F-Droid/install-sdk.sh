@@ -1,5 +1,5 @@
-pVersions=`grep compileSdkVersion -r extracted --include build.gradle -h | grep -Eo "\d\d" | sort -u`
-btVersions=`grep buildToolsVersion -r extracted --include build.gradle -h | grep -Eo "\d\d\.\d\.\d" | sort -u`
+pVersions=`grep compileSdkVersion -r extracted --include build.gradle -h | grep -o "[0-9][0-9]" | sort -u`
+btVersions=`grep buildToolsVersion -r extracted --include build.gradle -h | grep -o "[0-9][0-9]\.[0-9]\.[0-9]" | sort -u`
 
 alias sdkmanager="cmdline-tools/bin/sdkmanager --sdk_root=sdk"
 cmd="sdkmanager"
