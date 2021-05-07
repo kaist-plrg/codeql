@@ -14,7 +14,6 @@ while read line; do
 done < ndk-old.txt
 
 # install new ndks using sdkmanager
-alias sdkmanager="cmdline-tools/bin/sdkmanager --sdk_root=sdk"
 while read line; do
   echo $line
   set $line
@@ -23,6 +22,6 @@ while read line; do
     continue
   fi
 
-  sdkmanager --install "ndk;$1"
+  scmdline-tools/bin/sdkmanager --sdk_root=sdk --install "ndk;$1"
   ln -fs ../sdk/ndk/$1 ndk/$2
 done < ndk.txt
