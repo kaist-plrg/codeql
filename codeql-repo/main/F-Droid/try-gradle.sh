@@ -22,8 +22,13 @@ for d in `find extracted -type d`; do
     
     cur=$PWD
     cd $d
-    ./gradlew
-    if [ $? -eq 0 ]; then
+    # run gradle wrapper
+    ./gradlew clean assemble
+    st=$?
+    if [ $st -eq 130 ]; then #SIGINT
+      exit 130
+    fi
+    if [ $st -eq 0 ]; then
       (( ok+=1 ))
     fi
     cd $cur
