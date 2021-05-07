@@ -33,6 +33,7 @@ const SDK_DIR = process.env.PWD + "/sdk";
 const NDK_DIR = process.env.PWD + "/ndk";
 
 walk(EXTRACTED, "local.properties").forEach(from => {
+  console.log(from);
   to = from;
   bak = from + ".bak";
   lines = readLines(from);
