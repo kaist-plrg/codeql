@@ -3,9 +3,10 @@ while read line; do
 
   mkdir -p $1/gradle/wrapper
   
-  sed "s/$2/$3/g" $1/build.gradle > $1/build.gradle.new
-  mv $1/build.gradle.new $1/build.gradle
-  
-  echo distributionUrl=https\\://services.gradle.org/distributions/gradle-$4-bin.zip \
+  echo distributionUrl=https\\://services.gradle.org/distributions/gradle-$3-bin.zip \
   > $1/gradle/wrapper/gradle-wrapper.properties
+
+  if [ ! -z $4 ]; then
+    cp ../local.properties .
+  fi
 done < gradle-version-patch.txt
