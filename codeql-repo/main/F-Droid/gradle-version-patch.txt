@@ -4,7 +4,7 @@ extracted/de.schildbach.wallet_427_src.tar.gz 3.1.0 4.4
 extracted/de.schildbach.wallet_test_427_src.tar.gz 3.1.0 4.4
 extracted/nya.miku.wishmaster_54_src.tar.gz 1.3.1 2.2
 extracted/org.dolphinemu.dolphinemu_17057_src.tar.gz/Externals/fmt/support 3.3.0 3.3.0
-extracted/org.freeminer.freeminer_121_src.tar.gz/build/android 1.5.0 2.2 CP_LOCAL_PROPERTY
+extracted/org.freeminer.freeminer_121_src.tar.gz/build/android 1.5.0 2.2 CP_LOCAL_PROPERTIES
 extracted/org.geometerplus.zlibrary.ui.android_2050920_src.tar.gz/third-party/SuperToasts 0.9.+ 1.10 MAVEN_CENTRAL
 extracted/org.lumicall.android_190_src.tar.gz 1.3.1 2.2
 extracted/org.pocketworkstation.pckeyboard_1041001_src.tar.gz 3.2.1 4.6
