@@ -27,3 +27,5 @@ build
 # fdroid
 download
 extracted
+sdk
+ndk
