@@ -9,7 +9,9 @@ for d in `find extracted -type d`; do
     continue
   fi
   if [ -f $d/build.gradle ]; then
+    echo ===============================
     echo $d
+    echo ===============================
     prefix=$d
 
     (( cnt+=1 ))
@@ -23,7 +25,7 @@ for d in `find extracted -type d`; do
     cur=$PWD
     cd $d
     # run gradle wrapper
-    ./gradlew clean assemble
+    ./gradlew --no-daemon
     st=$?
     if [ $st -eq 130 ]; then #SIGINT
       exit 130
