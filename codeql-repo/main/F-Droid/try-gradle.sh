@@ -25,7 +25,7 @@ for d in `find extracted -type d`; do
     cur=$PWD
     cd $d
     # run gradle wrapper
-    ./gradlew --no-daemon
+    ./gradlew --no-daemon clean assemble
     st=$?
     if [ $st -eq 130 ]; then #SIGINT
       exit 130

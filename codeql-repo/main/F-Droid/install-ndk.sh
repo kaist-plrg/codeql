@@ -20,7 +20,7 @@ while read line; do
   wget -O $zip $1
   unzip -n -q $zip -d ndk
   rm $zip
-done < $ndk_old
+done < resource/$ndk_old
 
 # install new ndks using sdkmanager
 while read line; do
@@ -33,4 +33,4 @@ while read line; do
 
   cmdline-tools/bin/sdkmanager --sdk_root=sdk --install "ndk;$1"
   ln -fs ../sdk/ndk/$1 ndk/$2
-done < ndk.txt
+done < resource/ndk.txt

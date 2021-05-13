@@ -12,4 +12,4 @@ while read line; do
     sed 's/mavenCentral()/maven { url "https:\/\/repo1.maven.org\/maven2\/" }/g' $1/build.gradle > __tmp__
     mv __tmp__ $1/build.gradle
   fi
-done < gradle-version-patch.txt
+done < resource/gradle-version-patch.txt
