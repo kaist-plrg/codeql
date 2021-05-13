@@ -3,7 +3,7 @@
 ./extract.sh
 
 # Install sdk and ndk
-#./intall-sdkmanager.sh
+./intall-sdkmanager.sh
 ./install-sdk.sh
 ./install-ndk.sh
 

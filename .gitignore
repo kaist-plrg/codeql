@@ -27,5 +27,6 @@ build
 # fdroid
 download
 extracted
+cmdline-tools
 sdk
 ndk
