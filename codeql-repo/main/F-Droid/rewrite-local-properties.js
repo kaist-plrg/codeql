@@ -35,7 +35,6 @@ const NDK_DIR = process.env.PWD + "/ndk";
 walk(EXTRACTED, "local.properties").forEach(from => {
   console.log(from);
   to = from;
-  bak = from + ".bak";
   lines = readLines(from);
   newLines = lines.map(line => {
     if(line.startsWith("sdk")) {
@@ -51,5 +50,4 @@ walk(EXTRACTED, "local.properties").forEach(from => {
     return line;
   });
   writeLines(to, newLines);
-  writeLines(bak, lines);
 });
