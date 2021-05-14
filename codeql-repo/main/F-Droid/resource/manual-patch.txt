@@ -1,1 +1,2 @@
 extracted/com.xperia64.timidityae_81_src.tar.gz/AndroidManifest.xml minSdkVersion="9" minSdkVersion="14"
+extracted/com.xperia64.timidityae_81_src.tar.gz/build.gradle 23 24

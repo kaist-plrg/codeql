@@ -9,7 +9,8 @@
 
 # Apply some patches
 node rewrite-local-properties.js
-./rewrite-local-properties.sh
+./gradle-version-patch.sh
+./manual-patch.sh
 
 # Run gradle
 ./try-gradle.sh
