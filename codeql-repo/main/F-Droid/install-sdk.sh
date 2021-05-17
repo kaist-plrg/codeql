@@ -19,3 +19,24 @@ done
 
 echo $cmd
 eval $cmd
+
+# install ant script
+if [ -d sdk/tools/ant ]; then
+  exit 0
+fi
+
+if [[ $OSTYPE == linux-gnu* ]]; then
+  url=https://dl.google.com/android/repository/tools_r25.2.5-linux.zip
+elif [[ $OSTYPE == darwin* ]]; then
+  url=https://dl.google.com/android/repository/tools_r25.2.5-macosx.zip
+else
+  echo "OS not supported"
+  exit 1
+fi
+
+zip=__tmp__.zip
+wget -O $zip $url
+unzip -n -q $zip
+cp -n -r tools sdk
+rm -r tools
+rm $zip
