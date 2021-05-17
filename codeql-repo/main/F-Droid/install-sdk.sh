@@ -1,9 +1,12 @@
-pVersions=`grep compileSdkVersion -r extracted --include build.gradle -h | grep -o "[0-9][0-9]" | sort -u`
+pVersions=`grep compileSdkVersion -r extracted --include build.gradle -h | grep -o "[0-9][0-9]"`
 btVersions=`grep buildToolsVersion -r extracted --include build.gradle -h | grep -o "[0-9][0-9]\.[0-9]\.[0-9]" | sort -u`
 
 #org.zamedev.gloomydungeons
-pVersions+=" 17"
-btVersions+=" 19.1.0"
+pVersions+=$'\n17'
+btVersions+=$'\n19.1.0'
+
+pVersions_ant=`grep target= -r extracted --include project.properties -h | grep -o -E "[0-9]+"`
+pVersions=`(echo "$pVersions"; echo "$pVersions_ant") | sort -u`
 
 cmd="cmdline-tools/bin/sdkmanager --sdk_root=sdk"
 
