@@ -11,3 +11,7 @@ cp ../../gradlew .
 cp ../../gradle-wrapper.jar gradle/wrapper
 ./gradlew --no-daemon downloadDependencies 
 cd ../..
+
+cd extracted/org.geometerplus.zlibrary.ui.android_2050920_src.tar.gz/third-party/SuperToasts/
+cp ../../local.properties .
+cd ../../../..
