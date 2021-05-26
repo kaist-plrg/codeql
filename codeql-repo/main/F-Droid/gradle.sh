@@ -8,6 +8,9 @@ for d in `find extracted -type d`; do
   if [ ! -z $prefix ] && [[ $d == $prefix* ]]; then
     continue
   fi
+  if [[ $d == *Externals* ]] || [[ $d == *third-party* ]]; then
+    continue
+  fi
   if [ -f $d/build.gradle ]; then
     echo ===============================
     echo $d
@@ -25,7 +28,8 @@ for d in `find extracted -type d`; do
     cur=$PWD
     cd $d
     # run gradle wrapper
-    ./gradlew --no-daemon
+    task=`./gradlew --no-daemon task | grep -m 1 compile.*DebugSources`
+    ./gradlew --no-daemon clean $task
     st=$?
     if [ $st -eq 130 ]; then #SIGINT
       exit 130

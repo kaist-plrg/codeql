@@ -21,8 +21,7 @@ for d in `find extracted -type d`; do
     
     cur=$PWD
     cd $d
-    ant clean
-    ant debug
+    ant clean debug
     st=$?
     if [ $st -eq 130 ]; then #SIGINT
       exit 130
