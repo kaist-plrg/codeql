@@ -10,7 +10,8 @@ function readLines_gz(filename) { return zlib.gunzipSync(read(filename)).toStrin
 function readLines_br(filename) { return zlib.brotliDecompressSync(read(filename)).toString().split('\n'); }
 function write(filename, data) { fs.writeFileSync(filename, data); }
 function write_gz(filename, data) { write(filename, zlib.gzipSync(data)); }
-function write_br(filename, data) { write(filename, zlib.brotliCompressSync(data)); }
+const br_option = {params: {[zlib.constants.BROTLI_PARAM_QUALITY]: 2}}
+function write_br(filename, data) { write(filename, zlib.brotliCompressSync(data, br_option)); }
 function walk(dir, ext) {
     var results = [];
     var list = fs.readdirSync(dir);
@@ -66,6 +67,7 @@ walk(JAVA_DIR, ".trap.gz").forEach(from => {
   createParentDir(to);
   write_gz(to, rewritten.join("\n"));
 });
+/* uncomment this for NativeFlowBench
 walk(JAVA_LIB_DIR+"/classes/android",".trap.gz").forEach(from => {
   to = from.replace(JAVA_LIB_DIR, MERGED_DIR);
   lines = readLines_gz(from);
@@ -73,6 +75,7 @@ walk(JAVA_LIB_DIR+"/classes/android",".trap.gz").forEach(from => {
   createParentDir(to);
   write_gz(to, rewritten.join("\n"));
 });
+*/
 
 // cpp
 console.log("Rewriting cpp trap..");
