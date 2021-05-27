@@ -7,7 +7,7 @@ dirs=()
 
 while read line; do
   dirs+=( $line )
-done < F-Droid/resource/db-success.txt
+done < F-Droid/resource/success.txt
 
 for d in ${dirs[@]}; do
   echo "===================="
