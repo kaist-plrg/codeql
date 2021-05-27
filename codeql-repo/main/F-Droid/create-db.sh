@@ -2,6 +2,8 @@ prefix=""
 cnt=0
 ok=0
 
+rm -f success.txt
+
 for d in `find extracted -type d`; do
   if [ ! -z $prefix ] && [[ $d == $prefix* ]]; then
     continue
@@ -65,6 +67,7 @@ for d in `find extracted -type d`; do
         exit 130
       elif [ $st -eq 0 ]; then
         (( ok+=1 ))
+        echo $d $cmd >> success.txt
       fi
     fi
     
