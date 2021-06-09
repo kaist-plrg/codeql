@@ -1,6 +1,6 @@
 import jni.DataFlow::DataFlow
+import java
 
-//import java
 /*
 from JniCallNode call, DataFlowCallable method
 where
@@ -10,8 +10,10 @@ select call, method
 */
 
 from
-   DataFlowCall call
+   DataFlowCall call, JAVA::Callable callee
 where
-  call.asJavaDataFlowCall().getCallee().isNative()
+  callee = call.asJavaDataFlowCall().getCallee()
+  and callee.isNative()
+  and callee.getDeclaringType().fromSource()
 select
   call, call.asJavaDataFlowCall().getLocation().getFile().getAbsolutePath(), count(DataFlowCallable f | callEdge(call, f) | f.asCppDataFlowCallable())

@@ -18,6 +18,7 @@ DataFlowCallable viableCallable(DataFlowCall c) { //modified
       + "_"
       + m.toString() | 
     m.isNative() and
+    m.getDeclaringType().fromSource() and
     (
       f.toString() = name
       or
