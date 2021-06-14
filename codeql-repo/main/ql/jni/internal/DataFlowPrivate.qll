@@ -134,18 +134,20 @@ predicate isUnreachableInCall(Node n, DataFlowCall call) {
   CPP::isUnreachableInCall(n.asCppNode(), call.asCppDataFlowCall())
 }
 
+private predicate compatibleJavaCppTypes(JAVA::Type jt, CPP::Type ct) {
+  // Currently, implementation for cpp is stub
+  jt = jt and ct.toString() = "void"
+}
+
+pragma[inline]
 predicate compatibleTypes(DataFlowType t1, DataFlowType t2) { //modified
   JAVA::compatibleTypes(t1.asJavaDataFlowType(), t2.asJavaDataFlowType())
   or
   CPP::compatibleTypes(t1.asCppDataFlowType(), t2.asCppDataFlowType())
   or
-  exists(JAVA::Type jt, CPP::Type ct |
-    (
-      (jt = t1.asJavaDataFlowType() and ct = t2.asCppDataFlowType())
-      or
-      (jt = t2.asJavaDataFlowType() and ct = t1.asCppDataFlowType())
-    )
-  )
+  compatibleJavaCppTypes(t1.asJavaDataFlowType(), t2.asCppDataFlowType())
+  or
+  compatibleJavaCppTypes(t2.asJavaDataFlowType(), t1.asCppDataFlowType())
 }
 
 string ppReprType(DataFlowType t) {
