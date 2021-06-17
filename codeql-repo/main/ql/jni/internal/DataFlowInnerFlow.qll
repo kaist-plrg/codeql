@@ -53,6 +53,7 @@ module StringLiteralFlow {
   /**
    * A configuration for finding flow of string literal
    */
+   /*
   private class StringLiteralConfiguration extends CPP::Impl2::Configuration {
     StringLiteralConfiguration() { this = "StringLiteralConfiguration" }
 
@@ -64,12 +65,16 @@ module StringLiteralFlow {
       sink instanceof CPP::ArgumentNode
     }
   }
+  */
 
   //TODO: StringLiteral from java?
 
+  pragma[inline]
   string getStringLiteral(ArgumentNode arg) {
-    exists (StringLiteralConfiguration config, ExprNode stringNode |
-      config.hasFlow(stringNode.asCppNode(), arg.asCppNode()) and
+    exists (ExprNode stringNode |
+      stringNode.asCppNode().asExpr() instanceof CPP::StringLiteral |
+      (stringNode = arg or simpleLocalFlow(stringNode, arg)) and
+      //config.hasFlow(stringNode.asCppNode(), arg.asCppNode()) and
       result = stringNode.toString()
     )
   }
@@ -107,6 +112,7 @@ private class AttachCurrentThreadConfiguration extends CPP::Impl2::Configuration
   override predicate isSink(CPP::Node sink) { any() }
 }
 
+pragma[inline]
 predicate isJniEnv(CPP::Node node) {
   exists(JniParameterConfiguration config, CPP::ParameterNode paramNode |
     paramNode.isParameterOf(_, 0) and

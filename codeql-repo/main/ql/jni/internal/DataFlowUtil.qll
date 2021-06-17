@@ -19,7 +19,9 @@ predicate localFlowStep(Node node1, Node node2) {
 }
 
 predicate localFlow(Node node1, Node node2) = fastTC(localFlowStep/2)(node1, node2)
+predicate simpleLocalFlow(Node node1, Node node2) = fastTC(simpleLocalFlowStep/2)(node1, node2)
 
+pragma[inline]
 predicate callEdge(DataFlowCall call, DataFlowCallable callable) {
   callable = viableCallable(call)
 }
