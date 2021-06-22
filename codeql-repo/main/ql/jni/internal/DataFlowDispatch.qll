@@ -3,6 +3,7 @@ private import DataFlowImplSpecific::Private
 private import DataFlowImplSpecific::Original
 private import Signature
 
+pragma[inline]
 DataFlowCallable viableCallable(DataFlowCall c) { //modified
   result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall())
   or
@@ -11,22 +12,24 @@ DataFlowCallable viableCallable(DataFlowCall c) { //modified
   or
   exists(JAVA::Method m, CPP::Function f, string name |
     m = c.asJavaDataFlowCall().(JAVA::MethodAccess).getMethod() and
+    m.isNative() and
+    m.getDeclaringType().fromSource() and
     f = result.asCppDataFlowCallable() and
     name = 
       "Java_"
       + m.getDeclaringType().getQualifiedName().replaceAll("_", "_1").replaceAll(".", "_")
       + "_"
-      + m.toString() | 
-    m.isNative() and
-    m.getDeclaringType().fromSource() and
+      + m.toString().replaceAll("_", "_1") | 
     (
       f.toString() = name
       or
-      f.toString() = name + "__" + handleMethodSignature(m.getSignature())
+      f.toString().matches(name + "__%") and 
+      f.toString().matches("%__" + handleMethodSignature(m.getSignature())
         .replaceAll("_", "_1")
         .replaceAll("/", "_")
         .replaceAll(";", "_2")
         .replaceAll("[", "_3")
+      )
     )
   )
   or
