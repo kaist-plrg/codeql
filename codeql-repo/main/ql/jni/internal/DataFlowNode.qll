@@ -155,6 +155,10 @@ ExprNode exprNode(DataFlowExpr e) {
 
 /* custom classes */
 
+private predicate isJniEnv(CPP::Expr e) {
+  e.getType().toString() = "JNIEnv *"
+}
+
 class JniCallNode extends ExprNode {
   CPP::Call call;
   boolean is_cpp;
@@ -163,10 +167,10 @@ class JniCallNode extends ExprNode {
     call = this.asCppNode().asExpr() and
     (
       is_cpp = true and
-      isJniEnv(CPP::exprNode(call.(CPP::FunctionCall).getQualifier()))
+      isJniEnv(call.(CPP::FunctionCall).getQualifier())
       or
       is_cpp = false and
-      isJniEnv(CPP::exprNode(call.(CPP::ExprCall).getArgument(0)))
+      isJniEnv(call.(CPP::ExprCall).getArgument(0))
     )
   }
 

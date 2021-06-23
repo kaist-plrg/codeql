@@ -97,32 +97,6 @@ private class JniParameterConfiguration extends CPP::Impl2::Configuration {
 }
 
 /**
- * A configuration for finding flow from AttathCurrentThread
- */
-private class AttachCurrentThreadConfiguration extends CPP::Impl2::Configuration {
-  AttachCurrentThreadConfiguration() { this = "AttachCurrentThreadConfiguration" }
-
-  override predicate isSource(CPP::Node source) {
-    exists(CPP::Call call |
-     call.toString().matches("%AttachCurrentThread") |
-     call.getArgument(0) = source.(CPP::DefinitionByReferenceOrIteratorNode).getArgument()
-    )
-  }
-
-  override predicate isSink(CPP::Node sink) { any() }
-}
-
-pragma[inline]
-predicate isJniEnv(CPP::Node node) {
-  exists(JniParameterConfiguration config, CPP::ParameterNode paramNode |
-    paramNode.isParameterOf(_, 0) and
-    config.hasFlow(paramNode, node)
-  )
-  or
-  exists(AttachCurrentThreadConfiguration config | config.hasFlow(_, node))
-}
-
-/**
  * A configuration for finding flow from class instantiation
  */
 private class JavaObjectConfiguration extends JAVA::Configuration {
