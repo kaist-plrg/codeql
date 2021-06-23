@@ -5,26 +5,26 @@ private import Signature
 
 // jni functions
 predicate jniFindClassStep(JavaClassNode classNode, JniCallNode callNode) {
-  callNode.getTarget().toString() = "FindClass" and
+  callNode.getName() = "FindClass" and
   exists(ArgumentNode name |
-    name.argumentOf(callNode.getCall(), 0) |
+    name = callNode.getArgument(0) |
     classNode.getClass().getQualifiedName().replaceAll(".", "/") = StringLiteralFlow::getStringLiteral(name) 
   )
 }
 predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
-  callNode.getTarget().toString() = "GetObjectClass" and
+  callNode.getName() = "GetObjectClass" and
   exists(ArgumentNode obj |
-    obj.argumentOf(callNode.getCall(), 0) |
+    obj = callNode.getArgument(0) |
     classNode.getClass() = getJavaNewExpr(obj).asExpr().getType()
   )
 }
 //TODO: Static method?
 predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
-  callNode.getTarget().toString() = "GetMethodID" and
+  callNode.getName() = "GetMethodID" and
   exists(ArgumentNode cls, ArgumentNode name, ArgumentNode sig|
-    cls.argumentOf(callNode.getCall(), 0) and
-    name.argumentOf(callNode.getCall(), 1) and
-    sig.argumentOf(callNode.getCall(), 2) |
+    cls = callNode.getArgument(0) and
+    name = callNode.getArgument(1) and
+    sig = callNode.getArgument(2) |
     methodNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
     (
       methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
@@ -39,30 +39,30 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
   )
 }
 predicate jniGetFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
-  callNode.getTarget().toString() = "GetFieldID" and
+  callNode.getName() = "GetFieldID" and
   exists(ArgumentNode cls, ArgumentNode name |
-    cls.argumentOf(callNode.getCall(), 0) and
-    name.argumentOf(callNode.getCall(), 1) |
+    cls = callNode.getArgument(0) and
+    name = callNode.getArgument(1) |
     fieldNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
     fieldNode.getField().toString() = StringLiteralFlow::getStringLiteral(name)
   )
 }
 predicate jniGetStaticFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
-  callNode.getTarget().toString() = "GetStaticFieldID" and
+  callNode.getName() = "GetStaticFieldID" and
   exists(ArgumentNode cls, ArgumentNode name |
-    cls.argumentOf(callNode.getCall(), 0) and
-    name.argumentOf(callNode.getCall(), 1) |
+    cls = callNode.getArgument(0) and
+    name = callNode.getArgument(1) |
     fieldNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
     fieldNode.getStaticField().toString() = StringLiteralFlow::getStringLiteral(name)
   )
 }
 predicate jniStringStep(ArgumentNode argNode, JniCallNode callNode) {
   (
-    callNode.getTarget().toString() = "GetStringUTFChars"
+    callNode.getName() = "GetStringUTFChars"
     or
-    callNode.getTarget().toString() = "NewStringUTF"
+    callNode.getName() = "NewStringUTF"
   ) and
-  argNode.argumentOf(callNode.getCall(), 0)
+  argNode = callNode.getArgument(0)
 }
 
 predicate jumpStep(Node n1, Node n2) { //modified
@@ -80,9 +80,9 @@ predicate jumpStep(Node n1, Node n2) { //modified
   or
   //static field read
   exists(JniCallNode callNode, ArgumentNode clsNode, ArgumentNode fidNode, JAVA::Field f |
-    callNode.getTarget().toString().matches("GetStatic%Field") and
-    clsNode.argumentOf(callNode.getCall(), 0) and
-    fidNode.argumentOf(callNode.getCall(), 1)
+    callNode.getName().matches("GetStatic%Field") and
+    clsNode = callNode.getArgument(0) and
+    fidNode = callNode.getArgument(1)
     |
     f = CustomNodeFlow::getJavaStaticFieldNode(fidNode).getStaticField() and
     f.getDeclaringType() = CustomNodeFlow::getJavaClassNode(clsNode).getClass() and
@@ -98,10 +98,10 @@ predicate storeStep(Node node1, Content f, PostUpdateNode node2) {
   or
   //jni field set
   exists(JniCallNode callNode, ArgumentNode objNode, ArgumentNode fidNode, ArgumentNode valNode |
-    callNode.getTarget().toString().matches("Set%Field") and
-    objNode.argumentOf(callNode.getCall(), 0) and
-    fidNode.argumentOf(callNode.getCall(), 1) and
-    valNode.argumentOf(callNode.getCall(), 2)
+    callNode.getName().matches("Set%Field") and
+    objNode = callNode.getArgument(0) and
+    fidNode = callNode.getArgument(1) and
+    valNode = callNode.getArgument(2)
     |
     node1 = valNode and
     f.asJavaContent().(JAVA::FieldContent).getField() = CustomNodeFlow::getJavaFieldNode(fidNode).getField() and
@@ -117,9 +117,9 @@ predicate readStep(Node node1, Content f, Node node2) {
   or
   //jni field get
   exists(JniCallNode callNode, ArgumentNode objNode, ArgumentNode fidNode |
-    callNode.getTarget().toString().matches("Get%Field") and
-    objNode.argumentOf(callNode.getCall(), 0) and
-    fidNode.argumentOf(callNode.getCall(), 1)
+    callNode.getName().matches("Get%Field") and
+    objNode = callNode.getArgument(0) and
+    fidNode = callNode.getArgument(1)
     |
     node1 = objNode and
     f.asJavaContent().(JAVA::FieldContent).getField() = CustomNodeFlow::getJavaFieldNode(fidNode).getField() and

@@ -79,16 +79,10 @@ class ArgumentNode extends Node {
     this.asJavaNode().(JAVA::ArgumentNode).argumentOf(call.asJavaDataFlowCall(), pos)
     or
     (
-      if (
-        exists(JniCallNode n | n.getCall() = call) and
-        call.asCppDataFlowCall().(CPP::Call).getTarget().toString().matches("Call%Method")
-      ) then (
-        pos = -2 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), 1)
-        or
-        pos = -1 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), 0)
-        or
-        pos >= 0 and this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos + 2)
-      )
+      if
+        exists(JniCallNode n | n.getCall() = call | this = n.getArgument(pos))
+      then
+        any()
       else
         this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos)
     )
@@ -162,16 +156,48 @@ ExprNode exprNode(DataFlowExpr e) {
 /* custom classes */
 
 class JniCallNode extends ExprNode {
-  CPP::FunctionCall call;
+  CPP::Call call;
+  boolean is_cpp;
 
   JniCallNode() {
     call = this.asCppNode().asExpr() and
-    isJniEnv(CPP::exprNode(call.getQualifier()))
+    (
+      is_cpp = true and
+      isJniEnv(CPP::exprNode(call.(CPP::FunctionCall).getQualifier()))
+      or
+      is_cpp = false and
+      isJniEnv(CPP::exprNode(call.(CPP::ExprCall).getArgument(0)))
+    )
   }
 
   DataFlowCall getCall() { result.asCppDataFlowCall() = call }
 
-  CPP::Function getTarget() { result = call.getTarget() }
+  string getName() {
+    if is_cpp = true
+    then result = call.getTarget().toString()
+    else result = call.(CPP::ExprCall).getExpr().toString()
+  }
+
+  ArgumentNode getArgument(int pos) {
+    exists(int i
+      | 
+      if getName().matches("Call%Method")
+      then (
+        pos = -2 and i = 1
+        or
+        pos = -1 and i = 0
+        or
+        pos >= 0 and i = pos + 2
+      )
+      else (
+        pos = i and pos >= 0
+      )
+      |
+      is_cpp = true and result.asCppNode().(CPP::ArgumentNode).argumentOf(call, i)
+      or
+      is_cpp = false and result.asCppNode().(CPP::ArgumentNode).argumentOf(call, i + 1)
+    )
+  }
 }
 
 class JavaClassNode extends Node, TJavaClassNode {

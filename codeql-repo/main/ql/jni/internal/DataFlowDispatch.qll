@@ -35,7 +35,7 @@ DataFlowCallable viableCallable(DataFlowCall c) { //modified
   or
   exists(JniCallNode callNode, ArgumentNode midNode |
     callNode.getCall() = c and
-    callNode.getTarget().toString().matches("Call%Method") and
+    callNode.getName().matches("Call%Method") and
     midNode.argumentOf(c, -2) and
     result.asJavaDataFlowCallable() = CustomNodeFlow::getJavaMethodNode(midNode).getMethod()
   )
