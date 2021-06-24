@@ -15,7 +15,7 @@ predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
   callNode.getName() = "GetObjectClass" and
   exists(ArgumentNode obj |
     obj = callNode.getArgument(0) |
-    classNode.getClass() = getJavaNewExpr(obj).asExpr().getType()
+    classNode.getClass() = getJavaClass(obj)
   )
 }
 //TODO: Static method?

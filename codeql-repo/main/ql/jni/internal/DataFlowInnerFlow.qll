@@ -96,33 +96,16 @@ private class JniParameterConfiguration extends CPP::Impl2::Configuration {
   override predicate isSink(CPP::Node sink) { any() }
 }
 
-/**
- * A configuration for finding flow from class instantiation
- */
-private class JavaObjectConfiguration extends JAVA::Configuration {
-  JavaObjectConfiguration() { this = "JavaObjectConfiguration" }
-
-  override predicate isSource(JAVA::Node source) {
-    source instanceof JAVA::NewExpr
-  }
-
-  override predicate isSink(JAVA::Node sink) {
-    sink instanceof JAVA::ArgumentNode
-  }
-}
-
 private import DataFlowImplCommon
 
-JAVA::NewExpr getJavaNewExpr(Node node) {
+JAVA::Type getJavaClass(Node node) {
   exists(
-    JavaObjectConfiguration config1,
     ArgumentNode argNode,
     ParameterNode paramNode,
-    JniParameterConfiguration config2
+    JniParameterConfiguration config
     |
-    config1.hasFlow(result, argNode.asJavaNode()) and
+    result = argNode.asJavaNode().getType() and
     viableParamArg(_, paramNode, argNode) and
-    config2.hasFlow(paramNode.asCppNode(), node.asCppNode())
+    config.hasFlow(paramNode.asCppNode(), node.asCppNode())
   )
 }
-
