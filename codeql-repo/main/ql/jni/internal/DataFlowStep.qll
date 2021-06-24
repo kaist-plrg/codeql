@@ -27,14 +27,13 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
     sig = callNode.getArgument(2) |
     methodNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
     (
-      methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
-      StringLiteralFlow::getStringLiteral(sig).matches(
-        "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
-      )
+      methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name)
       or
       StringLiteralFlow::getStringLiteral(name) = "<init>" and
-      StringLiteralFlow::getStringLiteral(sig) = "()V" and
       methodNode.isConstructor()
+    ) and
+    StringLiteralFlow::getStringLiteral(sig).matches(
+      "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
     )
   )
 }
