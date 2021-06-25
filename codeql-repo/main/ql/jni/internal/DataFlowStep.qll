@@ -25,10 +25,10 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
     cls = callNode.getArgument(0) and
     name = callNode.getArgument(1) and
     sig = callNode.getArgument(2) |
-    methodNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
     (
       methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name)
       or
+      //methodNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass() and
       StringLiteralFlow::getStringLiteral(name) = "<init>" and
       methodNode.isConstructor()
     ) and
