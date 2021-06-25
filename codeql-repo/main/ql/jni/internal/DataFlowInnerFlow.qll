@@ -67,13 +67,19 @@ module StringLiteralFlow {
   }
   */
 
-  //TODO: StringLiteral from java?
+  private predicate myStep(Node fromNode, Node toNode) {
+    simpleLocalFlowStep(fromNode, toNode)
+    or
+    CPP::viableParamArg(_, toNode.asCppNode(), fromNode.asCppNode())
+  }
+
+  private predicate myFlow(Node n1, Node n2) = fastTC(myStep/2)(n1, n2)
 
   pragma[inline]
   string getStringLiteral(ArgumentNode arg) {
     exists (ExprNode stringNode |
       stringNode.asCppNode().asExpr() instanceof CPP::StringLiteral |
-      (stringNode = arg or simpleLocalFlow(stringNode, arg)) and
+      (stringNode = arg or myFlow(stringNode, arg)) and
       //config.hasFlow(stringNode.asCppNode(), arg.asCppNode()) and
       result = stringNode.toString()
     )

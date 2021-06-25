@@ -29,6 +29,7 @@ module Original {
     module Impl2 {
       import cpp.semmle.code.cpp.dataflow.internal.DataFlowImpl2
     }
+    import cpp.semmle.code.cpp.dataflow.internal.DataFlowImplCommon
   }
 
   module JAVA {
