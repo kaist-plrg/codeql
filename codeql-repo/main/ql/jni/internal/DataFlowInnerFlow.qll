@@ -115,12 +115,17 @@ private import DataFlowImplCommon
 
 JAVA::Type getJavaClass(Node node) {
   exists(
-    ArgumentNode argNode,
-    ParameterNode paramNode,
+    JAVA::ArgumentNode argNode,
+    CPP::ParameterNode paramNode,
+    JAVA::DataFlowCall call,
+    CPP::DataFlowCallable callable,
+    int i,
     JniParameterConfiguration config
     |
-    result = argNode.asJavaNode().getType() and
-    viableParamArg(_, paramNode, argNode) and
-    config.hasFlow(paramNode.asCppNode(), node.asCppNode())
+    result = argNode.getType() and
+    argNode.argumentOf(call, i) and
+    callable = viableCallableJ2C(call) and
+    paramNode.isParameterOf(callable, i+2) and
+    config.hasFlow(paramNode, node.asCppNode())
   )
 }

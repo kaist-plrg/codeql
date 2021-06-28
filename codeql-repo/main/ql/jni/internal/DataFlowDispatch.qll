@@ -4,27 +4,21 @@ private import DataFlowImplSpecific::Original
 private import Signature
 
 pragma[inline]
-DataFlowCallable viableCallable(DataFlowCall c) { //modified
-  result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall())
-  or
-  not exists(JniCallNode callNode | callNode.getCall() = c) and
-  result.asCppDataFlowCallable() = CPP::viableCallable(c.asCppDataFlowCall())
-  or
-  exists(JAVA::Method m, CPP::Function f, string name |
-    m = c.asJavaDataFlowCall().(JAVA::MethodAccess).getMethod() and
+CPP::DataFlowCallable viableCallableJ2C(JAVA::DataFlowCall c) {
+  exists(JAVA::Method m, string name |
+    m = c.(JAVA::MethodAccess).getMethod() and
     m.isNative() and
     m.getDeclaringType().fromSource() and
-    f = result.asCppDataFlowCallable() and
     name = 
       "Java_"
       + m.getDeclaringType().getQualifiedName().replaceAll("_", "_1").replaceAll(".", "_")
       + "_"
       + m.toString().replaceAll("_", "_1") | 
     (
-      f.toString() = name
+      result.toString() = name
       or
-      f.toString().matches(name + "__%") and 
-      f.toString().matches("%__" + handleMethodSignature(m.getSignature())
+      result.toString().matches(name + "__%") and 
+      result.toString().matches("%__" + handleMethodSignature(m.getSignature())
         .replaceAll("_", "_1")
         .replaceAll("/", "_")
         .replaceAll(";", "_2")
@@ -32,13 +26,26 @@ DataFlowCallable viableCallable(DataFlowCall c) { //modified
       )
     )
   )
-  or
+}
+pragma[inline]
+JAVA::DataFlowCallable viableCallableC2J(CPP::DataFlowCall c) {
   exists(JniCallNode callNode, ArgumentNode midNode |
-    callNode.getCall() = c and
+    callNode.getCall().asCppDataFlowCall() = c and
     callNode.getName().matches("Call%Method") and
-    midNode.argumentOf(c, -2) and
-    result.asJavaDataFlowCallable() = CustomNodeFlow::getJavaMethodNode(midNode).getMethod()
+    midNode =  callNode.getArgument(-2) and
+    result = CustomNodeFlow::getJavaMethodNode(midNode).getMethod()
   )
+}
+pragma[inline]
+DataFlowCallable viableCallable(DataFlowCall c) { //modified
+  result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall())
+  or
+  not exists(JniCallNode callNode | callNode.getCall() = c) and
+  result.asCppDataFlowCallable() = CPP::viableCallable(c.asCppDataFlowCall())
+  or
+  result.asCppDataFlowCallable() = viableCallableJ2C(c.asJavaDataFlowCall())
+  or
+  result.asJavaDataFlowCallable() = viableCallableC2J(c.asCppDataFlowCall())
 }
 
 DataFlowCallable viableImplInCallContext(DataFlowCall call, DataFlowCall ctx) {
