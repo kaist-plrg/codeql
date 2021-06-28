@@ -16,6 +16,15 @@ module CustomNodeFlow {
     override predicate isSink(CPP::Node sink) {
       sink instanceof CPP::ArgumentNode
     }
+
+    override predicate isAdditionalFlowStep(CPP::Node fromNode, CPP::Node toNode) {
+      exists(CPP::GlobalVariable g, CPP::VariableAccess lv |
+        lv = fromNode.(CPP::PostUpdateNode).getPreUpdateNode().asExpr()
+        and lv.isUsedAsLValue()
+        and lv.getTarget() = g
+        and toNode.asExpr().(CPP::VariableAccess).getTarget() = g
+      )
+    }
   }
 
   JavaClassNode getJavaClassNode(ArgumentNode arg) {
