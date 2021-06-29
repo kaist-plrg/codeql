@@ -8,6 +8,8 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
   CPP::simpleLocalFlowStep(node1.asCppNode(), node2.asCppNode())
   or
   jniStringStep(node1, node2)
+  or
+  jniNewGlobalRefStep(node1, node2)
 }
 
 predicate localFlowStep(Node node1, Node node2) {

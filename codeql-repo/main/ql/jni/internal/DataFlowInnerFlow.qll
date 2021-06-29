@@ -18,11 +18,21 @@ module CustomNodeFlow {
     }
 
     override predicate isAdditionalFlowStep(CPP::Node fromNode, CPP::Node toNode) {
+      //global
       exists(CPP::GlobalVariable g, CPP::VariableAccess lv |
         lv = fromNode.(CPP::PostUpdateNode).getPreUpdateNode().asExpr()
         and lv.isUsedAsLValue()
         and lv.getTarget() = g
         and toNode.asExpr().(CPP::VariableAccess).getTarget() = g
+      )
+      or
+      //jni functions
+      exists(Node n1, Node n2 |
+        n1.asCppNode() = fromNode and
+        n2.asCppNode() = toNode |
+        jniStringStep(n1, n2)
+        or
+        jniNewGlobalRefStep(n1, n2)
       )
     }
   }

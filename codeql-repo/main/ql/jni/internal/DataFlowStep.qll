@@ -95,6 +95,10 @@ predicate jniStringStep(ArgumentNode argNode, JniCallNode callNode) {
   ) and
   argNode = callNode.getArgument(0)
 }
+predicate jniNewGlobalRefStep(ArgumentNode argNode, JniCallNode callNode) {
+  callNode.getName() = "NewGlobalRef" and
+  argNode = callNode.getArgument(0)
+}
 
 predicate jumpStep(Node n1, Node n2) { //modified
   JAVA::jumpStep(n1.asJavaNode(), n2.asJavaNode())
