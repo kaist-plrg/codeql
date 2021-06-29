@@ -32,7 +32,7 @@ JAVA::DataFlowCallable viableCallableC2J(CPP::DataFlowCall c) {
   exists(JniCallNode callNode, ArgumentNode midNode |
     callNode.getCall().asCppDataFlowCall() = c and
     callNode.getName().matches("Call%Method") and
-    midNode =  callNode.getArgument(-2) and
+    midNode = callNode.getArgument(-2) and
     result = CustomNodeFlow::getJavaMethodNode(midNode).getMethod()
   )
 }

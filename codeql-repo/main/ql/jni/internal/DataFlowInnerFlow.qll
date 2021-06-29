@@ -142,4 +142,5 @@ JAVA::Type getJavaClass(Node node) {
     paramNode.isParameterOf(callable, i+2) and
     config.hasFlow(paramNode, node.asCppNode())
   )
+  //TODO: Handle the case where object is returend from function call to java
 }
