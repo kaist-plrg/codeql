@@ -227,16 +227,16 @@ class JavaMethodNode extends Node, TJavaMethodNode {
     clazz = callable.getDeclaringType()
   }
 
-  predicate isConstructor() { callable instanceof JAVA::Constructor }
-
   override string toString() { result = callable.toString() }
-
-  JAVA::Callable getMethod() { result = callable }
-  JAVA::Class getClass() { result = clazz }
 
   override DataFlowType getType() { result.asJavaDataFlowType() = clazz }
 
   override Location getLocation() { result.asJavaLocation() = callable.getLocation() }
+  
+  JAVA::Callable getMethod() { result = callable }
+  JAVA::Class getClass() { result = clazz }
+  predicate isConstructor() { callable instanceof JAVA::Constructor }
+  predicate isStatic() { callable.isStatic() }
 }
 
 class JavaFieldNode extends Node, TJavaFieldNode {

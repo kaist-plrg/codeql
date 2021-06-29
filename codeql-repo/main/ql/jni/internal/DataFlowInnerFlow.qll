@@ -40,7 +40,11 @@ module CustomNodeFlow {
   }
   JavaMethodNode getJavaMethodNode(ArgumentNode arg) {
     exists(CustomNodeConfiguration config, Node mid |
-      jniGetMethodIDStep(result, mid) and
+      (
+        jniGetMethodIDStep(result, mid)
+        or
+        jniGetStaticMethodIDStep(result, mid)
+      ) and
       config.hasFlow(mid.asCppNode(), arg.asCppNode())
     )
   }

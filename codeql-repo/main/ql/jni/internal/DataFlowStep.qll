@@ -26,7 +26,6 @@ private int dist(JAVA::Class c1, JAVA::Class c2) {
     result = 1 + dist(c3, c2)
   )
 }
-//TODO: Static method?
 predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
   callNode.getName() = "GetMethodID" and
   exists(ArgumentNode cls, ArgumentNode name, ArgumentNode sig|
@@ -34,6 +33,7 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
     name = callNode.getArgument(1) and
     sig = callNode.getArgument(2) |
     methodNode = min(JavaMethodNode m, int d | 
+      not m.isStatic() and
       (
         m.getMethod().toString() = StringLiteralFlow::getStringLiteral(name)
         or
@@ -48,6 +48,24 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
       else d = dist(CustomNodeFlow::getJavaClassNode(cls).getClass(), m.getClass())
       |
       m order by d
+    )
+  )
+}
+predicate jniGetStaticMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
+  callNode.getName() = "GetStaticMethodID" and
+  exists(ArgumentNode cls, ArgumentNode name, ArgumentNode sig |
+    cls = callNode.getArgument(0) and
+    name = callNode.getArgument(1) and
+    sig = callNode.getArgument(2) |
+    methodNode.isStatic() and
+    methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
+    StringLiteralFlow::getStringLiteral(sig).matches(
+      "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
+    ) and
+    (
+      not exists(CustomNodeFlow::getJavaClassNode(cls).getClass())
+      or
+      CustomNodeFlow::getJavaClassNode(cls).getClass() = methodNode.getClass()
     )
   )
 }
