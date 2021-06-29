@@ -6,7 +6,7 @@ module CustomNodeFlow {
   /**
    * A configuration for finding flow from custom nodes
    */
-  private class CustomNodeConfiguration extends CPP::Impl1::Configuration {
+  class CustomNodeConfiguration extends CPP::Impl1::Configuration {
     CustomNodeConfiguration() { this = "CustomNodeConfiguration" }
 
     override predicate isSource(CPP::Node source) {
@@ -125,9 +125,18 @@ private class JniParameterConfiguration extends CPP::Impl2::Configuration {
   override predicate isSink(CPP::Node sink) { any() }
 }
 
-private import DataFlowImplCommon
+pragma[nomagic]
+private string class2sig(JAVA::Class c) {
+  result = "L" + c.getQualifiedName().replaceAll(".", "/") + ";"
+}
+pragma[nomagic]
+private string extractSig(JniCallNode c) {
+  c.getName().matches("Get%MethodID") and
+  result = StringLiteralFlow::getStringLiteral(c.getArgument(2)).splitAt(")", 1)
+}
 
-JAVA::Type getJavaClass(Node node) {
+JAVA::Class getJavaClass(Node node) {
+  // obj from argument
   exists(
     JAVA::ArgumentNode argNode,
     CPP::ParameterNode paramNode,
@@ -142,5 +151,17 @@ JAVA::Type getJavaClass(Node node) {
     paramNode.isParameterOf(callable, i+2) and
     config.hasFlow(paramNode, node.asCppNode())
   )
-  //TODO: Handle the case where object is returend from function call to java
+  or
+  // obj from return
+  exists(
+    JniCallNode getNode,
+    JniCallNode callNode,
+    CustomNodeFlow::CustomNodeConfiguration cfg
+    |
+    getNode.getName().matches("Get%MethodID") and
+    cfg.hasFlow(getNode.asCppNode(), callNode.getArgument(-2).asCppNode()) and
+    callNode.getName().matches("Call%ObjectMethod") and
+    cfg.hasFlow(callNode.asCppNode(), node.asCppNode()) and
+    extractSig(getNode) = class2sig(result)
+  )
 }
