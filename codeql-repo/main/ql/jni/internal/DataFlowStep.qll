@@ -18,6 +18,14 @@ predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
     classNode.getClass() = getJavaClass(obj)
   )
 }
+private int dist(JAVA::Class c1, JAVA::Class c2) {
+  if c1 = c2
+  then result = 0
+  else exists(JAVA::Class c3 |
+    c1.extendsOrImplements(c3) and
+    result = 1 + dist(c3, c2)
+  )
+}
 //TODO: Static method?
 predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
   callNode.getName() = "GetMethodID" and
@@ -25,19 +33,21 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
     cls = callNode.getArgument(0) and
     name = callNode.getArgument(1) and
     sig = callNode.getArgument(2) |
-    (
-      not exists(CustomNodeFlow::getJavaClassNode(cls).getClass())
-      or
-      methodNode.getClass() = CustomNodeFlow::getJavaClassNode(cls).getClass()
-    ) and
-    (
-      methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name)
-      or
-      StringLiteralFlow::getStringLiteral(name) = "<init>" and
-      methodNode.isConstructor()
-    ) and
-    StringLiteralFlow::getStringLiteral(sig).matches(
-      "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
+    methodNode = min(JavaMethodNode m, int d | 
+      (
+        m.getMethod().toString() = StringLiteralFlow::getStringLiteral(name)
+        or
+        StringLiteralFlow::getStringLiteral(name) = "<init>" and
+        m.isConstructor()
+      ) and
+      StringLiteralFlow::getStringLiteral(sig).matches(
+        "(" + handleMethodSignature(m.getMethod().getSignature()) + ")%"
+      ) and
+      if not exists(CustomNodeFlow::getJavaClassNode(cls).getClass())
+      then d = -1
+      else d = dist(CustomNodeFlow::getJavaClassNode(cls).getClass(), m.getClass())
+      |
+      m order by d
     )
   )
 }
