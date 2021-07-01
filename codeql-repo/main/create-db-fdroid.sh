@@ -1,52 +1,45 @@
 set -e
 
-#rm -rf db-fdroid
-#mkdir db-fdroid
-
-dirs=()
+lines=()
 
 while read line; do
-  dirs+=( $line )
+  lines+=( "$line" )
 done < F-Droid/resource/success.txt
 
-for d in ${dirs[@]}; do
+for line in "${lines[@]}"; do
+  d=F-Droid/`echo $line | cut -d ";" -f 1`
+  clean=`echo $line | cut -d ";" -f 2`
+  ccmd=`echo $line | cut -d ";" -f 3`
+  jcmd=`echo $line | cut -d ";" -f 4`
   echo "===================="
   echo $d
   echo "===================="
 
-  cur=$PWD
-  cd F-Droid/$d
-
   if [ -f build.gradle ]; then
     #gradle
-    cp $cur/F-Droid/gradlew .
-    if [ ! -d gradle/wrapper ]; then
-      mkdir -p gradle/wrapper
+    cp F-Droid/gradlew $d
+    if [ ! -d $d/gradle/wrapper ]; then
+      mkdir -p $d/gradle/wrapper
     fi
-    cp $cur/F-Droid/gradle-wrapper.jar gradle/wrapper
-    task=`./gradlew --no-daemon task | grep -m 1 compile.*DebugSources`
-    cmd="./gradlew --no-daemon clean $task"
-  else
-    #ant
-    cmd="ant clean debug" 
+    cp F-Droid/gradle-wrapper.jar $d/gradle/wrapper
   fi
-
-  cd $cur
-
-  echo '[Creating database for java]'
-  rm -rf db-java
-  echo ' [init]'
-  codeql database init -l=java --source-root=F-Droid/$d db-java
-  echo ' [trace-command]'
-  codeql database trace-command --working-dir=F-Droid/$d db-java $cmd
+  
+  (cd $d ; $clean)
 
   echo '[Creating database for cpp]'
   rm -rf db-cpp
   echo ' [init]'
-  codeql database init -l=cpp --source-root=F-Droid/$d db-cpp
+  codeql database init -l cpp --source-root $d db-cpp
   echo ' [trace-command]'
-  codeql database trace-command --working-dir=F-Droid/$d db-cpp $cmd
+  codeql database trace-command --working-dir $d db-cpp $ccmd
+  
+  echo '[Creating database for java]'
+  rm -rf db-java
+  echo ' [init]'
+  codeql database init -l java --source-root $d db-java
+  echo ' [trace-command]'
+  codeql database trace-command --working-dir $d db-java $jcmd
 
-  dbdir=`echo $d | sed "s/extracted/db-fdroid/g"`
-  ./merge.sh F-Droid/$d $dbdir
+  dbdir=`echo $d | sed "s/F-Droid\/extracted/db-fdroid/g"`
+  ./merge.sh $d $dbdir
 done

@@ -2,7 +2,7 @@ prefix=""
 cnt=0
 ok=0
 
-rm -f success.txt
+rm -f resource/success.txt
 
 for d in `find extracted -type d`; do
   if [ ! -z $prefix ] && [[ $d == $prefix* ]]; then
@@ -49,29 +49,47 @@ for d in `find extracted -type d`; do
           cd $cur
           continue
         fi
-        cmd="./gradlew --no-daemon clean $task" ;;
+        clean="./gradlew --no-daemon clean"
+        ccmd="./gradlew --no-daemon $task"
+        jcmd="./gradlew --no-daemon clean $task" ;;
       ant)
-        cmd="ant clean debug" ;;
+        clean="ant clean"
+        ccmd="ant debug"
+        jcmd="ant clean debug" ;;
     esac
+
+    ndk-build -n > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      jcmd=$ccmd
+      ccmd="ndk-build -B"
+    fi
+
+    success=0
     
-    rm -rf db-java
-    codeql database create db-java -l java -c "$cmd"
+    $clean
+
+    rm -rf db-cpp
+    codeql database create db-cpp -l cpp -c "$ccmd"
     st=$?
     if [ $st -eq 130 ]; then #SIGINT
       exit 130
     elif [ $st -eq 0 ]; then
-      rm -rf db-cpp
-      codeql database create db-cpp -l cpp -c "$cmd"
+      rm -rf db-java
+      codeql database create db-java -l java -c "$jcmd"
       st=$?
       if [ $st -eq 130 ]; then #SIGINT
         exit 130
       elif [ $st -eq 0 ]; then
-        (( ok+=1 ))
-        echo $d $cmd >> success.txt
+        success=1
       fi
     fi
     
     cd $cur
+  
+    if [ $success -eq 1 ]; then
+      (( ok += 1 ))
+      echo $d ";" $clean ";" $ccmd ";" $jcmd >> resource/success.txt
+    fi
   fi
 done
 

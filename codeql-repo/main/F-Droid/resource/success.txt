@@ -1,24 +1,37 @@
-extracted/com.android.keepass_198_src.tar.gz
-extracted/org.navitproject.navit_2021030660_src.tar.gz
-extracted/com.viper.simplert_1_src.tar.gz/simple-rt-android
-extracted/info.guardianproject.pixelknot_101_src.tar.gz
-extracted/nya.miku.wishmaster_54_src.tar.gz
-extracted/org.tuxpaint_9250_src.tar.gz
-extracted/org.pocketworkstation.pckeyboard_1041001_src.tar.gz
-extracted/marto.rtl_tcp_andro_24_src.tar.gz
-extracted/bus.chio.wishmaster_1002_src.tar.gz
-extracted/org.cipherdyne.fwknop2_32_src.tar.gz
-extracted/org.tilelessmap.app_4_src.tar.gz/Android
-extracted/org.xapek.andiodine_6_src.tar.gz
-extracted/net.tjado.passwdsafe_400_src.tar.gz
-extracted/com.ruesga.android.wallpapers.photophase_1036_src.tar.gz
-extracted/eu.faircode.netguard_2021032201_src.tar.gz
-extracted/com.shurik.droidzebra_17_src.tar.gz/project
-extracted/org.witness.sscphase1_4011_src.tar.gz
-extracted/com.zoffcc.applications.trifa_10098_src.tar.gz/android-refimpl-app
-extracted/org.emunix.unipatcher_170200_src.tar.gz
-extracted/com.termux_112_src.tar.gz
-extracted/com.dozingcatsoftware.asciicam_16_src.tar.gz
-extracted/org.dyndns.fules.ck_20_src.tar.gz
-extracted/org.eehouse.android.xw4_172_src.tar.gz/xwords4/android
-extracted/com.kunzisoft.keepass.libre_73_src.tar.gz
+extracted/com.android.keepass_198_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileGeneralDebugSources ; ./gradlew --no-daemon clean compileGeneralDebugSources
+extracted/org.woltage.irssiconnectbot_393_src ; ant clean ; ndk-build -B ; ant debug
+extracted/org.navitproject.navit_2021030660_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/com.viper.simplert_1_src.tar.gz/simple-rt-android ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/com.xperia64.timidityae_81_src.tar.gz ; ./gradlew --no-daemon clean ; ndk-build -B ; ./gradlew --no-daemon compileDebugSources
+extracted/android.game.prboom_31_src ; ant clean ; ndk-build -B ; ant debug
+extracted/info.guardianproject.pixelknot_101_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/nya.miku.wishmaster_54_src.tar.gz ; ./gradlew --no-daemon clean ; ndk-build -B ; ./gradlew --no-daemon compileDebugSources
+extracted/org.tuxpaint_9250_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/org.pocketworkstation.pckeyboard_1041001_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/marto.rtl_tcp_andro_24_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/bus.chio.wishmaster_1002_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/org.jfedor.frozenbubble_54_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
+extracted/fm.a2d.sf_111_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
+extracted/org.cipherdyne.fwknop2_32_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/org.tilelessmap.app_4_src.tar.gz/Android ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileCompleteDebugSources ; ./gradlew --no-daemon clean compileCompleteDebugSources
+extracted/cz.hejl.chesswalk_9_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
+extracted/org.lumicall.android_190_src.tar.gz ; ./gradlew --no-daemon clean ; ndk-build -B ; ./gradlew --no-daemon compileDebugSources
+extracted/org.xapek.andiodine_6_src.tar.gz ; ./gradlew --no-daemon clean ; ndk-build -B ; ./gradlew --no-daemon compileArmDebugSources
+extracted/net.tjado.passwdsafe_400_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/org.sipdroid.sipua_115_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
+extracted/com.ruesga.android.wallpapers.photophase_1036_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/eu.faircode.netguard_2021032201_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/com.shurik.droidzebra_17_src.tar.gz/project ; ant clean ; ndk-build -B ; ant debug
+extracted/us.achromaticmetaphor.agram_21_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
+extracted/org.kde.necessitas.ministro_14_src.tar.gz/Ministro ; ant clean ; ndk-build -B ; ant debug
+extracted/org.witness.sscphase1_4011_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/com.zoffcc.applications.trifa_10098_src.tar.gz/android-refimpl-app ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/org.emunix.unipatcher_170200_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileFreeDebugSources ; ./gradlew --no-daemon clean compileFreeDebugSources
+extracted/com.termux_112_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/org.geometerplus.zlibrary.ui.android_2050920_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
+extracted/com.dozingcatsoftware.asciicam_16_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/org.dyndns.fules.ck_20_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
+extracted/cx.hell.android.pdfview_40000_src/pdfview ; ant clean ; ndk-build -B ; ant debug
+extracted/com.Bisha.TI89EmuDonation_1133_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
+extracted/com.kunzisoft.keepass.libre_73_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
+extracted/com.poinsart.votar_9_src.tar.gz ; ant clean ; ndk-build -B ; ant debug
