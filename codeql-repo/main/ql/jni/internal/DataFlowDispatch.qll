@@ -11,7 +11,7 @@ CPP::DataFlowCallable viableCallableJ2C(JAVA::DataFlowCall c) {
     m.getDeclaringType().fromSource() and
     name = 
       "Java_"
-      + m.getDeclaringType().getQualifiedName().replaceAll("_", "_1").replaceAll(".", "_")
+      + m.getDeclaringType().getQualifiedName().replaceAll("_", "_1").replaceAll(".", "_").replaceAll("$", "_00024")
       + "_"
       + m.toString().replaceAll("_", "_1") | 
     (
