@@ -73,11 +73,15 @@ class ArgumentNode extends Node {
     this.asJavaNode() instanceof JAVA::ArgumentNode
     or
     this.asCppNode() instanceof CPP::ArgumentNode
+    or
+    this instanceof JavaClassNode
   }
 
   predicate argumentOf(DataFlowCall call, int pos) { //modified
+    //JavaArg
     this.asJavaNode().(JAVA::ArgumentNode).argumentOf(call.asJavaDataFlowCall(), pos)
     or
+    //CppArg
     (
       if
         exists(JniCallNode n | n.getCall() = call | this = n.getArgument(pos))
@@ -86,6 +90,10 @@ class ArgumentNode extends Node {
       else
         this.asCppNode().(CPP::ArgumentNode).argumentOf(call.asCppDataFlowCall(), pos)
     )
+    or
+    //jni Class Arg
+    this.(JavaClassNode).getClass() = call.asJavaDataFlowCall().(JAVA::StaticMethodAccess).getReceiverType() and
+    pos = -1
   }
 }
 

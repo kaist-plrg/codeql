@@ -11,6 +11,11 @@ module CustomNodeFlow {
 
     override predicate isSource(CPP::Node source) {
       exists(JniCallNode call | call.asCppNode() = source)
+      or
+      exists(CPP::Function f |
+        f.toString().matches("Java_%") |
+        source.(CPP::ParameterNode).isParameterOf(f, _)
+      )
     }
 
     override predicate isSink(CPP::Node sink) {
@@ -43,6 +48,15 @@ module CustomNodeFlow {
         jniGetObjectClassStep(result, mid)
         or
         jniFindClassStep(result, mid)
+        or
+        exists(
+          DataFlowCall call,
+          DataFlowCallable callable
+          |
+          result.(ArgumentNode).argumentOf(call, -1) and
+          callable.asCppDataFlowCallable() = viableCallableJ2C(call.asJavaDataFlowCall()) and
+          mid.(ParameterNode).isParameterOf(callable, -1)
+        )
       )
       and
       config.hasFlow(mid.asCppNode(), arg.asCppNode())
