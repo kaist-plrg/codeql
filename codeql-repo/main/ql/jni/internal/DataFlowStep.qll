@@ -8,7 +8,7 @@ predicate jniFindClassStep(JavaClassNode classNode, JniCallNode callNode) {
   callNode.getName() = "FindClass" and
   exists(ArgumentNode name |
     name = callNode.getArgument(0) |
-    classNode.getClass().getQualifiedName().replaceAll(".", "/") = StringLiteralFlow::getStringLiteral(name) 
+    classNode.getClass().getQualifiedName().replaceAll(".", "/") = StringLiteralFlow::getStringLiteral(name).replaceAll("$", "/")
   )
 }
 predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
@@ -40,7 +40,7 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
         StringLiteralFlow::getStringLiteral(name) = "<init>" and
         m.isConstructor()
       ) and
-      StringLiteralFlow::getStringLiteral(sig).matches(
+      StringLiteralFlow::getStringLiteral(sig).replaceAll("$", "/").matches(
         "(" + handleMethodSignature(m.getMethod().getSignature()) + ")%"
       ) and
       if not exists(CustomNodeFlow::getJavaClassNode(cls).getClass())
@@ -59,7 +59,7 @@ predicate jniGetStaticMethodIDStep(JavaMethodNode methodNode, JniCallNode callNo
     sig = callNode.getArgument(2) |
     methodNode.isStatic() and
     methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
-    StringLiteralFlow::getStringLiteral(sig).matches(
+    StringLiteralFlow::getStringLiteral(sig).replaceAll("$", "/").matches(
       "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
     ) and
     (
