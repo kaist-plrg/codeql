@@ -33,7 +33,7 @@ JAVA::DataFlowCallable viableCallableC2J(CPP::DataFlowCall c) {
     callNode.getCall().asCppDataFlowCall() = c and
     callNode.getName().matches("Call%Method") and
     midNode = callNode.getArgument(-2) and
-    result = CustomNodeFlow::getJavaMethodNode(midNode).getMethod()
+    result = getJavaMethodNode(midNode).getMethod()
   )
 }
 pragma[inline]
