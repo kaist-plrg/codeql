@@ -32,6 +32,17 @@ class JniConfiguration extends CPP::Impl1::Configuration {
       and toNode.asExpr().(CPP::VariableAccess).getTarget() = g
     )
     or
+    //global field
+    exists(CPP::GlobalVariable g, CPP::Field f, CPP::ValueFieldAccess fr, CPP::ValueFieldAccess to |
+      fr = fromNode.(CPP::PostUpdateNode).getPreUpdateNode().asExpr()
+      and to = toNode.asExpr()
+      and fr.isUsedAsLValue()
+      and f = fr.getTarget()
+      and f = to.getTarget()
+      and g = fr.getQualifier().(CPP::VariableAccess).getTarget()
+      and g = to.getQualifier().(CPP::VariableAccess).getTarget()
+    )
+    or
     //jni functions
     exists(Node n1, Node n2 |
       n1.asCppNode() = fromNode and
