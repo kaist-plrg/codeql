@@ -3,7 +3,6 @@ private import DataFlowImplSpecific::Private
 private import DataFlowImplSpecific::Original
 private import Signature
 
-pragma[inline]
 CPP::DataFlowCallable viableCallableJ2C(JAVA::DataFlowCall c) {
   exists(JAVA::Method m, string name |
     m = c.(JAVA::MethodAccess).getMethod() and
@@ -18,7 +17,7 @@ CPP::DataFlowCallable viableCallableJ2C(JAVA::DataFlowCall c) {
       result.toString() = name
       or
       result.toString().matches(name + "__%") and 
-      result.toString().matches("%__" + handleMethodSignature(m.getSignature())
+      result.toString().matches("%__" + getHandledSignature(m)
         .replaceAll("_", "_1")
         .replaceAll("/", "_")
         .replaceAll(";", "_2")
@@ -27,7 +26,6 @@ CPP::DataFlowCallable viableCallableJ2C(JAVA::DataFlowCall c) {
     )
   )
 }
-pragma[inline]
 JAVA::DataFlowCallable viableCallableC2J(CPP::DataFlowCall c) {
   exists(JniCallNode callNode, ArgumentNode midNode |
     callNode.getCall().asCppDataFlowCall() = c and
@@ -36,7 +34,6 @@ JAVA::DataFlowCallable viableCallableC2J(CPP::DataFlowCall c) {
     result = getJavaMethodNode(midNode).getMethod()
   )
 }
-pragma[inline]
 DataFlowCallable viableCallable(DataFlowCall c) { //modified
   result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall())
   or

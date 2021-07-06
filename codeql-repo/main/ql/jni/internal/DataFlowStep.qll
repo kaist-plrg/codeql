@@ -41,7 +41,7 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
         m.isConstructor()
       ) and
       StringLiteralFlow::getStringLiteral(sig).replaceAll("$", "/").matches(
-        "(" + handleMethodSignature(m.getMethod().getSignature()) + ")%"
+        "(" + getHandledSignature(m.getMethod()) + ")%"
       ) and
       if not exists(getJavaClassNode(cls).getClass())
       then d = -1
@@ -60,7 +60,7 @@ predicate jniGetStaticMethodIDStep(JavaMethodNode methodNode, JniCallNode callNo
     methodNode.isStatic() and
     methodNode.getMethod().toString() = StringLiteralFlow::getStringLiteral(name) and
     StringLiteralFlow::getStringLiteral(sig).replaceAll("$", "/").matches(
-      "(" + handleMethodSignature(methodNode.getMethod().getSignature()) + ")%"
+      "(" + getHandledSignature(methodNode.getMethod()) + ")%"
     ) and
     (
       not exists(getJavaClassNode(cls).getClass())

@@ -1,9 +1,16 @@
+private import java.java
+
+pragma[noinline]
+string getHandledSignature(Method m) {
+  result = handleMethodSignature(m.getSignature())
+}
+
 bindingset[sig]
 string handleMethodSignature(string sig) {
-  exists(int st, int fn |
-    "(" = sig.charAt(st) and
-    ")" = sig.charAt(fn) |
-    result = handleArgs(sig.substring(st + 1, fn))
+  exists(string temp, string args |
+    temp = sig.splitAt("(", 1)
+    and args = temp.prefix(temp.length()-1)
+    and result = handleArgs(args)
   )
 }
 
@@ -16,10 +23,12 @@ string handleArgs(string args) {
 
 bindingset[ty]
 string handleType(string ty) {
-  exists(int idx | 
-    idx = min(int i | "[" = ty.charAt(i) or i = ty.length() | i) |
-    result = concat(int i | "[" = ty.charAt(i) | "[") + handleAtomicType(ty.prefix(idx))
+  if ty.matches("%]")
+  then exists(string brackets, int offset |
+    brackets = ty.regexpFind("(\\[\\])+", _, offset) and
+    result = concat(int i | i = [1 .. brackets.length()/2] | "[") + handleAtomicType(ty.prefix(offset))
   )
+  else result = handleAtomicType(ty)
 }
 
 bindingset[ty]
