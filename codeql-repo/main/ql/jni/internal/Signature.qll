@@ -1,7 +1,7 @@
 private import java.java
 
 pragma[noinline]
-string getHandledSignature(Method m) {
+string getHandledSignature(Callable m) {
   result = handleMethodSignature(m.getSignature())
 }
 
