@@ -6,6 +6,11 @@ while read line; do
   lines+=( "$line" )
 done < F-Droid/resource/success.txt
 
+export PATH="$CODE_QL_HOME/codeql-repo/main/F-Droid/resource:$PATH"
+while read line; do
+  lines+=( "$line" )
+done < F-Droid/resource/manual-success.txt
+
 for line in "${lines[@]}"; do
   d=F-Droid/`echo $line | cut -d ";" -f 1`
   clean=`echo $line | cut -d ";" -f 2`
