@@ -51,6 +51,11 @@ class JniConfiguration extends CPP::Impl1::Configuration {
       or
       jniNewGlobalRefStep(n1, n2)
     )
+    or
+    // ref / deref
+    fromNode.asExpr() = toNode.asExpr().(CPP::PointerDereferenceExpr).getOperand()
+    or
+    fromNode.asExpr() = toNode.asExpr().(CPP::AddressOfExpr).getOperand()
   }
 }
 
