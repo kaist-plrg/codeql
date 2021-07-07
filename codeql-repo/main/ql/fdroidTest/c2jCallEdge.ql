@@ -1,8 +1,17 @@
 import jni.DataFlow::DataFlow
+import cpp
 
 from
-  JniCallNode call
+  CPP::Location loc, string name
 where
-  call.getName().matches("%Call%Method")
+  exists(JniCallNode call |
+    loc = call.getLocation().asCppLocation()
+    and name = call.getName()
+    and name.matches("Call%Method")
+  )
 select
-  call.getName(), call.getLocation(), count(DataFlowCallable method | callEdge(call.getCall(), method) | method)
+  name,
+  loc,
+  count(DataFlowCallable method |
+    exists(JniCallNode call | loc = call.getLocation().asCppLocation() and callEdge(call.getCall(), method))
+  )

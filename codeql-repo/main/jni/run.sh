@@ -1,5 +1,5 @@
 # build java project
-gradle build
+./gradlew --no-daemon build
 
 # Compile C file into library file
 make

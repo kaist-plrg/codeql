@@ -7,9 +7,14 @@ public class HelloJNI {
     System.loadLibrary("HelloJNI");  
   }
   public native int f(int java_param);
+  public static native int g(int java_param);
 
   public int java_callback(int java_callback_param) {
     return java_callback_param;
+  }
+  
+  public static int java_s_callback(int java_s_callback_param) {
+    return java_s_callback_param;
   }
 
   public int java_field;
@@ -21,7 +26,7 @@ public class HelloJNI {
     jni.java_field = 99;
     jni.java_static_field = 999;
 
-    int val = jni.f(9);
+    int val = g(jni.f(9));
     System.out.println(val);
 
     int java_field_write = jni.java_field;

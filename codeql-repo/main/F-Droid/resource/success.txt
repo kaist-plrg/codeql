@@ -1,3 +1,4 @@
+extracted/org.dolphinemu.dolphinemu_17057_src.tar.gz/Source/Android ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
 extracted/com.android.keepass_198_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileGeneralDebugSources ; ./gradlew --no-daemon clean compileGeneralDebugSources
 extracted/org.woltage.irssiconnectbot_393_src ; ant clean ; ndk-build -B ; ant debug
 extracted/org.navitproject.navit_2021030660_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
