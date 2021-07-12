@@ -2,3 +2,4 @@ extracted/org.sufficientlysecure.viewer_2827_src.tar.gz ; ./gradlew --no-daemon 
 extracted/org.wikimedia.commons.wikimedia_1_src.tar.gz ; ./gradlew --no-daemon clean ; cd-ndk-build.sh openplayer ; ./gradlew --no-daemon compileDebugSources
 extracted/org.andglkmod.hunkypunk_7_src.tar.gz/ ; ./gradlew --no-daemon clean ; cd-ndk-build.sh app/src/main ; ./gradlew --no-daemon compileDebugSources
 extracted/com.morlunk.mumbleclient_73_src.tar.gz/ ; ./gradlew --no-daemon clean ; cd-ndk-build.sh libraries/Jumble/src/main/jni ; ./gradlew --no-daemon compileDebugSources
+extracted/org.eehouse.android.xw4_172_src.tar.gz/xwords4/android ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon externalNativeBuildXw4dDebug ; ./gradlew compileXw4dDebugJavaWithJavac
