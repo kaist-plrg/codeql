@@ -15,3 +15,7 @@ cd ../..
 cd extracted/org.geometerplus.zlibrary.ui.android_2050920_src.tar.gz/third-party/SuperToasts/
 cp ../../local.properties .
 cd ../../../..
+
+cd extracted/org.tof_17_src
+cp -r src-libs/tof/ jni
+cd ../..

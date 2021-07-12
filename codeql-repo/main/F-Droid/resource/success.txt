@@ -7,6 +7,7 @@ extracted/com.xperia64.timidityae_81_src.tar.gz ; ./gradlew --no-daemon clean ; 
 extracted/android.game.prboom_31_src ; ant clean ; ndk-build -B ; ant debug
 extracted/info.guardianproject.pixelknot_101_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
 extracted/nya.miku.wishmaster_54_src.tar.gz ; ./gradlew --no-daemon clean ; ndk-build -B ; ./gradlew --no-daemon compileDebugSources
+extracted/org.tof_17_src ; ant clean ; ndk-build -B ; ant debug
 extracted/org.tuxpaint_9250_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
 extracted/org.pocketworkstation.pckeyboard_1041001_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
 extracted/marto.rtl_tcp_andro_24_src.tar.gz ; ./gradlew --no-daemon clean ; ./gradlew --no-daemon compileDebugSources ; ./gradlew --no-daemon clean compileDebugSources
