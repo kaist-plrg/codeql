@@ -1,6 +1,6 @@
 set -e
 
-lines=()
+lines=( )
 
 while read line; do
   lines+=( "$line" )
@@ -16,11 +16,6 @@ for line in "${lines[@]}"; do
   clean=`echo $line | cut -d ";" -f 2`
   ccmd=`echo $line | cut -d ";" -f 3`
   jcmd=`echo $line | cut -d ";" -f 4`
-
-  if [[ $d == *TI89EmuDonation* ]]; then
-    # merge fail
-    continue
-  fi
 
   echo "===================="
   echo $d

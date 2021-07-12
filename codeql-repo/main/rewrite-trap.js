@@ -99,7 +99,7 @@ walk(CPP_DIR + '/tarballs','.br').forEach(tar_br => {
     tar.x({file: '__temp__.tar', cwd: '__temp__', sync: true});
   }
   catch{
-    console.log(tar_br);
+    console.log("[Error] " + tar_br);
     fs.unlinkSync('__temp__.tar');
     fs.rmdirSync('__temp__', {recursive:true});
     return;
@@ -108,9 +108,20 @@ walk(CPP_DIR + '/tarballs','.br').forEach(tar_br => {
   walk('__temp__','.trap').forEach(from => {
     to = from;
     lines = readLines(from);
+    if(lines.last() != "") {
+      // This means that there was a problem for .tar file
+      // (length of extracted file is too short)
+      console.log("[Error] " + tar_br);
+      fs.unlinkSync('__temp__.tar');
+      fs.rmdirSync('__temp__', {recursive:true});
+      return;
+    }
     rewritten = lines.map(rewriteLine(CPP_PREFIX));
     write(to, rewritten.join("\n"));
   });
+  
+  if(!fs.existsSync('__temp__'))
+    return;
 
   tar.c({file: '__temp__.tar', cwd:'__temp__', sync: true}, fs.readdirSync('__temp__'));
   var new_tar_content = readLines('__temp__.tar');
