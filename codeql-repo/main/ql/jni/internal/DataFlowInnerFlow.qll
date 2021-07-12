@@ -56,6 +56,12 @@ class JniConfiguration extends CPP::Impl1::Configuration {
     fromNode.asExpr() = toNode.asExpr().(CPP::PointerDereferenceExpr).getOperand()
     or
     fromNode.asExpr() = toNode.asExpr().(CPP::AddressOfExpr).getOperand()
+    or
+    // Initializer (not counted as assignment)
+    exists(CPP::Initializer i |
+      fromNode.asExpr() = i.getExpr() and
+      toNode.asExpr().(CPP::VariableAccess).getTarget() = i.getDeclaration()
+    )
   }
 }
 
