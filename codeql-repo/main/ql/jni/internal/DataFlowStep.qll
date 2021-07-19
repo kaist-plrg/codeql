@@ -8,7 +8,7 @@ predicate jniFindClassStep(JavaClassNode classNode, JniCallNode callNode) {
   callNode.getName() = "FindClass" and
   exists(ArgumentNode name |
     name = callNode.getArgument(0) |
-    classNode.getClass().getQualifiedName().replaceAll(".", "/") = StringLiteralFlow::getStringLiteral(name).replaceAll("$", "/")
+    classNode.getClass().getQualifiedName().replaceAll(".", "/").replaceAll("$","/")  = StringLiteralFlow::getStringLiteral(name).replaceAll("$", "/")
   )
 }
 predicate jniGetObjectClassStep(JavaClassNode classNode, JniCallNode callNode) {
@@ -76,9 +76,9 @@ predicate jniGetFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
     name = callNode.getArgument(1) and
     sig = callNode.getArgument(2) |
     (
-      fieldNode.getClass() = getJavaClassNode(cls).getClass()
-      or
       not exists(getJavaClassNode(cls).getClass())
+      or
+      exists(dist(getJavaClassNode(cls).getClass(), fieldNode.getClass()))
     )
     and fieldNode.getField().toString() = StringLiteralFlow::getStringLiteral(name)
     //and StringLiteralFlow::getStringLiteral(sig) = ???
@@ -91,9 +91,9 @@ predicate jniGetStaticFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode)
     name = callNode.getArgument(1) and
     sig = callNode.getArgument(2) |
     (
-      fieldNode.getClass() = getJavaClassNode(cls).getClass()
-      or
       not exists(getJavaClassNode(cls).getClass())
+      or
+      exists(dist(getJavaClassNode(cls).getClass(), fieldNode.getClass()))
     )
     and fieldNode.getStaticField().toString() = StringLiteralFlow::getStringLiteral(name)
     //and StringLiteralFlow::getStringLiteral(sig) = ???
