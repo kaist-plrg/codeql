@@ -71,20 +71,32 @@ predicate jniGetStaticMethodIDStep(JavaMethodNode methodNode, JniCallNode callNo
 }
 predicate jniGetFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
   callNode.getName() = "GetFieldID" and
-  exists(ArgumentNode cls, ArgumentNode name |
+  exists(ArgumentNode cls, ArgumentNode name, ArgumentNode sig |
     cls = callNode.getArgument(0) and
-    name = callNode.getArgument(1) |
-    fieldNode.getClass() = getJavaClassNode(cls).getClass() and
-    fieldNode.getField().toString() = StringLiteralFlow::getStringLiteral(name)
+    name = callNode.getArgument(1) and
+    sig = callNode.getArgument(2) |
+    (
+      fieldNode.getClass() = getJavaClassNode(cls).getClass()
+      or
+      not exists(getJavaClassNode(cls).getClass())
+    )
+    and fieldNode.getField().toString() = StringLiteralFlow::getStringLiteral(name)
+    //and StringLiteralFlow::getStringLiteral(sig) = ???
   )
 }
 predicate jniGetStaticFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
   callNode.getName() = "GetStaticFieldID" and
-  exists(ArgumentNode cls, ArgumentNode name |
+  exists(ArgumentNode cls, ArgumentNode name, ArgumentNode sig |
     cls = callNode.getArgument(0) and
-    name = callNode.getArgument(1) |
-    fieldNode.getClass() = getJavaClassNode(cls).getClass() and
-    fieldNode.getStaticField().toString() = StringLiteralFlow::getStringLiteral(name)
+    name = callNode.getArgument(1) and
+    sig = callNode.getArgument(2) |
+    (
+      fieldNode.getClass() = getJavaClassNode(cls).getClass()
+      or
+      not exists(getJavaClassNode(cls).getClass())
+    )
+    and fieldNode.getStaticField().toString() = StringLiteralFlow::getStringLiteral(name)
+    //and StringLiteralFlow::getStringLiteral(sig) = ???
   )
 }
 predicate jniStringStep(ArgumentNode argNode, JniCallNode callNode) {
