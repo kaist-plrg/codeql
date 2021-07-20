@@ -4,7 +4,7 @@ FILE = main
 
 all: main.pdf
 
-$(FILE).pdf:  $(FILE).tex  $(PACKAGE).cls  ACM-Reference-Format.bst
+$(FILE).pdf:  $(FILE).tex *.tex $(PACKAGE).cls  ACM-Reference-Format.bst
 	pdflatex-dev $<
 	- bibtex $(basename $<)
 	pdflatex-dev $<
