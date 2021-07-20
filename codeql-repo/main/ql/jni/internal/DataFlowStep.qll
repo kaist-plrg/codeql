@@ -81,7 +81,12 @@ predicate jniGetFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
       exists(dist(getJavaClassNode(cls).getClass(), fieldNode.getClass()))
     )
     and fieldNode.getField().toString() = StringLiteralFlow::getStringLiteral(name)
-    //and StringLiteralFlow::getStringLiteral(sig) = ???
+    and (
+      not exists(fieldNode.getField().getType())
+      or
+      fieldNode.getField().getType().getTypeDescriptor()
+        = StringLiteralFlow::getStringLiteral(sig)
+    )
   )
 }
 predicate jniGetStaticFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode) {
@@ -96,7 +101,12 @@ predicate jniGetStaticFieldIDStep(JavaFieldNode fieldNode, JniCallNode callNode)
       exists(dist(getJavaClassNode(cls).getClass(), fieldNode.getClass()))
     )
     and fieldNode.getStaticField().toString() = StringLiteralFlow::getStringLiteral(name)
-    //and StringLiteralFlow::getStringLiteral(sig) = ???
+    and (
+      not exists(fieldNode.getField().getType())
+      or
+      fieldNode.getField().getType().getTypeDescriptor()
+        = StringLiteralFlow::getStringLiteral(sig)
+    )
   )
 }
 predicate jniStringStep(ArgumentNode argNode, JniCallNode callNode) {
