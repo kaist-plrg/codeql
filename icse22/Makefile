@@ -11,8 +11,8 @@ PACKAGE=acmart
 
 PDF = $(PACKAGE).pdf acmguide.pdf
 
-all:  ${PDF} ALLSAMPLES
-
+#all:  ${PDF} ALLSAMPLES
+all:  ALLSAMPLES
 
 %.pdf:  %.dtx   $(PACKAGE).cls
 	pdflatex $<
