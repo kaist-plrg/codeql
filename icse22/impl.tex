@@ -1,7 +1,21 @@
-\section{Typefaces}
+\section{Implementation}
+We implemented this idea into JNI analzer, using CodeQL.
+[Insert picure here]
 
-The ``\verb|acmart|'' document class requires the use of the
-``Libertine'' typeface family. Your \TeX\ installation should include
-this set of packages. Please do not substitute other typefaces. The
-``\verb|lmodern|'' and ``\verb|ltimes|'' packages should not be used,
-as they will override the built-in typeface families.
+\subsection{Extract database}
+We can extract db of two languages, using CodeQL
+
+\subsection{Merge database}
+Merge two database.
+Problem: duplicated names
+i.e. cpp db has "@expr" database, and java db has "@expr" database.
+Solution: add prefix: "cpp\_expr", "java\_expr"
+
+\subsection{Lift library}
+Dataflow library for each library already exists.
+Each has same structure, but with diffrent impl.
+However, they are not compatible yet.
+We lift each library's classes and predicates.
+
+\subsection{Merge library}
+Add extra edges to lifted library.

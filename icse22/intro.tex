@@ -1,17 +1,15 @@
 \section{Introduction}
-ACM's consolidated article template, introduced in 2017, provides a
-consistent \LaTeX\ style for use across ACM publications, and
-incorporates accessibility and metadata-extraction functionality
-necessary for future Digital Library endeavors. Numerous ACM and
-SIG-specific \LaTeX\ templates have been examined, and their unique
-features incorporated into this single new template.
+- Growing use of multilingual programs
+- Example: JNI
+- Importance of dataflow analysis of multilingual problem
+- Problem: known analyzer for JNI programs are not scalable enough
 
-If you are new to publishing with ACM, this document is a valuable
-guide to the process of preparing your work for publication. If you
-have published with ACM before, this document provides insight and
-instruction into more recent changes to the article template.
+- We suggest: declarive style dataflow analysis for multilingual program
+- First show general approach
+- Then show implementation of analyzer for JNI programs, using CodeQL
+- Show that our method is 14x faster, and find new bugs
 
-The ``\verb|acmart|'' document class can be used to prepare articles
-for any ACM publication --- conference or journal, and for any stage
-of publication, from review to final ``camera-ready'' copy, to the
-author's own version, with {\itshape very} few changes to the source.
+-Contribution
+  + Suggest new methodology of using Declarative style dataflow analysis for Multilingual program
+  + Implement JNI analyzer with CodeQL
+  + Show that it outperforms state-of-art analyzers, and find new bugs

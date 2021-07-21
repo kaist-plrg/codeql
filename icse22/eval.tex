@@ -1,14 +1,19 @@
-\section{Title Information}
+\section{Evaluation}
 
-The title of your work should use capital letters appropriately -
-\url{https://capitalizemytitle.com/} has useful rules for
-capitalization. Use the {\verb|title|} command to define the title of
-your work. If your work has a subtitle, define it with the
-{\verb|subtitle|} command.  Do not insert line breaks in your title.
+RQ1: Is the analyzer fesible?
+RQ2: How fast is the analyzer?
+RQ3: How practical is the analyzer? (In terms of bug finding)
 
-If your title is lengthy, you must define a short version to be used
-in the page headers, to prevent overlapping text. The \verb|title|
-command has a ``short title'' parameter:
-\begin{verbatim}
-  \title[short title]{full title}
-\end{verbatim}
+\subsection{RQ1}
+Test on small benchmark: NativeFlowBench.
+Resolve all function call and field access correctly, except one (string op)
+Compared to previous work, we also identified all data leaks precisely.
+
+\subsection{RQ2}
+Experiment on real world 43 F-Droid apps.
+27 of them has c->j interaction.
+
+Speed: x14 on average, x53 max
+
+\subsection{RQ3}
+Interoperation bugs

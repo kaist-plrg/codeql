@@ -1,9 +1,26 @@
-\section{Modifications}
+\section{General Approach}
 
-Modifying the template --- including but not limited to: adjusting
-margins, typeface sizes, line spacing, paragraph and list definitions,
-and the use of the \verb|\vspace| command to manually adjust the
-vertical spacing between elements of your work --- is not allowed.
+\subsection{Declarative dataflow analysis}
+Consider a language with a function call and field access.
+step(a,b) :- localStep(a,b) or functionStep(a,b) or fieldSteo(a,b)
+flow(a,b) :- a = b or step(a,c) and flow(c,b)
+flow is transitive closure of step.
 
-{\bfseries Your document will be returned to you for revision if
-  modifications are discovered.}
+\subsection{Interopration between languages}
+Interopeation can happen by:
+Call to a function of another langue, or Accessing field of another language.
+
+\subsection{Extension to dataflow analysis of multilingual language}
+We need to extend 3 predicates: callEdge(call, fun), fieldRead(a,b) and fieldWrite(a,b)
+
+\subsection{Static edge and Dynamic edge}
+Some edges only require static information, such as function name.
+i.e. staticCallEdge(call, fun) :- targetName(call, name) and funName(fun, name)
+Some edges require runtime-value of certain variable
+i.e.
+name = "callback";
+callMethod(name, param);
+In that case, we perfrom "inner flow analysis"
+i.e.
+dynamicCallEdge(call, fun) :- flow(name, arg) and funName(call, "callMethod") and
+getFunctionArg(call, arg) and funName(fun, name)
