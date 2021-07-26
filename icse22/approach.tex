@@ -1,26 +1,88 @@
 \section{General Approach}
 
+In this section, we propose a gneralized approach for performing declarative
+dataflow analysis for a multilingual program.
+
 \subsection{Declarative dataflow analysis}
-Consider a language with a function call and field access.
-step(a,b) :- localStep(a,b) or functionStep(a,b) or fieldSteo(a,b)
-flow(a,b) :- a = b or step(a,c) and flow(c,b)
-flow is transitive closure of step.
+
+We start by defining a declarative style dataflow analysis for one language.
+First, program points that can hold values are represented as nodes. Example of
+nodes would be varaibles, literals, parameter, arguments, or object fields.
+Now, we can express dataflow analysis in declarative style as flow(a, b), which
+means that value of the node a can flow into node b. flow(a, b) can be defined
+as transitive closure of a predicate step(a, b);
+
+flow(a,b) :- a = b or step(a,c) and flow(c, b)
+
+The predicate step(a,b) means that there is a direct flow from node a to b. Assuming that
+out target languages have function call and field access, then step (a,b) would be
+defined as following:
+
+step(a,b) :- localStep(a, b) or functionInStep(a, b) or functionOutStep(a, b)
+or filedReadStep(a, b) or fieldWriteStep(a, b)
+
+Here, localStep represents any flows that do not envolve function call or field
+access.  Example would be assigning to a variable, or simple def-use pattern.
+functionInStep and functionOutStep are used for flows envolving function calls,
+such as flow from argument to parameter or flows regarding return statement.
+fieldReadStep and fieldWriteStep are predicates for field access.
+
+Two predicates, functionInStep and functionOutStep, can be defined using more basic predicates:
+
+functionInStep(arg, param) :- isArgument(call, arg, i) and isParameter(function, param, i) and callEdge(call, function)
+functionOutStep(ret, pos) :- return(function, ret) and returnPosition(call, pos) and calLEdge(call, function)
+
+The predicate isArgument(call, arg, i) means that arg is the ith argument of
+given call, and similarly, the predicate isParameter(function, param, i) means
+that param is the ith parameter of given function.  The predicate
+return(function, ret) indicates that there is a return statement returning the
+value ret in given function, and the prediacate returnPosition(call, pos)
+indicates that the returned value of given call would be stored in the node
+ret.  Finally, the callEdge(call, function) means that the given call's target
+is the given function.
+
+With the all of above rules defined, once we provide facts for predicates that
+do not appear as head position for rules (a.k.a. external predicates) such as localStep, fieldReadStep, or
+callEdge, then the system can successfully find all pair of nodes (a,b) that
+satisfies flow(a,b).
+
+TODO: exmaple with simple language?
 
 \subsection{Interopration between languages}
-Interopeation can happen by:
-Call to a function of another langue, or Accessing field of another language.
+
+Now, in order to extend the dataflow analysis of single-language program into
+the dataflow analysis of multi-lingual language, we should first consider what
+kind of interactions between two languages can happen. There are mainly two
+ways of interactions: calling a function in another language, or accessing a
+field of a object in another language.
+
+When dispatching the target for function call or field access,
+there are two types of interactions: static, and dynamic. When static interaction is used,
+the dispatch target is decided in static manner, that is, not requiring any run-time value.
+For example, the target of function call from java to C is determined by adding prefix to
+the name of called function name, which can be detemined in compile time. In contrast,
+dynamic interaction requires a runtime-value of a program. For example, when C tries to call
+a method in java, it is required that the name of the target method is represented as string.
 
 \subsection{Extension to dataflow analysis of multilingual language}
-We need to extend 3 predicates: callEdge(call, fun), fieldRead(a,b) and fieldWrite(a,b)
 
-\subsection{Static edge and Dynamic edge}
-Some edges only require static information, such as function name.
-i.e. staticCallEdge(call, fun) :- targetName(call, name) and funName(fun, name)
-Some edges require runtime-value of certain variable
-i.e.
-name = "callback";
-callMethod(name, param);
-In that case, we perfrom "inner flow analysis"
-i.e.
-dynamicCallEdge(call, fun) :- flow(name, arg) and funName(call, "callMethod") and
-getFunctionArg(call, arg) and funName(fun, name)
+Note that providing facts for external predicates was required to complete
+dataflow analysis of single-language program.  This is also true for
+multi-lingual language. Let's assume that we are given all required facts for
+each of two languages separately. For predicates that are not envolved with interaction
+between languages, all we have to do is just merging those predicates together. For example,
+the facts for localStep for multilingual analysis would be simply the union of facts for localStep
+of each language. For predicates that are envloved with interaction, they should be extended further,
+considering the semantics of the operation. Such predicates would include 3 predicates:
+callEdge(call, fun), fieldReadStep(a,b) ,fieldWriteStep(a,b). Let's take a callEdge predicate as an
+example. By simply merging existing two predicates, then for every pair taht satisfies callEdge(call, fun),
+both call and fun would be from either the first language or the second language. In addition to that,
+we must find and add all pair of call and fun, where call is from the first language and the fun from the second,
+or vice versa.
+
+For static interactions, such extensions are not difficult, since new facts can be easily recognized.
+For dynamic interactions however, finding such facts are not trivial, since in order to determine the
+target, the runtime value is needed. In this case, one can perform "inner dataflow analysis", only targeting
+one language. For example, when a dynamic function call of form callMethod(funnName, arg) is made,
+then one can find all possible string literal values that can flow into the argument "funName". Using this
+analysis result, the function target is determined, and then the new fact for predicate callEdge can be added.
