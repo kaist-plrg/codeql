@@ -1,6 +1,11 @@
 \section{Implementation}
-We implemented this idea into JNI analzer, using CodeQL.
+In this section, we show how we applied the general idea for multilingual program analysis
+into implementing the dataflow analysis tool for JNI programs, using CodeQL.
 [Insert picure here]
+Figure xx. shows the overall structure of JN-QL. First, it generates database for each language
+and merge it to one database. Then, two seperate dataflow analysis library is also
+merged into one. Using the merged database and merged library, the user can
+qrite a query and evaluate it to get query result.
 
 \subsection{Extract database}
 We can extract db of two languages, using CodeQL
