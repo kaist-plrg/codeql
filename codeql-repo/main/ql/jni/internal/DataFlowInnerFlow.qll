@@ -91,13 +91,17 @@ JavaMethodNode getJavaMethodNode(ArgumentNode arg) {
       jniGetMethodIDStep(result, mid)
       or
       jniGetStaticMethodIDStep(result, mid)
-    ) and
-    config.hasFlow(mid.asCppNode(), arg.asCppNode())
+    )
+    and config.hasFlow(mid.asCppNode(), arg.asCppNode())
   )
 }
 JavaMethodNode getWrongJavaMethodNode(ArgumentNode arg) {
   exists(JniConfiguration config, Node mid |
-    jniGetWrongMethodIDStep(result, mid)
+    (
+      jniGetWrongMethodIDStep(result, mid)
+      or
+      jniGetWrongStaticMethodIDStep(result, mid)
+    )
     and config.hasFlow(mid.asCppNode(), arg.asCppNode())
   )
 }
