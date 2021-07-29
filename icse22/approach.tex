@@ -48,22 +48,6 @@ satisfies flow(a,b).
 
 TODO: exmaple with simple language?
 
-\subsection{Interopration between languages}
-
-Now, in order to extend the dataflow analysis of single-language program into
-the dataflow analysis of multi-lingual language, we should first consider what
-kind of interactions between two languages can happen. There are mainly two
-ways of interactions: calling a function in another language, or accessing a
-field of a object in another language.
-
-When dispatching the target for function call or field access,
-there are two types of interactions: static, and dynamic. When static interaction is used,
-the dispatch target is decided in static manner, that is, not requiring any run-time value.
-For example, the target of function call from java to C is determined by adding prefix to
-the name of called function name, which can be detemined in compile time. In contrast,
-dynamic interaction requires a runtime-value of a program. For example, when C tries to call
-a method in java, it is required that the name of the target method is represented as string.
-
 \subsection{Extension to dataflow analysis of multilingual language}
 
 Note that providing facts for external predicates was required to complete
