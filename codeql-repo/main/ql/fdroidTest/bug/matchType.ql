@@ -12,6 +12,8 @@ predicate compatibleBaseJavaCppType(string jt, string ct) {
     ct = "j"+jt
     or
     ct = jt
+    or
+    ct + "ean" = jt //boolean
   )
 
   else (
@@ -28,12 +30,20 @@ predicate compatibleJavaCppType(string jt, string ct) {
   exists(string basejt, string basect |
     compatibleBaseJavaCppType(basejt, basect)
     and
-    jt = basejt + "[]" and ct = basect + "Array"
+    (
+      jt = basejt + "[]" and ct = basect + "Array"
+      or
+      jt = basejt and ct = "const " + basect
+    )
   )
+  or
+  jt.matches("%[]") and ct = "jarray"
+  or
+  ct = jt+"Type"
 }
 
 from
-   DataFlowCall call, JAVA::Callable m, DataFlowCallable f, string t1, string t2
+   DataFlowCall call, JAVA::Callable m, DataFlowCallable f, string t1, string t2, string ty
 where
   m = call.asJavaDataFlowCall().getCallee()
   and m.isNative()
@@ -41,11 +51,13 @@ where
   and callEdge(call, f)
   and
   (
-    t1 = m.getReturnType().toString()
+    ty="return" 
+    and t1 = m.getReturnType().toString()
     and t2 = f.asCppDataFlowCallable().getType().toString()
     and not compatibleJavaCppType(t1, t2)
     or
-    exists(int i, JAVA::Parameter p1, CPP::ParameterNode p2 |
+    ty="arg"
+    and exists(int i, JAVA::Parameter p1, CPP::ParameterNode p2 |
       p1.getCallable() = m
       and p1.getPosition() = i
       and p2.isParameterOf(f.asCppDataFlowCallable(), i+2)
@@ -55,4 +67,4 @@ where
     )
   )
 select
-  m, t1, f, t2
+  ty, m, t1, f, t2
