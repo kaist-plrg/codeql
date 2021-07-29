@@ -11,6 +11,10 @@ while read line; do
   lines+=( "$line" )
 done < F-Droid/resource/manual-success.txt
 
+rm -rf time.txt
+
+lines=( "extracted/org.andglkmod.hunkypunk_7_src.tar.gz/ ; ./gradlew --no-daemon clean ; cd-ndk-build.sh app/src/main ; ./gradlew --no-daemon compileDebugSources" )
+
 for line in "${lines[@]}"; do
   d=F-Droid/`echo $line | cut -d ";" -f 1`
   clean=`echo $line | cut -d ";" -f 2`
@@ -37,15 +41,26 @@ for line in "${lines[@]}"; do
   echo ' [init]'
   codeql database init -l cpp --source-root $d db-cpp
   echo ' [trace-command]'
+  prev=`date +%s%N`
   codeql database trace-command --working-dir $d db-cpp $ccmd
-  
+  cur=`date +%s%N`
+  (( cpp_time = (cur - prev)/1000000 ))
+
   echo '[Creating database for java]'
   rm -rf db-java
   echo ' [init]'
   codeql database init -l java --source-root $d db-java
   echo ' [trace-command]'
+  prev=`date +%s%N`
   codeql database trace-command --working-dir $d db-java $jcmd
+  cur=`date +%s%N`
+  (( java_time = (cur - prev)/1000000 ))
 
   dbdir=`echo $d | sed "s/F-Droid\/extracted/db-fdroid/g"`
+  prev=`date +%s%N`
   ./merge.sh $d $dbdir
+  cur=`date +%s%N`
+  (( merge_time = (cur - prev)/1000000 ))
+
+  echo $d $cpp_time $java_time $merge_time >> time.txt
 done
