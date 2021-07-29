@@ -95,6 +95,12 @@ JavaMethodNode getJavaMethodNode(ArgumentNode arg) {
     config.hasFlow(mid.asCppNode(), arg.asCppNode())
   )
 }
+JavaMethodNode getWrongJavaMethodNode(ArgumentNode arg) {
+  exists(JniConfiguration config, Node mid |
+    jniGetWrongMethodIDStep(result, mid)
+    and config.hasFlow(mid.asCppNode(), arg.asCppNode())
+  )
+}
 JavaFieldNode getJavaFieldNode(ArgumentNode arg) {
   exists(JniConfiguration config, Node mid |
     jniGetFieldIDStep(result, mid) and

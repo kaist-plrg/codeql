@@ -51,6 +51,26 @@ predicate jniGetMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
     )
   )
 }
+predicate jniGetWrongMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
+  ( callNode.getName() = "GetMethodID" or callNode.getName() = "GetStaticMethodID") and
+  exists(ArgumentNode cls, ArgumentNode name |
+    cls = callNode.getArgument(0) and
+    name = callNode.getArgument(1) and
+    methodNode = min(JavaMethodNode m, int d | 
+      (
+        m.getMethod().toString() = StringLiteralFlow::getStringLiteral(name)
+        or
+        StringLiteralFlow::getStringLiteral(name) = "<init>" and
+        m.isConstructor()
+      ) and
+      if not exists(getJavaClassNode(cls).getClass())
+      then d = -1
+      else d = dist(getJavaClassNode(cls).getClass(), m.getClass())
+      |
+      m order by d
+    )
+  )
+}
 predicate jniGetStaticMethodIDStep(JavaMethodNode methodNode, JniCallNode callNode) {
   callNode.getName() = "GetStaticMethodID" and
   exists(ArgumentNode cls, ArgumentNode name, ArgumentNode sig |
