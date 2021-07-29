@@ -1,20 +1,30 @@
 \section{Implementation}
 In this section, we show how we applied the general idea for multilingual program analysis
-into implementing the dataflow analysis tool for JNI programs, using CodeQL.
+into implementing the dataflow analysis tool for JNI programs, using CodeQL. CodeQL is a
+static analysis engine that transforms source code into database, and performs analysis by
+evaluating query written in language called QL (Query langague).
 [Insert picure here]
 Figure xx. shows the overall structure of JN-QL. First, it generates database for each language
 and merge it to one database. Then, two seperate dataflow analysis library is also
 merged into one. Using the merged database and merged library, the user can
 qrite a query and evaluate it to get query result.
 
-\subsection{Extract database}
-We can extract db of two languages, using CodeQL
-
-\subsection{Merge database}
-Merge two database.
-Problem: duplicated names
-i.e. cpp db has "@expr" database, and java db has "@expr" database.
-Solution: add prefix: "cpp\_expr", "java\_expr"
+\subsection{Create database}
+The first step is to gernerate database for each of two languages. 
+For compiled languages such as C++ and Java, CodeQL generates database by
+tracing the compiler for each language. While compiler is running, CodeQL
+extracts information it needs, and create database with that information.
+Creation of database is performed in two steps: first, the extracted information from compiler is
+stored in the human readable file format
+called trap files, and second, these trap files are then converted into database.
+[Insert example of trap file here]
+JN-QL performs first step for each languages separately to get two sets of trap files.
+Next step would be to perfrom finalization step on merged set of trap files. However, both of
+trap files have duplicated table, so simply mering them would not work. The solution is to add
+prefix to name of each table. For example, if both database have tables named "@expr",
+the table from cpp would be renamed as "@cpp\_expr", and the table from java would be renamed as
+"@java\_expr". After renaming each table, the second step can be applied to finalize the database
+on which the query can be performed.
 
 \subsection{Lift library}
 Dataflow library for each library already exists.
