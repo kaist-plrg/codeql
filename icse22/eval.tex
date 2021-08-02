@@ -1,19 +1,42 @@
 \section{Evaluation}
+In this section, we show the feasibility of the approach of using declarative dataflow
+analysis for multilingual program, and the effectiveness of its implentation. More specifically,
+we set three RQs as follow:
+RQ1) Feasibility: Is the approach of declarative dataflow analysis for multilingual program fesible?
+RQ2) Performance: How is the spped and precision of analyzer, compared to the previous approach?
+RQ3) Usefulness: How practical is the analyzer?
+To answer RQ1, we ran our analyzer to NativeFlowBench, a jni program dataflow analysis benchmark.
+NativeFlowBench is a set of 23 android application featuring various interactions between
+C++ and Java, where some applications contain a code that leaks sensitive user data by logging it.
+To answer RQ2 and RQ3, we ran our analyzer to 43 real-world applications collected from F-Droid, a
+open-source application repository. We compared our analyzer with state-of-the-art JNI analyzer, and
+show that our analyzer outperforms in terms of speed and precision. We also found 28 interoperation bugs,
+including 20 newly found bugs.
 
-RQ1: Is the analyzer fesible?
-RQ2: How fast is the analyzer?
-RQ3: How practical is the analyzer? (In terms of bug finding)
 
-\subsection{RQ1}
-Test on small benchmark: NativeFlowBench.
-Resolve all function call and field access correctly, except one (string op)
-Compared to previous work, we also identified all data leaks precisely.
+\subsection{RQ1: Feasibility}
+The table1 shows the analysis result for 19 benchmarks in NativeFlowBench.
+The "Benchmark" coulmns denote the benchmark names, and "result" coulmns denote whether the
+analysis result for corresponding benchmark was correct(O) or not(X). We call that the
+analysis result is successful if every function call target (call(j->c), call(c->j)) and field access tagret
+(field_read(c->j), field_write(c->j)) are precisely determined, and every data leak is reported correctly
+without false positives or false negatives.
+The result shows that except for one benchmark, our analyzer could correctly determine all targets for
+function calls and field access correctly, and could successfully perform dataflow analysis to find all
+of the data leaks. The only exception was native_compexdata_stringop, where string manipulations functions
+such as strcpy or strcat was used, and since the inner-flow analysis could not properly handle these functions,
+analyzer could not correctly deterimine the function call target.
 
-\subsection{RQ2}
+\subsection{RQ2: Performance}
+The table2 shows the analysis result for 43 F-Droid applications. The "time" coulmn denotes
+the time for creating database and evaluating query. 
+
+
+The first coulmn 
 Experiment on real world 43 F-Droid apps.
 27 of them has c->j interaction.
 
 Speed: x14 on average, x53 max
 
-\subsection{RQ3}
+\subsection{RQ3: Usefulness}
 Interoperation bugs
