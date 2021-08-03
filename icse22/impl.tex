@@ -167,17 +167,25 @@ semantics of interoperation between languages. For example, the predicate named 
 is a predicate for connecting function call and target function. It gets argument of class "DataFlowCall",
 and the result is of class "DataFlowCallable". After merging the libraries, this predicate would be as follow:
 
-DataFlowCallable viableCallable(DataFlowCall c) {
+DataFlowCallable viableCallable(DataFlowCall c) \{
 
-result.asJavaDataFlowCallable() = JAVA::viableCallable(c.asJavaDataFlowCall()) or
+result.asJavaDataFlowCallable()
 
-result.asCppDataFlowCallable() = CPP::viableCallable(c.asCppDataFlowCall()) or
+  = JAVA::viableCallable(c.asJavaDataFlowCall()) or
 
-result.asCppDataFlowCallable() = viableCallableJ2C(c.asJavaDataFlowCall()) or
+result.asCppDataFlowCallable()
 
-result.asJavaDataFlowCallable() = viableCallableC2J(c.asCppDataFlowCall())
+  = CPP::viableCallable(c.asCppDataFlowCall()) or
 
-}
+result.asCppDataFlowCallable()
+
+  = viableCallableJ2C(c.asJavaDataFlowCall()) or
+
+result.asJavaDataFlowCallable()
+
+  = viableCallableC2J(c.asCppDataFlowCall())
+
+\}
 
 The first two lines are result of lifting, and they take advantage of the original predicates from dataflow library.
 They handle the call edges from Java to Java, and from C++ to C++.
