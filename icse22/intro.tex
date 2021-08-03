@@ -1,15 +1,28 @@
 \section{Introduction}
 - Growing use of multilingual programs
-- Example: JNI
-- Importance of dataflow analysis of multilingual problem
-- Problem: known analyzer for JNI programs are not scalable enough
 
-- We suggest: declarive style dataflow analysis for multilingual program
+- Example: JNI
+
+- Importance of dataflow analysis of multilingual problem
+
+- Problem: known analyzer for JNI programs are not scalable enough / heavy weight
+
+- We suggest: declarative style dataflow analysis for multilingual program
+
+- because, declarative analysis are known to be light weight.
+
 - First show general approach
+
 - Then show implementation of analyzer for JNI programs, using CodeQL
-- Show that our method is 14x faster, and find new bugs
+
+- Show that our method is 14x faster, have higher precision, and find new bugs
 
 -Contribution
-  + Suggest new methodology of using Declarative style dataflow analysis for Multilingual program
-  + Implement JNI analyzer with CodeQL
-  + Show that it outperforms state-of-art analyzers, and find new bugs
+
++ Suggest new methodology of using Declarative style dataflow analysis for Multilingual program
+
++ Implement JNI analyzer with CodeQL
+
++ Show that it outperforms state-of-art analyzers in terms of speed and precision.
+
++ Found new bugs(?)
