@@ -1,6 +1,5 @@
 \section{Motivation}
-This section is Motivation:
-it will introduce a simple/generalized multilingual code example,
+We will introduce a simple/generalized multilingual code example,
 discuss how previous works perform analysis for this example,
 and illustrate some issue for each approach.
 
@@ -8,13 +7,77 @@ Then, we introduce declarative style analysis,
 and show hoe declarative style dataflow anlysis can be applied.
 
 \subsection{Multilingual program}
-A simple, generalized example of multilingual program.
-- function call
-- field access
+Let's look at the following example:
 
-\subsection{Previous approaches for analyzing multilingual program}
-Introduce previous approaches for analyzing multilongual program.
+Language A
 
-\subsection{Declarative analysis}
-Introduce declarative analysis, and how we can apply declartive style dataflow analysis
-for this example.
+public void main() {
+
+  Obj obj = new Obj();
+
+  obj.p = SOURCE;
+
+  native::f(obj);
+
+}
+
+Language B
+
+int f(Obj obj) {
+
+  SINK = getField(obj, "p");
+  
+}
+
+What we are interested is whether the data stored in the node named SOURCE
+can flow into the node named SINK. For example, SOURCE can be sensitive data like
+smartphone's device ID (IMEI), and SINK can be an argument to the logging function.
+
+\subsection{Previous approaches for analyzing multilingual program} There are
+mainly two approaces for analyzing multilingual progrmas. One approach is to
+define host language and guest language, and transform the guest language
+source code into the host language source code. The rationale behind this
+approach is that one can resuse the existing analyzers for the host language
+source code after the transformation is done.  ILEA[1] is a JNI program
+analyzer that adopted this approach. It compiles native C code into (extended)
+Java virtual machine language (EJVML), and uses existing analyzer that works on
+EJVML, namely Jlint.  Recent study[2, ASE] generalizes this idea and provides
+formalized method to perform analysis in more general setting.  The problem of
+this approach is that ... (Compile is heavy? Challenging? Not appropriate?
+Expressive power of two languaes differ and information is lost when one
+language is compield to another?) (Example needed?)
+
+Another approach is to use a single framework which incorporates both
+languages. JN-SAF[3] is a good example.  JN-SAF is a dataflow analisys tool
+specialized for android applications that includes C code as binary.  The core
+algorithm it uses is SBDA (summary based dataflow analysis). After constructing
+call graph for both Java and native methods, "summary" for each method is
+generated for each of methods. Summary is generated in bottom-up manner; if a
+method calls another method, the callee method's summary is generated first and
+the caller method's summary is generated, possibly using the information from
+the callee's summary. (Too long?) This approach solves the problem of compiling
+languages as previous approach, yet has some limitation in its implementation
+detail.
+- Symbolic execution -> heavy. - Cycle in call graph -> unsound
+
+\subsection{Declarative style analysis} In order to solve the problem of
+JN-SAF, we propose the declarative style analysis.  The biggest advantage of
+the declarative style analysis is that writing analysis in declarative language
+is simple and light-weight, and it does not require complex implmentation. For
+instance, the traditional fix-point calucation that is used in previous
+approaches are handled by declarative language engines, and the programmer for
+the analyzer does not need to manually consider such semantics. All they have
+to write is "declaring" each rules.
+
+For example, we can think of the rule flow(a,b) that will denote the fact that
+there is a data flow forn node a to node b. This rule can be defined in terms of
+another preicate step:
+
+flow(a,b):-step(a,b) or step(a,c) and flow(c,b)
+
+where the predicate step(a,b) denotes the direct data flow from node a and b.
+Given the set of facts that denote all the possible dircet steps,
+then all possible flow is calculated by evaluating engine. For example,
+step(SOURCE -> obj)
+step(obj -> obj)
+step(obj -> sink).
