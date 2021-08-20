@@ -1,26 +1,105 @@
 \section{Introduction}
-There are many cases where a single language alone is not enough to meet the requirement of large and comlplex programs nowadays,
-so using multiple languages is one of the promising way to implement such programs. For example ~~~
 
-However, writing a relialbe multilingual program is not an easy task. (Too similar with ASE?)
+There are many cases where a single language alone is not enough to meet the
+requirement of large and comlplex programs nowadays, and using multiple
+languages is one of the promising way to implement such programs. For this
+reason, many languages support FFI(Foreign function interface), which enables a
+program written in a language to call the function written in another language.
+For example, (Write examples of FFI here)
 
-Performing dataflow analysis of multilingual programs help developers to write more reliable code.
+However, writing a relialbe multilingual program is not an easy task. The
+programmer of multilingual programs should fully understand semantics of both
+language, in addition to the inter-operation semantics between two languages in
+order to write the correct code.  Such complex semantics make it much more
+difficult to reson about the program, and programmers may leave some bugs that
+can crash the program in runtime, or security vulnerabilities that attackers
+can take advantage of.
 
-Many researchers have tried to perform static (dataflow?) analysis for multilingual programs.
-(JN-SAF, Illia, ASE)
+Performing static analysis on multilingual programs can help developers to
+write more reliable code. (Write importance of static analysis here.)
 
-In this paper, we suggest a novel methodology for performing dataflow analysis of multilingual program.
-(Which uses lightweight declarative style)
+For this reason, previous researchers have tried to implement the analyzer for
+multilingual analysis with various approaches.  One approach[1][2] is to
+translate one language into another language and perform analysis with existing
+analyzer on the translated language. This approach has a virtue in that
+existing analyzers can be reused without almost no modification.  Another
+approach[3] is to modify and combine existing analyzer of each language, so
+that two analyzers give the analysis result in unified output format, and the
+analysis is performed with respect to this output format.
+(Discussion: Do we need to separate these two previous approaches?)
 
-To evaluate the feasibility of our approach, we implemented the dataflow analysis for JNI programs using CodeQL.
-(Which showed better performance)
+A common, inevitable pattern of implementing analyzer for multilingual program
+is that intermidiate representation (IR) which can incorporate the both
+languages is defined, and the client-analysis is performed upon IR. In case of
+compile-based appraoch, the IR is one of the language itself, and in case of
+combination-based approach, the IR would be the unified output format for each
+of the anlyzers. One observation is that in previous approaches, the part for
+translating each language into IR, and the part for performing analysis on IR
+is completely separated, and this may incur some problems whwn one would like
+to change the client-analysis into a different one. If one would like to make a
+client-analysis into a simpler one which needs less information, then the
+process of translating into IR is doing unnecessary work for creating
+unnecessary information, resulting in an inefficient analysis. On the other
+hand, we can consider a case where one wants to extend the client-analysis into
+a more complex one that requires more complex information. In this case, on top
+of unavoidable effort to extend the client-analysis itself, the additional task
+of extending IR itself and translating each language into IR is also required,
+and it imposes extra burden on analyzer developers, especially if each task is
+very different from each other.
 
-We also tested out analyzer with real world applications retrieved from F-droid, and found new bugs and vulnerabilities from these apps.
+In this paper, we suggest a novel methodology for implementing static analysis
+of multilingual program to alleviate this problem, which is using declarative
+language.  In declarative language, everything is expressed as in terms of
+"data-fact" and "rule".  "Data-fact" is simply an ordered tuples of elements,
+and "rule" is a way to define how one data-fact can be derived from other
+data-facts. Evaluating declarative program is defined as finding all possible
+data-facts that can be derived by given basic data-facts and rules.  Adopting
+this approach, we can perform static analysis on multilingual programs in
+following sense.  The first step is to converted each language into a set of
+syntactic data-facts. In a sense, these data-facts can be viewd as IR for two
+languages.  Then, programmers can define the intra-language rules that would
+generate new data-facts based on already known data-facts. New data-facts
+generated in this way would tend to contain more higer-level information,
+considering the semantics of each languge. Finally, programmer can implement
+the static analysis by defining the inter-language rules considering the
+inter-operation semantcis between two languages, and evaluating these new rules
+along with intra-language rules would give the final analysis result in form of
+a set of data-facts.
+
+On top of the know advantages of being fast, modular and scalable[4], using
+declarative language to implement static analysis can also be helpful to
+sidestep the problems mentioned above. Major engines of declrative languages
+are evaluated in bottom-up manner[Need search: at least CodeQL does so, but do
+other engines also operate in this way?], which means that data-facts that are
+not needed for calculating the final analysis result can be effectively
+removed, potentially reducing the total evaluation time if the client-analysis
+happend to be simple enough. In addition, the burden of modifying or extending
+the existing analyzer is lessened in declrative style. The syntactic facts
+extracted in the first step is very less likey to be changed, and the
+additionaly required task is boiled down to defining some more rules and
+data-facts, which does not impose significant overhead than implementing the
+analyzer itself.
+
+To show the feasibility of our approach, we implemented the dataflow analysis
+for JNI programs using CodeQL[5], a static analysis where implementation can be
+written in declarative style. We applied our analyzer to real-world android JNI
+applications retrieved from F-droid[6], a repository for open-source android
+applications to see whether perforance of this implementation is competable
+with existing works. Surprisingly, our experiment result show that our
+implementation outperforms the state of the art JNI analyzer in terms of speed
+and analyzer our implementation shows x14 speed up on average, and shoinwg the
+slightly better precision. In addition, we could emulate the various kinds of
+bug detectors mentioned in previous researches on top of our analyzer in
+declarative style with relative ease, and could find the genuine bugs and
+vulnerabilites from the benchmark.
 
 The contribution of this paper is as follows:
 
-+ We suggested a new methodology of using declarative style dataflow analysis for multilingual program
++ We suggested a new methodology of using declarative style dataflow analysis
+for multilingual program, which can circumvent some problems of multilingual analysis.
 
-+ We implemented JNI dataflow analyzer with CodeQL, which outperforms state-of-art analyzers in terms of speed and precision.
++ We implemented JNI dataflow analyzer with CodeQLi based on this approach,
+which outperforms state-of-art analyzers in terms of speed and precision.
 
-+ We found and reported new bugs and vulnerabilities from the real-world JNI applications.
++ We could find new bugs and vulnerabilities from the real-world JNI applications
+by easily implementing the bug detectors from the previous researches.
