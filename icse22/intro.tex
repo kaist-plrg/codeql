@@ -31,7 +31,6 @@ combination-based approach, which is to modify and combine existing analyzers
 of each language, so that two analyzers give the analysis result in unified
 output format, and the analysis is performed with respect to this output
 format.
-(Discussion: Do we need to separate these two previous approaches?)
 
 A common, inevitable pattern of implementing analyzer for multilingual program
 is that intermidiate representation (IR) which can incorporate the both
@@ -46,48 +45,49 @@ for each function as IR, which is obtained by two modified analyzers for Java
 and binary. The dataflow analysis is calculated with extracted summaires.  One
 observation is that in previous approaches, the part for translating each
 language into IR, and the part for performing analysis on IR is completely
-separated, and this may incur some problems when one would like to change the
-client-analysis into a different one. If one would like to make a
-client-analysis into a simpler one which needs less information, then the
-process of translating into IR is doing unnecessary work for creating
-unnecessary information, resulting in an inefficient analysis. On the other
-hand, we can consider a case where one wants to extend the client-analysis into
-a more complex one that requires more complex information. In this case, on top
-of unavoidable effort to extend the client-analysis itself, the additional task
-of extending IR itself and translating each language into IR is also required,
-and it imposes extra burden on analyzer developers, especially if each task is
-very different from each other.
+separated, and this makes the implementation inflexible. For example,  If one
+would like to make a client-analysis into a simpler one which needs less
+information, then the process of translating into IR is doing unnecessary work
+for creating unnecessary information, resulting in an inefficient analysis. On
+the other hand, we can consider a case where one wants to extend the
+client-analysis into a more complex one that requires more complex information.
+In this case, on top of unavoidable effort to extend the client-analysis
+itself, the additional task of extending IR itself and translating each
+language into IR is also required, and it imposes extra burden on analyzer
+developers, especially if each task is very different from each other.
 
 In this paper, we suggest a novel methodology for implementing static analysis
-of multilingual program to alleviate this problem, which is using declarative
-language.  In declarative language, everything is expressed as in terms of
-"data-fact" and "rule".  "Data-fact" is simply an ordered tuples of elements,
-and "rule" is a way to define how one data-fact can be derived from other
-data-facts. Evaluating declarative program is defined as finding all possible
-data-facts that can be derived by given basic data-facts and rules.  Adopting
-this approach, we can perform static analysis on multilingual programs in
-following sense.  The first step is to converted each language into a set of
-syntactic data-facts. In a sense, these data-facts can be viewd as IR for two
-languages.  Then, programmers can define the intra-language rules that would
-generate new data-facts based on already known data-facts. New data-facts
-generated in this way would tend to contain more higer-level information,
-considering the semantics of each languge. Finally, programmer can implement
-the static analysis by defining the inter-language rules considering the
-inter-operation semantcis between two languages, and evaluating these new rules
-along with intra-language rules would give the final analysis result in form of
-a set of data-facts. On top of the know advantages of being fast, modular and
-scalable[4], using declarative language to implement static analysis can also
-be helpful to sidestep the problems mentioned above. Major engines of
-declrative languages are evaluated in bottom-up manner[Need search: at least
-CodeQL does so, but do other engines also operate in this way?], which means
-that data-facts that are not needed for calculating the final analysis result
-can be effectively removed, potentially reducing the total evaluation time if
-the client-analysis happend to be simple enough. In addition, the burden of
-modifying or extending the existing analyzer is lessened in declrative style.
-The syntactic facts extracted in the first step is very less likey to be
-changed, and the additionaly required task is boiled down to defining some more
-rules and data-facts, which does not impose significant overhead than
-implementing the analyzer itself.
+of multilingual program, which is using declarative language.  In declarative
+language, everything is expressed as in terms of "data-fact" and "rule".
+"Data-fact" is simply an ordered tuples of elements, and "rule" is a way to
+define how one data-fact can be derived from other data-facts. Evaluating
+declarative program is defined as finding all possible data-facts that can be
+derived by given basic data-facts and rules.  Adopting this approach, we can
+perform static analysis on multilingual programs in following sense.  The first
+step is to converted each language into a set of syntactic data-facts. In a
+sense, these data-facts can be viewd as IR for two languages.  Then,
+programmers can define the intra-language rules that would generate new
+data-facts based on already known data-facts. New data-facts generated in this
+way would tend to contain more higer-level information, considering the
+semantics of each languge. Finally, programmer can implement the static
+analysis by defining the inter-language rules considering the inter-operation
+semantcis between two languages, and evaluating these new rules along with
+intra-language rules would give the final analysis result in form of a set of
+data-facts.
+
+On top of the know advantages of being fast, modular and scalable[4], using
+declarative language to implement static analysis can also be helpful to
+alleviate the problems mentioned above, thanks to its flexibity and extensibility.
+Major engines of declrative languages are evaluated in bottom-up manner[Need
+search: at least CodeQL does so, but do other engines also operate in this
+way?], which means that data-facts that are not needed for calculating the
+final analysis result can be effectively removed, potentially reducing the
+total evaluation time if the client-analysis happend to be simple enough. In
+addition, the burden of modifying or extending the existing analyzer is
+lessened in declrative style.  The syntactic facts extracted in the first step
+is very less likey to be changed, and the additionaly required task is boiled
+down to defining some more rules and data-facts, which does not impose
+significant overhead than implementing the analyzer itself.
 
 To show the feasibility of our approach, we chose JNI programs as analysis
 target, and implemented dataflow analysis as client-analysis using CodeQL[5], a
@@ -106,8 +106,7 @@ benchmark.
 The contribution of this paper is as follows:
 
 + We suggested a new methodology of using declarative style static analysis
-for multilingual program, which can circumvent the dificulty of changing IR
-with respect to client-analysis in previous approaches.
+for multilingual program, which is more flexible and extensible.
 
 + We implemented JNI dataflow analyzer with CodeQL based on declarative-style approach,
 which outperforms state-of-art analyzers in terms of scalability and precision.
