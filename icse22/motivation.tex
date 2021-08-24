@@ -1,7 +1,8 @@
 \section{Motivation}
 
-In this section, we visualize the problems of multilingual programa analysis
-with concrete examples, and show how declrative style imeplementation can be helpful.
+In this section, we visualize the problems of multilingual program analysis
+with concrete examples, and show how declrative style implementation can be helpful
+for those problems.
 
 \subsection{Example 1: Extending to more complex client-analysis}
 
@@ -14,9 +15,9 @@ Language A
 
 public void main() \{
 
-  Node node = null;
+  \quad Node node = null;
  
-  B::f(node);
+  \quad B::f(node);
 
 \}
 
@@ -24,100 +25,102 @@ Language B
 
 void f(Node* arg) \{
   
-  Node* ptr = arg;
+  \quad Node* ptr = arg;
 
-  ptr->next = new Node;
+  \quad ptr->next = new Node;
 
 \}
 
 What we are interested is whether the value null from language A
-can be dereferenced in language B. IR~~~
+can be dereferenced in language B. One way to express this with IR 
+would be the following format: 
 
-Now, let's assume that we want to analyze the following different program:
+main: \{
 
-EXAMPLE 2
-
-Language A
-
-public void main() \{
-
-  Node node = null;
- 
-  B::f(node);
+  \quad node = null;
+  
+  \quad f(node);
 
 \}
+
+f(arg): \{
+  
+  \quad ptr = arg;
+  
+  \quad deref(ptr);
+
+\}
+
+Performing dataflow analysis on this IR would be straight forward, and it can
+be concluded that te null can be derefereced.
+
+Now, let's assume that we want to analyze the following different program,
+where Language B is changed as follow:
+
+EXAMPLE 2
 
 Language B
 
 void f(Node* arg) \{
 
-  Node* ptr = arg;
+  \quad Node* ptr = arg;
   
-  if(ptr != NULL) \{
+  \quad if(ptr != NULL) \{
 
-    ptr->next = new Node;
+    \quad \quad ptr->next = new Node;
 
-  \}
+  \quad \}
 
 \}
 
 In this example, since the null-check is performed before dereferencing it,
 there should be no alarm in this case. However, if IR itself does not contain
 the control-flow structure such as if-statement, then the analyzer might
-produce the same IR as before as if there were no null checking logic, and
-would result in a false alarm that reports the dereference of null. If one
-wants to extend this analyzer to support this more complex analysis, then all
+produce the same IR as before as if there were no null checking logic ar all,
+and would result in a false alarm that reports the dereference of null. If one
+wants to extend this analyzer to support this kind of analysis, then all
 three jobs of extending IR, translating source code into extended IR, and
 implementing analysis on extended IR. This can be especially more cubersome
 if all of three jobs are very different from others.
 
 \subsection{Example 2: Changing into simpler client-analysis}
 
-This time, we can think of the situation where we want to change the client analysis
-into a simpler one. For example, consider the following example.
+This time, let's consider the opposite case, where the developer already built
+a analyzer aimed for complex analysis, but a user wants to perform a 
+simple client-analysis. For example, consider the following example.
 
 EXAMPLE 3
-
-Language A
-
-public void main() \{
-
-  Node node = null;
-
-  B::f(node);
-
-\}
 
 Language B
 
 void f(Node* arg) \{
 
-  Node* ptr = arg;
+  \quad Node* ptr = arg;
 
-  for(int i = 0; i < 10; i++) \{
+  \quad Node* next;
 
-    object* next = new object();
-    
-    ptr -> next = next;
+  \quad if(condition()) \{
 
-    ptr = next;
+    \quad \quad next = null;
   
-  \}
+  \quad \}
+
+  \quad else \{
+   
+    \quad \quad next = new Node;
+  
+  \quad \}
+
+  \quad ptr->next = next;
 
 \}
 
-Let's say we have a complex analyzer that can handle this progrma in a
-loop-seneitive[6] manner: it can preciely decide that the derefencing null
-wouuld only happen in first iteration, at it would never happen at another
-iteration.  In order to get this precise result, this would require some
-heavy-weight analysis which woulld keep track of the number of iterations, and
-IR should be expressive enough to handle all of these semantics.  However, the
-user of analyzer might not want to use such a complex analysis, and simply want
-to see if null dereferencing is possible at all. In this point of view,
-considering loop is unnecessary and it is enough to express as the original IRs.
-
-
-~~~
+and let's assume that the analyzer already handles control flow.
+However, what user is interested is to find wheter the variable "ptr"
+can be null or not, and while determining that, the control flow need
+not be considered. Despite that fact, the analyzer would unnecessarily
+calculate the analysis result for the variable next, which is a waste
+of time.
 
 \subsection{Declarative style analysis}
 
@@ -160,7 +163,14 @@ simply defining new rules and data-facts. Once the guard is implemented, then
 all we have to do is to shrink the data-fact step, so that step(a,b) does not
 hold if a or b is guarded by a proper guard.
 
-This time, 
+This time, let's assume that we apply this extended analysis for EXAMPLE 3.
+Note that the the condition for "if statement" does not include the bariable
+"ptr" here.  Therefore, the datafact regarding "guard" does not need to be
+calculated from the beggining. Depending on the optimization of the evaluation
+engine, this guard can be effectively precluded from the data-facts
+calculation, which can save some time.  Even without the optimization, the
+programmer can manually modify the rules regarding guard, which would be not a
+big problem compared to non-declarative implementations.
 
 In the following sections, we formalize the general approach for performing
 declartive style analysis in multilingual program (Section 3), show the
