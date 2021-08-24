@@ -22,7 +22,10 @@ For this reason, previous researchers have tried to implement the analyzer for
 multilingual analysis with various approaches.  One approach[1][2] is
 translation-based approach, where one language is translated or compiled into
 another language and analysis on translated language is performed with existing
-analyzer. This approach has a virtue in that existing analyzers for tranalated
+analyzer. Since translating one language into another one while preserving every
+semantics is a challenging task, the translation is usually performed in
+abstract manner to approximate the effect of original code might have.
+This approach has a virtue in that existing analyzers for tranalated
 language can be reused with almost no modification.  Another approach[3] is
 combination-based approach, which is to modify and combine existing analyzers
 of each language, so that two analyzers give the analysis result in unified
@@ -33,7 +36,7 @@ format.
 A common, inevitable pattern of implementing analyzer for multilingual program
 is that intermidiate representation (IR) which can incorporate the both
 languages is defined, and the client-analysis is performed upon IR. In case of
-compile-based appraoch, the IR is one of the language itself. For example, ILEA[1]
+translation-based appraoch, the IR is one of the language itself. For example, ILEA[1]
 translated C code into (extended) Java byte code, and performed analysis with
 JLint[5], a dataflow analyzer for Java byte code. Implementation of [2] extracted
 "summary" from C functions in form of Java code, and used FlowDroid[6] as the
