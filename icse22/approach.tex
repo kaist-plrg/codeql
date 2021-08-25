@@ -1,72 +1,118 @@
-\section{General Approach}
+\section{General approach}
 
 In this section, we propose a gneralized approach for performing declarative
-dataflow analysis for a multilingual program.
+static analysis for a multilingual program.
 
-\subsection{Declarative dataflow analysis}
+\includegraphics[width=0.5\textwidth]{img/overview}
 
-We start by defining a declarative style dataflow analysis for one language.
-First, program points that can hold values are represented as nodes. Example of
-nodes would be varaibles, literals, parameter, arguments, or object fields.
-Now, we can express dataflow analysis in declarative style as flow(a, b), which
-means that value of the node a can flow into node b. flow(a, b) can be defined
-as transitive closure of a predicate step(a, b);
+Above figure illustrate the overview of this approach. The analysis mainly
+consists of three steps. First, each language is converted into a syntactic
+data-facts. Second, the rule for generating data-facts are defined. Finally,
+the declarative language engine is executed with the given data-facts and
+rules, giving the analysis result as an output in form of data fact.
 
-flow(a,b) :- a = b or step(a,c) and flow(c, b)
+\subsection{Syntax of data-fact and rule}
 
-The predicate step(a,b) means that there is a direct flow from node a to b. Assuming that
-out target languages have function call and field access, then step (a,b) would be
-defined as following:
+First, we define the syntax of data-fact and rule, which is fairly simple.
+
+\[e := num | string\]
+\[df := p(\overline{e})\]
+\[r := df :- \overline{(not)? df}\]
+
+e stands for an element, and is either number or string.  df stands for
+data-fact, and it is an ordered tuple of elements.  r stands for rule, and it
+denotes how one rule can be derived from another data-facts.  It states that
+LHS data-fact(the data-fact before the symbol ":-") holds if all RHS data-facts
+(data-facts after the symbol ":-") without "not" notation holds, and all RHS
+data-facts with "not" notation does not hold.  (? Note that recursion is
+permitted, that is, a data-fact can depend on itself.  The exception is the
+recursion with odd number of negation, that is, the rule such as "p(x) :- not
+p(x)" is not valid. ?)
+
+\subsection{Extracting syntactic data-fact}
+
+The first step is to extract syntactic data-facts from the source code.
+The example of syntactic data-facts would be data-facts about certain
+AST node, or parent-child relationship between nodes. For example, if we
+have the following source code:
+
+1 int x = 42 + 43;
+
+we can define "expr(i, s)" to be a name of data-fact, which is 2-dimensional
+tuple of expression id and the expression string represented in source code.
+Therefore, we will have the set of expr data-facts: expr(0, "42"), expr(1,
+"43"), and expr(2, "42 + 43").  Another example of syntactic fact would be
+"subexpr(i, j, k)", which is a 3-dimensional data-fact which states that the
+expression with id i has expression with id j as a kth expression. For example,
+we can find the rule subexpr(2, 0, 1) and subexpr(2, 1, 2).
+
+The advantage for extracting syntactic data-facts is that once they are extracted,
+they can be utilzed easily in any other kind of analysis, since they are basically
+also a data-fact that can be simply manipulated by rules.
+
+\subsection{Defining rule}
+
+The next step is defining rules to generate new data-facts on top of know
+data-facts, that is, actually implementing the analysis in declrative style.
+This setp can be futrher divided into more sub tasks. First thing to do is to
+designing the generalized and unified framework for static analysis,
+that can incorporate both languages. The second step is to actually fill in
+the implementation, for each of the language. The interoperation between two languages
+is considered in the final step, where some rules in frameworks are extended
+to handle the interoperation between them, while the language-specific implementation itself
+needs little modification.
+
+There would be the trade-off between the generality of framework, and the
+complexity of implementation. Designing more general and shallow framework
+would be easier, yet it would require more detailed implmentaion of the framework. On the other
+hand, one can design more language-specific framework which would reduce the
+burden of implemenation, but designing a good framework that is suitable for both
+languages would be rather challenging.
+
+Let's look at the concrete example of dataflow analysis. First thing we do is
+designing the analysis framework, which can be applied to both of the language.
+In this framework, the analysis result we want is expressed with the data-fact
+of the form of flow(a,b), which means that value of the node a can flow into
+node b. flow(a, b) can be defined as transitive closure of a data-fact step(a,
+b);
+
+flow(a,b) :- step(a,b) or step(a,c) and flow(c, b)
+
+where the data-fact step(a,b) means that there is a direct flow from node a to b.
+Next thing to do is defining rule for the data-fact step for each language.
+For example, if a lnaguage has a syntactic data-fact which indicates the assignment
+x = val, in form of assign(val, x), then one can define a rule for step to be
+step(a, b) :- assign(a,b). The final step is to take the inter operation into account.
+A way to pass data in one language into another is via funcction call, which can be
+reflected into the rule of step(a,b) :- foreignArgParam(a,b,i), where foreignArgParam(a,b,i)
+is the data-fact that indicates a is an i-th argument of a foreign function call to a
+function, whoose i-th argument is b.
+
+An alternative to this framework, is defining a more fine-grained rule for step:
+Assuming that both target languages have function call and field access, step (a,b) can be
 
 step(a,b) :- localStep(a, b) or functionInStep(a, b) or functionOutStep(a, b)
 or filedReadStep(a, b) or fieldWriteStep(a, b)
 
-Here, localStep represents any flows that do not envolve function call or field
-access.  Example would be assigning to a variable, or simple def-use pattern.
-functionInStep and functionOutStep are used for flows envolving function calls,
-such as flow from argument to parameter or flows regarding return statement.
-fieldReadStep and fieldWriteStep are predicates for field access.
+as a part of the framework. Here, localStep represents any flows that do not
+envolve function call or field access.  Example would be assigning to a
+variable, or simple def-use pattern.  functionInStep and functionOutStep are
+used for flows envolving function calls, such as flow from argument to
+parameter or flows regarding return statement.  fieldReadStep and
+fieldWriteStep are predicates for field access. Then, the implementation of
+each framework, and the rules for inter-operation, can be written on top of
+this framework. This framework has the advantage of being modular, and rule for
+each framework data-facts being simpler, but desigining this framework would
+require the designer to verify if this design is indeed appropriate one, i.e.,
+there is no other possible steps.
 
-Two predicates, functionInStep and functionOutStep, can be defined using more basic predicates:
 
-functionInStep(arg, param) :- isArgument(call, arg, i) and isParameter(function, param, i) and callEdge(call, function)
-functionOutStep(ret, pos) :- return(function, ret) and returnPosition(call, pos) and calLEdge(call, function)
+\subsection{Evaluating rules}
 
-The predicate isArgument(call, arg, i) means that arg is the ith argument of
-given call, and similarly, the predicate isParameter(function, param, i) means
-that param is the ith parameter of given function.  The predicate
-return(function, ret) indicates that there is a return statement returning the
-value ret in given function, and the prediacate returnPosition(call, pos)
-indicates that the returned value of given call would be stored in the node
-ret.  Finally, the callEdge(call, function) means that the given call's target
-is the given function.
+The final step is to simply evaluate the defined rules, with the given data-facts.
+By evaluating the rules, we mean that finding all possible data-facts that
+can be derived. The rules are ususally evaluated in bottom-up and
+modular manner, that is, each rule is evaluated one-by-one, after every rule
+it depends on is evaluated.
 
-With the all of above rules defined, once we provide facts for predicates that
-do not appear as head position for rules (a.k.a. external predicates) such as localStep, fieldReadStep, or
-callEdge, then the system can successfully find all pair of nodes (a,b) that
-satisfies flow(a,b).
 
-TODO: exmaple with simple language?
-
-\subsection{Extension to dataflow analysis of multilingual language}
-
-Note that providing facts for external predicates was required to complete
-dataflow analysis of single-language program.  This is also true for
-multi-lingual language. Let's assume that we are given all required facts for
-each of two languages separately. For predicates that are not envolved with interaction
-between languages, all we have to do is just merging those predicates together. For example,
-the facts for localStep for multilingual analysis would be simply the union of facts for localStep
-of each language. For predicates that are envloved with interaction, they should be extended further,
-considering the semantics of the operation. Such predicates would include 3 predicates:
-callEdge(call, fun), fieldReadStep(a,b) ,fieldWriteStep(a,b). Let's take a callEdge predicate as an
-example. By simply merging existing two predicates, then for every pair taht satisfies callEdge(call, fun),
-both call and fun would be from either the first language or the second language. In addition to that,
-we must find and add all pair of call and fun, where call is from the first language and the fun from the second,
-or vice versa.
-
-For static interactions, such extensions are not difficult, since new facts can be easily recognized.
-For dynamic interactions however, finding such facts are not trivial, since in order to determine the
-target, the runtime value is needed. In this case, one can perform "inner dataflow analysis", only targeting
-one language. For example, when a dynamic function call of form callMethod(funnName, arg) is made,
-then one can find all possible string literal values that can flow into the argument "funName". Using this
-analysis result, the function target is determined, and then the new fact for predicate callEdge can be added.

@@ -1,3 +1,5 @@
+\subsection{Extension to dataflow analysis of multilingual language}
+
 \section{Implementation}
 In this section, we show how we applied the general idea for multilingual
 program analysis into implementing the dataflow analysis tool for JNI programs,
@@ -195,3 +197,11 @@ The predicate "viableCallableJ2C" finds call edges from Java to C++. Since the f
 these function calls can be statically determined, we don't need to use inner-flow analysis to implement this predicate.
 Meanwhile, the predicate "viableCallableC2J" finds call edges from C++ to Java, and since runtime values are required to
 determine the function call target, inner-flow is used to implment this predicate.
+
+
+For static interactions, such extensions are not difficult, since new facts can be easily recognized.
+For dynamic interactions however, finding such facts are not trivial, since in order to determine the
+target, the runtime value is needed. In this case, one can perform "inner dataflow analysis", only targeting
+one language. For example, when a dynamic function call of form callMethod(funnName, arg) is made,
+then one can find all possible string literal values that can flow into the argument "funName". Using this
+analysis result, the function target is determined, and then the new fact for predicate callEdge can be added.
