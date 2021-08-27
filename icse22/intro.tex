@@ -22,39 +22,36 @@ For this reason, previous researchers have tried to implement the analyzer for
 multilingual analysis with various approaches.  One approach[1][2] is
 translation-based approach, where one language is translated or compiled into
 another language and analysis on translated language is performed with existing
-analyzer. Since translating one language into another one while preserving every
-semantics is a challenging task, the translation is usually performed in
-abstract manner to approximate the effect of original code might have.
-This approach has a virtue in that existing analyzers for tranalated
-language can be reused with almost no modification.  Another approach[3] is
-combination-based approach, which is to modify and combine existing analyzers
-of each language, so that two analyzers give the analysis result in unified
-output format, and the analysis is performed with respect to this output
-format.
+analyzer.  This approach has a virtue in that existing analyzers for tranalated
+language can be reused with almost no modification.  However, since translating
+one language into another one while preserving every semantics is a challenging
+task, the translation is usually performed in abstract manner to approximate
+the effect of original code might have, and translated code is composed of the
+subset of the target langague. Another approach[3] is combination-based
+approach, which is to modify and combine existing analyzers of each language,
+so that two analyzers give the analysis result in unified output format, and
+the analysis is performed with respect to this output format.
 
 A common, inevitable pattern of implementing analyzer for multilingual program
-is that intermidiate representation (IR) which can incorporate the both
-languages is defined, and the client-analysis is performed upon IR. In case of
-translation-based appraoch, the IR is one of the language itself. For example, ILEA[1]
-translated C code into (extended) Java byte code, and performed analysis with
-JLint[5], a dataflow analyzer for Java byte code. Implementation of [2] extracted
-"summary" from C functions in form of Java code, and used FlowDroid[6] as the
-client-analysis. In case of combination-based approach, the IR would be the unified
-output format for each of the anlyzers. JN-SAF[3] defined "Heap Manipulation Summary"
-for each function as IR, which is obtained by two modified analyzers for Java
-and binary. The dataflow analysis is calculated with extracted summaires.  One
-observation is that in previous approaches, the part for translating each
-language into IR, and the part for performing analysis on IR is completely
-separated, and this makes the implementation inflexible. For example,  If one
-would like to make a client-analysis into a simpler one which needs less
-information, then the process of translating into IR is doing unnecessary work
-for creating unnecessary information, resulting in an inefficient analysis. On
-the other hand, we can consider a case where one wants to extend the
-client-analysis into a more complex one that requires more complex information.
-In this case, on top of unavoidable effort to extend the client-analysis
-itself, the additional task of extending IR itself and translating each
-language into IR is also required, and it imposes extra burden on analyzer
-developers, especially if each task is very different from each other.
+is that, due to the nature of multilingual programs being composed of multiple
+language, the analyzer itself also consists of multiple components. The problem
+of the previous approaches is that each of the component treats other
+components as blackbox. The detailed implementation of a component is not
+visible to another component, and the only way one component can interact with
+each other is through a fixed form of API. For example, in translation-based
+approach, the translator and the client-analyzer can only communicate through a
+syntax of target language, and in combination-based approach, two analyzers
+communicate via unified output format. This makes the implementation
+restrictive and inflexible. Modifying one component requires that it still
+meets the API requirement after the modification. Otherwise, modification to
+multiple components should be made simultaneously, which can be imposes extra
+burden on analyzer developers, especially if each component is very different
+from each other. For example, we can consider a situation where one wants to
+extend the client-analysis so that it performs more accurate analysis. If the
+current API does not contain enough information, then it might be impossible to
+implement such a extended anlysis that the developer is thinking of. Then it is
+required that API is extended and the other components pass such information
+via API, which requries more work for the developer.
 
 In this paper, we suggest a novel methodology for implementing static analysis
 of multilingual program, which is using declarative language.  In declarative
@@ -64,9 +61,8 @@ define how one data-fact can be derived from other data-facts. Evaluating
 declarative program is defined as finding all possible data-facts that can be
 derived by given basic data-facts and rules.  Adopting this approach, we can
 perform static analysis on multilingual programs in following sense.  The first
-step is to converted each language into a set of syntactic data-facts. In a
-sense, these data-facts can be viewd as IR for two languages.  Then,
-programmers can define the intra-language rules that would generate new
+step is to converted each language into a set of syntactic data-facts.
+Programmers can define the intra-language rules that would generate new
 data-facts based on already known data-facts. New data-facts generated in this
 way would tend to contain more higer-level information, considering the
 semantics of each languge. Finally, programmer can implement the static
@@ -75,26 +71,22 @@ semantcis between two languages, and evaluating these new rules along with
 intra-language rules would give the final analysis result in form of a set of
 data-facts.
 
-On top of the know advantages of being fast, modular and scalable[4], using
-declarative language to implement static analysis can also be helpful to
-alleviate the problems mentioned above, thanks to its flexibity and extensibility.
-Major engines of declrative languages are evaluated in bottom-up manner[Need
-search: at least CodeQL does so, but do other engines also operate in this
-way?], which means that data-facts that are not needed for calculating the
-final analysis result can be effectively removed, potentially reducing the
-total evaluation time if the client-analysis happend to be simple enough. In
-addition, the burden of modifying or extending the existing analyzer is
-lessened in declrative style.  The syntactic facts extracted in the first step
-is very less likey to be changed, and the additionaly required task is boiled
-down to defining some more rules and data-facts, which does not impose
-significant overhead than implementing the analyzer itself.
+On top of the know advantages of enabling fast, modular and scalable
+implementation[4], using declarative language can also be helpful to alleviate
+the problems of multilingual analysis mentioned above. The main reason is that
+in declarative style, any rule can easily utilze the data-facts generated by
+any component, that is, no fixed API is needed between two components.  This
+feature lessens the burden of modifying or extending the existing analyzer.
+The additionaly required task is boiled down to defining some more rules and
+data-facts for different components, which does not impose significant overhead
+than implementing the analyzer itself.
 
-To show the feasibility of our approach, we chose JNI programs as analysis
+To show the practicality of our approach, we chose JNI programs as analysis
 target, and implemented dataflow analysis as client-analysis using CodeQL[5], a
 static analysis where implementation can be written in declarative style. We
 applied our analyzer to real-world android JNI applications retrieved from
 F-droid[6], a repository for open-source android applications to see whether
-perforance of this implementation is competable with existing works.
+performance of this implementation is competable with existing works.
 Surprisingly, our experiment result show that our implementation outperforms
 the state of the art JNI analyzer in terms of speed and analyzer our
 implementation shows x14 speed up on average, and shoinwg the slightly better

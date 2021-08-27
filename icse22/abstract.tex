@@ -7,21 +7,23 @@ and applying static analyzer for the translated language, or combining two
 analyzers so that the two analyzer give output in unified format, and analysis
 is done with respect to the output.  In whichever approach, the problem
 is that the system consists of too many components which treat each others
-as blackbox, resulting in lacks of flexibility and extensibility.
+as blackbox, and each component communicates with each other through a fixed
+form of API. This restriction results in lacks of flexibility and extensibility of
+the implementation.
 
 In this paper, we suggest a novel methodology for implementing static analysis
-for multilingual program, which is using declarive style analysis, for the
-first time. In declarive style analysis, everything is expressed in terms of
+for multilingual program, which is using declarative style analysis, for the
+first time. In declarative style analysis, everything is expressed in terms of
 "data-facts" and "rules". The analysis result and the information required for
 calculating it is expressed in "data-facts", and how one can derive new
-data-facts from the known data-facts.  This simple structure makes declraritive
-stlye analysis more flexible and extensibie, alleviating the innate problem of
-multilingual analysis.
+data-facts from the known data-facts is expressed in "rules". This simple
+structure makes declarative style analysis more flexible and extensible,
+alleviating the innate problem of multilingual analysis.
 
-To show the feasibility of our approach, we implementated dataflow analyzer for
+To show the practicality of our approach, we implemented dataflow analyzer for
 JNI programs, using CodeQL, and compared its performance in terms of
-scalibility and precision with a state-of-the-art JNI analyzer. The experiment
+scalability and precision with a state-of-the-art JNI analyzer. The experiment
 result shows that our implementation is x14 faster, and has ??\%p better
-precision. In addition, we implented bug checkers on top of our analyzer, and
+precision. In addition, we implemented bug checkers on top of our analyzer, and
 we could find bugs in real-world JNI applications.
 \end{abstract}
