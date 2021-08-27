@@ -5,18 +5,18 @@ existing static analyzers target one language, the static analysis of
 multilingual programs are done by either translating one language into another
 and applying static analyzer for the translated language, or combining two
 analyzers so that the two analyzer give output in unified format, and analysis
-is done with respect to the output.  In whichever approach, the common pattern
-is that intermediate representation of two langues (IR) is defined, and
-analysis is performed upon IR. The problem is that due to too many components
-it consists of, the analysis lacks of flexibility and extensibility.
+is done with respect to the output.  In whichever approach, the problem
+is that the system consists of too many components which treat each others
+as blackbox, resulting in lacks of flexibility and extensibility.
 
-In this paper, we suggest a novel methodology for implementing static analysis,
-which is using declarive style analysis, for the first time. In declarive style
-analysis, everything is expressed in terms of "data-facts" and "rules". The
-analysis result and the information required for calculating it is expressed in
-"data-facts", and how one can derive new data-facts from the known data-facts.
-This simple structure makes declraritive stlye analysis more flexible and
-extensibie, alleviating the inate problem of multilingual analysis.
+In this paper, we suggest a novel methodology for implementing static analysis
+for multilingual program, which is using declarive style analysis, for the
+first time. In declarive style analysis, everything is expressed in terms of
+"data-facts" and "rules". The analysis result and the information required for
+calculating it is expressed in "data-facts", and how one can derive new
+data-facts from the known data-facts.  This simple structure makes declraritive
+stlye analysis more flexible and extensibie, alleviating the innate problem of
+multilingual analysis.
 
 To show the feasibility of our approach, we implementated dataflow analyzer for
 JNI programs, using CodeQL, and compared its performance in terms of
