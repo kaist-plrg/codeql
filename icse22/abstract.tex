@@ -1,29 +1,59 @@
 \begin{abstract}
-The use of multilingual programs are growing, and the demand for the static
-analysis of multilingual programs is also growing correspondingly.  Since most
-existing static analyzers target one language, the static analysis of
-multilingual programs are done by either translating one language into another
-and applying static analyzer for the translated language, or combining two
-analyzers so that the two analyzer give output in unified format, and analysis
-is done with respect to the output.  In whichever approach, the problem
-is that the system consists of too many components which treat each others
-as blackbox, and each component communicates with each other through a fixed
-form of API. This restriction results in lacks of flexibility and extensibility of
-the implementation.
+Multilingual programs written in multiple programming languages together have
+been widely developed for various purposes, but they may have more bug and
+vulnerability surfaces than monolingual programs. Previous research has
+proposed static analysis techniques for multilingual programs utilizing
+multiple static analyzers together. The approaches abstract behaviors of
+whole modules written in a single language as summaries using an analyzer,
+and use another analyzer that analyzes modules written in another language
+with the summaries to detect bugs and security vulnerabilities cross language
+boundaries. While they leverage full features of multiple static analyzers,
+they suffer from scalability issues because the summary generations require
+expensive static analyses even for modules unrelated to their target
+properties. 
 
-In this paper, we suggest a novel methodology for implementing static analysis
-for multilingual program, which is using declarative style analysis, for the
-first time. In declarative style analysis, everything is expressed in terms of
-"data-facts" and "rules". The analysis result and the information required for
-calculating it is expressed in "data-facts", and how one can derive new
-data-facts from the known data-facts is expressed in "rules". This simple
-structure makes declarative style analysis more flexible and extensible,
-alleviating the innate problem of multilingual analysis.
 
-To show the practicality of our approach, we implemented dataflow analyzer for
-JNI programs, using CodeQL, and compared its performance in terms of
-scalability and precision with a state-of-the-art JNI analyzer. The experiment
-result shows that our implementation is x14 faster, and has ??\%p better
-precision. In addition, we implemented bug checkers on top of our analyzer, and
-we could find bugs in real-world JNI applications.
+In this paper, we propose a simple and effective declarative style static
+analysis for multilingual programs, for the first time. Our approach extracts
+{\it datafacts} from modules written in each language respectively, and
+applies {\it rules} ... (Require more precise high-level description for our
+approach). Because our approach directly works on datafacts syntactically
+extracted from modules and inherits the query-based-analysis feature from the
+declarative style analysis, it can effectively check target properties in
+multilingual programs without expensive and redundant summary generations.
+As a proof-of-concept, we implement a JNI program static analyzer on top of
+CodeQL, which detects bugs and security vulnerabilities by tracking dataflows
+over language boundaries between Java and C. In our empirical evaluation, we
+show that the analyzer is {\it precise} in that it analyzed dataflows with
+higher precision, and {\it scalable} in that it detected the same types of
+bugs and security vulnerabilities about 14x faster, than the state-of-the-art
+analyzers.
 \end{abstract}
+
+%The use of multilingual programs are growing, and the demand for the static
+%analysis of multilingual programs is also growing correspondingly.  Since most
+%existing static analyzers target one language, the static analysis of
+%multilingual programs are done by either translating one language into another
+%and applying static analyzer for the translated language, or combining two
+%analyzers so that the two analyzer give output in unified format, and analysis
+%is done with respect to the output.  In whichever approach, the problem
+%is that the system consists of too many components which treat each others
+%as blackbox, and each component communicates with each other through a fixed
+%form of API. This restriction results in lacks of flexibility and extensibility of
+%the implementation.
+%
+%In this paper, we suggest a novel methodology for implementing static analysis
+%for multilingual program, which is using declarative style analysis, for the
+%first time. In declarative style analysis, everything is expressed in terms of
+%"data-facts" and "rules". The analysis result and the information required for
+%calculating it is expressed in "data-facts", and how one can derive new
+%data-facts from the known data-facts is expressed in "rules". This simple
+%structure makes declarative style analysis more flexible and extensible,
+%alleviating the innate problem of multilingual analysis.
+%
+%To show the practicality of our approach, we implemented dataflow analyzer for
+%JNI programs, using CodeQL, and compared its performance in terms of
+%scalability and precision with a state-of-the-art JNI analyzer. The experiment
+%result shows that our implementation is x14 faster, and has ??\%p better
+%precision. In addition, we implemented bug checkers on top of our analyzer, and
+%we could find bugs in real-world JNI applications.
