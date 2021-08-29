@@ -1,34 +1,39 @@
 \begin{abstract}
-Multilingual programs written in multiple programming languages together have
-been widely developed for various purposes, but they may have more bug and
-vulnerability surfaces than monolingual programs. Previous research has
-proposed static analysis techniques for multilingual programs utilizing
-multiple static analyzers together. The approaches abstract behaviors of
-whole modules written in a single language as summaries using an analyzer,
-and use another analyzer that analyzes modules written in another language
-with the summaries to detect bugs and security vulnerabilities cross language
-boundaries. While they leverage full features of multiple static analyzers,
-they suffer from scalability issues because the summary generations require
-expensive static analyses even for modules unrelated to their target
-properties. 
+Multilingual programs are written in different programming languages
+taking advantage of their own language features and benefits.
+While multilingual programs have been widely developed for various purposes,
+they are more vulnerable to bugs and security issues than monolingual programs.
+Because different languages have distinctive behaviors,
+researchers have proposed to leverage existing static analyzers for
+monolingual programs to analyze multilingual programs.
+The approaches first analyze each part written in a single language
+using its corresponding analyzer to generate its summary and then
+perform \textit{a target analysis} to detect bugs and security vulnerabilities cross
+language boundaries using the generated summaries.
+While they can leverage the full features of existing static analyzers,
+they often suffer from the analysis performance overhead.
+Because existing static analyzers are general purpose, in the
+sense that they support abstractions of all the language features,
+they may waste their analysis time on the features that may not be
+relevant to summary generation for the target analysis. 
 
-
-In this paper, we propose a simple and effective declarative style static
-analysis for multilingual programs, for the first time.  In declarative style,
-the information is exprssed in terms of {\it datafacts}, and the way to derive
-a datafact from another datafacts are expressed in terms of {\it rules}.  Our
-approach extracts syntactic {\it datafacts} from modules written in each
-language respectively, and applies {\it rules} upon known {\it datafacts} to
-derive new {\it datafacts}.  Because our approach directly works on datafacts
-syntactically extracted from modules and inherits the query-based-analysis
-feature from the declarative style analysis, it can effectively check target
-properties in multilingual programs without expensive and redundant summary
-generations.  As a proof-of-concept, we implement a JNI program static analyzer
+In this paper, we propose a simple and effective declarative-style static
+analysis for multilingual programs for the first time.
+A declarative-style analysis expresses analysis information as {\it datafacts},
+describes how to derive a datafact from another datafacts as {\it rules},
+and performs a {\it query-based} analysis, which considers only relevant datafacts.
+Our approach extracts syntactic datafacts from the parts written in different
+languages separately and defines additional rules to describe the interaction
+between different languages.  Because our approach works directly on datafacts
+syntactically extracted from programs and inherits the query-based-analysis
+feature from a declarative style analysis, it can effectively check target
+properties in multilingual programs without expensive and redundant summary generation.
+As a proof-of-concept, we implement a JNI program static analyzer
 on top of CodeQL, which detects bugs and security vulnerabilities by tracking
-dataflows over language boundaries between Java and C. In our empirical
-evaluation, we show that the analyzer is {\it precise} in that it analyzed
-dataflows with higher precision, and {\it scalable} in that it detected the
-same types of bugs and security vulnerabilities 14x faster in average, than the
+dataflows over language boundaries between Java and C.
+In our empirical evaluation, we show that the analyzer is {\it precise} in that it analyzes
+dataflows with higher precision and is {\it scalable} in that it detects the
+same types of bugs and security vulnerabilities 14x faster on average than the
 state-of-the-art analyzers.
 \end{abstract}
 
