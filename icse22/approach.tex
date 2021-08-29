@@ -1,16 +1,7 @@
-\section{General approach}
+\section{Composing declarative static analyzers}
 
 In this section, we propose a gneralized approach for performing declarative
 static analysis for a multilingual program.
-
-\includegraphics[width=0.5\textwidth]{img/overview}
-
-Above figure illustrate the overview of this approach. The analysis mainly
-consists of three steps. First, each language is converted into a syntactic
-data-facts. Second, the rules that would generate new facts are difined, which
-corresponds to the actual implementation of the analysis. Finally, the
-declarative language engine is executed with the given data-facts and rules,
-giving the analysis result as an output in form of data fact.
 
 \subsection{Syntax of data-fact and rule}
 
@@ -30,8 +21,19 @@ permitted, that is, a data-fact can depend on itself.  The exception is the
 recursion with odd number of negation, that is, the rule such as "p(x) :- not
 p(x)" is not valid. ?)
 
-\subsection{Extracting syntactic data-fact}
+\subsection{Static analyzer for one languge}
 
+\includegraphics[width=0.5\textwidth]{img/overview}
+
+Above figure illustrate the overview of how declarative style analysis works for
+one language works. The analysis mainly
+consists of three steps. First, the language is converted into a syntactic
+data-facts. Second, the rules that would generate new facts are defined, and
+these rules correspond to the actual implementation of the analysis. Finally, the
+declarative language engine is executed with the given data-facts and rules,
+giving the analysis result as an output in form of data fact.
+
+\textbf{Extracting syntactic data-fact}
 The first step is to extract syntactic data-facts from the source code.
 The example of syntactic data-facts would be data-facts about certain
 AST node, or parent-child relationship between nodes. For example, consider
@@ -59,45 +61,68 @@ manipulated by defining new rules.  This also means that there is no need to
 re-extract the syntactic data-facts, even if the different client analysis is
 used.
 
-\subsection{Defining rule}
-
+\textbf{Defining rule}
 The next step is defining rules to generate new data-facts on top of know
 data-facts, that is, actually implementing the analysis in declrative style.
-This setp can be futrher divided into more sub tasks. First thing to do is to
+This setp can be futrher divided into two sub tasks. First thing to do is to
 designing the generalized and unified framework for static analysis, that can
 incorporate both languages. The framework consists of the result data-fact which
 would correspond to the final result of the analisys, and some helper
 data-facts used for calculating the result data-fact, whose implementation
 would differ depending on the language. The second task is to actually fill in
-the rules for such helper data-facts, for each of the language. In the final step,
-the interoperation between two languages is considered, and some helper rules in frameworks are
-extended to handle the interoperation between them. By divding the second and the tird task,
-one can focus on the intra-language semantics and the inter-language semantics
-separately; in the second task, one can consider the task as just implementing a
-static analyzer for a specific language, and in the third task, such
-language-specific implementation itself needs little modification while implementing
-the inter-language semantics.
+the rules for such helper data-facts.
 
 Let's look at the concrete example of dataflow analysis. First thing we do is
-designing the analysis framework, which can be applied to both of the language.
-In this framework, the analysis result we want is expressed with the data-fact
-of the form of flow(a,b), which means that value of the node a can flow into
-node b. flow(a, b) can be defined as transitive closure of a data-fact step(a,
-b);
+designing the analysis framework.  In this framework, the final analysis result
+we want is expressed with the data-fact of the form of flow(a,b), which means
+that value of the node a can flow into node b. flow(a, b) can be defined as
+transitive closure of a data-fact step(a, b);
 
 \[flow(a,b) :- step(a,b)\]
 \[flow(a,b) :- step(a,c) and flow(c, b)\]
 
 where the data-fact step(a,b) means that there is a direct flow from node a to b.
 
-
 Next thing to do is defining rule for the helper data-fact, step, for each
 language.  For example, if a lnaguage has a syntactic data-fact which indicates
 the assignment x = val, in form of assign(val, x), then one can define a rule
-for step to be step(a, b) :- assign(a, b). The final step is to take the
-inter-language operation into account. A way to pass data in one language into
-another is via funcction call, which can be reflected into the rule of
-step(a,b) :- foreignArgParam(a,b,i), where foreignArgParam(a,b,i) is the
+for step to be step(a, b) :- assign(a, b).
+
+\textbf{Defining rule}
+The final step is to simply evaluate the defined rules, with the given
+data-facts.  By evaluating the rules, we mean that finding all possible
+data-facts that can be derived. The rules are ususally evaluated in bottom-up
+and modular manner, that is, each rule is evaluated one-by-one, after every
+rule it depends on is evaluated.
+
+\subsection{Composing two static analyzers}
+
+\includegraphics[width=0.5\textwidth]{img/overview2}
+
+Above figure illustrate the overview of how declarative style analysis can
+be extended to multilingual analysis. The main difference is that the evaluator
+now gets two sets of syntactic data-facts extracted from both language, and
+the rules also should be merged, also by taking interoperation-semantics into accout.
+
+In order to two sets of rules, the second step can be extended with one more
+task..  In the final step, the interoperation between two languages is
+considered, and some helper rules in frameworks are extended to handle the
+interoperation between them. By divding the second and the tird task, one can
+focus on the intra-language semantics and the inter-language semantics
+separately; in the second task, one can consider the task as just implementing
+a static analyzer for a specific language, and in the third task, such
+language-specific implementation itself needs little modification while
+implementing the inter-language semantics.
+
+Let's illustrate this step with the example of dataflow analysis above.  In
+order to take the inter-language operation into account, one should find out
+how a data of one language can be passed to different language beyond boudary.
+A way to pass data in one language into another is via funcction call, which
+can be reflected into the rule of
+
+step(a,b) :- foreignArgParam(a,b,i)
+
+where foreignArgParam(a,b,i) is the
 data-fact that indicates a is an i-th argument of a foreign function call to a
 function, whoose i-th argument is b.
 
@@ -131,14 +156,3 @@ modular, and rule for each framework data-facts being simpler, but designing
 this framework would require the designer to verify if this design is indeed
 appropriate one, i.e., both languages do have such way to pass data, and there
 is no other way that a data can flow.
-
-
-\subsection{Evaluating rules}
-
-The final step is to simply evaluate the defined rules, with the given data-facts.
-By evaluating the rules, we mean that finding all possible data-facts that
-can be derived. The rules are ususally evaluated in bottom-up and
-modular manner, that is, each rule is evaluated one-by-one, after every rule
-it depends on is evaluated.
-
-
