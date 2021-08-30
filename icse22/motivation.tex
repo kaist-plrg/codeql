@@ -9,47 +9,51 @@ for those problems.
 Let's consider the dataflow analysis for the following program,
 which is written in Java-like language A and C-like language B:
 
-EXAMPLE 1
 
-Language A
-
-public void main() \{
-
-  \quad Node node = null;
- 
-  \quad B::f(node);
-
-\}
-
-Language B
-
-void f(Node* arg) \{
-  
-  \quad Node* ptr = arg;
-
-  \quad ptr->next = new Node;
-
-\}
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+public void main() { //Language A
+  Node node = null;
+  B::f(node);
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{Language A}
+    \label{fig:exam1:langA}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
+void f(Node* arg) { //Language B
+  Node* ptr = arg;
+  ptr->next = new Node;
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{Language B}
+    \label{fig:exam1:langB}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{EXAMPLE 1}
+  \label{fig:exam1}
+\end{figure}
+Figure \ref{fig:exam1}.
 
 What we are interested is whether the value null from language A
 can be dereferenced in language B. One way to express this with IR 
 would be the following format: 
-
-main: \{
-
-  \quad node = null;
-  
-  \quad f(node);
-
-\}
-
-f(arg): \{
-  
-  \quad ptr = arg;
-  
-  \quad deref(ptr);
-
-\}
+\begin{lstlisting}[style=myIR,xleftmargin=2.5em]
+main: {
+  node = null;
+  f(node);
+}
+f(arg): {
+  ptr = arg;
+  deref(ptr);
+}
+\end{lstlisting}
 
 Performing dataflow analysis on this IR would be straight forward, and it can
 be concluded that te null can be derefereced.
@@ -57,21 +61,22 @@ be concluded that te null can be derefereced.
 Now, let's assume that we want to analyze the following different program,
 where Language B is changed as follow:
 
-EXAMPLE 2
-
-Language B
-
-void f(Node* arg) \{
-
-  \quad Node* ptr = arg;
-  
-  \quad if(ptr != NULL) \{
-
-    \quad \quad ptr->next = new Node;
-
-  \quad \}
-
-\}
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
+void f(Node* arg) { //Language B
+  Node* ptr = arg;
+  if(ptr != NULL) {
+    ptr->next = new Node;
+  }
+}
+  \end{lstlisting}
+  \vspace*{-.5em}
+  \caption{EXAMPLE 2. Language B}
+  \label{fig:exam2}
+\end{figure}
+Figure \ref{fig:exam2}.
 
 In this example, since the null-check is performed before dereferencing it,
 there should be no alarm in this case. However, if IR itself does not contain
@@ -89,31 +94,27 @@ This time, let's consider the opposite case, where the developer already built
 a analyzer aimed for complex analysis, but a user wants to perform a 
 simple client-analysis. For example, consider the following example.
 
-EXAMPLE 3
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
+void f(Node* arg) { //Language B
+  Node* ptr = arg;
+  Node* next;
+  if(condition()) {
+    next = null;
+  } else {
+    next = new Node;
+  }
+  ptr->next = next;
+}
+  \end{lstlisting}
+  \vspace*{-.5em}
+  \caption{EXAMPLE 3. Language B}
+  \label{fig:exam3}
+\end{figure}
 
-Language B
-
-void f(Node* arg) \{
-
-  \quad Node* ptr = arg;
-
-  \quad Node* next;
-
-  \quad if(condition()) \{
-
-    \quad \quad next = null;
-  
-  \quad \}
-
-  \quad else \{
-   
-    \quad \quad next = new Node;
-  
-  \quad \}
-
-  \quad ptr->next = next;
-
-\}
+Figure \ref{fig:exam3}.
 
 and let's assume that the analyzer already handles control flow.
 However, what user is interested is to find wheter the variable "ptr"
@@ -127,40 +128,40 @@ of time.
 By using declarative style analysis, some problems can be mitigated.
 
 First, let's see how a dataflow for multilingual program can be implemented in
-declrative style. Ultimately, the result data-fact we want would be flow(a,b),
+declrative style. Ultimately, the result data-fact we want would be \datalog{flow(a,b)},
 which will denote the fact that there is a data flow from node a to node b. The
 rule for this data-fact can be defined in terms of another data-fact named
 step:
 
-flow(a,b):-step(a,b) or ( step(a,c) and flow(c,b) )
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+flow(a,b):- step(a,b) or ( step(a,c) and flow(c,b) )
+\end{lstlisting}
 
 Simply put, this rule states that flow is defined as transitive closure of step.
-Here, step(a,b) denotes the direct data flow from node a to node b. Again, the
+Here, \datalog{step(a,b)} denotes the direct data flow from node a to node b. Again, the
 data-fact step can be calculated by rules using another data-facts, which will
 be eventually broken down to basic syntactic data-facts. Then, given the set of
 all syntatctic data-facts, all possible flow data-facts, including flow, can be
 calculated by evaluating engine. For example, the following data-facts will be
 generated,
 
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 step(null, list) // A -> A
-
 step(list, arg) // A -> B
-
 step(arg, ptr) // B -> B
-
 step(ptr, [dereference of ptr]) // B -> B
+\end{lstlisting}
 
-then the declarative language engine can compute the result flow(null,
-[dereference of ptr]), and the analyzer concludes that there is a dereference
-of null.
+then the declarative language engine can compute the result \datalog{flow(null, [dereference of ptr])},
+and the analyzer concludes that there is a dereference of null.
 
 Now, let's say we are extending this analyzer to consider the control flow.
 One way to implement it would be to bring the concept of guard, that is,
 annotating the nodes within a certain "if statement block" with the condition
-of that if statement.  For example, in EXAMPLE 2, the [dereference of ptr] node
+of that if statement.  For example, in EXAMPLE 2, the \datalog{[dereference of ptr]} node
 would be guarded with the condition, "ptr != null".  Implementing the guard is
 simply defining new rules and data-facts. Once the guard is implemented, then
-all we have to do is to shrink the data-fact step, so that step(a,b) does not
+all we have to do is to shrink the data-fact step, so that \datalog{step(a,b)} does not
 hold if a or b is guarded by a proper guard.
 
 This time, let's assume that we apply this extended analysis for EXAMPLE 3.

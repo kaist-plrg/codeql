@@ -1,0 +1,180 @@
+% latexdiff
+%DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
+%DIF UNDERLINE PREAMBLE %DIF PREAMBLE
+\RequirePackage[normalem]{ulem} %DIF PREAMBLE
+\RequirePackage{color}\definecolor{RED}{rgb}{1,0,0}\definecolor{BLUE}{rgb}{0,0,1} %DIF PREAMBLE
+\providecommand{\DIFadd}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE
+\providecommand{\DIFdel}[1]{{\protect\color{red}\sout{#1}}} %DIF PREAMBLE
+%DIF SAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddbegin}{} %DIF PREAMBLE
+\providecommand{\DIFaddend}{} %DIF PREAMBLE
+\providecommand{\DIFdelbegin}{} %DIF PREAMBLE
+\providecommand{\DIFdelend}{} %DIF PREAMBLE
+%DIF FLOATSAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddFL}[1]{\DIFadd{#1}} %DIF PREAMBLE
+\providecommand{\DIFdelFL}[1]{\DIFdel{#1}} %DIF PREAMBLE
+\providecommand{\DIFaddbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFaddendFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelendFL}{} %DIF PREAMBLE
+%DIF END PREAMBLE EXTENSION ADDED BY LATEXDIFF
+
+% thicker vertical line
+\newcolumntype{?}{!{\vrule width 1pt}}
+
+% Styles
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstdefinelanguage{JavaScript}{
+  keywords={async, await, break, case, catch, class, const, continue, debugger,
+    default, delete, do, else, enum, export, extends, false, finally, for,
+    function, if, import, in, instanceof, new, null, return, super, switch, this,
+    throw, true, try, typeof, var, void, while, with, yield, deref},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{dkgreen}\ttfamily,
+  stringstyle=\color{purple}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+\lstdefinestyle{myJSstyle}{
+  language=JavaScript,
+  numbers=left,
+  stepnumber=1,
+  extendedchars=true,
+  basicstyle=\footnotesize\ttfamily,
+  showstringspaces=false,
+  showspaces=false,
+  xleftmargin=\parindent,
+  tabsize=2,
+  breaklines=true,
+  showtabs=false,
+  captionpos=b
+}
+\lstdefinestyle{myIR}{
+  language=JavaScript,
+%  numbers=left,
+%  stepnumber=1,
+  extendedchars=true,
+  basicstyle=\footnotesize\ttfamily,
+  showstringspaces=false,
+  showspaces=false,
+  xleftmargin=\parindent,
+  tabsize=2,
+  breaklines=true,
+  showtabs=false,
+  captionpos=b
+}
+\lstdefinestyle{myDatalog}{
+  language=JavaScript,
+%  numbers=left,
+%  stepnumber=1,
+  extendedchars=true,
+  basicstyle=\footnotesize\ttfamily,
+  showstringspaces=false,
+  showspaces=false,
+  xleftmargin=\parindent,
+  tabsize=2,
+  breaklines=true,
+  showtabs=false,
+  captionpos=b
+}
+%\lstdefinelanguage{nJavaScript}{
+%  keywordstyle=\color{blue}\bfseries,
+%  ndkeywordstyle=\color{darkgray}\bfseries,
+%  identifierstyle=\color{black},
+%  sensitive=false,
+%  comment=[l]{//},
+%  morecomment=[s]{/*}{*/},
+%  commentstyle=\color{dkgreen}\ttfamily,
+%  stringstyle=\color{purple}\ttfamily,
+%  morestring=[b]',
+%  morestring=[b]"
+%}
+%\lstdefinestyle{nmyJSstyle}{
+%  language=nJavaScript,
+%  numbers=left,
+%  stepnumber=1,
+%  extendedchars=true,
+%  basicstyle=\footnotesize\ttfamily,
+%  showstringspaces=false,
+%  showspaces=false,
+%  xleftmargin=\parindent,
+%  tabsize=2,
+%  breaklines=true,
+%  showtabs=false,
+%  captionpos=b
+%}
+
+\lstdefinestyle{common}{
+  extendedchars=true,
+  basicstyle=\footnotesize\ttfamily,
+  showstringspaces=false,
+  showspaces=false,
+  xleftmargin=\parindent,
+  tabsize=2,
+  breaklines=true,
+  showtabs=false,
+  captionpos=b
+}
+
+\definecolor{eclipsegreen}{HTML}{008000}
+\definecolor{eclipseblue}{HTML}{0000FF}
+\definecolor{eclipsegray}{HTML}{808080}
+\definecolor{eclipseoperator}{HTML}{8000FF}
+\lstdefinestyle{commoncode}{
+  style=common,
+  keywordstyle=\bfseries\color{eclipseblue},
+  commentstyle=\itshape\color{eclipsegreen},
+  %identifierstyle=\color{blue},
+  stringstyle=\color{eclipsegray},
+  numbers=left,
+  stepnumber=1,
+}
+\lstdefinestyle{cpp}{
+  style=commoncode,
+  language=C++,
+  classoffset=1, % starting new class
+  %otherkeywords={>,<,.,;,-,!,=,~},
+  morekeywords={>,<,.,;,-,!,=,~},
+  keywordstyle=\color{eclipseoperator},
+  numbers=left,
+  stepnumber=1,
+}
+\lstdefinestyle{codeql}{
+  style=commoncode,
+  language=C++,
+  classoffset=1, % starting new class
+  %otherkeywords={>,<,.,;,-,!,=,~},
+  morekeywords={>,<,.,;,-,!,=,~,extends},
+  keywordstyle=\color{eclipseoperator},
+  numbers=left,
+  stepnumber=1,
+}
+\lstdefinestyle{java}{
+    style=commoncode,
+    language=Java,
+}
+
+% Basic
+\DeclareMathAlphabet{\mathpzc}{T1}{pzc}{m}{it}
+\newcommand{\powerset}[1]{\mathcal{P}(#1)}
+\newcommand{\imbox}[1]{\mbox{\small \textit{#1}}}
+\newcommand{\name}[1]{\textsf{#1}}
+\newcommand{\inred}[1]{{\color{red}{#1}}}
+\newcommand{\todo}{\inred{TODO}}
+\newcommand{\abs}[1]{{#1}^{\#}}
+\newcommand{\finmap}{{\xrightarrow[]{\text{fin}}}}
+\newcommand{\mapstos}{\;\dot{\mapsto}\;}
+\newcommand{\Dom}{\name{Dom}}
+
+% speed up
+\newcommand{\x}{{\textsf{x}}}
+
+% Keywords
+\newcommand{\datalog}[1]{\text{\lstinline[style=myDatalog,numbers=none]!#1!}}

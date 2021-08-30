@@ -76,15 +76,22 @@ Let's look at the concrete example of dataflow analysis. First thing we do is
 designing the dataflow analysis framework.  In this framework, the final
 analysis result we want is expressed with the data-fact of the form of
 flow(a,b), which means that value of the node a can flow into node b. flow(a,
-b) can be defined as transitive closure of a data-fact step(a, b);
-\[flow(a,b) :- step(a,b)\]
-\[flow(a,b) :- step(a,c), flow(c, b)\]
+b) can be defined as transitive closure of a data-fact \datalog{step(a, b)};
+
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+flow(a,b) :- step(a,b)
+flow(a,b) :- step(a,c), flow(c, b)
+\end{lstlisting}
 where the data-fact step(a,b) means that there is a direct flow from node a to b.
 
 Next thing to do is defining rule for the helper data-fact, step.  For example,
 let's assume that the syntactic data-fact assign(x, val) indicates the assinment
 x = val, then one can define a rule for step to be
-\[step(a,b) :- assign(a, b)\].
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+step(a,b) :- assign(a, b)
+\end{lstlisting}
+.
+
 
 \textbf{Evaluating rules}
 The final step is to simply evaluate the defined rules, with the given
@@ -122,30 +129,24 @@ previous implementation.
 Let's illustrate this extension with the example of dataflow analysis above.
 First, we are given two rules for the helper data-fact "step", for each language
 respectviely:
-\[step(a,b) :- step_A(a,b)\]
-\[step(a,b) :- step_B(a,b)\]
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+step(a,b) :- step_A(a,b)
+step(a,b) :- step_B(a,b)
+\end{lstlisting}
 In order to take the inter-language dataflow into account, one should find out
 how a data of one language can be passed to different language beyond language
 boudary.  One way to pass data in one language into another is via function
 call, shown as in the example below:
 
-language A
-
-public void main() \{
-
-\quad int x = SOURCE();
-
-\quad B::f(x);
-
-\}
-
-language B
-
-void f(int param) \{
-
-\quad printf("\%d", param);
-
-\}
+\begin{lstlisting}[style=java,xleftmargin=2.5em]
+public void main() { // Language A
+  int x = SOURCE();
+  B::f(x);
+}
+void f(int param) { // Language B
+  printf("\%d", param);
+}
+\end{lstlisting}
 
 Here, the variable x in language A is passed to the parameter of a function f
 in language B. We can define the data-fact to reflect this kind of information,
@@ -153,6 +154,8 @@ foreignArgParam(a,b,i), which indicates that a is an i-th argument of a foreign
 function call to a function whose i-th parameter is b. In above example, we
 could derive the data-fact, foreignArgParam(x, param, 0). Using this data-fact,
 we can add new rule for deriving the helper data-fact step as follows:
-\[step(a,b) :- foreignArgParam(a,b,i)\]
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+step(a,b) :- foreignArgParam(a,b,i)
+\end{lstlisting}
 so that dataflow through foreign dunction call also can be considered in this
 framework.

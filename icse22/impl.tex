@@ -6,40 +6,28 @@ transforms source code into database, and performs analysis by evaluating
 "query", written in declarative language called QL (Query langague). In QL,
 defining data-facts and rules are referred as defining "predicates", which has
 the following form:
-
-predicate isOneTwoThree(int n) \{
-
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+predicate isOneTwoThree(int n) {
   n = 1
-
   or
-
   n = 2
-
   or
-
   n = 3
-
-\}
+}
+\end{lstlisting}
 
 QL is also object-oriented language, so that it support class definition:
-
-class OneTwoThree extends int \{
-  
-  OneTwoThree() \{ // characteristic predicate
-    
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+class OneTwoThree extends int {
+  OneTwoThree() { // characteristic predicate
     this = 1
-
     or
-
     this = 2
-
     or
-
     this = 3
-  
-  \}
-
-\}
+  }
+}
+\end{lstlisting}
 
 Basically, defining class is not really different to defining predicate,
 as class is just set of elements that satisfy the predicate called
@@ -87,68 +75,40 @@ C++ and Java supports this dataflow anslysis library. Two dataflow analysis
 library have same framework: they share same classes such as "Node", and some
 predicates such as "simpleLocalFlowStep".
 
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class Node extends TNode {
-
   ...
-
 }
-
 predicate simpleLocalFlowStep(Node nodeFrom, Node nodeTo) {
-
   // Expr -> Expr
- 
-  exprToExprStep\_nocfg(
-  
+  exprToExprStep_nocfg(
     nodeFrom.asExpr(),
-    
     nodeTo.asExpr()
-  
   )
-  
   or
-  
   // Assignment -> LValue post-update node
-  
   ...
-
 }
-
-cpp/dataflow/internal/DataFlowUtil.qll
-
-class Node extends TNode \{
-   …
-\}
-
-predicate simpleLocalFlowStep(Node node1, Node node2) \{
-
-  // Variable flow steps through
-  
-  // adjacent def-use and use-use pairs.
-  
-  exists(SsaExplicitUpdate upd |
-  
-    upd.getDefiningExpr().(VariableAssign).getSource()
-    
-    = node1.asExpr() or
-    
-    upd.getDefiningExpr().(AssignOp) = node1.asExpr()
-  
-  |
-  
-    node2.asExpr() = upd.getAFirstUse()
-  
-  )
-  
-  or
-  
-  // Flow through this
-  
+//cpp/dataflow/internal/DataFlowUtil.qll
+class Node extends TNode {
   ...
-
-\}
-
-cpp/dataflow/internal/DataFlowUtil.qll
-
+}
+predicate simpleLocalFlowStep(Node node1, Node node2) {
+  // Variable flow steps through
+  // adjacent def-use and use-use pairs.
+  exists(SsaExplicitUpdate upd |
+    upd.getDefiningExpr().(VariableAssign).getSource()
+    = node1.asExpr() or
+    upd.getDefiningExpr().(AssignOp) = node1.asExpr()
+  |
+    node2.asExpr() = upd.getAFirstUse()
+  )
+  or
+  // Flow through this
+  ...
+}
+//cpp/dataflow/internal/DataFlowUtil.qll
+\end{lstlisting}
 However, these two implementations are not compatible, that is, although they have the same name,
 we can not use "Node" class of C++ as an argument for "simpleLocalFlowStep" predicate of Java or vice versa.
 Therefore, we lift each of the library into the same level so that classes and predicates become compatible.
@@ -157,56 +117,37 @@ original classes and predicated can be distinguished with lifted ones.
 A class can be lifted by first defining sum type, which denotes that the lifted class would be either from C++ or
 Java, and then make the lifted class be of that type. We also implemented two member predicates that can cast
 the lifted class into each of corresponding class.
-
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 private newtype TNode =
-
   TJavaNode(JAVA::Node n)
-  
   or
-  
   TCppNode(CPP::Node n)
-
-class Node extends TNode \{
-  
-  JAVA::Node asJavaNode() \{
-    
+class Node extends TNode {
+  JAVA::Node asJavaNode() {
     this = TJavaNode(result)
-  
-  \}
-  
-  CPP::Node asCppNode() \{
-    
+  }
+  CPP::Node asCppNode() {
     this = TCppNode(result)
-  
-  \}
-  
+  }
   ...
-
-\}
+}
+\end{lstlisting}
 
 A predicate can be lifted by combining two original predicates with "or" connectives.
 For each original predicate, each of the arguments and return values are casted down to
 correspnding language's class. After lifting, the lifted predicate shows equlivalent behavior
 as the original ones if all the arguments are from the same language.
-
-predicate simpleLocalFlowStep(Node node1, Node node2) \{
-  
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+predicate simpleLocalFlowStep(Node node1, Node node2) {
   JAVA::simpleLocalFlowStep(
-    
     node1.asJavaNode(), node2.asJavaNode()
-
   )
-  
   or
-  
   CPP::simpleLocalFlowStep(
-
     node1.asCppNode(), node2.asCppNode()
-
   )
-
-\}
-
+}
+\end{lstlisting}
 \subsection{Merge library}
 
 After the library is lifted, the last step is to extend some predicates to reflect the
@@ -214,25 +155,18 @@ semantics of interoperation between languages. For example, the predicate named 
 is a predicate for connecting function call and target function. It gets argument of class "DataFlowCall",
 and the result is of class "DataFlowCallable". After merging the libraries, this predicate would be as follow:
 
-DataFlowCallable viableCallable(DataFlowCall c) \{
-
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+DataFlowCallable viableCallable(DataFlowCall c) {
 result.asJavaDataFlowCallable()
-
   = JAVA::viableCallable(c.asJavaDataFlowCall()) or
-
 result.asCppDataFlowCallable()
-
   = CPP::viableCallable(c.asCppDataFlowCall()) or
-
 result.asCppDataFlowCallable()
-
   = viableCallableJ2C(c.asJavaDataFlowCall()) or
-
 result.asJavaDataFlowCallable()
-
   = viableCallableC2J(c.asCppDataFlowCall())
-
-\}
+}
+\end{lstlisting}
 
 The first two lines are result of lifting, and they take advantage of the
 original predicates from dataflow library.  They handle the call edges from
