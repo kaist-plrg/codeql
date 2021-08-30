@@ -96,13 +96,21 @@ case where "Call<type>Method" uses wrong signature for the java mehthod. The
 number in each cell denotes the number of alarms, and the number in the
 paranthesis denotes the number of true alarm.
 
-[shoule be replaced with real excerpt of examples of bugs]
+\inred{[shoule be replaced with real excerpt of examples of bugs]}
 
 1. null dereferencing bug
 
 //java
 
-x = null;
+String x = null;
+
+String y = getDir();
+
+if(y != null) \{
+ 
+ x = y + "/tmp";
+
+\}
 
 f(x);
 
@@ -160,7 +168,32 @@ public int f2(int y, int z);
 
 \#define SIG2 = "I(I)"; //should be different, but seems to be copy-paste error
 
-env->callIntMethod("f2", SIG2);
+env->getMethodID("f2", SIG2);
+
+We demonstrate some interesting bugs we found in our benchmark with actual minified examples above
+for each kind.
+
+First example denotes null dereference bug. A null is stored in variable, and
+it is updated into non-null value under certain condition. However, that value
+itself is passed to a C function even if it is still null, and it is dereferenced there
+without proper check.
+
+Second example denotes a bug where C function is missing. The name for target C
+function is decided with convention, and the java package's name is used
+for deciding the name. It seems that package name is chenged during development,
+but the function name in the C source code was not changed repectively, resulting
+in missing function bug.
+
+In third example, the ArrayList is passed to the function, which is an object.
+However, in C, the parameter type is defined as "jarray", which should be used
+for array, not object. It seems that the developer thought that jarray can be
+used for jobject.
+
+In the final example, it demonstrates the case where wrong signature is used
+for dispatching java method from C, using "getMethodID" function. An interesting
+point is that, the signatures were defined in C macro, and the wrong signature
+was the same as the previous one. It seems that the signature is copied and pasted
+from the previous one, yet not modified.
 
 No false positives were found for latter three kinds of bugs.  There were some
 false positive for the first bug, the null dereference bug. The reason for
@@ -169,3 +202,7 @@ dataflow. Fo example, the analyzer could not handle the case where a variable
 is reassigned to a non-null value only if the value of a variable is null and
 then the variable is derefernced, resulting in giving the false poitive that
 null value can be dereferenced.
+
+In summary, we can conclude that our analyzer is practical and useful enough,
+in that we could find previously unknown bugs/security vulnerabilities using
+our analyzer.
