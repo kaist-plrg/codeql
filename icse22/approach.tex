@@ -63,96 +63,96 @@ used.
 
 \textbf{Defining rule}
 The next step is defining rules to generate new data-facts on top of know
-data-facts, that is, actually implementing the analysis in declrative style.
-This setp can be futrher divided into two sub tasks. First thing to do is to
-designing the generalized and unified framework for static analysis, that can
-incorporate both languages. The framework consists of the result data-fact which
-would correspond to the final result of the analisys, and some helper
-data-facts used for calculating the result data-fact, whose implementation
-would differ depending on the language. The second task is to actually fill in
-the rules for such helper data-facts.
+data-facts. This step corresponds to actually implementing the algorithm for
+static analysis in declrative style. Considering the extension to the
+multilingual analysis, a useful pattern for defining rule is to take framework
+approach.  First thing to do is to designing the framework for static analysis.
+The framework consists of the result data-fact which would correspond to the
+final result of the analysis, and some helper data-facts used for calculating
+the result data-fact. Then, second task is to actually fill in the rules for
+such helper data-facts.
 
 Let's look at the concrete example of dataflow analysis. First thing we do is
-designing the analysis framework.  In this framework, the final analysis result
-we want is expressed with the data-fact of the form of flow(a,b), which means
-that value of the node a can flow into node b. flow(a, b) can be defined as
-transitive closure of a data-fact step(a, b);
-
+designing the dataflow analysis framework.  In this framework, the final
+analysis result we want is expressed with the data-fact of the form of
+flow(a,b), which means that value of the node a can flow into node b. flow(a,
+b) can be defined as transitive closure of a data-fact step(a, b);
 \[flow(a,b) :- step(a,b)\]
-\[flow(a,b) :- step(a,c) and flow(c, b)\]
-
+\[flow(a,b) :- step(a,c), flow(c, b)\]
 where the data-fact step(a,b) means that there is a direct flow from node a to b.
 
-Next thing to do is defining rule for the helper data-fact, step, for each
-language.  For example, if a lnaguage has a syntactic data-fact which indicates
-the assignment x = val, in form of assign(val, x), then one can define a rule
-for step to be step(a, b) :- assign(a, b).
+Next thing to do is defining rule for the helper data-fact, step.  For example,
+let's assume that the syntactic data-fact assign(x, val) indicates the assinment
+x = val, then one can define a rule for step to be
+\[step(a,b) :- assign(a, b)\].
 
-\textbf{Defining rule}
+\textbf{Evaluating rules}
 The final step is to simply evaluate the defined rules, with the given
 data-facts.  By evaluating the rules, we mean that finding all possible
 data-facts that can be derived. The rules are ususally evaluated in bottom-up
 and modular manner, that is, each rule is evaluated one-by-one, after every
 rule it depends on is evaluated.
 
-\subsection{Composing two static analyzers}
+\subsection{Composing two declarative static analyzers}
+
+In the following, we illustrate how we can compose two declarative style static analyzers
+to perform analysis on multilingual program.
 
 \includegraphics[width=0.5\textwidth]{img/overview2}
 
-Above figure illustrate the overview of how declarative style analysis can
-be extended to multilingual analysis. The main difference is that the evaluator
-now gets two sets of syntactic data-facts extracted from both language, and
-the rules also should be merged, also by taking interoperation-semantics into accout.
+Above figure illustrate the overview of how declarative style analysis can be
+extended to multilingual analysis. The main difference is that the evaluator
+now gets two sets of syntactic data-facts extracted from both language, and the
+rules also should be merged, with taking interoperation-semantics into account by
+extending some rules.
 
-In order to two sets of rules, the second step can be extended with one more
-task..  In the final step, the interoperation between two languages is
-considered, and some helper rules in frameworks are extended to handle the
-interoperation between them. By divding the second and the tird task, one can
-focus on the intra-language semantics and the inter-language semantics
-separately; in the second task, one can consider the task as just implementing
-a static analyzer for a specific language, and in the third task, such
-language-specific implementation itself needs little modification while
-implementing the inter-language semantics.
+In order to easily merge two sets of rules or each languages, two rules should
+conform to the same framework, that is, they should have same sets of helper
+data-facts (although the rule for deriveing helper data-facts might differ).
+Given two sets of rules, the first thing to do id to identify the syntactic
+parts of program where interaction can happen.  Then, based on the information
+regarding these parts, new rules for generating proper helper data-facts are
+defined, so that the interoperation semantic is properly modeled.
 
-Let's illustrate this step with the example of dataflow analysis above.  In
-order to take the inter-language operation into account, one should find out
-how a data of one language can be passed to different language beyond boudary.
-A way to pass data in one language into another is via funcction call, which
-can be reflected into the rule of
+One thing to note here is that already-defined intra language rules for helper
+data-facts and newly-defined inter-language rules can be treated independently;
+defining new helper rules can be done without considering or modifying the 
+previous implementation.
 
-step(a,b) :- foreignArgParam(a,b,i)
+Let's illustrate this extension with the example of dataflow analysis above.
+First, we are given two rules for the helper data-fact "step", for each language
+respectviely:
+\[step(a,b) :- step_A(a,b)\]
+\[step(a,b) :- step_B(a,b)\]
+In order to take the inter-language dataflow into account, one should find out
+how a data of one language can be passed to different language beyond language
+boudary.  One way to pass data in one language into another is via function
+call, shown as in the example below:
 
-where foreignArgParam(a,b,i) is the
-data-fact that indicates a is an i-th argument of a foreign function call to a
-function, whoose i-th argument is b.
+language A
 
-There would be the trade-off between the generality of framework, and the
-complexity of implementation. Designing more general framework would be easier,
-yet it would require more detailed implmentaion of the framework. On the other
-hand, one can design more language-specific framework which would reduce the
-complexity of each helper rule, which also enables more fine-grained control
-when extending helper rule to handle interoperation semantics, but designing a
-good framework that is suitable for both languages would be rather challenging.
+public void main() \{
 
-For example, we can design an alternative framework from the previous one, by
-defining more fine-grained rules for step.  Assuming that both target languages
-have function call and field access, step (a,b) can be defiend as
+\quad int x = SOURCE();
 
-\[step(a,b) :- localStep(a, b)\]
-\[step(a,b) :- functionInStep(a, b)\]
-\[step(a,b) :- functionOutStep(a, b)\]
-\[step(a,b) :- filedReadStep(a, b)\]
-\[step(a,b) :- fieldWriteStep(a, b)\]
+\quad B::f(x);
 
-as a part of the framework, and define rule for each of 5 different steps.
-Here, localStep represents any flows that do not envolve function call or field
-access.  Example would be assigning to a variable, or simple def-use pattern.
-functionInStep and functionOutStep are used for flows envolving function calls,
-such as flow from argument to parameter or flows regarding return statement.
-fieldReadStep and fieldWriteStep are data-facts for field access. Then, the
-implementation of each framework, and the rules for inter-operation, can be
-written on top of this framework. This framework has the advantage of being
-modular, and rule for each framework data-facts being simpler, but designing
-this framework would require the designer to verify if this design is indeed
-appropriate one, i.e., both languages do have such way to pass data, and there
-is no other way that a data can flow.
+\}
+
+language B
+
+void f(int param) \{
+
+\quad printf("\%d", param);
+
+\}
+
+Here, the variable x in language A is passed to the parameter of a function f
+in language B. We can define the data-fact to reflect this kind of information,
+foreignArgParam(a,b,i), which indicates that a is an i-th argument of a foreign
+function call to a function whose i-th parameter is b. In above example, we
+could derive the data-fact, foreignArgParam(x, param, 0). Using this data-fact,
+we can add new rule for deriving the helper data-fact step as follows:
+\[step(a,b) :- foreignArgParam(a,b,i)\]
+so that dataflow through foreign dunction call also can be considered in this
+framework.
