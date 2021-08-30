@@ -19,10 +19,10 @@ collected from F-Droid[9], a repository for open-source android application. The
 42 apps are selected by searching for apps with JNI, and among them, selecting those
 that we could sucessfully compile. We compared our analyzer with
 state-of-the-art[3] JNI analyzer, and confirmed that our analyzer outperforms
-in terms of scalability and precision.  To answer RQ3, we implemented various
+in terms of scalability and precision. To answer RQ3, we implemented various
 kinds of bug checkers, illustrated in previous researches[1][3], on top of our
 analyzer. We ran our bug checker on the 42 applications of F-Droid mentioned
-above, and discovered 38 bugs, including 30 newly found bugs.
+above, and discovered \inred{??} bugs, including \inred{??} newly found bugs.
 
 
 \subsection{RQ1: Feasibility}
@@ -43,24 +43,129 @@ value that indicates the target method's name, and since the inner-flow
 analysis could not properly handle these functions, analyzer could not
 correctly deterimine the function call target.
 
-(Emphasize that data leak was not found in the previous research? or not?)
+As a reusult, we could conclude that it is feasible to implement
+static analysis in declarative style
+
 
 \subsection{RQ2: Performance}
 \includegraphics[width=0.5\textwidth]{img/table2}
-The table2 shows the analysis result for 42 F-Droid applications. The "time"
-coulmn denotes the time for creating database and evaluating query. The average
-time for creating DB was ??? seconds, and average time for evaluating query was
-??? seconds, making the total analysis time ??? seconds. This is x4 faster on
-average, compared to the state-of-the art JNI program analyzer.  Note that time
-for creating DB includes compile time, and once DB is created, multiple queries
-can be evaluated withou creating DB again. This means that pratically, the
-pratical speed up becomes x14.
+The table2 shows the analysis result for F-Droid applications. We summarize
+result for \inred{??} of 42 apps, which contains Java method or field access
+from C. \inred{The full list of data is available at ???}.
+
+The "time" coulmn denotes the time for creating database and evaluating query.
+The average time for creating DB was ??? seconds, and average time for
+evaluating query was ???  seconds, making the total analysis time ??? seconds.
+This is x4 faster on average, compared to the state-of-the art JNI program
+analyzer.  Note that time for creating DB includes compile time, and once DB is
+created, multiple queries can be evaluated without creating DB again. This means
+that pratically, the pratical speed up becomes x14.
 
 The "precision" coulms denotes the precision of dispatching function call
 target, and field access target.  "Precise" means exactly one target was found,
-and resolved means at least one target was found.  Compared to the previous
-result, the precision was also higher for both function call targets and field
-access targets.
+and resolved means at least one target was found. For the function call from C to Java,
+\inred{???}\% of function calls were resolved, and \inred{???}\% of functions calls
+were precisely resolved. For the field access, \inred{???}\% of field accesses (both
+read and write) were resolved, and \inred{???}\% of field access were precisely resolved.
+Compared to the precision result of the state-of-the-art analyzer, our implementation
+showwd higher precision.
+
+The main reason that the analyzer failed to resolve some of the function calls
+is due to the lack of soundness of base-line CodeQL dataflow analysis library.
+Specifically, if function pointer is involved when calling C function within C,
+CodeQL could not determine the exact call target, and some data which is needed
+for determining the Java method callt arget is not analyzed to be passed, resulting
+in failure to resolviging Java method target.
+
+In conclusion, considering that our analyzer could successflly analyze the
+benchmark applications with higer precision in significantly shorter time
+compared to the stat-of-the-art analyzer, we conclude that our implementation
+has competitive performance.
 
 \subsection{RQ3: Usefulness}
+\includegraphics[width=0.5\textwidth]{img/table3}
+The table 3 shows the list of bugs and security vulnerabilites we coud detect.
+The first bug is the null dereference bug[1][9], which detects the derefence of
+Java's null value in C, without proper nullity checking logic. Rest of three
+bugs are related to mistake in using interaction, which are described in
+previous research[2]. "Missing fun" denotes the case where C function is
+missing even if it is called from java. "Type mismatch" denotes the case where
+the declaration of native function in Java has different return type or
+parameter type with its actual definition in C.  "Wrong signature" denotes the
+case where "Call<type>Method" uses wrong signature for the java mehthod. The
+number in each cell denotes the number of alarms, and the number in the
+paranthesis denotes the number of true alarm.
 
+[shoule be replaced with real excerpt of examples of bugs]
+
+1. null dereferencing bug
+
+//java
+
+x = null;
+
+f(x);
+
+//c
+
+int f(jobject a) \{
+
+  env->dereference(a);
+
+\}
+
+2. missing fun
+
+//java
+
+package originalPackageName;
+
+f(x)
+
+//c
+
+int Java\_changedPackageName\_f()  \{
+
+  ...
+
+\}
+
+3. type mismatch
+
+//java
+
+ArrayList x = ...;
+
+f(x);
+
+//c
+
+int f(jarray x) \{
+
+  ...
+
+\}
+
+4. Wrong signature
+
+//java
+
+public int f1(int x);
+
+public int f2(int y, int z);
+
+//c
+
+\#define SIG1 = "I(I)";
+
+\#define SIG2 = "I(I)"; //should be different, but seems to be copy-paste error
+
+env->callIntMethod("f2", SIG2);
+
+No false positives were found for latter three kinds of bugs.  There were some
+false positive for the first bug, the null dereference bug. The reason for
+these false positives were mainly due to, again, imprecise intra-language
+dataflow. Fo example, the analyzer could not handle the case where a variable
+is reassigned to a non-null value only if the value of a variable is null and
+then the variable is derefernced, resulting in giving the false poitive that
+null value can be dereferenced.
