@@ -98,77 +98,73 @@ paranthesis denotes the number of true alarm.
 
 \inred{[shoule be replaced with real excerpt of examples of bugs]}
 
-1. null dereferencing bug
-
-//java
-
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//Java
 String x = null;
-
 String y = getDir();
-
-if(y != null) \{
- 
+if(y != null) {
  x = y + "/tmp";
-
-\}
-
+}
 f(x);
-
-//c
-
-int f(jobject a) \{
-
+//C
+int f(jobject a) {
   env->dereference(a);
-
-\}
-
-2. missing fun
-
-//java
-
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{1. null dereferencing bug}
+    \label{fig:bug1}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//Java
 package originalPackageName;
-
 f(x)
-
-//c
-
-int Java\_changedPackageName\_f()  \{
-
+//C
+int Java_changedPackageName_f() {
   ...
-
-\}
-
-3. type mismatch
-
-//java
-
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{2. missing fun}
+    \label{fig:bug2}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//Java
 ArrayList x = ...;
-
 f(x);
-
-//c
-
-int f(jarray x) \{
-
+//C
+int f(jarray x) {
   ...
-
-\}
-
-4. Wrong signature
-
-//java
-
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{3. type mismatch}
+    \label{fig:bug3}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//Java
 public int f1(int x);
-
 public int f2(int y, int z);
-
-//c
-
-\#define SIG1 = "I(I)";
-
-\#define SIG2 = "I(I)"; //should be different, but seems to be copy-paste error
-
+//C
+#define SIG1 = "I(I)";
+#define SIG2 = "I(I)"; //should be different, but seems to be copy-paste error
 env->getMethodID("f2", SIG2);
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{4. Wrong signature}
+    \label{fig:bug3}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{Real excerpt of examples of bugs}
+  \label{fig:bugs}
+\end{figure}
 
 We demonstrate some interesting bugs we found in our benchmark with actual minified examples above
 for each kind.
