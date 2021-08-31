@@ -24,6 +24,8 @@ class DataFlowCallable extends TDataFlowCallable {
 
   predicate isJniFunction() { //modified
     this.asCppDataFlowCallable().toString().matches("Java_%")
+    or
+    registeredMethod(_, _, this.asCppDataFlowCallable())
   }
 }
 
