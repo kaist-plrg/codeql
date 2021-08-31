@@ -23,9 +23,18 @@ p(x)" is not valid. ?)
 
 \subsection{Static analyzer for one languge}
 
-\includegraphics[width=0.5\textwidth]{img/overview}
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.5\textwidth]{img/overview}
+  \vspace*{-1.5em}
+  \caption{The overview of how declarative style analysis works for
+  one language}
+  \label{fig:overview}
+\vspace*{-.5em}
+\end{figure}
 
-Above figure illustrate the overview of how declarative style analysis works for
+Figure~\ref{fig:overview} illustrates the overview of how declarative style analysis works for
 one language works. The analysis mainly
 consists of three steps. First, the language is converted into a syntactic
 data-facts. Second, the rules that would generate new facts are defined, and
@@ -105,9 +114,18 @@ rule it depends on is evaluated.
 In the following, we illustrate how we can compose two declarative style static analyzers
 to perform analysis on multilingual program.
 
-\includegraphics[width=0.5\textwidth]{img/overview2}
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.5\textwidth]{img/overview2}
+  \vspace*{-1.5em}
+  \caption{the overview of how declarative style analysis can be
+  extended to multilingual analysis}
+  \label{fig:overview2}
+\vspace*{-.5em}
+\end{figure}
 
-Above figure illustrate the overview of how declarative style analysis can be
+Figure~\ref{fig:overview2} illustrates the overview of how declarative style analysis can be
 extended to multilingual analysis. The main difference is that the evaluator
 now gets two sets of syntactic data-facts extracted from both language, and the
 rules also should be merged, with taking interoperation-semantics into account by
