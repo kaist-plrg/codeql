@@ -96,69 +96,82 @@ case where "Call<type>Method" uses wrong signature for the java mehthod. The
 number in each cell denotes the number of alarms, and the number in the
 paranthesis denotes the number of true alarm.
 
-\inred{[shoule be replaced with real excerpt of examples of bugs]}
-
 \begin{figure}[t]
   \centering
   \vspace{2mm}
   \begin{subfigure}[t]{0.5\textwidth}
     \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
-//Java
-String x = null;
-String y = getDir();
-if(y != null) {
- x = y + "/tmp";
+//EmulatorActivity.java
+String tmp = null;
+String folder = Util.GetInternalAppStorage(activity);
+
+if (folder != null) {
+  tmp = folder + "tmp";
+  Util.CreateDirectory(tmp);
 }
-f(x);
-//C
-int f(jobject a) {
-  env->dereference(a);
+
+EmulatorActivity.nativeInitGraph89(..., tmp);
+
+//wrappercommonjni.c
+void Java_com_graph89_emulationcore_EmulatorActivity_nativeInitGraph89(..., jstring tmp_dir) {
+   (*env)->GetStringUTFChars(env, tmp_dir, 0);
+   ...
 }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{1. null dereferencing bug}
+    \caption{Null dereference}
     \label{fig:bug1}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
     \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
-//Java
-package originalPackageName;
-f(x)
-//C
-int Java_changedPackageName_f() {
+//JpegRedaction.java
+package org.witness.obscuracam.photo.jpegredaction;
+
+public class JpegRedaction {
+  private native void redactRegions(...);
+  ...
+}
+
+//org_witness_securesmartcam_jpegredaction_JpegRedaction.cpp
+void Java_org_witness_securesmartcam_jpegredaction_JpegRedaction_redactRegions(...) {
   ...
 }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{2. missing fun}
+    \caption{Missing Fun}
     \label{fig:bug2}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
     \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
-//Java
-ArrayList x = ...;
-f(x);
-//C
-int f(jarray x) {
-  ...
-}
+//MuPdfPage.java
+private native static List<PageTextBox> search(...);
+
+//mupdfdroidbridge.c
+jobjectArray Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_search(...){
+   ...
+ }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{3. type mismatch}
+    \caption{Type Mismatch}
     \label{fig:bug3}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
     \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
 //Java
-public int f1(int x);
-public int f2(int y, int z);
-//C
-#define SIG1 = "I(I)";
-#define SIG2 = "I(I)"; //should be different, but seems to be copy-paste error
-env->getMethodID("f2", SIG2);
+void OnMessage(String text);
+void OnInfoMessage(String msg, int displayType);
+
+
+//jni_doom.h
+#define CB_CLASS_MSG_SIG  "(Ljava/lang/String;I)V"
+#define CB_CLASS_INFMSG_SIG  "(Ljava/lang/String;I)V"
+
+//jni_doom.c
+mSendStr = (*env)->GetMethodID(env, jNativesCls, CB_CLASS_MSG_CB, CB_CLASS_MSG_SIG);
+
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{4. Wrong signature}
+    \caption{Wrong Signature}
     \label{fig:bug3}
   \end{subfigure}
   \vspace*{-.5em}
@@ -169,9 +182,9 @@ env->getMethodID("f2", SIG2);
 We demonstrate some interesting bugs we found in our benchmark with actual minified examples above
 for each kind.
 
-First example denotes null dereference bug. A null is stored in variable, and
-it is updated into non-null value under certain condition. However, that value
-itself is passed to a C function even if it is still null, and it is dereferenced there
+First example denotes null dereference bug. A null is stored in variable tmp, and
+it is updated into non-null value under certain condition. However, tmp is passed
+to a C function even if it is still null, and it is dereferenced there
 without proper check.
 
 Second example denotes a bug where C function is missing. The name for target C
@@ -180,16 +193,14 @@ for deciding the name. It seems that package name is chenged during development,
 but the function name in the C source code was not changed repectively, resulting
 in missing function bug.
 
-In third example, the ArrayList is passed to the function, which is an object.
-However, in C, the parameter type is defined as "jarray", which should be used
-for array, not object. It seems that the developer thought that jarray can be
-used for jobject.
+In third example, the return type of the function is List, which is an object.
+However, in C, the return type of the function is defined as "jarray", which
+should be used for array, not object.
 
 In the final example, it demonstrates the case where wrong signature is used
 for dispatching java method from C, using "getMethodID" function. An interesting
 point is that, the signatures were defined in C macro, and the wrong signature
-was the same as the previous one. It seems that the signature is copied and pasted
-from the previous one, yet not modified.
+was the same as the next one.
 
 No false positives were found for latter three kinds of bugs.  There were some
 false positive for the first bug, the null dereference bug. The reason for
