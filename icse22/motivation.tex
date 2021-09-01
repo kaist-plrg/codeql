@@ -1,15 +1,13 @@
 \section{Motivation}
 
-In this section, we visualize the problems of multilingual program analysis
-with concrete examples, and show how declrative style implementation can be helpful
-for those problems.
+In this section, we visualize the problems of previous approaches for
+multilingual program analysis with concrete examples, and show how declrative
+style implementation can be helpful for those problems.
 
-\subsection{Example 1: Extending to more complex client-analysis}
+\subsection{Example target multilingual program}
 
-Let's consider the dataflow analysis for the following program,
-which is written in Java-like language A and C-like language B:
-
-
+Let's consier two multilingual programs, written in (Java-like) language A
+and (C-like) language B.
 \begin{figure}[t]
   \centering
   \vspace{2mm}
@@ -26,9 +24,11 @@ public void main() { //Language A
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
     \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
-void f(Node* arg) { //Language B
-  Node* ptr = arg;
-  ptr->next = new Node;
+void f(Node* param) { //Language B
+  if(param != NULL) {
+    Node* ptr = param;
+    ptr->next = new Node;
+  }
 }
     \end{lstlisting}
     \vspace*{-.5em}
@@ -41,65 +41,17 @@ void f(Node* arg) { //Language B
 \end{figure}
 Figure \ref{fig:exam1}.
 
-What we are interested is whether the value null from language A
-can be dereferenced in language B. One way to express this with IR 
-would be the following format: 
-\begin{lstlisting}[style=myIR,xleftmargin=2.5em]
-main: {
-  node = null;
-  f(node);
-}
-f(arg): {
-  ptr = arg;
-  deref(ptr);
-}
-\end{lstlisting}
-
-Performing dataflow analysis on this IR would be straight forward, and it can
-be concluded that te null can be derefereced.
-
-Now, let's assume that we want to analyze the following different program,
-where Language B is changed as follow:
+In the first program, value null from language A is passed to the parameter of
+function language B via calling it. Then, in language B, it is checked whether
+the paratmeter has null value or not, and only when it is not null, the
+parameter is safely dereferenced.
 
 \begin{figure}[t]
   \centering
   \vspace{2mm}
   \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
-void f(Node* arg) { //Language B
-  Node* ptr = arg;
-  if(ptr != NULL) {
-    ptr->next = new Node;
-  }
-}
-  \end{lstlisting}
-  \vspace*{-.5em}
-  \caption{EXAMPLE 2. Language B}
-  \label{fig:exam2}
-\end{figure}
-Figure \ref{fig:exam2}.
-
-In this example, since the null-check is performed before dereferencing it,
-there should be no alarm in this case. However, if IR itself does not contain
-the control-flow structure such as if-statement, then the analyzer might
-produce the same IR as before as if there were no null checking logic ar all,
-and would result in a false alarm that reports the dereference of null. If one
-wants to extend this analyzer to support this kind of analysis, then all
-three jobs of extending IR, translating source code into extended IR, and
-implementing analysis on extended IR. This can be especially more cubersome
-if all of three jobs are very different from others.
-
-\subsection{Example 2: Changing into simpler client-analysis}
-
-This time, let's consider the opposite case, where the developer already built
-a analyzer aimed for complex analysis, but a user wants to perform a 
-simple client-analysis. For example, consider the following example.
-
-\begin{figure}[t]
-  \centering
-  \vspace{2mm}
-  \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
-void f(Node* arg) { //Language B
-  Node* ptr = arg;
+void f(Node* param) { //Language B
+  Node* ptr = param;
   Node* next;
   if(condition()) {
     next = null;
@@ -110,40 +62,64 @@ void f(Node* arg) { //Language B
 }
   \end{lstlisting}
   \vspace*{-.5em}
-  \caption{EXAMPLE 3. Language B}
-  \label{fig:exam3}
+  \caption{EXAMPLE 2. Language B}
+  \label{fig:exam2}
 \end{figure}
+Figure \ref{fig:exam2}.
 
-Figure \ref{fig:exam3}.
+In the second program, the code for language A is same as before. The
+difference is in code for language B. This time, the code does not check wheter
+or not the parameter is null. Instead, there is another if-statement, which is
+not directly related parameter, but affects value of another variable.
 
-and let's assume that the analyzer already handles control flow.
-However, what user is interested is to find wheter the variable "ptr"
-can be null or not, and while determining that, the control flow need
-not be considered. Despite that fact, the analyzer would unnecessarily
-calculate the analysis result for the variable next, which is a waste
-of time.
+\subsection{Previous approaches for performing analysis on target program}
 
-\subsection{Declarative style analysis}
+Let's assume that we want to perform dataflow analysis for these programs.
+What we are interested is whether the value null from language A can be
+dereferenced in language B or not. In the first program, the parameter is
+dereferenced only if it is not null, so there is no such a bug. Note that in
+order to correctly conclude that there is no error, the control flow should be
+considered. On the other hand, in second program, since we do not check the
+value of parameter, it should be reported that null dereference error might
+happen.
 
-By using declarative style analysis, some problems can be mitigated.
+In previous approaches[2][3], existing analyzers are utilzed to generate
+summaries. Then the actual target-analysis, the dataflow analysis, is performed
+on these sumamries. The problem is that since such existing analyzers are
+mostly general purpose, unnecessary calculations which are not needed for
+target-analysis would happen, resulting in the overhead. For example,
+calulating information about \textit{if} statement in the first program, and
+generating summary regarding it, would be required. However, calcuating the
+information about \textit{if} in the second program is not necessary for
+calculating the dataflow from null to ptr, yet there is no easy way to "turn
+off" such heavy computation for this specific \textit{if} statement.
 
-First, let's see how a dataflow for multilingual program can be implemented in
-declrative style. Ultimately, the result data-fact we want would be \datalog{flow(a,b)},
-which will denote the fact that there is a data flow from node a to node b. The
-rule for this data-fact can be defined in terms of another data-fact named
-step:
+\subsection{Declarative style multilingual program analysis}
+
+By using declarative style analysis, we can solve the problem mentioned above.
+The main reason is in its query-based analysis: the target-analysis is
+written in terms of \textit{query}, and only related data-facts and rules
+are used for evaluating the query, reducing the amount of computation.
+
+Let's see how a dataflow analysis can be implemented in declrative style.
+Let's define \datalog{node} to be the program entity that can hold the run-time
+value, such as variable, literal, or function parameter.  Ultimately, the
+result data-fact we want would be \datalog{flow(a,b)}, which will denote the
+fact that there is a data flow from node a to node b. The rule for this
+data-fact can be defined in terms of another data-fact named step:
 
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
-flow(a,b):- step(a,b) or ( step(a,c) and flow(c,b) )
+flow(a,b) :- step(a,b)
+flow(a,b) :- step(a,c), flow(c,b)
 \end{lstlisting}
 
-Simply put, this rule states that flow is defined as transitive closure of step.
-Here, \datalog{step(a,b)} denotes the direct data flow from node a to node b. Again, the
-data-fact step can be calculated by rules using another data-facts, which will
-be eventually broken down to basic syntactic data-facts. Then, given the set of
-all syntatctic data-facts, all possible flow data-facts, including flow, can be
-calculated by evaluating engine. For example, the following data-facts will be
-generated,
+Simply put, this rule states that flow is defined as transitive closure of
+step.  Here, \datalog{step(a,b)} denotes the direct data flow from node a to
+node b. Again, the data-fact step can be calculated by rules using another
+data-facts, which will be eventually broken down to basic syntactic data-facts.
+Then, given the set of all syntatctic data-facts, all the other possible
+data-facts, including \datalog{flow}, can be calculated. For example, for the second
+program, the following data-facts will be generated,
 
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 step(null, list) // A -> A
@@ -152,26 +128,27 @@ step(arg, ptr) // B -> B
 step(ptr, [dereference of ptr]) // B -> B
 \end{lstlisting}
 
-then the declarative language engine can compute the result \datalog{flow(null, [dereference of ptr])},
-and the analyzer concludes that there is a dereference of null.
+then the declarative language engine can compute the result \datalog{flow(null,
+[dereference of ptr])}, and the analyzer concludes that there is a dereference
+of null. In process of deriving this conclusion, there was no need to consider
+the \textit{if} statement.
 
-Now, let's say we are extending this analyzer to consider the control flow.
-One way to implement it would be to bring the concept of guard, that is,
-annotating the nodes within a certain "if statement block" with the condition
-of that if statement.  For example, in EXAMPLE 2, the \datalog{[dereference of ptr]} node
-would be guarded with the condition, "ptr != null".  Implementing the guard is
-simply defining new rules and data-facts. Once the guard is implemented, then
-all we have to do is to shrink the data-fact step, so that \datalog{step(a,b)} does not
-hold if a or b is guarded by a proper guard.
+This time, let's say we are analyzing the first program. It would require to
+consider the control flow.  One way to implement it would be to bring the
+concept of guard. We can define the data-fact \datalog{guard(node, cond)} which
+annotating the node is contained in the block defiend by given if statement
+whose condition is \datalog{cond}.  For example, in the first program, the
+\datalog{ptr} node would be guarded with the condition, "param != null", and
+this is expressed by the data-fact guard(ptr, "param != null").  Once the guard
+is implemented, then all we have to do is to ginve additional condition to the
+data-fact \datalog{step}, so that \datalog{step(a,b)} does not hold if a or b
+is guarded by a proper guard, for example, it contains comparison with null.
 
-This time, let's assume that we apply this extended analysis for EXAMPLE 3.
-Note that the the condition for "if statement" does not include the bariable
-"ptr" here.  Therefore, the datafact regarding "guard" does not need to be
-calculated from the beggining. Depending on the optimization of the evaluation
-engine, this guard can be effectively precluded from the data-facts
-calculation, which can save some time.  Even without the optimization, the
-programmer can manually modify the rules regarding guard, which would be not a
-big problem compared to non-declarative implementations.
+The important thing here is that, unlike previous approaches that considers
+every if-statement in order to generte the sumamry, such process is not
+required in our approach. We can selectively calculate the certain data-fact
+regarding control flow, only if we do require it for performing the
+target-analysis.
 
 In the following sections, we formalize the general approach for performing
 declartive style analysis in multilingual program (Section 3), show the
