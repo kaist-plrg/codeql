@@ -81,12 +81,13 @@ analysis result for the given benchmark.
 \end{figure*}
 
 Table~\ref{fig:table2} shows the analysis result for F-Droid applications. We summarize
-result for \inred{??} of 42 apps, which contains Java method or field access
+result for 25 of 42 apps, which contains Java method or field access
 from C. \inred{The full list of data is available at ???}.
 
 The "time" column denotes the time for creating database and evaluating query.
 The average time for creating DB was ??? seconds, and average time for
-evaluating query was ???  seconds, making the total analysis time ??? seconds.
+evaluating query was ???  seconds, making the average of total analysis time
+??? seconds. 
 
 \begin{figure}[t]
   \centering
@@ -98,11 +99,12 @@ evaluating query was ???  seconds, making the total analysis time ??? seconds.
 \vspace*{-.5em}
 \end{figure}
 
-Figure~\ref{fig:graph} comapres the speedup per application, one by one, with ASE'20.
-The average speed up was x4. Note that time for creating DB includes compile
-time, and once DB is created, multiple queries can be evaluated without
-creating DB again. This means that practically, the practical speed up becomes
-x14.
+Among 25 apps, 13 of them were included in benchmark of ASE'20, and the
+evaluation time with their tool is available.  Figure~\ref{fig:graph} shows the speed per
+application, one by one.  The average speed up was x4. Note that time for
+creating DB is done by comping source code, which is excluded from the calculated
+time of ASE'20. This means that we also have to exxclude the time for creating DB
+from our calculated time, shich makes the practical speed up become x14.
 
 The "precision" columns denotes the precision of dispatching function call
 target, and field access target.  "Precise" means exactly one target was found,
@@ -114,11 +116,11 @@ Compared to the precision result of the state-of-the-art analyzer, our implement
 showed higher precision.
 
 The main reason that the analyzer failed to resolve some of the function calls
-is due to the lack of soundness of base-line CodeQL dataflow analysis library.
-Specifically, if function pointer is involved when calling C function within C,
-CodeQL could not determine the exact call target, and some data which is needed
-for determining the Java method call target is not analyzed to be passed, resulting
-in failure to resolving Java method target.
+or field accesses is due to the lack of soundness of base-line CodeQL dataflow
+analysis library.  Specifically, if function pointer is involved when calling C
+function within C, CodeQL could not determine the exact call target, and some
+data which is needed for determining the Java method call target is not
+analyzed to be passed, resulting in failure to resolving Java method target.
 
 In conclusion, considering that our analyzer could successfully analyze the
 benchmark applications with higher precision in significantly shorter time
@@ -144,9 +146,9 @@ previous research[2]. "Missing fun" denotes the case where C function is
 missing even if it is called from java. "Type mismatch" denotes the case where
 the declaration of native function in Java has different return type or
 parameter type with its actual definition in C.  "Wrong signature" denotes the
-case where "Call<type>Method" uses wrong signature for the java method. The
+case where "GetMethodID" uses wrong signature for the java method. The
 number in each cell denotes the number of alarms, and the number in the
-parenthesis denotes the number of true alarm.
+parenthesis denotes the number of false alarm, if any.
 
 \begin{figure}[t]
   \centering
@@ -165,7 +167,7 @@ if (folder != null) {
 EmulatorActivity.nativeInitGraph89(..., tmp);
 
 //wrappercommonjni.c
-void Java_com_graph89_emulationcore_EmulatorActivity_nativeInitGraph89(..., jstring tmp_dir) {
+void Java_..._nativeInitGraph89(..., jstring tmp_dir) {
    (*env)->GetStringUTFChars(env, tmp_dir, 0);
    ...
 }
@@ -184,8 +186,9 @@ public class JpegRedaction {
   ...
 }
 
-//org_witness_securesmartcam_jpegredaction_JpegRedaction.cpp
-void Java_org_witness_securesmartcam_jpegredaction_JpegRedaction_redactRegions(...) {
+//JpegRedaction.cpp
+void
+Java_org_witness_securesmartcam_jpegredaction_JpegRedaction_redactRegions(...) {
   ...
 }
     \end{lstlisting}
@@ -199,7 +202,7 @@ void Java_org_witness_securesmartcam_jpegredaction_JpegRedaction_redactRegions(.
 private native static List<PageTextBox> search(...);
 
 //mupdfdroidbridge.c
-jobjectArray Java_org_ebookdroid_droids_mupdf_codec_MuPdfPage_search(...){
+jobjectArray Java_..._search(...){
    ...
  }
     \end{lstlisting}
@@ -254,13 +257,14 @@ for dispatching java method from C, using "GetMethodID" function. An interesting
 point is that, the signatures were defined in C macro, and the wrong signature
 was the same as the next one.
 
-No false positives were found for latter three kinds of bugs.  There were some
-false positive for the first bug, the null dereference bug. The reason for
-these false positives were mainly due to, again, imprecise intra-language
-dataflow. For example, the analyzer could not handle the case where a variable
-is reassigned to a non-null value only if the value of a variable is null and
-then the variable is derefernced, resulting in giving the false positive that
-null value can be dereferenced.
+We manually inspected the source code if the reported alarms are false positive
+or not. No false positives were found for latter three kinds of bugs.  There
+were some false positive for the first bug, the null dereference bug. The
+reason for these false positives were mainly due to, again, imprecise
+intra-language dataflow. For example, the analyzer could not handle the case
+where a variable is reassigned to a non-null value in a diffrent branch or a
+different function, resulting in giving the false positive that null value can
+be dereferenced.
 
 In summary, we can conclude that our analyzer is practical and useful enough,
 in that we could find previously unknown bugs/security vulnerabilities using
