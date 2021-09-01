@@ -1,39 +1,108 @@
+\newcommand{\req}[1]{RQ#1}
+
 \section{Evaluation}
-In this section, we show the feasibility of the approach of using declarative
-analysis for multilingual program, and the effectiveness of its
-implementation. More specifically, we set three research questions as follow:
+%In this section, we show the feasibility of the approach of using declarative
+%analysis for multilingual program, and the effectiveness of its
+%implementation. More specifically, we set three research questions as follow:
 
-RQ1) Feasibility: Is it possible to implement a working static analyzer for multilingual program in declarative style?
+%RQ1) Feasibility: Is it possible to implement a working static analyzer for multilingual program in declarative style?
+%
+%RQ2) Performance: How is the speed and precision of implemented analyzer, compared to the state-of-the-art analyzer?
+%
+%RQ3) Usefulness: How practical is the implemented analyzer?
 
-RQ2) Performance: How is the speed and precision of implemented analyzer, compared to the state-of-the-art analyzer?
+To show the effectiveness of our approach, we evaluate our analyzer with the
+following three research questions:
+\begin{itemize}
+  \item \req{1}: {\it (Feasibility)} Can our tool analyze JNI programs that use
+    various JNI inteoperations?
 
-RQ3) Usefulness: How practical is the implemented analyzer?
+  \item \req{2}: {\it (Performance)} How precise and scalable is our tool for
+    real-world JNI program analysis compared to Lee's analyzer~\cite{LeeASE20}?
 
-To answer RQ1, we tested our implemented analyzer with NativeFlowBench, which
-is a small set of benchmarks manually crafted by authors of JN-SAF[2], with the
-purpose of testing dataflow analyzer for JNI programs. It consists of 23
-android applications featuring various interactions between C and Java, some of
-which contain a malicious code pattern that tries to leak sensitive user data.
-The analyzer should successfully recognize and report those patterns for each
-application, if any. The result showws that our approach is feasible enough,
-in that we could correctly draw call graph, find field access target, and
-find data leaks from the benchmarks.
+  \item \req{3}: {\it (Usefulness)} Can our tool analyze the same types of bugs
+    the state-of-the-art JNI program analyzers can detect?
+\end{itemize}
 
-To answer RQ2, we applied our analyzer to 42 real-world android applications
-collected from F-Droid[9], a repository for open-source android application.
-These 42 apps are selected by first scannig the apps that feature JNI from the
-repository, and among them, selecting those that we could successfully compile.
-The line number of collected code ragnes from hundreds of lines, to hundreds of
-thousands of lines.  We compared our analyzer with Lee's state-of-the-art JNI
-analyzer[3], and confirmed that our analyzer outperforms in terms of
-scalability and precision.
+%To answer RQ1, we tested our implemented analyzer with NativeFlowBench, which
+%is a small set of benchmarks manually crafted by authors of JN-SAF[2], with the
+%purpose of testing dataflow analyzer for JNI programs. It consists of 23
+%android applications featuring various interactions between C and Java, some of
+%which contain a malicious code pattern that tries to leak sensitive user data.
+%The analyzer should successfully recognize and report those patterns for each
+%application, if any. The result showws that our approach is feasible enough,
+%in that we could correctly draw call graph, find field access target, and
+%find data leaks from the benchmarks.
 
-To answer RQ3, we implemented various kinds of bug checkers, introduced in
-previous researches[1][3], on top of our analyzer. We ran our bug checker on
-the 42 applications of F-Droid mentioned above, and detected 33 bugs,
-including \inred{25} newly found bugs.
+For \req{1}, we analyze benchmarks in NativeFlowBench~\cite{nativeflowbench,
+JN-SAF} using our tool. The benchmarks contain 23 JNI Android applications that
+use various JNI interoperations and leak sensitive data from sources in Java to
+sinks in C via the interoperations. We also compare analysis results of our
+tool to results of Lee's analyzer and JN-SAF. Because the target programs of
+JN-SAF are compiled JNI programs, we use compiled versions of the benchmarks
+for the analysis of JN-SAF and source code of the benchmarks for the analyses
+of our tool and Lee's analyzer. In addition, because JN-SAF detects data
+leakages differently from Lee's analyzer targeting call graph construction, we
+compare our tool to JN-SAF with regard to data leakage detection and to Lee's
+analyzer with regard to precision of resolving foreign function calls as the
+same basis of their evaluation~\cite{LeeASE20}.
 
-\subsection{RQ1: Feasibility}
+%To answer RQ2, we applied our analyzer to 42 real-world android applications
+%collected from F-Droid[9], a repository for open-source android application.
+%These 42 apps are selected by first scannig the apps that feature JNI from the
+%repository, and among them, selecting those that we could successfully compile.
+%The line number of collected code ragnes from hundreds of lines, to hundreds of
+%thousands of lines.  We compared our analyzer with Lee's state-of-the-art JNI
+%analyzer[3], and confirmed that our analyzer outperforms in terms of
+%scalability and precision.
+
+For \req{2}, we compare analysis results of our tool and Lee's analyzer on 42
+real-world JNI Android applications downloaded from F-Droid, a repository of
+open-source Android applications~\cite{fdroid}. We first classified
+applications of F-Droid into JNI or non-JNI applications. Then, we selected the
+42 applications out of all the JNI applications as our analysis targets,
+because they are only applications that are compiled without errors.
+
+%To answer RQ2, we applied our analyzer to 42 real-world android applications
+%collected from F-Droid[9], a repository for open-source android application.
+%These 42 apps are selected by first scannig the apps that feature JNI from the
+%repository, and among them, selecting those that we could successfully compile.
+%The line number of collected code ragnes from hundreds of lines, to hundreds of
+%thousands of lines.  We compared our analyzer with Lee's state-of-the-art JNI
+%analyzer[3], and confirmed that our analyzer outperforms in terms of
+%scalability and precision.
+
+
+%To answer RQ1, we tested our implemented analyzer with NativeFlowBench, which
+%is a small set of benchmarks manually crafted by authors of JN-SAF[2], with the
+%purpose of testing dataflow analyzer for JNI programs. It consists of 23
+%android applications featuring various interactions between C and Java, some of
+%which contain a malicious code pattern that tries to leak sensitive user data.
+%The analyzer should successfully recognize and report those patterns for each
+%application, if any. The result showws that our approach is feasible enough,
+%in that we could correctly draw call graph, find field access target, and
+%find data leaks from the benchmarks.
+
+%tool on benchmarks in NativeFlowBench~\cite{nativeflowbench, JN-SAF}. The
+%benchmarks include 23 Android JNI applications that use various JNI
+%interoperation features. Because JN-SAF targets compiled JNI programs, we use
+%compiled versions of the benchmarks for JN-SAF and source code of the
+%benchmarks for Lee's analyzer and our tool. 
+
+
+%To answer RQ3, we implemented various kinds of bug checkers, introduced in
+%previous researches[1][3], on top of our analyzer. We ran our bug checker on
+%the 42 applications of F-Droid mentioned above, and detected 33 bugs,
+%including \inred{25} newly found bugs.
+
+For \req{3}, we detect JNI interoperation bugs in the 42 real-world Android
+applications using our tool. We implemented a checker detecting four types of
+bugs on top of our tool using the query language of CodeQL. We chose our target
+JNI interoperation bugs as the same as the targets of previous research's
+client analyses~\cite{LeeASE20, ILEA}.
+
+
+\subsection{\req{1}: Feasibility}
 \input{tableRQ1}
 Table~\ref{table:RQ1} shows the analysis result for 23 benchmarks in
 NativeFlowBench.  The "Benchmark" columns denote the benchmark names, and rest
