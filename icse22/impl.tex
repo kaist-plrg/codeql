@@ -4,7 +4,7 @@ analysis for multilingual program to implement the proof-of-concept dataflow
 analysis tool for JNI programs using CodeQL, which we named JN-QL. CodeQL is a
 static analysis engine that transforms source code into database, and performs
 analysis by evaluating "query", written in declarative language called QL
-(Query Langague). In QL, defining rules are don via defining "predicates",
+(Query Language). In QL, defining rules are don via defining "predicates",
 which has the following form:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneTwoThree(int n) {
@@ -31,7 +31,7 @@ class OneTwoThree extends int {
 
 Basically, defining class is not really different to defining predicate.  Class
 is just set of elements that satisfy the predicate called "characteristic
-prdicate". For more detailed information about QL, one can refer to the
+predicate". For more detailed information about QL, one can refer to the
 paper[6] or the official document[7].
 
 \begin{figure}[t]
@@ -54,7 +54,7 @@ using the merged database and merged library, the user can write a query to
 perform the client-analysis, and evaluate it to get analysis result.
 
 \subsection{Create database}
-The first step is to gernerate database for each of two languages.  For
+The first step is to generate database for each of two languages.  For
 compiled languages such as C++ and Java, CodeQL generates database by running
 the compiler for each language. While the compiler is running, CodeQL monitors
 the behavior of compiler and extracts information it needs, and create database
@@ -80,8 +80,8 @@ paramName(#10067,"java_callback_param")
 
 In order to create a database for two languages, JN-QL performs first step for
 each languages separately to get two sets of trap files.  Next step would be to
-perfrom finalization step on merged set of trap files. However, a problem is that
-both of trap files have table with duplicated name, so simply mering them would not work.
+perform finalization step on merged set of trap files. However, a problem is that
+both of trap files have table with duplicated name, so simply merging them would not work.
 The solution is to add prefix to name of each table. For example, if both
 database have tables named "@expr", the table from C++ would be renamed as
 "@cpp\_expr", and the table from Java would be renamed as "@java\_expr". After
@@ -92,7 +92,7 @@ which the query can be evaluated.
 CodeQL provides various libraries for each languages, which consists of some
 pre-defined predicates and classes that can be useful for user to implement
 analysis on their own taste. Dataflow analysis library is one of them, and both
-C++ and Java supports this dataflow anslysis library. Two dataflow analysis
+C++ and Java supports this dataflow analysis library. Two dataflow analysis
 library have same framework: they share same classes such as "Node", and some
 predicates such as "simpleLocalFlowStep".
 
@@ -156,8 +156,8 @@ class Node extends TNode {
 
 A predicate can be lifted by combining two original predicates with "or"
 connectives.  For each original predicate, each of the arguments and return
-values are casted down to correspnding language's class. After lifting, the
-lifted predicate shows equlivalent behavior as the original ones if all the
+values are casted down to corresponding language's class. After lifting, the
+lifted predicate shows equivalent behavior as the original ones if all the
 arguments are from the same language.
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate simpleLocalFlowStep(Node node1, Node node2) {
@@ -175,7 +175,7 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
 After the library is lifted, the last step is to extend some predicates to
 reflect the semantics of interoperation between languages. The interaction from
 Java to C, or C to Java are identified, and some predicates are extended to
-model their behaviors. As an concrete exmpale, Let's take a look how the predicate
+model their behaviors. As an concrete example, Let's take a look how the predicate
 named viableCallable can be extended.
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
@@ -203,18 +203,18 @@ are implemented in different way.
 calling native function in C, possibly with some arguments. The function
 call target is determined in static manner. The target function should
 follow the JNI naming convention, which is adding "Java\_" as prefix, 
-folowed by fully qualified name of class and additional "\_", to the
+followed by fully qualified name of class and additional "\_", to the
 method name. For example, the target function name for the method call
 cfunction would be Java\_fully\_\_qualified\_\_class\_\_name\_cfunction.
-Based on this convenvtion, we can define the predicate viableCallableJ2C
+Based on this convention, we can define the predicate viableCallableJ2C
 so that f = viablaCallableJ2C(m) holds when f.toString() = "Java\_" + 
 m.className() + "\_" + "m.toString() holds. \inred{Include concrete code?}
 
 \textbf{C to Java} The interaction from C to Java is more complex, and
 requires more detailed implementation. The biggest difference is that
-the method call from C to Java requires the runtime value of variables.
+the method call from C to Java requires the run-time value of variables.
 First, C calls the interface function "GetMethodID(name, sig)" to get "method
-ID" of the method whooe name mathces the first argument, and the type signature
+ID" of the method whose name matches the first argument, and the type signature
 matches the second argument passed to this function. This method id is stored
 at a variable, say "mid", and actual method call is done by calling another
 interface function, "Call<type>Method(obj, mid, args...)". Calling this interface
@@ -222,16 +222,16 @@ function corresponds to call the method that mid indicates, with the "this objec
 obj, and the arguments as args.
 
 In order to correctly handle this method call, we have to answer these
-questions: "what string values does 'name' or 'sig' have when GetMetodID is
+questions: "what string values does 'name' or 'sig' have when GetMethodID is
 called", and "what method ID value does 'mid' have when Call<type>Method is
 called". Note that what we need to answer to this question is the dataflow
 analysis. Although inter-language dataflow is needed to soundly answer to the
-questions, in practice intra-languae dataflow analysis is enough in most
-situatitions. Therefore, we implemented two "inner-flow" analysis module for C,
+questions, in practice intra-language dataflow analysis is enough in most
+situations. Therefore, we implemented two "inner-flow" analysis module for C,
 which find all the dataflow from string literal to the argument of interface
 function, and the dataflow from interface function call result to the argument
 of interface function. Based on these two modules, we can implement the
-predicate viableCallableC2J by connecting the calledge from "Call<type>Method"
+predicate viableCallableC2J by connecting the call edge from "Call<type>Method"
 call to the method m, if there is a flow to mid from call to "GetMethodID", and
 string values that flow into name argument and sig argument of the "GetMethodID"
 corresponds with that of method m.
