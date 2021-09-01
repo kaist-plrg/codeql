@@ -26,8 +26,17 @@ above, and discovered \inred{??} bugs, including \inred{??} newly found bugs.
 
 
 \subsection{RQ1: Feasibility}
-\includegraphics[width=0.5\textwidth]{img/table1}
-The table1 shows the analysis result for 19 benchmarks in NativeFlowBench.  The
+\begin{figure*}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=\textwidth]{img/table1}
+  \vspace*{-1.5em}
+  \caption{The analysis result of NativeFlowBench}
+  \label{fig:table1}
+\vspace*{-.5em}
+\end{figure*}
+
+Table~\ref{fig:table1} shows the analysis result for 19 benchmarks in NativeFlowBench.  The
 "Benchmark" coulmns denote the benchmark names, and "ASE'20", "JN-SAF", "Ours"
 coulmns denote whether the analysis result for corresponding benchmark was
 correct(O), incorrect(X), or not available(-) in terms of two criteria for each
@@ -61,8 +70,17 @@ analysis result for the given benchmark.
 
 
 \subsection{RQ2: Performance}
-\includegraphics[width=0.5\textwidth]{img/table2}
-The table2 shows the analysis result for F-Droid applications. We summarize
+\begin{figure*}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=\textwidth]{img/table2}
+  \vspace*{-1.5em}
+  \caption{The analysis result for F-Droid applications}
+  \label{fig:table2}
+\vspace*{-.5em}
+\end{figure*}
+
+Table~\ref{fig:table2} shows the analysis result for F-Droid applications. We summarize
 result for \inred{??} of 42 apps, which contains Java method or field access
 from C. \inred{The full list of data is available at ???}.
 
@@ -70,9 +88,17 @@ The "time" coulmn denotes the time for creating database and evaluating query.
 The average time for creating DB was ??? seconds, and average time for
 evaluating query was ???  seconds, making the total analysis time ??? seconds.
 
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.5\textwidth]{img/graph}
+  \vspace*{-1.5em}
+  \caption{Speedup}
+  \label{fig:graph}
+\vspace*{-.5em}
+\end{figure}
 
-\includegraphics[width=0.5\textwidth]{img/graph}
-The above graph comapres the speedup per application, one by one, with ASE'20.
+Figure~\ref{fig:graph} comapres the speedup per application, one by one, with ASE'20.
 The average speed up was x4. Note that time for creating DB includes compile
 time, and once DB is created, multiple queries can be evaluated without
 creating DB again. This means that pratically, the pratical speed up becomes
@@ -100,8 +126,17 @@ compared to the stat-of-the-art analyzer, we conclude that our implementation
 has competitive performance.
 
 \subsection{RQ3: Usefulness}
-\includegraphics[width=0.5\textwidth]{img/table3}
-The table 3 shows the list of bugs and security vulnerabilites we coud detect.
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.5\textwidth]{img/table3}
+  \vspace*{-1.5em}
+  \caption{The list of bugs and security vulnerabilites checkers}
+  \label{fig:table3}
+\vspace*{-.5em}
+\end{figure}
+
+Table~\ref{fig:table3} shows the list of bugs and security vulnerabilites we coud detect.
 The first bug is the null dereference bug[1][9], which detects the derefence of
 Java's null value in C, without proper nullity checking logic. Rest of three
 bugs are related to mistake in using interaction, which are described in
