@@ -112,8 +112,27 @@ summary generation for the target analysis.
 %data-facts.
 
 In this paper, we propose a novel approach that statically analyzes
-multilingual programs using a declarative-style analysis for the first time. 
-... (Describe our approach briefly)
+multilingual programs using a declarative-style analysis for the first time.
+Declarative-style analysis consists of \textit{data-facts} and \textit{rules}.
+A data-fact is simply an ordered tuples of elements, which indicates the
+information that corresponding elements are in certain relation. A Rule defines
+how one data-fact can be derived from other data-facts. Evaluating declarative
+program is performed by finding possible data-facts that can be derived by
+given data-facts and rules.  Adopting this approach, we can perform static
+analysis on multilingual programs in following sense.  The first step is to
+convert each language into a set of syntactic data-facts.  Then, Programmers
+can define the intra-language rules that would generate new data-facts based on
+already known data-facts. Finally, programmer can implement the static analysis
+by defining the inter-language rules considering the inter-operation semantcis
+between two languages. Evaluating these new rules along with intra-language
+rules would give the final analysis result in form of a set of data-facts.
+The biggest advantage of using declarative-stlye analysis is that it uses
+query-based analysis, which means that the target-analysis is written in
+special rules called queries, and only datafacts that is required to evaluate
+the query is calculated. Unlike the previous approaches where general purpose
+analyzers are used to generate the summaires and unnecessary computation might
+be performed during this process, our approach does not need to spend time
+on generating unnecessary sumamry or calculating the unrelated data-facts.
 
 %In declarative
 %language, everything is expressed as in terms of "data-fact" and "rule".
@@ -148,8 +167,19 @@ analyzer for JNI programs written in both Java and C. JNI programs have been
 actively developed for both desktop and mobile applications, but they often
 contain diverse bad smells in code, which may introduce bugs and security
 issues~\cite{nishiwaki2012sean, grichi2019state, abidi2019behind,
-abidi2021multi}. We implement our analyzer on top of CodeQL~\cite{codeql}
-...(Describe CodeQL, our tool, and analysis result briefly)
+abidi2021multi}. We implement our analyzer on top of CodeQL~\cite{codeql}, a
+static analysis engine powered by a declarative language named QL.  It
+abstracts away the need of managing underlying data structure or implementing
+the efficient algorithm for evaluating the query, thus enabling simple and fast
+query writing. We tested our analyzer with real-world android JNI applications
+to see whether the performance of our analyzer is comparable with existing works.
+Surprisingly, our experiment result show that our analyzer outperforms the
+state of the art JNI analyzer in terms of scalability in that our analyzer
+shows x14 speed up on average, while shoinwg no analysis precision degrade. In
+addition,  we could easily emulate the various kinds of bug detectors
+illustrated in previous researches on top of our analyzer, thanks to the
+power of the CodeQL. Using these bug checkers, we could find 25 new bugs and
+vulnerabilites from the real world applications.
 
 %the practicality of our approach, we chose JNI programs as analysis
 %target, and implemented dataflow analysis as client-analysis using CodeQL[5], a
