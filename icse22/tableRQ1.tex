@@ -1,0 +1,25 @@
+\begin{table*}[t]
+  \vspace{2mm}
+  \caption{The analysis result of NativeFlowBench}
+  \label{table:RQ1}
+  \vspace*{-1em}
+  \centering
+  \small
+  \begin{tabular}{l|c|c|c|c||l|c|c|c|c}
+    \myhead{Benchmark}{Precision}{Dataflow}
+    %\myhead{Benchmark}{Lee~\cite{LeeASE20}}{Ours}{Benchmark}{JN-SAF}{Ours}
+    icc\_javatonative                   & X & X & O & X & native\_noleak                       & O & O & O & O  \\
+    icc\_nativetojava                   & O & O & O & X & native\_noleak\_array                & O & O & X & O  \\
+    native\_complexdata                 & O & O & O & O & native\_nosource                     & O & O & O & O  \\
+    native\_complexdata\_stringop       & X & X & X & X & native\_pure                         & X & O & O & O  \\
+    native\_dynamic\_register\_multiple & O & O & O & O & native\_pure\_direct                 & X & O & O & O  \\
+    native\_heap\_modify                & O & O & O & O & native\_pure\_direct\_customized     & X & O & O & O  \\
+    native\_leak                        & O & O & O & O & native\_set\_field\_from\_arg        & O & O & O & O  \\
+    native\_leak\_array                 & O & O & - & X & native\_set\_field\_from\_arg\_field & O & O & O & O  \\
+    native\_leak\_dynamic\_register     & O & O & O & O & native\_set\_field\_from\_native     & O & O & O & O  \\
+    native\_method\_overloading         & O & O & O & O & native\_source                       & O & O & O & O  \\
+    native\_multiple\_interactions      & O & O & O & O & native\_source\_clean                & O & O & O & O  \\
+    native\_multiple\_libraries         & O & O & O & O & \multicolumn{1}{c}{}                 & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{}
+  \end{tabular}
+\end{table*}
+
