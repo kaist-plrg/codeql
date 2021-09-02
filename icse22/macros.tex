@@ -177,4 +177,23 @@
 \newcommand{\x}{{\textsf{x}}}
 
 % Keywords
+\newcommand{\javacode}[1]{\text{\lstinline[style=commoncode,numbers=none]!#1!}}
+\newcommand{\ccode}[1]{\text{\lstinline[style=commoncode,numbers=none]!#1!}}
 \newcommand{\datalog}[1]{\text{\lstinline[style=myDatalog,numbers=none]!#1!}}
+\newcommand{\codeql}[1]{\text{\lstinline[style=commoncode,numbers=none]!#1!}}
+
+% Table 1
+\newcommand{\myhead}[3]{
+  \multicolumn{1}{c|}{\multirow{2}{*}{\textbf{#1}}} &
+  \multicolumn{2}{c|}{\textbf{#2}} &
+  \multicolumn{2}{c||}{\textbf{#3}} &
+  \multicolumn{1}{c|}{\multirow{2}{*}{\textbf{#1}}} &
+  \multicolumn{2}{c|}{\textbf{#2}} &
+  \multicolumn{2}{c}{\textbf{#3}}
+  %\\\cline{2-5}\cline{7-10}
+  \\\hhline{~|----||~|----}
+  & \textbf{Lee~\cite{LeeASE20}} & \textbf{Ours}
+  & \textbf{JN-SAF} & \textbf{Ours} &
+  & \textbf{Lee~\cite{LeeASE20}} & \textbf{Ours}
+  & \textbf{JN-SAF} & \textbf{Ours}\\\hhline{=====||=====}
+}

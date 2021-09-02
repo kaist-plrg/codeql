@@ -138,8 +138,8 @@ consider the control flow.  One way to implement it would be to bring the
 concept of guard. We can define the data-fact \datalog{guard(node, cond)} which
 annotating the node is contained in the block defined by given if statement
 whose condition is \datalog{cond}.  For example, in the first program, the
-\datalog{ptr} node would be guarded with the condition, "param != null", and
-this is expressed by the data-fact guard(ptr, "param != null").  Once the guard
+\datalog{ptr} node would be guarded with the condition, \ccode{param \!= NULL}, and
+this is expressed by the data-fact \datalog{guard(ptr, "param \!= NULL")}.  Once the guard
 is implemented, then all we have to do is to give additional condition to the
 data-fact \datalog{step}, so that \datalog{step(a,b)} does not hold if a or b
 is guarded by a proper guard, for example, it contains comparison with null.
