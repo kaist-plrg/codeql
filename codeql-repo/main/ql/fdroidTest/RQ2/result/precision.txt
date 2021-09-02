@@ -1,0 +1,168 @@
+../db-fdroid/com.android.keepass_198_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    8 |    8 |    8 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.woltage.irssiconnectbot_393_src/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    4 |    4 |    4 |    1 |    1 |    1 |      0 |      0 |      2 |
+../db-fdroid/org.navitproject.navit_2021030660_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   44 |   44 |   44 |   16 |   22 |   55 |      0 |      0 |      0 |
+../db-fdroid/com.viper.simplert_1_src.tar.gz/simple-rt-android/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    3 |    3 |    3 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/com.xperia64.timidityae_81_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   32 |   32 |   32 |   16 |   16 |   16 |      0 |      0 |      0 |
+../db-fdroid/android.game.prboom_31_src/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   72 |   72 |   72 |    7 |    7 |   15 |      0 |      0 |      0 |
+../db-fdroid/info.guardianproject.pixelknot_101_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   30 |   30 |   30 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/nya.miku.wishmaster_54_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   20 |   20 |   20 |    1 |    2 |    4 |      0 |      0 |      1 |
+../db-fdroid/org.tof_17_src/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   11 |   11 |   11 |    0 |    0 |    0 |      2 |      2 |      2 |
+../db-fdroid/org.tuxpaint_9250_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   83 |   83 |   83 |   80 |   83 |   89 |      4 |      4 |      6 |
+../db-fdroid/org.pocketworkstation.pckeyboard_1041001_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    7 |    7 |    7 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/marto.rtl_tcp_andro_24_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    4 |    4 |    4 |    2 |    2 |    2 |      0 |      0 |      0 |
+../db-fdroid/bus.chio.wishmaster_1002_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   20 |   20 |   20 |    1 |    2 |    4 |      0 |      0 |      1 |
+../db-fdroid/org.jfedor.frozenbubble_54_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   26 |   26 |   26 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/fm.a2d.sf_111_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    1 |    1 |    1 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.cipherdyne.fwknop2_32_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    1 |    1 |    1 |    0 |    0 |    0 |      0 |     13 |     13 |
+../db-fdroid/org.tilelessmap.app_4_src.tar.gz/Android/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   44 |   44 |   44 |   50 |   58 |   59 |      3 |      4 |      5 |
+../db-fdroid/cz.hejl.chesswalk_9_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    1 |    1 |    1 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.lumicall.android_190_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   50 |   50 |   53 |    4 |    4 |    4 |      2 |      2 |     13 |
+../db-fdroid/org.xapek.andiodine_6_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   13 |   13 |   13 |    1 |    1 |    1 |      0 |      0 |      0 |
+../db-fdroid/net.tjado.passwdsafe_400_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    1 |    1 |    1 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.sipdroid.sipua_115_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   50 |   50 |   54 |    2 |    2 |    2 |      2 |      2 |     16 |
+../db-fdroid/com.ruesga.android.wallpapers.photophase_1036_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    1 |    1 |    1 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.sufficientlysecure.viewer_2827_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   59 |   59 |   59 |    6 |    6 |    6 |     23 |     23 |     24 |
+../db-fdroid/eu.faircode.netguard_2021032201_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   17 |   17 |   17 |    0 |    9 |    9 |      3 |     27 |     27 |
+../db-fdroid/com.shurik.droidzebra_17_src.tar.gz/project/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   26 |   26 |   26 |    4 |    5 |    5 |      0 |      0 |      0 |
+../db-fdroid/us.achromaticmetaphor.agram_21_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   13 |   13 |   13 |    0 |    0 |    2 |      4 |      4 |      4 |
+../db-fdroid/org.kde.necessitas.ministro_14_src.tar.gz/Ministro/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   12 |   12 |   12 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.witness.sscphase1_4011_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    0 |    0 |    2 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.emunix.unipatcher_170200_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    1 |    1 |    1 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/com.termux_112_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    5 |    5 |    5 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/com.morlunk.mumbleclient_73_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   83 |   83 |   83 |    0 |    0 |    0 |    610 |    610 |    610 |
+../db-fdroid/org.geometerplus.zlibrary.ui.android_2050920_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   16 |   16 |   16 |    0 |    0 |    0 |      0 |      0 |      1 |
+../db-fdroid/org.wikimedia.commons.wikimedia_1_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    4 |    4 |    4 |    4 |    5 |    5 |      0 |      0 |      0 |
+../db-fdroid/com.dozingcatsoftware.asciicam_16_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    3 |    3 |    3 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.dyndns.fules.ck_20_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    4 |    4 |    4 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.eehouse.android.xw4_172_src.tar.gz/xwords4/android/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|  143 |  143 |  143 |   68 |   68 |   70 |      9 |     10 |     14 |
+../db-fdroid/cx.hell.android.pdfview_40000_src/pdfview/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    9 |    9 |    9 |    4 |    4 |    4 |     15 |     15 |     16 |
+../db-fdroid/com.Bisha.TI89EmuDonation_1133_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|   37 |   37 |   37 |    1 |    1 |    1 |      0 |      0 |      0 |
+../db-fdroid/com.kunzisoft.keepass.libre_73_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    6 |    6 |    6 |    0 |    0 |    0 |      0 |      0 |      0 |
+../db-fdroid/org.andglkmod.hunkypunk_7_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    9 |    9 |    9 |   50 |   50 |   52 |     10 |     10 |     10 |
+../db-fdroid/com.poinsart.votar_9_src.tar.gz/db-merged
+| j2c1 | j2c2 | j2c3 | c2j1 | c2j2 | c2j3 | field1 | field2 | field3 |
++------+------+------+------+------+------+--------+--------+--------+
+|    1 |    1 |    1 |    1 |    1 |    2 |      3 |      3 |      3 |

@@ -1,0 +1,135 @@
+../db-fdroid/com.android.keepass_198_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.woltage.irssiconnectbot_393_src/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.navitproject.navit_2021030660_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.viper.simplert_1_src.tar.gz/simple-rt-android/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.xperia64.timidityae_81_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/android.game.prboom_31_src/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/info.guardianproject.pixelknot_101_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/nya.miku.wishmaster_54_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.tof_17_src/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.tuxpaint_9250_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.pocketworkstation.pckeyboard_1041001_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/marto.rtl_tcp_andro_24_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/bus.chio.wishmaster_1002_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.jfedor.frozenbubble_54_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/fm.a2d.sf_111_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.cipherdyne.fwknop2_32_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.tilelessmap.app_4_src.tar.gz/Android/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/cz.hejl.chesswalk_9_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.lumicall.android_190_src.tar.gz/db-merged
+|           call            |            col1            |
++---------------------------+----------------------------+
+| open(...)                 | SILK16:63[10-33]           |
+| open(...)                 | SILK24:64[10-33]           |
+| inheritedChannelImpl(...) | OSNetworkSystem:737[16-37] |
+../db-fdroid/org.xapek.andiodine_6_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/net.tjado.passwdsafe_400_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.sipdroid.sipua_115_src.tar.gz/db-merged
+|           call            |            col1            |
++---------------------------+----------------------------+
+| open(...)                 | SILK16:73[4-27]            |
+| open(...)                 | SILK24:73[4-27]            |
+| open(...)                 | SILK8:71[4-27]             |
+| inheritedChannelImpl(...) | OSNetworkSystem:737[16-37] |
+../db-fdroid/com.ruesga.android.wallpapers.photophase_1036_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.sufficientlysecure.viewer_2827_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/eu.faircode.netguard_2021032201_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.shurik.droidzebra_17_src.tar.gz/project/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/us.achromaticmetaphor.agram_21_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.kde.necessitas.ministro_14_src.tar.gz/Ministro/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.witness.sscphase1_4011_src.tar.gz/db-merged
+|        call        |          col1           |
++--------------------+-------------------------+
+| redactRegion(...)  | JpegRedaction:95[5-74]  |
+| redactRegions(...) | JpegRedaction:164[6-63] |
+../db-fdroid/org.emunix.unipatcher_170200_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.termux_112_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.morlunk.mumbleclient_73_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.geometerplus.zlibrary.ui.android_2050920_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.wikimedia.commons.wikimedia_1_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.dozingcatsoftware.asciicam_16_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.dyndns.fules.ck_20_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.eehouse.android.xw4_172_src.tar.gz/xwords4/android/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/cx.hell.android.pdfview_40000_src/pdfview/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.Bisha.TI89EmuDonation_1133_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.kunzisoft.keepass.libre_73_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/org.andglkmod.hunkypunk_7_src.tar.gz/db-merged
+| call | col1 |
++------+------+
+../db-fdroid/com.poinsart.votar_9_src.tar.gz/db-merged
+| call | col1 |
++------+------+
