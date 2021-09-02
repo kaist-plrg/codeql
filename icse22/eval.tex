@@ -9,70 +9,88 @@ RQ2) Performance: How is the speed and precision of implemented analyzer, compar
 
 RQ3) Usefulness: How practical is the implemented analyzer?
 
-To answer RQ1, we ran our implemented analyzer to NativeFlowBench, which is a
-small set of benchmarks manually crafted by authors of JN-SAF[2], with the
+To answer RQ1, we tested our implemented analyzer with NativeFlowBench, which
+is a small set of benchmarks manually crafted by authors of JN-SAF[2], with the
 purpose of testing dataflow analyzer for JNI programs. It consists of 23
-android applications featuring various interactions between C++ and Java, some
-of which contain a malicious code pattern that tries leak sensitive user data.
-To answer RQ2, we ran our analyzer to 42 real-world android applications
-collected from F-Droid[9], a repository for open-source android application. These
-42 apps are selected by searching for apps with JNI, and among them, selecting those
-that we could successfully compile. We compared our analyzer with
-state-of-the-art[3] JNI analyzer, and confirmed that our analyzer outperforms
-in terms of scalability and precision. To answer RQ3, we implemented various
-kinds of bug checkers, illustrated in previous researches[1][3], on top of our
-analyzer. We ran our bug checker on the 42 applications of F-Droid mentioned
-above, and discovered \inred{??} bugs, including \inred{??} newly found bugs.
+android applications featuring various interactions between C and Java, some of
+which contain a malicious code pattern that tries to leak sensitive user data.
+The analyzer should successfully recognize and report those patterns for each
+application, if any. The result showws that our approach is feasible enough,
+in that we could correctly draw call graph, find field access target, and
+find data leaks from the benchmarks.
 
+To answer RQ2, we applied our analyzer to 42 real-world android applications
+collected from F-Droid[9], a repository for open-source android application.
+These 42 apps are selected by first scannig the apps that feature JNI from the
+repository, and among them, selecting those that we could successfully compile.
+The line number of collected code ragnes from hundreds of lines, to hundreds of
+thousands of lines.  We compared our analyzer with Lee's state-of-the-art JNI
+analyzer[3], and confirmed that our analyzer outperforms in terms of
+scalability and precision.
+
+To answer RQ3, we implemented various kinds of bug checkers, introduced in
+previous researches[1][3], on top of our analyzer. We ran our bug checker on
+the 42 applications of F-Droid mentioned above, and detected 33 bugs,
+including \inred{25} newly found bugs.
 
 \subsection{RQ1: Feasibility}
 \input{tableRQ1}
-Table~\ref{table1:RQ1} shows the analysis result for 19 benchmarks in
-NativeFlowBench.  The "Benchmark" columns denote the benchmark names, and
-"ASE'20", "JN-SAF", "Ours" columns denote whether the analysis result for
-corresponding benchmark was correct(O), incorrect(X), or not available(-) in
-terms of two criteria for each of the implementation.  The left denotes
-precision result, where we call that the analysis result is successful if every
-function call target (call(j->c), call(c->j)) and field access target
-(field\_read(c->j), field\_write(c->j)) are precisely determined. The right
-denotes dataflow result, where it's considered correct if every data leak is
-reported correctly without false positives nor false negatives. 
 
-For the precision result, except for two benchmarks, our analyzer could
-correctly determine all targets for function calls and field access correctly.
-One of two exception benchmarks was \textit{icc\_java\_to\_native}, which
-reported two more suprious call edges for function call of android library
-function "getIntent" from C to Java. The other exception was
-\textit{native\_complexdata\_stringop}, where string manipulation functions
-such as strcpy or strcat from C++'s standard library were used to create the
-string value that indicates the target field's name, and since the inner-flow
-analysis could not properly handle these functions, analyzer could not
-correctly determine the field access target. Yet, the overall result is
-superior to the ASE'20, which could not precisely analyze the 4 additional
+Table~\ref{table:RQ1} shows the analysis result for 23 benchmarks in
+NativeFlowBench.  The "Benchmark" columns denote the benchmark names, and rest
+of columns denote whether the analysis result for corresponding benchmark is
+correct(O), incorrect(X), or not available(-) in terms of two criteria for each
+of the analyzers. For the "Precision" columns we call the analysis result is
+correct if every function call (call from Java to C, call from C to Java)
+target and field access (field read from C to Java, field write from C to Java)
+target is precisely determined. For "Dataflow" columns, it's considered correct
+if every data leak is reported correctly without false positives nor false
+negatives. 
+
+For precision, we compare our result with Lee's analyzer, since JN-SAF does not
+provide the function call / field access target information. Except for two
+benchmarks, our analyzer could correctly determine all targets for function
+calls and field access correctly.  One of two exception benchmarks was
+\textit{icc\_java\_to\_native}, which reported two more suprious call edges for
+a function call of android library function from C to Java. The other exception
+was \textit{native\_complexdata\_stringop}, where string manipulation functions
+such as strcpy or strcat from C standard library were used to create the string
+value that indicates the target field's name. Since the inner-flow analysis
+could not properly model these string manipulation functions, analyzer could
+not correctly determine the field access target. Still, the overall result is
+superior to the Lee's, which could not precisely analyze the 4 additional
 benchmarks.
 
-For the dataflow result, we compare the result with JN-SAF. There were 3 benchmarks
-that our analyzer failed to detect leak. Two of them are related to inter component
-communication(ICC), which is a android-specific feature and was out of scope for
-our implementation. The other one was related to array. The data is stored in
-array and read. Since our base analyzer could not model the data flow through
-array, this kind of leak was not detected.
+For the dataflow result, we compare the result with JN-SAF. There were 3
+benchmarks that our analyzer failed to detect the leak. Two of them are related
+to \textit{inter component communication}(ICC), which is a android-specific
+feature and was out of scope for our implementation. The other one involves
+dataflow via array. The data is stored in array and read. Since our base
+analyzer could not model the data flow through array, this kind of leak was not
+detected. Whether JN-SAF could detect the leak in this case is not available
+from the paper, but we believe the would be modeled in sound manner,
+considering their result for benchmark "native\_noleak\_array" showed false
+positive. 
 
-As a result, we could conclude that it is feasible to implement
-static analysis in declarative style, in that it shows competable
-analysis result for the given benchmark.
+As a result, we could conclude that it is feasible to implement static analysis
+in declarative style, in that it shows competable analysis result for the
+benchmark, NativeFlowBench.
 
 
 \subsection{RQ2: Performance}
 \input{tableRQ2}
-Table~\ref{fig:table2} shows the analysis result for F-Droid applications. We summarize
-result for 25 of 42 apps, which contains Java method or field access
-from C. \inred{The full list of data is available at ???}.
+
+Table~\ref{table:RQ2} shows the analysis result for F-Droid applications.
+Applications that do not have interaction form C to Java is ommitted from the
+table, and we summarize the result for 25 of 42 apps, which contains call to
+Java method or access to Java field access from C.\footnote{The full list of data
+is submitted to supplementary material.}
 
 The "time" column denotes the time for creating database and evaluating query.
-The average time for creating DB was ??? seconds, and average time for
-evaluating query was ???  seconds, making the average of total analysis time
-??? seconds. 
+The average time for creating DB was 103.8 seconds, and average time for
+evaluating query was 57.5 seconds, making the average of total analysis time
+161.3 seconds. The longest time it took to analyze was 726.5 seconds for
+analyzing \inred{??} lines of codes, which is about 12 minutes.
 
 \begin{figure}[t]
   \centering
@@ -84,12 +102,13 @@ evaluating query was ???  seconds, making the average of total analysis time
 \vspace*{-.5em}
 \end{figure}
 
-Among 25 apps, 13 of them were included in benchmark of ASE'20, and the
-evaluation time with their tool is available.  Figure~\ref{fig:graph} shows the speed per
-application, one by one.  The average speed up was x4. Note that time for
-creating DB is done by comping source code, which is excluded from the calculated
-time of ASE'20. This means that we also have to exclude the time for creating DB
-from our calculated time, which makes the practical speed up become x14.
+Among 25 apps, the 13 of them were included in benchmark of Lee's and the
+evaluation time with their tool is available.  Figure~\ref{fig:graph}
+demonstrates the speed comparison per application, one by one.  The average
+speed up was x4. Note that time for creating DB is done by comping source code,
+which is excluded from the calculated time of Lee's. This means that we also
+have to exclude the time for creating DB from our calculated time, which makes
+the practical speed up become x14.
 
 The "precision" columns denotes the precision of dispatching function call
 target, and field access target.  "Precise" means exactly one target was found,

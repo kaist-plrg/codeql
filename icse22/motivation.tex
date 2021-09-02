@@ -36,7 +36,7 @@ void f(Node* param) { //Language B
     \label{fig:exam1:langB}
   \end{subfigure}
   \vspace*{-.5em}
-  \caption{EXAMPLE 1}
+  \caption{Prgram 1}
   \label{fig:exam1}
 \end{figure}
 
@@ -53,7 +53,7 @@ void f(Node* param) { //Language B
   Node* ptr = param;
   Node* next;
   if(condition()) {
-    next = null;
+    next = NULL;
   } else {
     next = new Node;
   }
@@ -61,7 +61,7 @@ void f(Node* param) { //Language B
 }
   \end{lstlisting}
   \vspace*{-.5em}
-  \caption{EXAMPLE 2. Language B}
+  \caption{Program 2}
   \label{fig:exam2}
 \end{figure}
 
@@ -88,11 +88,11 @@ performed on these summaries. The problem is that since such existing analyzers
 are mostly general purpose, unnecessary calculations which are not needed for
 target-analysis would happen during genrerating the summaries, resultingin the
 performance overhead. For example, unlike the first program where calculating
-information about \textit{if} statement and generating summary regarding it
-would be required. calculating the information about \textit{if} in the second
+information about if-statement and generating summary regarding it
+would be required. calculating the information about if-statement in the second
 program is not necessary for detecting the dataflow from null to ptr, yet there
 is no easy way to "turn off" such heavy computation for this specific
-\textit{if} statement.
+if-statement.
 
 \subsection{Declarative style multilingual program analysis}
 
@@ -105,21 +105,23 @@ Let's see how a dataflow analysis can be implemented in declarative style.
 Let's define \datalog{node} to be the program entity that can hold the run-time
 value, such as variable, literal, or function parameter.  Ultimately, the
 result data-fact we want would be \datalog{flow(a,b)}, which will denote the
-fact that there is a data flow from node a to node b. The rule for this
-data-fact can be defined in terms of another data-fact named \datalog{step}:
+fact that there is a data flow from \datalog{node a} to \datalog{node b}. The
+rule for this data-fact can be defined in terms of another data-fact named
+\datalog{step}:
 
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 flow(a,b) :- step(a,b)
 flow(a,b) :- step(a,c), flow(c,b)
 \end{lstlisting}
 
-Simply put, this rule states that flow is defined as transitive closure of
-\datalog{step}.  Here, \datalog{step(a,b)} denotes the direct data flow from node a to
-node b. Again, the data-fact \datalog{step} can be calculated by rules using another
-data-facts, which will be eventually broken down to basic syntactic data-facts.
-Then, given the set of all syntactic data-facts, all the other possible
-data-facts, including \datalog{flow}, can be calculated. For example, for the second
-program, the following data-facts will be generated,
+Simply put, this rule states that \datalog{flow} is defined as transitive
+closure of \datalog{step}.  Here, \datalog{step(a,b)} denotes the direct data
+flow from \datalog{node a} to \datalog{node b}. Again, the data-fact
+\datalog{step} can be calculated by rules using another data-facts, which will
+be eventually broken down to basic syntactic data-facts.  Then, given the set
+of all syntactic data-facts, all the other possible data-facts, including
+\datalog{step} and \datalog{flow}, can be calculated. For example, for the
+second program, the following data-facts will be generated,
 
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 step(null, list) // A -> A
@@ -131,24 +133,25 @@ step(ptr, [dereference of ptr]) // B -> B
 then the declarative language engine can compute the result \datalog{flow(null,
 [dereference of ptr])}, and the analyzer concludes that there is a dereference
 of null. In process of deriving this conclusion, there was no need to consider
-the \textit{if} statement.
+the if-statement.
 
-This time, let's say we are analyzing the first program. It would require to
-consider the control flow.  One way to implement it would be to bring the
-concept of guard. We can define the data-fact \datalog{guard(node, cond)} which
-annotating the node is contained in the block defined by given if statement
-whose condition is \datalog{cond}.  For example, in the first program, the
-\datalog{ptr} node would be guarded with the condition, \ccode{param \!= NULL}, and
-this is expressed by the data-fact \datalog{guard(ptr, "param \!= NULL")}.  Once the guard
-is implemented, then all we have to do is to give additional condition to the
-data-fact \datalog{step}, so that \datalog{step(a,b)} does not hold if a or b
-is guarded by a proper guard, for example, it contains comparison with null.
+This time, let's say we are analyzing the first program, which requires
+considering the control flow.  One way to implement it would be to bring the
+concept of guard. We can define the data-fact \datalog{guard(node, cond)} to
+indicate that \datalog{node} is contained in the scope of if statement whose
+condition is \datalog{cond}.  For example, in the first program, the
+\datalog{ptr} node would be guarded with the condition, \ccode{param \!= NULL},
+and this is expressed by the data-fact \datalog{guard(ptr, "param \!= NULL")}.
+Once the guard is implemented, then all we have to do is to give additional
+condition to the data-fact \datalog{step}, so that \datalog{step(a,b)} does not
+hold if \datalog{a} or \datalog{b} is guarded by a proper guard, for example,
+it contains comparison with null.
 
 The important thing here is that, unlike previous approaches that considers
 every if-statement in order to generate the summary, it is not required to
 handle all the if-statements in our approach. We can selectively calculate the
-certain data-fact regarding certain control flow, only if we do require it for
-performing the target-analysis.
+certain data-facts regarding certain control flow, only the target-analysis
+does require information about it.
 
 In the following sections, we formalize the general approach for performing
 declarative style analysis in multilingual program (Section 3), show the
