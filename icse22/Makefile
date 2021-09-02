@@ -5,12 +5,12 @@ FILE = main
 all: main.pdf
 
 $(FILE).pdf:  $(FILE).tex *.tex $(PACKAGE).cls  ACM-Reference-Format.bst
-	pdflatex-dev $<
+	pdflatex $<
 	- bibtex $(basename $<)
-	pdflatex-dev $<
-	pdflatex-dev $<
+	pdflatex $<
+	pdflatex $<
 	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
-	  do pdflatex-dev $<; done
+	  do pdflatex $<; done
 
 .PRECIOUS:  $(PACKAGE).cfg $(PACKAGE).cls
 
