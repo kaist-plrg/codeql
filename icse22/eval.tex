@@ -35,7 +35,6 @@ including \inred{25} newly found bugs.
 
 \subsection{RQ1: Feasibility}
 \input{tableRQ1}
-
 Table~\ref{table:RQ1} shows the analysis result for 23 benchmarks in
 NativeFlowBench.  The "Benchmark" columns denote the benchmark names, and rest
 of columns denote whether the analysis result for corresponding benchmark is
@@ -79,7 +78,6 @@ benchmark, NativeFlowBench.
 
 \subsection{RQ2: Performance}
 \input{tableRQ2}
-
 Table~\ref{table:RQ2} shows the analysis result for F-Droid applications.
 Applications that do not have interaction form C to Java is ommitted from the
 table, and we summarize the result for 25 of 42 apps, which contains call to
@@ -132,17 +130,8 @@ compared to the stat-of-the-art analyzer, we conclude that our implementation
 has competitive performance.
 
 \subsection{RQ3: Usefulness}
-\begin{figure}[t]
-  \centering
-  \vspace{2mm}
-  \includegraphics[width=0.5\textwidth]{img/table3}
-  \vspace*{-1.5em}
-  \caption{The list of bugs and security vulnerabilities checkers}
-  \label{fig:table3}
-\vspace*{-.5em}
-\end{figure}
-
-Table~\ref{fig:table3} shows the list of bugs and security vulnerabilities we could detect.
+\input{tableRQ3}
+Table~\ref{table:RQ3} shows the list of bugs and security vulnerabilities we could detect.
 The first bug is the null dereference bug[1][9], which detects the dereference of
 Java's null value in C, without proper nullity checking logic. Rest of three
 bugs are related to mistake in using interaction, which are described in
