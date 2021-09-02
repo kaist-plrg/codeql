@@ -1,225 +1,105 @@
 \section{Introduction}
-Multilingual programs have been widely developed in various application
-domains. Multilingual programs are written in multiple different programming
-languages and the languages interoperate each other via a foriegn function
-interface (FFI).  Taking benefits of each programming language, developers
-often implement complex programs productively, improve performance of their
-programs, and reuse existing modules written in different programming
-languages. Kochhar et al. reported that about half of most popular open-source
-projects mainly written in one of popular programming languages are
-multilingual~\cite{kochhar2016large}.
-
-
-%There are many cases where a single language alone is not enough to meet the
-%requirement of large and comlplex programs nowadays, and using multiple
-%languages is one of the promising way to implement such programs. For this
-%reason, many languages support FFI(Foreign function interface), which enables a
-%program written in a language to call the function written in another language.
-%For example, (Write examples of FFI here)
+Multilingual programs written in multiple programming languages
+have been widely used in various application domains.
+Because different languages have different benefits,
+developers use multiple languages and the interoperations between them
+via their Foreign Function Interface (FFI). For example, using the Java Native Interface (JNI),
+JNI programs have high-level logic implemented in Java and performance-critical
+modules in C. By utilizing diverse languages, programmers can
+develop complex programs effectively, improve the performance of their
+programs, and reuse existing modules written in different programming languages.
+\citet{kochhar2016large} reported that about half of the most popular open-source
+projects mainly written in one of the popular programming languages are
+multilingual.
 
 However, multilingual programs are often vulnerable to bugs or security issues
-more than monolingual programs.  Language interoperation on the FFI is complex
-itself and has different semantics from the languages' semantics.  Programmer
-errors on the language interoperation frequently occur but are hard to get
-detected and fixed, because development tools such as IDEs and compilers cannot
-detect erroneous behaviors on the language interoperation.  Previous research
-conducted a large-scale study of multilingual programs' code quality, and
-showed that using multiple languages together correlates with higher
-error-proneness~\cite{kochhar2016large}.  Moreover, Grichi et.al.  reported
-that two or three times more bugs and security issues have been reported on the
-language interoperation than intraoperation in widely used open-source JNI
-programs, such as OpenJ9 and VLC, written in both Java and
-C~\cite{grichi2020impact}.
+more than monolingual programs. Since the language interoperation semantics
+via FFIs are often complex and different from the semantics of any
+single language, programmers can easily make errors by mistake.
+However, such errors are difficult to catch and fix because existing
+tools such as compilers, IDEs, and static analyzers cannot detect erroneous
+behaviors involving interoperation semantics.
+A large-scale study on the code quality of multilingual programs~\cite{kochhar2016large}
+reported that using multiple languages together correlates with higher error-proneness.  
+Moreover, \citet{grichi2020impact} showed that two or three times more
+bugs and security issues had been reported on the language
+interoperation than on the intraoperation in widely used open-source JNI
+programs such as OpenJ9 and VLC.
 
-%However, writing a relialbe multilingual program is not an easy task. The
-%programmer of multilingual programs should fully understand semantics of both
-%language, in addition to the inter-operation semantics between two languages in
-%order to write the correct code.  Such complex semantics make it much more
-%difficult to reson about the program, and programmers may leave some bugs that
-%can crash the program in runtime, or security vulnerabilities that attackers
-%can take advantage of.
-
-Static analysis is one of promising solutions to detect bugs and security
-vulnerabilities in monolingual programs, but analyzing multiple different
-language semantics together is challenging in multilingual programs.
-Researchers have proposed to leverage existing general purpose static analyzers
-for monolingual programs~\cite{JN-SAF, LeeASE20}. They first analyze each part
-written in a single language using its corresponding analyzer to generate its
-summary as an abstraction of behaviors of the part. Then, they perform a target
-analysis to detect bugs and secrutiy vulnerabilities cross language boundaries
-using the generated summaries. While the approaches can analyze different
+For multilingual program analysis, researchers have proposed to
+leverage existing general-purpose static analyzers for monolingual
+programs~\cite{JN-SAF, LeeASE20}.  They first analyze each module
+written in a single programming language using its corresponding analyzer to generate
+a summary of the module as an abstraction of its behaviors.  Then, they perform a target
+analysis to detect bugs and security vulnerabilities cross language boundaries
+using the generated summaries.  While this approach can analyze different
 semantics of different languages and detect bugs and security vulnerabilities
-in multilingual programs, they often suffer from performance overhead. Because
-they leverage the full features of expensive general purpose static analyzers,
+in multilingual programs, they often suffer from performance overhead.
+Because they leverage the full features of expensive general-purpose static analyzers,
 they may waste their analysis time on the features that may not be relevant to
 summary generation for the target analysis.
 
-
-%Performing static analysis on multilingual programs can help developers to
-%write more reliable code. (Write importance of static analysis here.)
-%
-%For this reason, previous researchers have tried to implement the analyzer for
-%multilingual analysis with various approaches.  One approach[1][2] is
-%translation-based approach, where one language is translated or compiled into
-%another language and analysis on translated language is performed with existing
-%analyzer.  This approach has a virtue in that existing analyzers for tranalated
-%language can be reused with almost no modification.  However, since translating
-%one language into another one while preserving every semantics is a challenging
-%task, the translation is usually performed in abstract manner to approximate
-%the effect of original code might have, and translated code is composed of the
-%subset of the target langague. Another approach[3] is combination-based
-%approach, which is to modify and combine existing analyzers of each language,
-%so that two analyzers give the analysis result in unified output format, and
-%the analysis is performed with respect to this output format.
-
-%A common, inevitable pattern of implementing analyzer for multilingual program
-%is that, due to the nature of multilingual programs being composed of multiple
-%language, the analyzer itself also consists of multiple components. The problem
-%of the previous approaches is that each of the component treats other
-%components as blackbox. The detailed implementation of a component is not
-%visible to another component, and the only way one component can interact with
-%each other is through a fixed form of API. For example, in translation-based
-%approach, the translator and the client-analyzer can only communicate through a
-%syntax of target language, and in combination-based approach, two analyzers
-%communicate via unified output format. This makes the implementation
-%restrictive and inflexible. Modifying one component requires that it still
-%meets the API requirement after the modification. Otherwise, modification to
-%multiple components should be made simultaneously, which can be imposes extra
-%burden on analyzer developers, especially if each component is very different
-%from each other. For example, we can consider a situation where one wants to
-%extend the client-analysis so that it performs more accurate analysis. If the
-%current API does not contain enough information, then it might be impossible to
-%implement such a extended anlysis that the developer is thinking of. Then it is
-%required that API is extended and the other components pass such information
-%via API, which requries more work for the developer.
-
-%In this paper, we suggest a novel methodology for implementing static analysis
-%of multilingual program, which is using declarative language.  In declarative
-%language, everything is expressed as in terms of "data-fact" and "rule".
-%"Data-fact" is simply an ordered tuples of elements, and "rule" is a way to
-%define how one data-fact can be derived from other data-facts. Evaluating
-%declarative program is defined as finding all possible data-facts that can be
-%derived by given basic data-facts and rules.  Adopting this approach, we can
-%perform static analysis on multilingual programs in following sense.  The first
-%step is to converted each language into a set of syntactic data-facts.
-%Programmers can define the intra-language rules that would generate new
-%data-facts based on already known data-facts. New data-facts generated in this
-%way would tend to contain more higer-level information, considering the
-%semantics of each languge. Finally, programmer can implement the static
-%analysis by defining the inter-language rules considering the inter-operation
-%semantcis between two languages, and evaluating these new rules along with
-%intra-language rules would give the final analysis result in form of a set of
-%data-facts.
-
 In this paper, we propose a novel approach that statically analyzes
-multilingual programs using a declarative-style analysis for the first time.
-Declarative-style analysis consists of \textit{data-facts} and \textit{rules}.
-A data-fact is simply an ordered tuples of elements, which indicates the
-information that corresponding elements are in certain relation. A Rule defines
-how one data-fact can be derived from other data-facts. Evaluating declarative
-program is performed by finding possible data-facts that can be derived by
-given data-facts and rules.  Adopting this approach, we can perform static
-analysis on multilingual programs in following sense.  The first step is to
-convert each language into a set of syntactic data-facts.  Then, Programmers
-can define the intra-language rules that would generate new data-facts based on
-already known data-facts. Finally, programmer can implement the static analysis
-by defining the inter-language rules considering the inter-operation semantcis
-between two languages. Evaluating these new rules along with intra-language
-rules would give the final analysis result in form of a set of data-facts.
-The biggest advantage of using declarative-stlye analysis is that it uses
-query-based analysis, which means that the target-analysis is written in
-special rules called queries, and only datafacts that is required to evaluate
-the query is calculated. Unlike the previous approaches where general purpose
-analyzers are used to generate the summaires and unnecessary computation might
-be performed during this process, our approach does not need to spend time
-on generating unnecessary sumamry or calculating the unrelated data-facts.
+multilingual programs using a declarative-style analysis~\cite{doop} for the first time.
+A declarative-style analysis has been broadly used for monolingual programs,
+and it consists of \textit{datafacts} and \textit{rules}.
+A datafact is simply an ordered tuple of elements, which indicates the
+information that the elements in the tuple have a certain relation.
+A Rule defines how to derive a datafact from other datafacts.
+A declarative-style analysis finds all the possible datafacts that can
+be derived from given datafacts and rules.
+Adopting this approach, we can statically analyze multilingual programs as follows.
+The first step is to extract syntactic datafacts from the modules written in each language.
+Then, the next step is to define intraoperation rules that
+generate new datafacts using existing datafacts.
+The final step is to implement a multilingual static analysis by defining
+inter-language rules considering the interoperation semantics between different languages. 
+Applying all the rules, including both intraoperation
+and interoperation rules, produces the final analysis results in
+the form of a set of datafacts.  The biggest advantage of a declarative-style analysis is its
+\textit{query-based} analysis; a target analysis is specified in
+special rules called queries. Only such datafacts that are
+necessary to evaluate the query are computed.
+Unlike the previous approaches where general-purpose static
+analyzers generate all possible summaries, which may lead to
+unnecessary computations, our approach does not spend time
+on generating unnecessary summaries or computing irrelevant datafacts.
 
-%In declarative
-%language, everything is expressed as in terms of "data-fact" and "rule".
-%"Data-fact" is simply an ordered tuples of elements, and "rule" is a way to
-%define how one data-fact can be derived from other data-facts. Evaluating
-%declarative program is defined as finding all possible data-facts that can be
-%derived by given basic data-facts and rules.  Adopting this approach, we can
-%perform static analysis on multilingual programs in following sense.  The first
-%step is to converted each language into a set of syntactic data-facts.
-%Programmers can define the intra-language rules that would generate new
-%data-facts based on already known data-facts. New data-facts generated in this
-%way would tend to contain more higer-level information, considering the
-%semantics of each languge. Finally, programmer can implement the static
-%analysis by defining the inter-language rules considering the inter-operation
-%semantcis between two languages, and evaluating these new rules along with
-%intra-language rules would give the final analysis result in form of a set of
-%data-facts.
-
-
-%On top of the know advantages of enabling fast, modular and scalable
-%implementation[4], using declarative language can also be helpful to alleviate
-%the problems of multilingual analysis mentioned above. The main reason is that
-%in declarative style, any rule can easily utilze the data-facts generated by
-%any component, that is, no fixed API is needed between two components.  This
-%feature lessens the burden of modifying or extending the existing analyzer.
-%The additionaly required task is boiled down to defining some more rules and
-%data-facts for different components, which does not impose significant overhead
-%than implementing the analyzer itself.
 
 To show the usefulness of our approach, we implement a proof-of-concept static
-analyzer for JNI programs written in both Java and C. JNI programs have been
-actively developed for both desktop and mobile applications, but they often
-contain diverse bad smells in code, which may introduce bugs and security
-issues~\cite{nishiwaki2012sean, grichi2019state, abidi2019behind,
-abidi2021multi}. We implement our analyzer on top of CodeQL~\cite{codeql}, a
-static analysis engine powered by a declarative language named QL.  It
-abstracts away the need of managing underlying data structure or implementing
-the efficient algorithm for evaluating the query, thus enabling simple and fast
-query writing. We tested our analyzer with real-world android JNI applications
-to see whether the performance of our analyzer is comparable with existing works.
-Surprisingly, our experiment result show that our analyzer outperforms the
-state of the art JNI analyzer in terms of scalability in that our analyzer
-shows x14 speed up on average, while shoinwg no analysis precision degrade. In
-addition,  we could easily emulate the various kinds of bug detectors
-illustrated in previous researches on top of our analyzer, thanks to the
-power of the CodeQL. Using these bug checkers, we could find 25 new bugs and
-vulnerabilites from the real world applications.
-
-%the practicality of our approach, we chose JNI programs as analysis
-%target, and implemented dataflow analysis as client-analysis using CodeQL[5], a
-%static analysis where implementation can be written in declarative style. We
-%applied our analyzer to real-world android JNI applications retrieved from
-%F-droid[6], a repository for open-source android applications to see whether
-%performance of this implementation is competable with existing works.
-%Surprisingly, our experiment result show that our implementation outperforms
-%the state of the art JNI analyzer in terms of speed and analyzer our
-%implementation shows x14 speed up on average, and shoinwg the slightly better
-%precision. In addition, we could emulate the various kinds of bug detectors
-%mentioned in previous researches on top of our analyzer in declarative style
-%with relative ease, and could find the genuine bugs and vulnerabilites from the
-%benchmark.
-
-%The contribution of this paper is as follows:
-%
-%+ We suggested a new methodology of using declarative style static analysis
-%for multilingual program, which is more flexible and extensible.
-%
-%+ We implemented JNI dataflow analyzer with CodeQL based on declarative-style approach,
-%which outperforms state-of-art analyzers in terms of scalability and precision.
-%
-%+ We could find new bugs and vulnerabilities from the real-world JNI applications
-%by easily implementing the bug detectors from the previous researches.
+analyzer for JNI programs written in both Java and C.
+JNI programs have been actively developed for both desktop and mobile
+applications. Still, they often contain diverse bad smells in code,
+which may introduce bugs and security
+issues~\cite{nishiwaki2012sean, grichi2019state, abidi2019behind, abidi2021multi}.
+We implement our analyzer on top of CodeQL~\cite{codeql}, a
+static analysis engine powered by a declarative language named QL.
+It abstracts away the need to manage underlying data structures or implementing
+efficient algorithms for evaluating queries, thus enabling simple and fast query writing.
+We evaluated the analyzer using real-world Android JNI applications
+to see whether its performance is comparable to that of the existing work.
+Our experiment results show that our analyzer outperforms the
+state-of-the-art JNI analyzer, \jnsaf, in terms of scalability in that our analyzer
+shows \inred{x14} speed up on average without analysis precision degradation.
+In addition,  we could easily develop various kinds of bug detectors
+reported in the literature on top of our analyzer, thanks to the power of CodeQL.
+Using these bug detectors, we found 25 new bugs and
+vulnerabilties from real-world applications.
 
 The contributions of this paper include the following:
-
 \begin{itemize}
   \item We propose a simple and effective declarative-style static analysis for
     multilingual programs for the first time. Our approach analyzes dataflows
-    over language boundaries seamlessly without complex and expensive summary
-    generation.
+    over language boundaries seamlessly without complex, expensive,
+    and unnecessary summary generation.
 
-\item We implement a declarative-style JNI program analyzer on top of CodeQL.
+\item We implement a prototype declarative-style JNI program analyzer on top of CodeQL.
   The design of our analyzer enables us to easily implement various bug
-    checkers for JNI programs using the powerful query language of CodeQL. 
+    detectors for JNI programs using the powerful query language
+    features of CodeQL. 
 
-\item We show practical usefulness of the JNI program analyzer for real-world
-  JNI programs. Our tool detected the same types of bugs and security
-    vulnerabilities with higher precision 14x faster on average than the
-    state-of-the-art JNI program analyzers.
+\item We show the practical usefulness of the JNI program analyzer for real-world
+  JNI programs. Our tool detected the same kinds of bugs and security
+    vulnerabilities as the state-of-the-art JNI program analyzer, \jnsaf.
+Our tool is more precise and 14x faster on average than \jnsaf.
 \end{itemize}
