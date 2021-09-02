@@ -1,12 +1,12 @@
 \section{Motivation}
 
 In this section, we visualize the problems of previous approaches for
-multilingual program analysis with concrete examples, and show how declrative
+multilingual program analysis with concrete examples, and show how declarative
 style implementation can be helpful for those problems.
 
 \subsection{Example target multilingual program}
 
-Let's consier two multilingual programs, written in (Java-like) language A
+Let's consider two multilingual programs, written in (Java-like) language A
 and (C-like) language B.
 \begin{figure}[t]
   \centering
@@ -43,7 +43,7 @@ Figure \ref{fig:exam1}.
 
 In the first program, value null from language A is passed to the parameter of
 function language B via calling it. Then, in language B, it is checked whether
-the paratmeter has null value or not, and only when it is not null, the
+the parameter has null value or not, and only when it is not null, the
 parameter is safely dereferenced.
 
 \begin{figure}[t]
@@ -68,7 +68,7 @@ void f(Node* param) { //Language B
 Figure \ref{fig:exam2}.
 
 In the second program, the code for language A is same as before. The
-difference is in code for language B. This time, the code does not check wheter
+difference is in code for language B. This time, the code does not check whether
 or not the parameter is null. Instead, there is another if-statement, which is
 not directly related parameter, but affects value of another variable.
 
@@ -83,13 +83,13 @@ considered. On the other hand, in second program, since we do not check the
 value of parameter, it should be reported that null dereference error might
 happen.
 
-In previous approaches[2][3], existing analyzers are utilzed to generate
+In previous approaches[2][3], existing analyzers are utilized to generate
 summaries. Then the actual target-analysis, the dataflow analysis, is performed
-on these sumamries. The problem is that since such existing analyzers are
+on these summaries. The problem is that since such existing analyzers are
 mostly general purpose, unnecessary calculations which are not needed for
 target-analysis would happen, resulting in the overhead. For example,
-calulating information about \textit{if} statement in the first program, and
-generating summary regarding it, would be required. However, calcuating the
+calculating information about \textit{if} statement in the first program, and
+generating summary regarding it, would be required. However, calculating the
 information about \textit{if} in the second program is not necessary for
 calculating the dataflow from null to ptr, yet there is no easy way to "turn
 off" such heavy computation for this specific \textit{if} statement.
@@ -101,7 +101,7 @@ The main reason is in its query-based analysis: the target-analysis is
 written in terms of \textit{query}, and only related data-facts and rules
 are used for evaluating the query, reducing the amount of computation.
 
-Let's see how a dataflow analysis can be implemented in declrative style.
+Let's see how a dataflow analysis can be implemented in declarative style.
 Let's define \datalog{node} to be the program entity that can hold the run-time
 value, such as variable, literal, or function parameter.  Ultimately, the
 result data-fact we want would be \datalog{flow(a,b)}, which will denote the
@@ -117,7 +117,7 @@ Simply put, this rule states that flow is defined as transitive closure of
 step.  Here, \datalog{step(a,b)} denotes the direct data flow from node a to
 node b. Again, the data-fact step can be calculated by rules using another
 data-facts, which will be eventually broken down to basic syntactic data-facts.
-Then, given the set of all syntatctic data-facts, all the other possible
+Then, given the set of all syntactic data-facts, all the other possible
 data-facts, including \datalog{flow}, can be calculated. For example, for the second
 program, the following data-facts will be generated,
 
@@ -136,22 +136,22 @@ the \textit{if} statement.
 This time, let's say we are analyzing the first program. It would require to
 consider the control flow.  One way to implement it would be to bring the
 concept of guard. We can define the data-fact \datalog{guard(node, cond)} which
-annotating the node is contained in the block defiend by given if statement
+annotating the node is contained in the block defined by given if statement
 whose condition is \datalog{cond}.  For example, in the first program, the
 \datalog{ptr} node would be guarded with the condition, "param != null", and
 this is expressed by the data-fact guard(ptr, "param != null").  Once the guard
-is implemented, then all we have to do is to ginve additional condition to the
+is implemented, then all we have to do is to give additional condition to the
 data-fact \datalog{step}, so that \datalog{step(a,b)} does not hold if a or b
 is guarded by a proper guard, for example, it contains comparison with null.
 
 The important thing here is that, unlike previous approaches that considers
-every if-statement in order to generte the sumamry, such process is not
+every if-statement in order to generate the summary, such process is not
 required in our approach. We can selectively calculate the certain data-fact
 regarding control flow, only if we do require it for performing the
 target-analysis.
 
 In the following sections, we formalize the general approach for performing
-declartive style analysis in multilingual program (Section 3), show the
-specific implementation of this appraoch for JNI programs as form of dataflow
+declarative style analysis in multilingual program (Section 3), show the
+specific implementation of this approach for JNI programs as form of dataflow
 analysis, implemented with CodeQL(Section 4) and show the evaluation result of
 this implementation (Section 5).

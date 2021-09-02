@@ -1,6 +1,6 @@
 \section{Related Work}
 \paragraph{Analysis of Java and C for JNI}
-Among various language representataions of JNI programs, we describe studies
+Among various language representations of JNI programs, we describe studies
 dealing with pairs of languages.
 For JNI programs consisting of Java and C source codes, ILEA~\cite{ILEA} extends
 the Java Virtual Machine Language (JVML) and Jlint\footnote{\url{http://artho.com/jlint/manual.html}}, which is a JVML dataflow
@@ -22,17 +22,17 @@ Fourtounis et al.~\cite{scanning} proposed a lightweight reverse engineering
 technique to recover Java method calls in binary codes instead of performing
 heavy analyses on binary code.  Their reverse engineering generates the data
 facts of the Java calls with declarative style analyses for Java.
-Their technique is lightweight yet targeting on Java method signitures,
-in contrast, our apporach targets on two general declarative style analyses for
+Their technique is lightweight yet targeting on Java method signatures,
+in contrast, our approach targets on two general declarative style analyses for
 each language and their interoperations seamlessly.
 JN-SAF~\cite{JN-SAF} defines a unified summary in order to handle Java bytecode
 and binary at once.  It extracts the summaries for each method with a Java
 bytecode dataflow analyzer and a binary symbolic execution and composes the
 summaries in a bottom-up manner to detect security vulnerabilities.
-It sacrifies propagating dataflow facts until a fixed point by breaking a cycle
+It sacrifices propagating dataflow facts until a fixed point by breaking a cycle
 in the call graph arbitrarily to mitigate expensive computations from the
 dataflow analysis and symbolic execution.  Our approach is scalable
-for the JNI dataflow analysis even without sacrificing fixed point compuations
+for the JNI dataflow analysis even without sacrificing fixed point computations
 when C source code is available.
 
 \paragraph{Analysis for the other FFIs}

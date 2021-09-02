@@ -103,8 +103,8 @@ Among 25 apps, 13 of them were included in benchmark of ASE'20, and the
 evaluation time with their tool is available.  Figure~\ref{fig:graph} shows the speed per
 application, one by one.  The average speed up was x4. Note that time for
 creating DB is done by comping source code, which is excluded from the calculated
-time of ASE'20. This means that we also have to exxclude the time for creating DB
-from our calculated time, shich makes the practical speed up become x14.
+time of ASE'20. This means that we also have to exclude the time for creating DB
+from our calculated time, which makes the practical speed up become x14.
 
 The "precision" columns denotes the precision of dispatching function call
 target, and field access target.  "Precise" means exactly one target was found,
@@ -139,7 +139,7 @@ has competitive performance.
 \end{figure}
 
 Table~\ref{fig:table3} shows the list of bugs and security vulnerabilities we could detect.
-The first bug is the null dereference bug[1][9], which detects the derefence of
+The first bug is the null dereference bug[1][9], which detects the dereference of
 Java's null value in C, without proper nullity checking logic. Rest of three
 bugs are related to mistake in using interaction, which are described in
 previous research[2]. "Missing fun" denotes the case where C function is
@@ -188,7 +188,7 @@ public class JpegRedaction {
 
 //JpegRedaction.cpp
 void
-Java_org_witness_securesmartcam_jpegredaction_JpegRedaction_redactRegions(...) {
+Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) {
   ...
 }
     \end{lstlisting}
@@ -212,17 +212,16 @@ jobjectArray Java_..._search(...){
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
     \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
-//Java
+//PrBoomActivity.java
 void OnMessage(String text);
 void OnInfoMessage(String msg, int displayType);
-
 
 //jni_doom.h
 #define CB_CLASS_MSG_SIG  "(Ljava/lang/String;I)V"
 #define CB_CLASS_INFMSG_SIG  "(Ljava/lang/String;I)V"
 
 //jni_doom.c
-mSendStr = (*env)->GetMethodID(env, jNativesCls, CB_CLASS_MSG_CB, CB_CLASS_MSG_SIG);
+mSendStr = (*env)->GetMethodID(env, jNativesCls, "OnMessage", CB_CLASS_MSG_SIG);
 
     \end{lstlisting}
     \vspace*{-.5em}
@@ -262,7 +261,7 @@ or not. No false positives were found for latter three kinds of bugs.  There
 were some false positive for the first bug, the null dereference bug. The
 reason for these false positives were mainly due to, again, imprecise
 intra-language dataflow. For example, the analyzer could not handle the case
-where a variable is reassigned to a non-null value in a diffrent branch or a
+where a variable is reassigned to a non-null value in a different branch or a
 different function, resulting in giving the false positive that null value can
 be dereferenced.
 
