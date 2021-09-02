@@ -16,7 +16,7 @@
 ../db-fdroid/android.game.prboom_31_src/db-merged
 |         name         |                                                             loc                                                             | cnt2 |
 +----------------------+-----------------------------------------------------------------------------------------------------------------------------+------+
-| CallStaticVoidMethod | file:///home/f52985/codeql/codeql-repo/main/F-Droid/extracted/android.game.prboom_31_src/jni/prboom/jni_doom.c:279:6:282:19 |    1 |
+| CallStaticVoidMethod | file:///home/anonymous/codeql/codeql-repo/main/F-Droid/extracted/android.game.prboom_31_src/jni/prboom/jni_doom.c:279:6:282:19 |    1 |
 ../db-fdroid/info.guardianproject.pixelknot_101_src.tar.gz/db-merged
 | name | loc | cnt2 |
 +------+-----+------+
@@ -125,4 +125,4 @@
 ../db-fdroid/com.poinsart.votar_9_src.tar.gz/db-merged
 |      name      |                                                             loc                                                             | cnt2 |
 +----------------+-----------------------------------------------------------------------------------------------------------------------------+------+
-| CallVoidMethod | file:///home/f52985/codeql/codeql-repo/main/F-Droid/extracted/com.poinsart.votar_9_src.tar.gz/jni/android.cpp:108:13:108:26 |    1 |
+| CallVoidMethod | file:///home/anonymous/codeql/codeql-repo/main/F-Droid/extracted/com.poinsart.votar_9_src.tar.gz/jni/android.cpp:108:13:108:26 |    1 |
