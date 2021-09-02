@@ -2,7 +2,7 @@
 
 In this section, we visualize the problems of previous approaches for
 multilingual program analysis with concrete examples, and show how declarative
-style implementation can be helpful for those problems.
+style implementation can alleviate those problems.
 
 \subsection{Example target multilingual program}
 
@@ -39,12 +39,11 @@ void f(Node* param) { //Language B
   \caption{EXAMPLE 1}
   \label{fig:exam1}
 \end{figure}
-Figure \ref{fig:exam1}.
 
-In the first program, value null from language A is passed to the parameter of
-function language B via calling it. Then, in language B, it is checked whether
-the parameter has null value or not, and only when it is not null, the
-parameter is safely dereferenced.
+In the first program(Figure \ref{fig:exam1}), value null from language A is
+passed to the parameter of function language B via calling it. Then, in
+language B, it is checked whether the parameter has null value or not, and only
+when it is not null, the parameter is safely dereferenced.
 
 \begin{figure}[t]
   \centering
@@ -65,12 +64,12 @@ void f(Node* param) { //Language B
   \caption{EXAMPLE 2. Language B}
   \label{fig:exam2}
 \end{figure}
-Figure \ref{fig:exam2}.
 
-In the second program, the code for language A is same as before. The
-difference is in code for language B. This time, the code does not check whether
-or not the parameter is null. Instead, there is another if-statement, which is
-not directly related parameter, but affects value of another variable.
+In the second program(Figure \ref{fig:exam2}), the code for language A is same
+as before. The difference is in code for language B. This time, the code does
+not check whether or not the parameter is null. Instead, there is another
+if-statement, which is not directly related parameter, but affects value of
+  another variable.
 
 \subsection{Previous approaches for performing analysis on target program}
 
@@ -84,15 +83,16 @@ value of parameter, it should be reported that null dereference error might
 happen.
 
 In previous approaches[2][3], existing analyzers are utilized to generate
-summaries. Then the actual target-analysis, the dataflow analysis, is performed
-on these summaries. The problem is that since such existing analyzers are
-mostly general purpose, unnecessary calculations which are not needed for
-target-analysis would happen, resulting in the overhead. For example,
-calculating information about \textit{if} statement in the first program, and
-generating summary regarding it, would be required. However, calculating the
-information about \textit{if} in the second program is not necessary for
-calculating the dataflow from null to ptr, yet there is no easy way to "turn
-off" such heavy computation for this specific \textit{if} statement.
+\textit{summaries}. Then the actual target-analysis, the dataflow analysis, is
+performed on these summaries. The problem is that since such existing analyzers
+are mostly general purpose, unnecessary calculations which are not needed for
+target-analysis would happen during genrerating the summaries, resultingin the
+performance overhead. For example, unlike the first program where calculating
+information about \textit{if} statement and generating summary regarding it
+would be required. calculating the information about \textit{if} in the second
+program is not necessary for detecting the dataflow from null to ptr, yet there
+is no easy way to "turn off" such heavy computation for this specific
+\textit{if} statement.
 
 \subsection{Declarative style multilingual program analysis}
 
@@ -106,7 +106,7 @@ Let's define \datalog{node} to be the program entity that can hold the run-time
 value, such as variable, literal, or function parameter.  Ultimately, the
 result data-fact we want would be \datalog{flow(a,b)}, which will denote the
 fact that there is a data flow from node a to node b. The rule for this
-data-fact can be defined in terms of another data-fact named step:
+data-fact can be defined in terms of another data-fact named \datalog{step}:
 
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 flow(a,b) :- step(a,b)
@@ -114,8 +114,8 @@ flow(a,b) :- step(a,c), flow(c,b)
 \end{lstlisting}
 
 Simply put, this rule states that flow is defined as transitive closure of
-step.  Here, \datalog{step(a,b)} denotes the direct data flow from node a to
-node b. Again, the data-fact step can be calculated by rules using another
+\datalog{step}.  Here, \datalog{step(a,b)} denotes the direct data flow from node a to
+node b. Again, the data-fact \datalog{step} can be calculated by rules using another
 data-facts, which will be eventually broken down to basic syntactic data-facts.
 Then, given the set of all syntactic data-facts, all the other possible
 data-facts, including \datalog{flow}, can be calculated. For example, for the second
@@ -145,10 +145,10 @@ data-fact \datalog{step}, so that \datalog{step(a,b)} does not hold if a or b
 is guarded by a proper guard, for example, it contains comparison with null.
 
 The important thing here is that, unlike previous approaches that considers
-every if-statement in order to generate the summary, such process is not
-required in our approach. We can selectively calculate the certain data-fact
-regarding control flow, only if we do require it for performing the
-target-analysis.
+every if-statement in order to generate the summary, it is not required to
+handle all the if-statements in our approach. We can selectively calculate the
+certain data-fact regarding certain control flow, only if we do require it for
+performing the target-analysis.
 
 In the following sections, we formalize the general approach for performing
 declarative style analysis in multilingual program (Section 3), show the

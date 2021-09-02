@@ -36,26 +36,29 @@ above, and discovered \inred{??} bugs, including \inred{??} newly found bugs.
 \vspace*{-.5em}
 \end{figure*}
 
-Table~\ref{fig:table1} shows the analysis result for 19 benchmarks in NativeFlowBench.  The
-"Benchmark" columns denote the benchmark names, and "ASE'20", "JN-SAF", "Ours"
-columns denote whether the analysis result for corresponding benchmark was
-correct(O), incorrect(X), or not available(-) in terms of two criteria for each
-of the implementation.  The left denotes precision result, where we call that
-the analysis result is successful if every function call target (call(j->c),
-call(c->j)) and field access target (field\_read(c->j), field\_write(c->j)) are
-precisely determined. The right denotes dataflow result, where it's considered
-correct if every data leak is reported correctly without false positives nor
-false negatives. 
+Table~\ref{fig:table1} shows the analysis result for 19 benchmarks in
+NativeFlowBench.  The "Benchmark" columns denote the benchmark names, and
+"ASE'20", "JN-SAF", "Ours" columns denote whether the analysis result for
+corresponding benchmark was correct(O), incorrect(X), or not available(-) in
+terms of two criteria for each of the implementation.  The left denotes
+precision result, where we call that the analysis result is successful if every
+function call target (call(j->c), call(c->j)) and field access target
+(field\_read(c->j), field\_write(c->j)) are precisely determined. The right
+denotes dataflow result, where it's considered correct if every data leak is
+reported correctly without false positives nor false negatives. 
 
-For the precision result, except for one benchmark, our analyzer could
-correctly determine all targets for function calls and field access correctly,
-and could successfully perform dataflow analysis to find all of the data leaks.
-The only exception was native\_complexdata\_stringop, where string manipulation
-functions such as strcpy or strcat from C++'s standard library were used to
-create the string value that indicates the target method's name, and since the
-inner-flow analysis could not properly handle these functions, analyzer could
-not correctly determine the function call target. This is superior result to
-the ASE'20, which could not precisely analyze the 4 additional benchmarks.
+For the precision result, except for two benchmarks, our analyzer could
+correctly determine all targets for function calls and field access correctly.
+One of two exception benchmarks was \textit{icc\_java\_to\_native}, which
+reported two more suprious call edges for function call of android library
+function "getIntent" from C to Java. The other exception was
+\textit{native\_complexdata\_stringop}, where string manipulation functions
+such as strcpy or strcat from C++'s standard library were used to create the
+string value that indicates the target field's name, and since the inner-flow
+analysis could not properly handle these functions, analyzer could not
+correctly determine the field access target. Yet, the overall result is
+superior to the ASE'20, which could not precisely analyze the 4 additional
+benchmarks.
 
 For the dataflow result, we compare the result with JN-SAF. There were 3 benchmarks
 that our analyzer failed to detect leak. Two of them are related to inter component
