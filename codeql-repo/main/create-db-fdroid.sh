@@ -13,8 +13,6 @@ done < F-Droid/resource/manual-success.txt
 
 rm -rf time.txt
 
-lines=( "extracted/org.andglkmod.hunkypunk_7_src.tar.gz/ ; ./gradlew --no-daemon clean ; cd-ndk-build.sh app/src/main ; ./gradlew --no-daemon compileDebugSources" )
-
 for line in "${lines[@]}"; do
   d=F-Droid/`echo $line | cut -d ";" -f 1`
   clean=`echo $line | cut -d ";" -f 2`
