@@ -1,0 +1,91 @@
+../db-native/icc_javatonative
+| src | col1 | call | col3 |
++-----+------+------+------+
+../db-native/icc_nativetojava
+| src | col1 | call | col3 |
++-----+------+------+------+
+../db-native/native_complexdata
+|       src        |          col1          |            call             |                                                            col3                                                            |
++------------------+------------------------+-----------------------------+----------------------------------------------------------------------------------------------------------------------------+
+| getDeviceId(...) | MainActivity:42[23-39] | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_complexdata/src/main/jni/data.cpp:31:16:31:32 |
+../db-native/native_complexdata_stringop
+| src | col1 | call | col3 |
++-----+------+------+------+
+../db-native/native_dynamic_register_multiple
+|       src        |          col1          |            call             |                                                                             col3                                                                              |
++------------------+------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| getDeviceId(...) | MainActivity:47[23-39] | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_dynamic_register_multiple/src/main/jni/dynamic_register_multiple.cpp:31:22:31:38 |
+../db-native/native_heap_modify
+|           src            |                                                               col1                                                                |  call  |          col3          |
++--------------------------+-----------------------------------------------------------------------------------------------------------------------------------+--------+------------------------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_heap_modify/src/main/jni/heap_modify.cpp:24:35:24:50 | i(...) | MainActivity:40[22-29] |
+../db-native/native_leak
+|       src        |          col1          |            call             |                                                        col3                                                         |
++------------------+------------------------+-----------------------------+---------------------------------------------------------------------------------------------------------------------+
+| getDeviceId(...) | MainActivity:42[23-39] | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_leak/src/main/jni/leak.cpp:30:16:30:32 |
+../db-native/native_leak_array
+| src | col1 | call | col3 |
++-----+------+------+------+
+../db-native/native_leak_dynamic_register
+|       src        |          col1          |            call             |                                                                         col3                                                                          |
++------------------+------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
+| getDeviceId(...) | MainActivity:46[23-39] | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_leak_dynamic_register/src/main/jni/leak_dynamic_register.cpp:29:22:29:38 |
+../db-native/native_method_overloading
+|       src        |          col1          |            call             |                                                                      col3                                                                       |
++------------------+------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+
+| getDeviceId(...) | MainActivity:45[23-39] | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_method_overloading/src/main/jni/method_overloading.cpp:43:16:43:32 |
+../db-native/native_multiple_interactions
+|       src        |          col1          |            call             |                                                                         col3                                                                          |
++------------------+------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------+
+| getDeviceId(...) | MainActivity:57[31-47] | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_multiple_interactions/src/main/jni/multiple_interactions.cpp:49:16:49:32 |
+../db-native/native_multiple_libraries
+|       src        |          col1          |            call             |                                                                col3                                                                 |
++------------------+------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------+
+| getDeviceId(...) | MainActivity:46[23-39] | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_multiple_libraries/src/main/jni/master.cpp:30:16:30:32 |
+../db-native/native_noleak
+| src | col1 | call | col3 |
++-----+------+------+------+
+../db-native/native_noleak_array
+| src | col1 | call | col3 |
++-----+------+------+------+
+../db-native/native_nosource
+| src | col1 | call | col3 |
++-----+------+------+------+
+../db-native/native_pure
+|           src            |                                                         col1                                                          |            call             |                                                         col3                                                          |
++--------------------------+-----------------------------------------------------------------------------------------------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:156:35:156:50 | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:169:20:169:36 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:156:35:156:50 | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:169:20:169:36 |
+../db-native/native_pure_direct
+|           src            |                                                                 col1                                                                  |            call             |                                                                  col3                                                                   |
++--------------------------+---------------------------------------------------------------------------------------------------------------------------------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:86:35:86:50 | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:261:27:261:43 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:86:35:86:50 | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:261:27:261:43 |
+../db-native/native_pure_direct_customized
+|           src            |                                                                       col1                                                                       |            call             |                                                                        col3                                                                        |
++--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:86:35:86:50 | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:261:27:261:43 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:86:35:86:50 | call to __android_log_print | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:261:27:261:43 |
+../db-native/native_set_field_from_arg
+|       src        |          col1          |  call  |          col3          |
++------------------+------------------------+--------+------------------------+
+| getDeviceId(...) | MainActivity:54[23-39] | d(...) | MainActivity:61[27-56] |
+| getDeviceId(...) | MainActivity:54[23-39] | d(...) | MainActivity:62[27-42] |
+../db-native/native_set_field_from_arg_field
+|       src        |          col1          |  call  |          col3          |
++------------------+------------------------+--------+------------------------+
+| getDeviceId(...) | MainActivity:54[23-39] | d(...) | MainActivity:63[43-72] |
+| getDeviceId(...) | MainActivity:54[23-39] | d(...) | MainActivity:64[43-58] |
+../db-native/native_set_field_from_native
+|           src            |                                                                         col1                                                                          |  call  |          col3          |
++--------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------------------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:31:35:31:50 | d(...) | MainActivity:50[40-69] |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:31:35:31:50 | d(...) | MainActivity:51[40-55] |
+../db-native/native_source
+|           src            |                                                          col1                                                           |  call  |          col3          |
++--------------------------+-------------------------------------------------------------------------------------------------------------------------+--------+------------------------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_source/src/main/jni/source.cpp:26:35:26:50 | i(...) | MainActivity:39[23-26] |
+../db-native/native_source_clean
+|       src        |          col1          |  call  |          col3          |
++------------------+------------------------+--------+------------------------+
+| getDeviceId(...) | MainActivity:41[23-39] | d(...) | MainActivity:45[31-51] |

@@ -1,0 +1,90 @@
+../db-native/icc_javatonative
+| call | col1 | col2 |
++------+------+------+
+../db-native/icc_nativetojava
+|      call       |                                                                     col1                                                                      | col2 |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------+------+
+| sendIntent(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/icc_nativetojava/src/main/java/org/arguslab/icc_nativetojava/MainActivity.java |    1 |
+../db-native/native_complexdata
+|    call    |                                                                       col1                                                                        | col2 |
++------------+---------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...)  | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_complexdata/src/main/java/org/arguslab/native_complexdata/MainActivity.java |    1 |
+| send2(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_complexdata/src/main/java/org/arguslab/native_complexdata/MainActivity.java |    1 |
+../db-native/native_complexdata_stringop
+|   call    |                                                                                col1                                                                                 | col2 |
++-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_complexdata_stringop/src/main/java/org/arguslab/native_complexdata_stringop/MainActivity.java |    1 |
+../db-native/native_dynamic_register_multiple
+|   call    |                                                                                     col1                                                                                      | col2 |
++-----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_dynamic_register_multiple/src/main/java/org/arguslab/native_dynamic_register_multiple/MainActivity.java |    1 |
+../db-native/native_heap_modify
+|      call       |                                                                       col1                                                                        | col2 |
++-----------------+---------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| heapModify(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_heap_modify/src/main/java/org/arguslab/native_heap_modify/MainActivity.java |    1 |
+../db-native/native_leak
+|   call    |                                                                col1                                                                 | col2 |
++-----------+-------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_leak/src/main/java/org/arguslab/native_leak/MainActivity.java |    1 |
+../db-native/native_leak_array
+|   call    |                                                                      col1                                                                       | col2 |
++-----------+-------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_leak_array/src/main/java/org/arguslab/native_leak_array/MainActivity.java |    1 |
+../db-native/native_leak_dynamic_register
+|   call    |                                                                                 col1                                                                                  | col2 |
++-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_leak_dynamic_register/src/main/java/org/arguslab/native_leak_dynamic_register/MainActivity.java |    1 |
+../db-native/native_method_overloading
+|   call    |                                                                              col1                                                                               | col2 |
++-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_method_overloading/src/main/java/org/arguslab/native_method_overloading/MainActivity.java |    1 |
+../db-native/native_multiple_interactions
+|        call        |                                                                                 col1                                                                                  | col2 |
++--------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| propagateImei(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_multiple_interactions/src/main/java/org/arguslab/native_multiple_interactions/MainActivity.java |    1 |
+| leakImei(...)      | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_multiple_interactions/src/main/java/org/arguslab/native_multiple_interactions/MainActivity.java |    1 |
+../db-native/native_multiple_libraries
+|      call       |                                                                              col1                                                                               | col2 |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| masterSend(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_multiple_libraries/src/main/java/org/arguslab/native_multiple_libraries/MainActivity.java |    1 |
+../db-native/native_noleak
+|   call    |                                                                  col1                                                                   | col2 |
++-----------+-----------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_noleak/src/main/java/org/arguslab/native_noleak/MainActivity.java |    1 |
+../db-native/native_noleak_array
+|   call    |                                                                        col1                                                                         | col2 |
++-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| send(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_noleak_array/src/main/java/org/arguslab/native_noleak_array/MainActivity.java |    1 |
+../db-native/native_nosource
+|     call     |                                                                    col1                                                                     | col2 |
++--------------+---------------------------------------------------------------------------------------------------------------------------------------------+------+
+| getData(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_nosource/src/main/java/org/arguslab/native_nosource/MainActivity.java |    1 |
+../db-native/native_pure
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_pure_direct
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_pure_direct_customized
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_set_field_from_arg
+|     call      |                                                                              col1                                                                               | col2 |
++---------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| setField(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_arg/src/main/java/org/arguslab/native_set_field_from_arg/MainActivity.java |    1 |
+../db-native/native_set_field_from_arg_field
+|     call      |                                                                                    col1                                                                                     | col2 |
++---------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| setField(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_arg_field/src/main/java/org/arguslab/native_set_field_from_arg_field/MainActivity.java |    1 |
+../db-native/native_set_field_from_native
+|     call      |                                                                                 col1                                                                                  | col2 |
++---------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| setField(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/java/org/arguslab/native_set_field_from_native/MainActivity.java |    1 |
+../db-native/native_source
+|     call     |                                                                  col1                                                                   | col2 |
++--------------+-----------------------------------------------------------------------------------------------------------------------------------------+------+
+| getImei(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_source/src/main/java/org/arguslab/native_source/MainActivity.java |    1 |
+../db-native/native_source_clean
+|       call       |                                                                        col1                                                                         | col2 |
++------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| sourceClean(...) | /Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_source_clean/src/main/java/org/arguslab/native_source_clean/MainActivity.java |    1 |

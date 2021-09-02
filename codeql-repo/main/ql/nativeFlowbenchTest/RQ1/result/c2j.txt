@@ -1,0 +1,101 @@
+../db-native/icc_javatonative
+|           call           |                                                          col1                                                           | col2 |
++--------------------------+-------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/icc_javatonative/src/main/jni/foo.cpp:30:27:30:42 |    3 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/icc_javatonative/src/main/jni/foo.cpp:36:35:36:50 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/icc_javatonative/src/main/jni/foo.cpp:30:27:30:42 |    3 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/icc_javatonative/src/main/jni/foo.cpp:36:35:36:50 |    1 |
+../db-native/icc_nativetojava
+|           call           |                                                            col1                                                            | col2 |
++--------------------------+----------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/icc_nativetojava/src/main/jni/intent.cpp:22:14:22:29 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/icc_nativetojava/src/main/jni/intent.cpp:26:14:26:29 |    1 |
+| call to CallVoidMethod   | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/icc_nativetojava/src/main/jni/intent.cpp:29:10:29:23 |    1 |
+../db-native/native_complexdata
+|           call           |                                                            col1                                                            | col2 |
++--------------------------+----------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_complexdata/src/main/jni/data.cpp:40:34:40:49 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_complexdata/src/main/jni/data.cpp:30:34:30:49 |    1 |
+../db-native/native_complexdata_stringop
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_dynamic_register_multiple
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_heap_modify
+|           call           |                                                               col1                                                                | col2 |
++--------------------------+-----------------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_heap_modify/src/main/jni/heap_modify.cpp:21:30:21:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_heap_modify/src/main/jni/heap_modify.cpp:24:35:24:50 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_heap_modify/src/main/jni/heap_modify.cpp:21:30:21:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_heap_modify/src/main/jni/heap_modify.cpp:24:35:24:50 |    1 |
+../db-native/native_leak
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_leak_array
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_leak_dynamic_register
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_method_overloading
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_multiple_interactions
+|          call          |                                                                         col1                                                                          | col2 |
++------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallVoidMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_multiple_interactions/src/main/jni/multiple_interactions.cpp:42:10:42:23 |    1 |
+../db-native/native_multiple_libraries
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_noleak
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_noleak_array
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_nosource
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_pure
+|           call           |                                                         col1                                                          | col2 |
++--------------------------+-----------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:153:30:153:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:156:35:156:50 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:153:30:153:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:156:35:156:50 |    1 |
+../db-native/native_pure_direct
+|           call           |                                                                 col1                                                                  | col2 |
++--------------------------+---------------------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:83:30:83:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:86:35:86:50 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:83:30:83:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:86:35:86:50 |    1 |
+../db-native/native_pure_direct_customized
+|           call           |                                                                       col1                                                                       | col2 |
++--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:83:30:83:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:86:35:86:50 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:83:30:83:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:86:35:86:50 |    1 |
+../db-native/native_set_field_from_arg
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_set_field_from_arg_field
+| call | col1 | col2 |
++------+------+------+
+../db-native/native_set_field_from_native
+|           call           |                                                                         col1                                                                          | col2 |
++--------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:28:30:28:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:31:35:31:50 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:28:30:28:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:31:35:31:50 |    1 |
+../db-native/native_source
+|           call           |                                                          col1                                                           | col2 |
++--------------------------+-------------------------------------------------------------------------------------------------------------------------+------+
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_source/src/main/jni/source.cpp:23:30:23:45 |    1 |
+| call to CallObjectMethod | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_source/src/main/jni/source.cpp:26:35:26:50 |    1 |
+../db-native/native_source_clean
+| call | col1 | col2 |
++------+------+------+

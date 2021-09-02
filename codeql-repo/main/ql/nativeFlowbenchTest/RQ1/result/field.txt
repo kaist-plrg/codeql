@@ -1,0 +1,88 @@
+../db-native/icc_javatonative
+| name | loc | col2 |
++------+-----+------+
+../db-native/icc_nativetojava
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_complexdata
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_complexdata_stringop
+|      name      |                                                                 loc                                                                 | col2 |
++----------------+-------------------------------------------------------------------------------------------------------------------------------------+------+
+| GetObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_complexdata_stringop/src/main/jni/data.cpp:34:34:34:47 |    0 |
+../db-native/native_dynamic_register_multiple
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_heap_modify
+|         name         |                                                                loc                                                                | col2 |
++----------------------+-----------------------------------------------------------------------------------------------------------------------------------+------+
+| GetStaticObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_heap_modify/src/main/jni/heap_modify.cpp:20:34:20:53 |    1 |
+| SetObjectField       | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_heap_modify/src/main/jni/heap_modify.cpp:34:10:34:23 |    1 |
+../db-native/native_leak
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_leak_array
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_leak_dynamic_register
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_method_overloading
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_multiple_interactions
+|      name      |                                                                          loc                                                                          | col2 |
++----------------+-------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| GetObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_multiple_interactions/src/main/jni/multiple_interactions.cpp:39:25:39:38 |    1 |
+../db-native/native_multiple_libraries
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_noleak
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_noleak_array
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_nosource
+| name | loc | col2 |
++------+-----+------+
+../db-native/native_pure
+|         name         |                                                          loc                                                          | col2 |
++----------------------+-----------------------------------------------------------------------------------------------------------------------+------+
+| GetStaticObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure/src/main/jni/main.cpp:152:34:152:53 |    1 |
+../db-native/native_pure_direct
+|         name         |                                                                  loc                                                                  | col2 |
++----------------------+---------------------------------------------------------------------------------------------------------------------------------------+------+
+| GetStaticObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct/src/main/jni/native-activity.cpp:82:34:82:53 |    1 |
+../db-native/native_pure_direct_customized
+|         name         |                                                                       loc                                                                        | col2 |
++----------------------+--------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| GetStaticObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_pure_direct_customized/src/main/jni/native-activity.cpp:82:34:82:53 |    1 |
+../db-native/native_set_field_from_arg
+|      name      |                                                                       loc                                                                       | col2 |
++----------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| SetObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_arg/src/main/jni/set_field_from_arg.cpp:31:10:31:23 |    1 |
+| GetObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_arg/src/main/jni/set_field_from_arg.cpp:32:27:32:40 |    1 |
+../db-native/native_set_field_from_arg_field
+|      name      |                                                                             loc                                                                             | col2 |
++----------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| SetObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_arg_field/src/main/jni/set_field_from_arg_field.cpp:33:10:33:23 |    1 |
+| GetObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_arg_field/src/main/jni/set_field_from_arg_field.cpp:32:24:32:37 |    1 |
+| GetObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_arg_field/src/main/jni/set_field_from_arg_field.cpp:34:27:34:40 |    1 |
+../db-native/native_set_field_from_native
+|         name         |                                                                          loc                                                                          | col2 |
++----------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------+------+
+| GetStaticObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:27:34:27:53 |    1 |
+| SetIntField          | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:48:10:48:20 |    1 |
+| SetObjectField       | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:46:10:46:23 |    1 |
+| SetObjectField       | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:53:10:53:23 |    1 |
+| GetObjectField       | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_set_field_from_native/src/main/jni/set_field_from_native.cpp:54:27:54:40 |    1 |
+../db-native/native_source
+|         name         |                                                           loc                                                           | col2 |
++----------------------+-------------------------------------------------------------------------------------------------------------------------+------+
+| GetStaticObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_source/src/main/jni/source.cpp:22:34:22:53 |    1 |
+../db-native/native_source_clean
+|      name      |                                                                 loc                                                                 | col2 |
++----------------+-------------------------------------------------------------------------------------------------------------------------------------+------+
+| SetObjectField | file:///Users/yundongjun/PLRG/codeql/codeql-repo/main/NativeFlowBench/native_source_clean/src/main/jni/source_clean.cpp:23:10:23:23 |    1 |
