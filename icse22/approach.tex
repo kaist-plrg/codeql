@@ -1,10 +1,23 @@
-\section{Composing declarative static analyzers}
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.47\textwidth]{img/overview}
+%  \vspace*{-1.5em}
+  \caption{Declarative analysis for monolingual programs}
+  \label{fig:overview}
+%\vspace*{-.5em}
+\end{figure}
 
-In this section, we propose a generalized approach for performing declarative
-static analysis for a multilingual program.
+\section{Multilingual Program Analysis using Declarative Static Analyzers}
+\label{sec:approach}
 
-\subsection{Syntax of data-fact and rule}
+In this section, we propose a general approach to perform a declarative
+static analysis for multilingual programs.
 
+\subsection{Declarative Analysis for a Single Language}
+
+A declarative analysis~\cite{doop} consists of datafacts and rules
+%
 First, we define the syntax of data-fact and rule, which is fairly simple.
 
 \[e := num | string\]
@@ -21,18 +34,6 @@ permitted, that is, a data-fact can depend on itself.  The exception is the
 recursion with odd number of negation, that is, the rule such as "p(x) :- not
 p(x)" is not valid. ?)
 
-\subsection{Static analyzer for one language}
-
-\begin{figure}[t]
-  \centering
-  \vspace{2mm}
-  \includegraphics[width=0.5\textwidth]{img/overview}
-  \vspace*{-1.5em}
-  \caption{The overview of how declarative style analysis works for
-  one language}
-  \label{fig:overview}
-\vspace*{-.5em}
-\end{figure}
 
 Figure~\ref{fig:overview} illustrates the overview of how declarative style analysis works for
 one language works. The analysis mainly
@@ -109,7 +110,7 @@ data-facts that can be derived. The rules are usually evaluated in bottom-up
 and modular manner, that is, each rule is evaluated one-by-one, after every
 rule it depends on is evaluated.
 
-\subsection{Composing two declarative static analyzers}
+\subsection{\mbox{Declarative Analysis for Multiple Languages}}
 
 In the following, we illustrate how we can compose two declarative style static analyzers
 to perform analysis on multilingual program.
@@ -117,12 +118,10 @@ to perform analysis on multilingual program.
 \begin{figure}[t]
   \centering
   \vspace{2mm}
-  \includegraphics[width=0.5\textwidth]{img/overview2}
-  \vspace*{-1.5em}
-  \caption{the overview of how declarative style analysis can be
-  extended to multilingual analysis}
+  \includegraphics[width=0.47\textwidth]{img/overview2}
+  \caption{Declarative analysis for multilingual programs}
   \label{fig:overview2}
-\vspace*{-.5em}
+%\vspace*{-.5em}
 \end{figure}
 
 Figure~\ref{fig:overview2} illustrates the overview of how declarative style analysis can be
