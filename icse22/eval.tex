@@ -145,7 +145,7 @@ manually confirmed that the two common failures of Lee's and ours are
 originated from built-in structs and functions in C; {\it
 icc\_java\_to\_native} stores Java class information in the Android built-in
 structure {\tt android\_app} and {\it native\_complexdata\_stringop} generates
-a Java method name by concatenating two string values via the {\tt strcat}
+a Java field name by concatenating two string values via the {\tt strcat}
 built-in function. Because ours and Lee's analyzer do not handle such built-in
 structs and functions, they failed to analyze the two benchmarks.  Lee's
 analyzer failed to analyze the three more benchmarks due to native entry points
