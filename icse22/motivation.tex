@@ -94,7 +94,7 @@ the behaviors of the code written in A and B into a single form and
 perform the target analysis~\cite{hybridroid,cpython}
 The problem is that since such existing analyzers are mostly general-purpose,
 which may have unnecessary computations that are not necessary for the target analysis,
-resulting in performance overhead.
+these approaches may result in performance overhead.
 For example, even though the analysis of the conditional statement in Figure~\ref{fig:exam2}
 is not relevant to the detection of the null dereference bug on line 13,
 the conventional target analysis in the previous approaches computes
