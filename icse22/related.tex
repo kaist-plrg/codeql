@@ -2,7 +2,7 @@
 %We propose the declarative-style static analysis of multilingual programs and
 %actualize our approach as the JNI dataflow analyzer.
 We describe three closely related categories of work below.
-\subsection{Analysis for JNI}
+\subsection{Static analysis for multilingual JNI}
 Among various language representations of JNI programs, studies dealing with
 pairs of languages are most closed related.  For JNI programs consisting of
 Java and C source codes, ILEA~\cite{ILEA} extends the Java Virtual Machine
@@ -38,13 +38,11 @@ dataflow analysis and symbolic execution.  Our approach is scalable for the JNI
 dataflow analysis even without sacrificing fixed point computations when C
 source code is available.
 
-\inred{Security analysis, dynamic analysis}
-
-\subsection{Analysis for the other FFIs}
+\subsection{Static Analysis for the other FFIs}
 Android applications have another FFI between Java and JavaScript to maximize
 their portability.  Android hybrid apps use JavaScript code to be run on
 multiple browsers and can communicate with native Java code.
-HybriDroid~\cite{HybriDroid} analyzes Java and JavaScript at the same time on
+HybriDroid~\cite{hybridroid} analyzes Java and JavaScript at the same time on
 the top of the WALA framework~\cite{WALA} to detect programmer errors on interlanguage
 communications and to track private data leakages.  Bae et al.~\cite{BaeICSE19}
 tackled the expensive analysis of HybriDroid and proposed a light-weight type
@@ -55,8 +53,6 @@ expensive whole multilingual program analyses, they manually model APIs in the
 PhoneGap\footnote{\url{https://cordova.apache.org/}} framework and apply a taint
 analysis on JavaScript only.
 
-\inred{Security analysis, dynamic analysis}
-
 Python supports the interoperability mechanism with C~\cite{PythonC}.
 Developers often import performance-oriented C code to high-level Python code.
 Very recent work~\cite{sas2021} proposed a Python-C analyzer by reusing each
@@ -64,11 +60,14 @@ analyzer in the Mopsa framework~\cite{Mopsa}.  Their target properties require
 precise context-sensitive value analyses.  Our approach easily activates only
 the required features of each analyzer for such target properties.
 
-\inred{(type systems)[12, 13, 14] OCaml, Java, C}
+% furr2005 OCaml and C
+Furr and Foster~\cite{furr2005, furr2008} proposed a multilingual type inference
+system for the native OCaml with foreign C FFI.  No out-of-bounds accesses and
+no type casting in the C code were their assumptions.
 
 \subsection{Declarative-style analysis}
 Declarative-style analysis alleviates challenges in crafting a static program
-analyzer and thus Datalog \inred{[ten papers]} has become a dominant
+analyzer and thus Datalog~\cite{allen2015D, allen2015stagedD, alpuente2010D, doop, dawson1996D, naik2006D, reps1994D, smaragdakis2014D, whaley2005D} has become a dominant
 DSL for static analysis~\cite{scholz2016}.
 Bravenboer and Smaragdakis proposed the \doop framework~\cite{doop} using Datalog
 that showed dramatic speedups for the Java points-to analysis.  They explain that
