@@ -169,27 +169,49 @@ stores sensitive data in an array, and then retreives the data from the array
 and leaks it. On the other hand, {\it native\_noleak\_array} stores sensitive
 data in an array as well, but retrieves another element from the array and uses
 it. Because distinguishing different index of an array is challenging, JN-SAF
-tracks every value retrieved from the array if the array contains the sensitive
-data. The policy enables JN-SAF to analyze {\it native\_leak\_array} correctly,
-but introduce false alarm in {\it native\_noleak\_array} at the same time. In
-contrast, because CodeQL does not track dataflows depending on arrays by
-default, our tool does not report false alarm in {\it native\_noleak\_array}
-but cannot find the data leakage in {\it native\_leak\_array}.
+tracks every value retrieved from an array if the array contains sensitive
+data. Such over-approaximation enables JN-SAF to analyze {\it
+native\_leak\_array} correctly, but introduce false alarm on {\it
+native\_noleak\_array} at the same time. In contrast, because CodeQL does not
+track dataflows depending on arrays by default, our tool does not report false
+alarm on {\it native\_noleak\_array} but cannot find the data leakage in {\it
+native\_leak\_array}.
 
 
 \subsection{RQ2: Performance}
 \input{tableRQ2}
-Table~\ref{table:RQ2} shows the analysis result for F-Droid applications.
-Applications that do not have interaction form C to Java is ommitted from the
-table, and we summarize the result for 25 of 42 apps, which contains call to
-Java method or access to Java field access from C.\footnote{The full list of data
-is submitted to supplementary material.}
+Table~\ref{table:RQ2} shows analysis results of our tool on real-world Android
+JNI applications. Out of 42 applications we analyzed, we summarize analysis
+results of 25 applications that have interoperation from C to Java.\footnote{We
+list full analysis results up in our supplementary material.} \inred{The first column
+denotes application names, the second to fourth columns show database creation
+time for C code, Java code, and ...}
 
-The "time" column denotes the time for creating database and evaluating query.
-The average time for creating DB was 103.8 seconds, and average time for
-evaluating query was 57.5 seconds, making the average of total analysis time
-161.3 seconds. The longest time it took to analyze was 726.5 seconds for
-analyzing \inred{??} lines of codes, which is about 12 minutes.
+%The "time" column denotes the time for creating database and evaluating query.
+%The average time for creating DB was 103.8 seconds, and average time for
+%evaluating query was 57.5 seconds, making the average of total analysis time
+%161.3 seconds. The longest time it took to analyze was 726.5 seconds for
+%analyzing \inred{??} lines of codes, which is about 12 minutes.
+
+%The "precision" columns denotes the precision of dispatching function call
+%target, and field access target.  "Precise" means exactly one target was found,
+%and resolved means at least one target was found. For the function call from C to Java,
+%\inred{???}\% of function calls were resolved, and \inred{???}\% of functions calls
+%were precisely resolved. For the field access, \inred{???}\% of field accesses (both
+%read and write) were resolved, and \inred{???}\% of field access were precisely resolved.
+%Compared to the precision result of the state-of-the-art analyzer, our implementation
+%showed higher precision.
+
+Our analyzer resolved 1076 out of 1171 (92\%) foreign function calls, including
+347 out of 404 (86\%) C-to-Java method calls and 729 out of 767 (95\%)
+C-to-Java field accesses. In addition, 1008 (86\%) resolved foreign function
+calls are precies. The results show that our tool resolves more foreign
+function calls even precisley than Lee's analyzer that \inred{...} on the same
+dataset. Our analyzer failed to resolve 95 (8\%) foreign function calls because
+of complex language semantics such as arrays and function pointers. Because
+CodeQL does not track dataflows depending on C function pointers as well as
+arrays we descibed, our analyzer failed to analyze method or field IDs required
+to resolve the foreign function calls.
 
 \begin{figure}[t]
   \centering
@@ -201,34 +223,33 @@ analyzing \inred{??} lines of codes, which is about 12 minutes.
 \vspace*{-.5em}
 \end{figure}
 
-Among 25 apps, the 13 of them were included in benchmark of Lee's and the
-evaluation time with their tool is available.  Figure~\ref{fig:graph}
-demonstrates the speed comparison per application, one by one.  The average
-speed up was x4. Note that time for creating DB is done by comping source code,
-which is excluded from the calculated time of Lee's. This means that we also
-have to exclude the time for creating DB from our calculated time, which makes
-the practical speed up become x14.
+Our analyzer is scalable even for large-scale programs as well. The analysis
+time was 161.3 seconds on average for each application, including 103.8 seconds
+for the DB creation and 57.5 seconds for the query processing. The DB creation
+usually took more time than the query processing except for {\it Graph 89}, and
+the DB creation time was almost linear to the size of code. Our analyzer took
+about 12 minutes at most to analyze {\it Tileless Map} having about one million
+lines of code. Figure~\ref{fig:graph} visualizes analysis time of our analyzer
+compared to Lee's analyzer. \inred{describe the comparison result...}  Note
+that once we create database for a program, we can evaluate multiple queries on
+it without re-creation to gain various analysis results of the program.
 
-The "precision" columns denotes the precision of dispatching function call
-target, and field access target.  "Precise" means exactly one target was found,
-and resolved means at least one target was found. For the function call from C to Java,
-\inred{???}\% of function calls were resolved, and \inred{???}\% of functions calls
-were precisely resolved. For the field access, \inred{???}\% of field accesses (both
-read and write) were resolved, and \inred{???}\% of field access were precisely resolved.
-Compared to the precision result of the state-of-the-art analyzer, our implementation
-showed higher precision.
 
-The main reason that the analyzer failed to resolve some of the function calls
-or field accesses is due to the lack of soundness of base-line CodeQL dataflow
-analysis library.  Specifically, if function pointer is involved when calling C
-function within C, CodeQL could not determine the exact call target, and some
-data which is needed for determining the Java method call target is not
-analyzed to be passed, resulting in failure to resolving Java method target.
+%Applications that do not have interaction form C to Java is ommitted from the
+%table, and we summarize the result for 25 of 42 apps, which contains call to
+%Java method or access to Java field access from C.\footnote{The full list of data
+%is submitted to supplementary material.}
 
-In conclusion, considering that our analyzer could successfully analyze the
-benchmark applications with higher precision in significantly shorter time
-compared to the stat-of-the-art analyzer, we conclude that our implementation
-has competitive performance.
+%The "time" column denotes the time for creating database and evaluating query.
+%The average time for creating DB was 103.8 seconds, and average time for
+%evaluating query was 57.5 seconds, making the average of total analysis time
+%161.3 seconds. The longest time it took to analyze was 726.5 seconds for
+%analyzing \inred{??} lines of codes, which is about 12 minutes.
+
+%In conclusion, considering that our analyzer could successfully analyze the
+%benchmark applications with higher precision in significantly shorter time
+%compared to the stat-of-the-art analyzer, we conclude that our implementation
+%has competitive performance.
 
 \subsection{RQ3: Usefulness}
 \input{tableRQ3}
