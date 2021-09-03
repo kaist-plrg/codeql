@@ -91,7 +91,7 @@ The previous approaches either 1) utilize existing analyzers for
 languages A and B to generate their summaries and perform the
 target dataflow analysis~\cite{LeeASE20,JN-SAF}, or 2) abstract 
 the behaviors of the code written in A and B into a single form and
-perform the target analysis~\cite{HybriDroid,PyC}
+perform the target analysis~\cite{hybridroid,cpython}
 The problem is that since such existing analyzers are mostly general-purpose,
 which may have unnecessary computations that are not necessary for the target analysis,
 resulting in performance overhead.
@@ -107,7 +107,8 @@ the analysis of immense analysis information in both languages.
 %\subsection{Declarative style multilingual program analysis}
 \subsection{Our Approach}
 
-By using declarative style analysis, we can solve the problem mentioned above.
+Finally, our approach is based on declarative-style analysis, which
+alleviates the performance overhead problem of the previous approaches.
 The main reason is in its query-based analysis: the target-analysis is
 written in terms of \textit{query}, and only related data-facts and rules
 are used for evaluating the query, reducing the amount of computation.
