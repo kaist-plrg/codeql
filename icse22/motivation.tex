@@ -107,19 +107,20 @@ the analysis of immense analysis information in both languages.
 %\subsection{Declarative style multilingual program analysis}
 \subsection{Our Approach}
 
-Finally, our approach is based on declarative-style analysis, which
+Finally, our approach is based on a declarative-style analysis, which
 alleviates the performance overhead problem of the previous approaches.
-The main reason is in its query-based analysis: the target-analysis is
-written in terms of \textit{query}, and only related data-facts and rules
-are used for evaluating the query, reducing the amount of computation.
+The main benefit of the approach comes from its query-based analysis:
+a target analysis is
+specified in terms of \textit{queries}, and only relevant datafacts and rules
+are used for evaluating queries, reducing the amount of computation.
 
-Let's see how a dataflow analysis can be implemented in declarative style.
-Let's define \datalog{node} to be the program entity that can hold the run-time
-value, such as variable, literal, or function parameter.  Ultimately, the
-result data-fact we want would be \datalog{flow(a,b)}, which will denote the
-fact that there is a data flow from \datalog{node a} to \datalog{node b}. The
-rule for this data-fact can be defined in terms of another data-fact named
-\datalog{step}:
+  Let's see how a dataflow analysis can be implemented in declarative style.
+  Let's define \datalog{node} to be the program entity that can hold the run-time
+value, such as variable, literal, or function parameter.
+  Ultimately, the result data-fact we want would be \datalog{flow(a,b)}, which will denote the
+fact that there is a data flow from \datalog{node a} to \datalog{node b}.
+  The rule for this data-fact can be defined in terms of another data-fact named \datalog{step}:
+
 
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 flow(a,b) :- step(a,b)
@@ -162,7 +163,7 @@ it contains comparison with null.
 The important thing here is that, unlike previous approaches that considers
 every if-statement in order to generate the summary, it is not required to
 handle all the if-statements in our approach. We can selectively calculate the
-certain data-facts regarding certain control flow, only the target-analysis
+certain data-facts regarding certain control flow, only the target analysis
 does require information about it.
 
 In the following sections, we formalize the general approach for performing

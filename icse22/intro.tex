@@ -27,19 +27,19 @@ interoperation than on the intraoperation in widely-used open-source JNI
 programs such as OpenJ9 and VLC.
 
 For multilingual program analysis, researchers have proposed two approaches.
-The first approach leverages existing general-purpose static analyzers for monolingual
+The first approach leverages general-purpose analyzers for monolingual
 programs~\cite{JN-SAF, LeeASE20}.  It analyzes each module
 written in a single language using its analyzer to generate
 its summary as an abstraction of its behaviors.  Then, it performs a target
 analysis to detect bugs and security vulnerabilities cross language boundaries
-using the generated summaries. The second approach generates an abstraction
-of each module written in each language in a single form(i.e. IR that can
-incorporate both languages), and performs
-a target analysis using existing top-down general-purpose analyzer, which 
-runs on top of the unified single form.~\cite{hybridroid, cpython}.
+using the summaries. The second approach generates an abstraction
+of each module written in each language in an IR that can
+incorporate both languages, and performs
+a target analysis using a top-down general-purpose analyzer
+running on the IR~\cite{hybridroid, cpython}.
 While both approaches can analyze and detect bugs and security vulnerabilities
 in multilingual programs, they often suffer from performance overhead.
-Because they utilize the full features of expensive general-purpose static analyzers,
+Because they utilize the full features of expensive general-purpose analyzers,
 they may waste their analysis time on the features that are irrelevant to
 the target analysis.
 
