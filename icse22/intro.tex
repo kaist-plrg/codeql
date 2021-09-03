@@ -33,8 +33,10 @@ written in a single language using its analyzer to generate
 its summary as an abstraction of its behaviors.  Then, it performs a target
 analysis to detect bugs and security vulnerabilities cross language boundaries
 using the generated summaries. The second approach generates an abstraction
-of each module written in each language in a single form and performs
-a target analysis using existing top-down general-purpose analyzer~\cite{hybridroid, cpython}.
+of each module written in each language in a single form(i.e. IR that can
+incorporate both languages), and performs
+a target analysis using existing top-down general-purpose analyzer, which 
+runs on top of the unified single form.~\cite{hybridroid, cpython}.
 While both approaches can analyze and detect bugs and security vulnerabilities
 in multilingual programs, they often suffer from performance overhead.
 Because they utilize the full features of expensive general-purpose static analyzers,
