@@ -114,56 +114,60 @@ a target analysis is
 specified in terms of \textit{queries}, and only relevant datafacts and rules
 are used for evaluating queries, reducing the amount of computation.
 
-  Let's see how a dataflow analysis can be implemented in declarative style.
+To illustrate, we first explain how we can perform dataflow analysis with
+considering control flow in declarative style for the first program, and then
+explain why computation for control flow can be reduced for the second program.
+
   Let's define \datalog{node} to be the program entity that can hold the run-time
 value, such as variable, literal, or function parameter.
   Ultimately, the result data-fact we want would be \datalog{flow(a,b)}, which will denote the
 fact that there is a data flow from \datalog{node a} to \datalog{node b}.
-  The rule for this data-fact can be defined in terms of another data-fact named \datalog{step}:
-
-
+  The rule for this data-fact can be defined as transitive closure of data-fact named \datalog{step}:
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 flow(a,b) :- step(a,b)
 flow(a,b) :- step(a,c), flow(c,b)
 \end{lstlisting}
-
-Simply put, this rule states that \datalog{flow} is defined as transitive
-closure of \datalog{step}.  Here, \datalog{step(a,b)} denotes the direct data
-flow from \datalog{node a} to \datalog{node b}. Again, the data-fact
-\datalog{step} can be calculated by rules using another data-facts, which will
-be eventually broken down to basic syntactic data-facts.  Then, given the set
-of all syntactic data-facts, all the other possible data-facts, including
-\datalog{step} and \datalog{flow}, can be calculated. For example, for the
-second program, the following data-facts will be generated,
-
+Here, \datalog{step(a,b)} denotes the direct data
+flow from \datalog{node a} to \datalog{node b}, where \datalog{step}
+can be either intra-language, or inter-language, so the following data-facts
+will be generated.
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
-step(null, list) // A -> A
-step(list, arg) // A -> B
-step(arg, ptr) // B -> B
-step(ptr, [dereference of ptr]) // B -> B
+step(null, node) // A -> A
+step(node, param) // A -> B
 \end{lstlisting}
-
-then the declarative language engine can compute the result \datalog{flow(null,
-[dereference of ptr])}, and the analyzer concludes that there is a dereference
-of null. In process of deriving this conclusion, there was no need to consider
-the if-statement.
-
-This time, let's say we are analyzing the first program, which requires
-considering the control flow.  One way to implement it would be to bring the
-concept of guard. We can define the data-fact \datalog{guard(node, cond)} to
-indicate that \datalog{node} is contained in the scope of if statement whose
-condition is \datalog{cond}.  For example, in the first program, the
+Since there is a if-statement that check  nullity of the param, the null value
+does not flow into the variable \datalog{ptr}, so we don't want the data-fact
+\datalog{step(param, ptr)} to be generated.  One way to implement it would be
+to bring the concept of guard. We can define the data-fact \datalog{guard(node,
+cond)} to indicate that \datalog{node} is contained in the scope of if
+statement whose condition is \datalog{cond}. In the first program, the
 \datalog{ptr} node would be guarded with the condition, \ccode{param \!= NULL},
 and this is expressed by the data-fact \datalog{guard(ptr, "param \!= NULL")}.
-Once the guard is implemented, then all we have to do is to give additional
-condition to the data-fact \datalog{step}, so that \datalog{step(a,b)} does not
-hold if \datalog{a} or \datalog{b} is guarded by a proper guard, for example,
-it contains comparison with null.
+Using this data-fact \codeql{guard}, we can give additional condition to the
+data-fact \datalog{step}, so that \datalog{step(a,b)} does not hold if
+\datalog{node b} is contained in a if-statement block, and is guarded by a
+proper condition, for example, it contains comparison with null.
 
-The important thing here is that, unlike previous approaches that considers
-every if-statement in order to generate the summary, it is not required to
-handle all the if-statements in our approach. We can selectively calculate the
-certain data-facts regarding certain control flow, only the target analysis
+Now, let's look at the second program. Using the same approach, the following
+data-facts will be generated,
+
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+step(null, node) // A -> A
+step(node, param) // A -> B
+step(param, ptr) // B -> B
+step(ptr, [dereference of ptr]) // B -> B
+\end{lstlisting}
+then the declarative language engine can compute the result \datalog{flow(null,
+[dereference of ptr])}, and the analyzer concludes that there is a dereference
+of null. The important thing here is that none of the nodes in the trace of
+steps above is included in the if-statement block. Therefore, in the process of
+detecting this bug, there was no need to consider the unrelevant if-statement.
+
+
+The point is that unlike previous approaches that considers every if-statement
+regardless of whether that if-statement is relevant or not, it is not required
+to handle all the if-statements in our approach. We can selectively calculate
+the certain data-facts regarding certain control flow, only the target analysis
 does require information about it.
 
 In the following sections, we formalize the general approach for performing
