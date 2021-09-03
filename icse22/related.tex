@@ -1,83 +1,46 @@
 \section{Related Work}
-%We propose the declarative-style static analysis of multilingual programs and
-%actualize our approach as the JNI dataflow analyzer.
-We describe three closely related categories of work below.
-\subsection{Analysis for JNI}
-Among various language representations of JNI programs, studies dealing with
-pairs of languages are most closed related.  For JNI programs consisting of
-Java and C source codes, ILEA~\cite{ILEA} extends the Java Virtual Machine
-Language (JVML) and Jlint\footnote{\url{http://artho.com/jlint/manual.html}},
-which is a JVML dataflow analyzer, to integrate C codes into one language.
-Since a modest extension of JVML cannot fully support C semantics like memory
-models, it extremely over-approximates C operations such as read and write
-through pointers.  Lee et al.~\cite{LeeASE20} proposed a general approach to
-analyze multilingual programs in the form of host and guest languages.  Their
-approach first analyzes a guest language (C, in their implementation) to extract
-semantic summaries (by Infer\footnote{\url{https://fbinfer.com/}}), translates
-and integrates the summaries into a host language (Java), and then utilizes host
-language analyzer (Flowdroid~\cite{Flowdroid}).  While their approach can
-leverage the full features of existing static analyzers, ours inherits the
-query-based analysis and can compute target properties effectively without
-expensive and redundant summary generation.
+\paragraph{Analysis of Java and C for JNI}
+Among various language representations of JNI programs, we describe studies
+dealing with pairs of languages.
+For JNI programs consisting of Java and C source codes, ILEA~\cite{ILEA} extends
+the Java Virtual Machine Language (JVML) and Jlint\footnote{\url{http://artho.com/jlint/manual.html}}, which is a JVML dataflow
+analyzer, to integrate C codes into one language.  Since a modest extension of
+JVML cannot fully support C semantics like memory models, it extremely
+over-approximates C operations such as read and write through pointers.
+Lee et al.~\cite{LeeASE20} proposed a general approach to analyze multilingual
+programs in the form of host and guest languages.  Their approach first analyzes
+a guest language (C, in their implementation) to extract semantic summaries
+(by Infer\footnote{\url{https://fbinfer.com/}}), translates and integrates the summaries into a host
+language (Java), and then utilizes host language analyzer (Flowdroid~\cite{Flowdroid}).
+While their approach can leverage the full features of existing static
+analyzers, ours inherits the query-based-analysis and can compute target
+properties effectively without expensive and redundant summary generation.
 
+\paragraph{Analysis of Java and binary for JNI}
 Other studies deal with binaries rather than C/C++.
 Fourtounis et al.~\cite{scanning} proposed a lightweight reverse engineering
 technique to recover Java method calls in binary codes instead of performing
 heavy analyses on binary code.  Their reverse engineering generates the data
 facts of the Java calls with declarative style analyses for Java.
-Their reverse engineering is lightweight yet targeting on Java method calls in
-binary, in contrast, our approach targets on two general declarative style
-analyses for each language and their interoperations seamlessly.
+Their technique is lightweight yet targeting on Java method signatures,
+in contrast, our approach targets on two general declarative style analyses for
+each language and their interoperations seamlessly.
 JN-SAF~\cite{JN-SAF} defines a unified summary in order to handle Java bytecode
 and binary at once.  It extracts the summaries for each method with a Java
 bytecode dataflow analyzer and a binary symbolic execution and composes the
 summaries in a bottom-up manner to detect security vulnerabilities.
 It sacrifices propagating dataflow facts until a fixed point by breaking a cycle
 in the call graph arbitrarily to mitigate expensive computations from the
-dataflow analysis and symbolic execution.  Our approach is scalable for the JNI
-dataflow analysis even without sacrificing fixed point computations when C
-source code is available.
+dataflow analysis and symbolic execution.  Our approach is scalable
+for the JNI dataflow analysis even without sacrificing fixed point computations
+when C source code is available.
 
-\inred{Security analysis, dynamic analysis}
+\paragraph{Analysis for the other FFIs}
+Hybridroid
+Python-C
 
-\subsection{Analysis for the other FFIs}
-Android applications have another FFI between Java and JavaScript to maximize
-their portability.  Android hybrid apps use JavaScript code to be run on
-multiple browsers and can communicate with native Java code.
-HybriDroid~\cite{HybriDroid} analyzes Java and JavaScript at the same time on
-the top of the WALA framework~\cite{WALA} to detect programmer errors on interlanguage
-communications and to track private data leakages.  Bae et al.~\cite{BaeICSE19}
-tackled the expensive analysis of HybriDroid and proposed a light-weight type
-system covering types of bug in HybriDroid.  However, their type system does not
-cover tracking flows of private data.  Jin et al.~\cite{jin2014code} proposed a
-static detection of code injection attacks from JavaScript to Java.  To avoid
-expensive whole multilingual program analyses, they manually model APIs in the
-PhoneGap\footnote{\url{https://cordova.apache.org/}} framework and apply a taint
-analysis on JavaScript only.
+\paragraph{Declarative style analysis}
+Declarative analyzer
+Doop
+CodeQL
 
-\inred{Security analysis, dynamic analysis}
-
-Python supports the interoperability mechanism with C~\cite{PythonC}.
-Developers often import performance-oriented C code to high-level Python code.
-Very recent work~\cite{sas2021} proposed a Python-C analyzer by reusing each
-analyzer in the Mopsa framework~\cite{Mopsa}.  Their target properties require
-precise context-sensitive value analyses.  Our approach easily activates only
-the required features of each analyzer for such target properties.
-
-\inred{(type systems)[12, 13, 14] OCaml, Java, C}
-
-\subsection{Declarative-style analysis}
-Declarative-style analysis alleviates challenges in crafting a static program
-analyzer and thus Datalog \inred{[ten papers]} has become a dominant
-DSL for static analysis~\cite{scholz2016}.
-Bravenboer and Smaragdakis proposed the \doop framework~\cite{doop} using Datalog
-that showed dramatic speedups for the Java points-to analysis.  They explain that
-the modularity and declarativeness of Datalog rules are the keys to improve
-performance~\cite{doopWorkshop}.  In addition, researchers have improved
-analysis backends, declarative language engines%~\cite{bddbddb[37], µZ[16], Soufflé, madsen2016}.
-
-Avgustinov et al.~\cite{ql2016} proposed QL, a declarative and object-oriented
-query language to be compiled into Datalog and runs on a relational DB, and static
-analyzers implemented QL which scale to millions of lines of code.
-Our approach successfully inherits the fast and easy analysis of declarative-style
-and emphasizes the benefits with the problem of multilingual program analysis.
