@@ -1,43 +1,45 @@
 \section{Introduction}
 Multilingual programs written in multiple programming languages
 have been widely used in various application domains.
-Because different languages have different benefits,
-developers use multiple languages and the interoperations between them
-via their Foreign Function Interface (FFI). For example, using the Java Native Interface (JNI),
-JNI programs have high-level logic implemented in Java and performance-critical
-modules in C. By utilizing diverse languages, programmers can
-develop complex programs effectively, improve the performance of their
-programs, and reuse existing modules written in different programming languages.
-\citet{kochhar2016large} reported that about half of the most popular open-source
+Since different languages have different benefits,
+developers use multiple languages and their interoperations
+via the Foreign Function Interface (FFI). For example, using the Java Native Interface (JNI),
+JNI programs have high-level logic written in Java and performance-critical
+modules implemented in C. By utilizing diverse languages, programmers can
+develop complex code effectively, improve their program performance,
+and reuse existing modules written in different programming languages.
+\citet{kochhar2016large} reported that about a half of the most popular open-source
 projects mainly written in one of the popular programming languages are
 multilingual.
 
 However, multilingual programs are often vulnerable to bugs or security issues
 more than monolingual programs. Since the language interoperation semantics
-via FFIs are often complex and different from the semantics of any
+via FFIs is often complex and different from the semantics of any
 single language, programmers can easily make errors by mistake.
-However, such errors are difficult to catch and fix because existing
+Unfortunately, such errors are difficult to catch and fix because existing
 tools such as compilers, IDEs, and static analyzers cannot detect erroneous
-behaviors involving interoperation semantics.
+behaviors involving the interoperation semantics.
 A large-scale study on the code quality of multilingual programs~\cite{kochhar2016large}
 reported that using multiple languages together correlates with higher error-proneness.  
 Moreover, \citet{grichi2020impact} showed that two or three times more
 bugs and security issues had been reported on the language
-interoperation than on the intraoperation in widely used open-source JNI
+interoperation than on the intraoperation in widely-used open-source JNI
 programs such as OpenJ9 and VLC.
 
-For multilingual program analysis, researchers have proposed to
-leverage existing general-purpose static analyzers for monolingual
-programs~\cite{JN-SAF, LeeASE20}.  They first analyze each module
-written in a single programming language using its corresponding analyzer to generate
-a summary of the module as an abstraction of its behaviors.  Then, they perform a target
+For multilingual program analysis, researchers have proposed two approaches.
+The first approach leverages existing general-purpose static analyzers for monolingual
+programs~\cite{JN-SAF, LeeASE20}.  It first analyzes each module
+written in a single language using its analyzer to generate
+a summary of the module as an abstraction of its behaviors.  Then, it performs a target
 analysis to detect bugs and security vulnerabilities cross language boundaries
-using the generated summaries.  While this approach can analyze different
-semantics of different languages and detect bugs and security vulnerabilities
+using the generated summaries. The second approach generates an abstraction
+of each module written in each language in a single form and performs
+a target analysis using existing top-down analyzers.
+While both approaches can analyze and detect bugs and security vulnerabilities
 in multilingual programs, they often suffer from performance overhead.
-Because they leverage the full features of expensive general-purpose static analyzers,
-they may waste their analysis time on the features that may not be relevant to
-summary generation for the target analysis.
+Because they utilize the full features of expensive general-purpose static analyzers,
+they may waste their analysis time on the features that are irrelevant to
+the target analysis.
 
 In this paper, we propose a novel approach that statically analyzes
 multilingual programs using a declarative-style analysis~\cite{doop} for the first time.
@@ -73,25 +75,25 @@ applications. Still, they often contain diverse bad smells in code,
 which may introduce bugs and security
 issues~\cite{nishiwaki2012sean, grichi2019state, abidi2019behind, abidi2021multi}.
 We implement our analyzer on top of CodeQL~\cite{codeql}, a
-static analysis engine powered by a declarative language named QL.
-It abstracts away the need to manage underlying data structures or implementing
+static analysis engine powered by a declarative language called QL.
+It abstracts away the need to manage underlying data structures or implement
 efficient algorithms for evaluating queries, thus enabling simple and fast query writing.
 We evaluated the analyzer using real-world Android JNI applications
 to see whether its performance is comparable to that of the existing work.
-Our experiment results show that our analyzer outperforms the
-state-of-the-art JNI analyzer, \jnsaf, in terms of scalability in that our analyzer
-shows \inred{x14} speed up on average without analysis precision degradation.
+Our experimental results show that our analyzer outperforms the
+state-of-the-art JNI analyzer, \jnsaf, in terms of scalability.  Our analyzer
+shows \inred{14x} speedup on average without analysis precision degradation.
 In addition,  we could easily develop various kinds of bug detectors
 reported in the literature on top of our analyzer, thanks to the power of CodeQL.
 Using these bug detectors, we found 25 new bugs and
-vulnerabilties from real-world applications.
+vulnerabilities from real-world applications.
 
 The contributions of this paper include the following:
 \begin{itemize}
   \item We propose a simple and effective declarative-style static analysis for
     multilingual programs for the first time. Our approach analyzes dataflows
     over language boundaries seamlessly without complex, expensive,
-    and unnecessary summary generation.
+    and unnecessary computation.
 
 \item We implement a prototype declarative-style JNI program analyzer on top of CodeQL.
   The design of our analyzer enables us to easily implement various bug
@@ -100,6 +102,6 @@ The contributions of this paper include the following:
 
 \item We show the practical usefulness of the JNI program analyzer for real-world
   JNI programs. Our tool detected the same kinds of bugs and security
-    vulnerabilities as the state-of-the-art JNI program analyzer, \jnsaf.
-Our tool is more precise and 14x faster on average than \jnsaf.
+    vulnerabilities as the state-of-the-art JNI program analyzer, \jnsaf,
+and it is more precise and \inred{14x} faster on average than \jnsaf.
 \end{itemize}
