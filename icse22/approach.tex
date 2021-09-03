@@ -16,97 +16,116 @@ static analysis for multilingual programs.
 
 \subsection{Declarative Analysis for a Single Language}
 
-A declarative analysis~\cite{doop} consists of datafacts and rules
-%
-First, we define the syntax of data-fact and rule, which is fairly simple.
+A declarative analysis~\cite{doop} consists of datafacts and rules:
+\[
+  \begin{array}{llll}
+d & ::= & p(\overline{e}) & \mbox{datafact}\\
+e & ::= & \embox{num}~\mid~\embox{string} & \mbox{element}\\
+r & ::= & d\ \mbox{:-}\ \overline{\neg^? d} & \mbox{rule}
+\end{array}
+\]
+A datafact ``$d = p(\overline{e})$'' denotes a relation $p$ between elements $\overline{e}$.
+An element $e$ is either a number or a string.
+A rule ``$r = d'\ \mbox{:-}\ \overline{\neg^? d}$'' denotes that
+a datafact $d'$ can be derived from other datafacts $\overline{d}$;
+$d'$ holds if all the datafacts $d \in \{\overline{\neg^? d}\}$ hold
+and all the datafacts $\neg d \in \{\overline{\neg^? d}\}$ does not hold.
 
-\[e := num | string\]
-\[df := p(\overline{e})\]
-\[r := df :- \overline{(not)? df}\]
+Figure~\ref{fig:overview} presents the overview of how a
+declarative-style analysis works for monolingual programs.
+The analysis consists of three steps.
+First, a given program gets converted into syntactic datafacts.
+Second, the rules that generate new datafacts are defined, which
+correspond to the implementation of the analysis.
+Finally, a declarative language engine evaluates the rules with the given datafacts,
+producing an analysis result in the form of a datafact.
 
-e stands for an element, and is either number or string.  df stands for
-data-fact, and it is an ordered tuple of elements.  r stands for rule, and it
-denotes how one rule can be derived from another data-facts.  It states that
-LHS data-fact(the data-fact before the symbol ":-") holds if all RHS data-facts
-(data-facts after the symbol ":-") without "not" notation holds, and all RHS
-data-facts with "not" notation does not hold.  (? Note that recursion is
-permitted, that is, a data-fact can depend on itself.  The exception is the
-recursion with odd number of negation, that is, the rule such as "p(x) :- not
-p(x)" is not valid. ?)
-
-
-Figure~\ref{fig:overview} illustrates the overview of how declarative style analysis works for
-one language works. The analysis mainly
-consists of three steps. First, the language is converted into a syntactic
-data-facts. Second, the rules that would generate new facts are defined, and
-these rules correspond to the actual implementation of the analysis. Finally, the
-declarative language engine is executed with the given data-facts and rules,
-giving the analysis result as an output in form of data fact.
-
-\textbf{Extracting syntactic data-fact}
-The first step is to extract syntactic data-facts from the source code.
-The example of syntactic data-facts would be data-facts about certain
-AST node, or parent-child relationship between nodes. For example, consider
+\medskip
+\textbf{Step 1: Extracting syntactic datafacts.}
+The first step is to extract syntactic datafacts from a given source code.
+Syntactic datafacts include datafacts about certain AST nodes and
+the parent-child relationship between nodes. For example, consider
 the following code:
 
-1 int x = 42 + 43;
-
-We can define a data-fact of the form "expr(i, s)", which is a 2-dimensional
-tuple of a number indicating the expression id and the string representation
-of that expression in the source code.  Therefore, we can extract the following
-set of expr data-facts: expr(0, "42"), expr(1, "43"), and expr(2, "42 + 43"),
-which indicates "42" is the 0-th expression, "43" is the 1-st, and the "42 +
-43" is th 2-nd.  Another example of syntactic data-fact would be "subexpr(i, j,
-k)", which is a 3-dimensional data-fact that indicates that the i-th expression
-has j-th expression k-th expression. For example, we can extract the rule
-subexpr(2, 0, 0) and subexpr(2, 1, 1).
-
-In a sense, these syntactic data-facts can be viewed as building blocks for IR
-of two languages.  Compared to other IRs, this declarative style of IR has a few
-advantages. First, extracting in this format does not require consideration of
-semantics.  It imposes almost no overhead beyond parsing the source code.
-Second, the syntactic data-facts can be utilized easily in any other kind of
-analysis, since they are basically also a data-fact that can be simply
-manipulated by defining new rules.  This also means that there is no need to
-re-extract the syntactic data-facts, even if the different client analysis is
-used.
-
-\textbf{Defining rule}
-The next step is defining rules to generate new data-facts on top of know
-data-facts. This step corresponds to actually implementing the algorithm for
-static analysis in declarative style. Considering the extension to the
-multilingual analysis, a useful pattern for defining rule is to take framework
-approach.  First thing to do is to designing the framework for static analysis.
-The framework consists of the result data-fact which would correspond to the
-final result of the analysis, and some helper data-facts used for calculating
-the result data-fact. Then, second task is to actually fill in the rules for
-such helper data-facts.
-
-Let's look at the concrete example of dataflow analysis. First thing we do is
-designing the dataflow analysis framework.  In this framework, the final
-analysis result we want is expressed with the data-fact of the form of
-flow(a,b), which means that value of the node a can flow into node b. flow(a,
-b) can be defined as transitive closure of a data-fact \datalog{step(a, b)};
-
-\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
-flow(a,b) :- step(a,b)
-flow(a,b) :- step(a,c), flow(c, b)
+\begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+int x = 42 + 43;
 \end{lstlisting}
-where the data-fact step(a,b) means that there is a direct flow from node a to b.
+We can define a syntactic datafact of the form ``\datalog{expr(i, s)},''
+where \datalog{i} denotes the expression ID and \datalog{s}
+denotes a string representation of the expression in the source code.
+Therefore, we can extract the following set of expr datafacts:
+\datalog{expr(0, "42")}, \datalog{expr(1, "43")}, and \datalog{expr(2, "42 + 43")}.
+They denote that \datalog{"42"} is the 0-th expression,
+\datalog{"42"} is the first, and \datalog{"42 + 43"} is the second.
+Another example syntactic datafact is ``\datalog{subexpr(i, j, k)},''
+which denotes that the \datalog{i}-th expression has the \datalog{j}-th
+expression as the \datalog{k}-th expression.
+For example, we can extract the ffollowing syntactic datafacts:
+\datalog{subexpr(2, 0, 0)} and \datalog{subexpr(2, 1, 1)}.
 
-Next thing to do is defining rule for the helper data-fact, step.  For example,
-let's assume that the syntactic data-fact assign(x, val) indicates the assignment
-x = val, then one can define a rule for step to be
+In a sense, these syntactic datafacts serve as building blocks for the
+common Intermediate Representation (IR) of multiple languages.
+Compared to other IRs, this declarative-style IR has a few advantages.
+First, extracting information from source code in this format does not
+require any consideration of the language semantics, which imposes
+almost no performance overhead beyond parsing the source code.
+Second, the syntactic datafacts can be utilized easily in any other kind of
+analysis, since they are simple information that can be freely
+manipulated by defining new rules. Therefore, even when we use a different
+client analysis, we can reuse the extracted syntactic datafacts
+without re-extracting them from the source code.
+
+
+\medskip
+\textbf{Step 2: Defining rules.}
+The next step is to define rules to generate new datafacts out of known datafacts.
+This step corresponds to actually implementing the algorithm of a
+static analysis in a declarative style.
+For example, recall that we can define a dataflow analysis
+\datalog{flow(a, b)} as the transitive closure of the datafact
+named \datalog{step}.
+Then, we should define rules for the datafact \datalog{step}.
+For example, if the syntactic datafact \datalog{assign(x, val)}
+denotes the assignment \ccode{x = val}, then we can define a rule for
+\datalog{step} and the assignment as follows:
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
-step(a,b) :- assign(a, b)
+step(a, b) :- assign(a, b)
 \end{lstlisting}
-.
 
 
-\textbf{Evaluating rules}
-The final step is to simply evaluate the defined rules, with the given
-data-facts.  By evaluating the rules, we mean that finding all possible
-data-facts that can be derived. The rules are usually evaluated in bottom-up
+% {\color{red}{To make this step applicable to multilingual analysis, we present
+% a way to define rules in a ``framework approach.''
+% First, we design a framework for a static analysis, which consists of 
+% the result datafact which would correspond to the
+% final result of the analysis, and some helper datafacts used for calculating the result datafact.
+%  Then, second task is to actually fill in the rules for such helper datafacts.
+
+% Let's look at the concrete example of dataflow analysis. First thing we do is
+% designing the dataflow analysis framework.  In this framework, the final
+% analysis result we want is expressed with the datafact of the form of
+% flow(a,b), which means that value of the node a can flow into node b. flow(a,
+% b) can be defined as transitive closure of a datafact \datalog{step(a, b)};
+
+% \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+% flow(a,b) :- step(a,b)
+% flow(a,b) :- step(a,c), flow(c, b)
+% \end{lstlisting}
+% where the datafact step(a,b) means that there is a direct flow from node a to b.
+
+% Next thing to do is defining rule for the helper datafact, step.  For example,
+% let's assume that the syntactic datafact assign(x, val) indicates the assignment
+% x = val, then one can define a rule for step to be
+% \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+% step(a,b) :- assign(a, b)
+% \end{lstlisting}
+% }}
+
+
+\medskip
+\textbf{Step 3: Evaluating rules.}
+The final step is to simply evaluate the defined rules with the given datafacts.
+Evaluating the rules amounts to finding all possible
+datafacts that can be derived. The rules are usually evaluated in a bottom-up
 and modular manner, that is, each rule is evaluated one-by-one, after every
 rule it depends on is evaluated.
 
@@ -126,25 +145,25 @@ to perform analysis on multilingual program.
 
 Figure~\ref{fig:overview2} illustrates the overview of how declarative style analysis can be
 extended to multilingual analysis. The main difference is that the evaluator
-now gets two sets of syntactic data-facts extracted from both language, and the
+now gets two sets of syntactic datafacts extracted from both language, and the
 rules also should be merged, with taking inter operation-semantics into account by
 extending some rules.
 
 In order to easily merge two sets of rules or each languages, two rules should
 conform to the same framework, that is, they should have same sets of helper
-data-facts (although the rule for deriving helper data-facts might differ).
+datafacts (although the rule for deriving helper datafacts might differ).
 Given two sets of rules, the first thing to do id to identify the syntactic
 parts of program where interaction can happen.  Then, based on the information
-regarding these parts, new rules for generating proper helper data-facts are
+regarding these parts, new rules for generating proper helper datafacts are
 defined, so that the inter operation semantic is properly modeled.
 
 One thing to note here is that already-defined intra language rules for helper
-data-facts and newly-defined inter-language rules can be treated independently;
+datafacts and newly-defined inter-language rules can be treated independently;
 defining new helper rules can be done without considering or modifying the 
 previous implementation.
 
 Let's illustrate this extension with the example of dataflow analysis above.
-First, we are given two rules for the helper data-fact "step", for each language
+First, we are given two rules for the helper datafact "step", for each language
 respectively:
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 step(a,b) :- step_A(a,b)
@@ -166,11 +185,11 @@ void f(int param) { // Language B
 \end{lstlisting}
 
 Here, the variable x in language A is passed to the parameter of a function f
-in language B. We can define the data-fact to reflect this kind of information,
+in language B. We can define the datafact to reflect this kind of information,
 foreignArgParam(a,b,i), which indicates that a is an i-th argument of a foreign
 function call to a function whose i-th parameter is b. In above example, we
-could derive the data-fact, foreignArgParam(x, param, 0). Using this data-fact,
-we can add new rule for deriving the helper data-fact step as follows:
+could derive the datafact, foreignArgParam(x, param, 0). Using this datafact,
+we can add new rule for deriving the helper datafact step as follows:
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
 step(a,b) :- foreignArgParam(a,b,i)
 \end{lstlisting}
