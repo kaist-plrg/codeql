@@ -108,8 +108,8 @@ each other; Lee's analyzer constructs call graphs of JNI programs, and JN-SAF
 detects data leakages from sources to sinks. For fair comparison, we compare
 ours and Lee's analyzer for the precision of resolving targets of foreign
 function calls, and compare ours and JN-SAF for the data leakage detection
-results. We marked each analysis result as success($\bigcirc$) or
-failure($\times$). In the precision comparison, an analysis succeeds if
+results. We marked each analysis result as success ($\bigcirc$) or
+failure ($\times$). In the precision comparison, an analysis succeeds if
 it precisely resolves targets of all foreign function calls between Java and C,
 and it fails otherwise. In the dataflow comparison, an analysis succeeds
 if it reports all data leakages correctly without false positivies or
@@ -149,7 +149,7 @@ a Java field name by concatenating two string values via the {\tt strcat}
 built-in function. Because ours and Lee's analyzer do not handle such built-in
 structs and functions, they failed to analyze the two benchmarks.  Lee's
 analyzer failed to analyze the three more benchmarks due to native entry points
-or the benchmarks~\cite{nativeactivity}. FlowDroid~\cite{Flowdroid} used by
+of the benchmarks~\cite{nativeactivity}. FlowDroid~\cite{Flowdroid} used by
 Lee's analyzer performs the whole-program analysis from Android entry points.
 Because the benchmarks have entry points only in C differently from monolingual
 Android applications, FlowDroid cannot find entries from which its analysis
@@ -218,7 +218,7 @@ to resolve the foreign function calls.
   \vspace{2mm}
   \includegraphics[width=0.5\textwidth]{img/graph}
   \vspace*{-1.5em}
-  \caption{Speedup}
+  \caption{Analysis time comparison between ours and ASE'20}
   \label{fig:graph}
 \vspace*{-.5em}
 \end{figure}
@@ -232,7 +232,7 @@ about 12 minutes at most to analyze {\it Tileless Map} having about one million
 lines of code. Figure~\ref{fig:graph} visualizes analysis time of our analyzer
 compared to Lee's analyzer. \inred{describe the comparison result...}  Note
 that once we create database for a program, we can evaluate multiple queries on
-it without re-creation to gain various analysis results of the program.
+it without re-creation to obtain various analysis results of the program.
 
 
 %Applications that do not have interaction form C to Java is ommitted from the
@@ -253,17 +253,53 @@ it without re-creation to gain various analysis results of the program.
 
 \subsection{RQ3: Usefulness}
 \input{tableRQ3}
-Table~\ref{table:RQ3} shows the list of bugs and security vulnerabilities we could detect.
-The first bug is the null dereference bug[1][9], which detects the dereference of
-Java's null value in C, without proper nullity checking logic. Rest of three
-bugs are related to mistake in using interaction, which are described in
-previous research[2]. "Missing fun" denotes the case where C function is
-missing even if it is called from java. "Type mismatch" denotes the case where
-the declaration of native function in Java has different return type or
-parameter type with its actual definition in C.  "Wrong signature" denotes the
-case where "GetMethodID" uses wrong signature for the java method. The
-number in each cell denotes the number of alarms, and the number in the
-parenthesis denotes the number of false alarm, if any.
+The bug checker of our analyzer detects four kinds of JNI interoperation bugs
+that previous research~\cite{ILEA, LeeASE20} defined as the follows:
+
+%The first bug is the null dereference bug[1][9], which detects the dereference of
+%Java's null value in C, without proper nullity checking logic. Rest of three
+%bugs are related to mistake in using interaction, which are described in
+%previous research[2]. "Missing fun" denotes the case where C function is
+%missing even if it is called from java. "Type mismatch" denotes the case where
+%the declaration of native function in Java has different return type or
+%parameter type with its actual definition in C.  "Wrong signature" denotes the
+%case where "GetMethodID" uses wrong signature for the java method. The
+%number in each cell denotes the number of alarms, and the number in the
+%parenthesis denotes the number of false alarm, if any.
+
+\begin{itemize}
+  \item {\it NullDereference}: dereferencing the {\tt null} value of Java in C
+  \item {\it MissingFun}: calling a missing Java method from C
+  \item {\it TypeMismatch}: declaring a C function with a different signature
+    from its corresponding Java native method
+  \item {\it WrongSignature}: calling a Java method using a method ID with a
+    wrong signature in C
+\end{itemize}
+
+Table~\ref{table:RQ3} summarizes the bug detection results of 19 out of 42
+applications, on which our analyzer reported true or false alarms.  The first
+column denotes application names, the second and third columns denotes the
+number of true and false positives of {\it NullDereference} respectively, and
+the fourth to six columns denote the number of true positives of {\it
+MissingFun}, {\it TypeMismatch}, and {\it WrongSig} respectively. We omit the
+number of false positivies of the last three bug types, because our tool
+reported only true positives on them. We classified the reported alarms into
+true or false positives by manual inspection of source code. 
+
+
+Our analyzer found 33 genuine bugs, but reported 24 false positives in 19
+applications. All false positives are reported only in the {\it
+NullDereference} bug detection; our tool reported five true and 24 false alarms
+of {\it NullDereference} in 11 apps, nine true alarms of {\it MissingFun} in
+three apps, 17 true alarms of {\it TypeMismatch} in eight apps, and two true
+alarms of {\it WrongSignature} in two apps. We manually checked that the false
+positives come from diverse over-approximation issues in static analyses but
+one of the main causes is conditionally sanitized variables.  Many applications
+have a code pattern that assigns a value to a variable only if the variable has
+the {\tt null} value. Because our analysis does not support the
+path-sensitivity that analyzes each execution path separately, it reports that
+the variable may still have {\tt null} even after the conditional assignment. 
+
 
 \begin{figure}[t]
   \centering
@@ -282,13 +318,13 @@ if (folder != null) {
 EmulatorActivity.nativeInitGraph89(..., tmp);
 
 //wrappercommonjni.c
-void Java_..._nativeInitGraph89(..., jstring tmp_dir) {
+void nativeInitGraph89(..., jstring tmp_dir) {
    (*env)->GetStringUTFChars(env, tmp_dir, 0);
    ...
 }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Null dereference}
+    \caption{NullDereference}
     \label{fig:bug1}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
@@ -308,7 +344,7 @@ Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) 
 }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Missing Fun}
+    \caption{MissingFun}
     \label{fig:bug2}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
@@ -317,12 +353,12 @@ Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) 
 private native static List<PageTextBox> search(...);
 
 //mupdfdroidbridge.c
-jobjectArray Java_..._search(...){
+jobjectArray search(...){
    ...
  }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Type Mismatch}
+    \caption{TypeMismatch}
     \label{fig:bug3}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
@@ -340,46 +376,102 @@ mSendStr = (*env)->GetMethodID(env, jNativesCls, "OnMessage", CB_CLASS_MSG_SIG);
 
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Wrong Signature}
+    \caption{WrongSignature}
     \label{fig:bug3}
   \end{subfigure}
   \vspace*{-.5em}
-  \caption{Real excerpt of examples of bugs}
+  \caption{Four kinds of JNI interoperation bugs}
   \label{fig:bugs}
 \end{figure}
 
-We demonstrate some interesting bugs we found in our benchmark with actual minified examples above
-for each kind.
+Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs our
+tool detected.  For brievity, we simplified code snippets excerpted from
+real-world applications. 
 
-First example denotes null dereference bug. A null is stored in variable tmp, and
-it is updated into non-null value under certain condition. However, tmp is passed
-to a C function even if it is still null, and it is dereferenced there
-without proper check.
+Figure~\ref{fig:bugs}(a) shows a code fragment with the {\it NullDerefence} bug
+in Graph 89. Java may calls a C function {\tt nativeInitGraph89} with {\tt
+null} value as the last argument, because a Java variable {\tt tmp} has {\tt
+null} when a function {\tt GetInternalAppStorage} returns {\tt null}.  The C
+function calls a JNI function {\tt GetStringUTFChars} with the value as the
+second argument, without null check of the value. However, because the JNI
+specification describes that the second argument of the functions must not be
+{\tt null}~\cite{getstringutfchars}, the JNI function may behave unexpectedly.
+Note that calling JNI functions with wrong arguments may introduce various
+unexpected executions, since JVMs do not validate the arguments because of the
+performance overhead~\cite{hwang2021justgen}.
 
-Second example denotes a bug where C function is missing. The name for target C
-function is decided with convention, and the java package's name is used
-for deciding the name. It seems that package name is changed during development,
-but the function name in the C source code was not changed respectively, resulting
-in missing function bug.
+\renewcommand{\texttt}[1]{%
+  \begingroup
+  \ttfamily
+  \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\discretionary{}{}{}}%
+  \begingroup\lccode`~=`[\lowercase{\endgroup\def~}{[\discretionary{}{}{}}%
+  \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\discretionary{}{}{}}%
+  \catcode`/=\active\catcode`[=\active\catcode`.=\active
+  \scantokens{#1\noexpand}%
+  \endgroup
+}
 
-In third example, the return type of the function is List, which is an object.
-However, in C, the return type of the function is defined as "jarray", which
-should be used for array, not object.
+Figure~\ref{fig:bugs}(b) shows a code snippet with the {\it MissingFun} bug in
+ObscuraCam. As described in \inred{Section~\ref{}}, JNI has a C function naming
+convention for JVMs to link Java native methods to the corresponding C
+functions~\cite{jninaming}. While a Java class {\tt JpegRedaction} declaring a
+native method {\tt redactRegions} belongs to a package
+\texttt{org.witness.obscuracam.photo.jpegredaction}, the corresponding C
+function is named with a wrong package name
+\texttt{org.witness.securesmartcam.jpegredaction}.  When calling the native
+method, JVM fails to link the native method because of the wrongly named C
+function.
 
-In the final example, it demonstrates the case where wrong signature is used
-for dispatching java method from C, using "GetMethodID" function. An interesting
-point is that, the signatures were defined in C macro, and the wrong signature
-was the same as the next one.
 
-We manually inspected the source code if the reported alarms are false positive
-or not. No false positives were found for latter three kinds of bugs.  There
-were some false positive for the first bug, the null dereference bug. The
-reason for these false positives were mainly due to, again, imprecise
-intra-language dataflow. For example, the analyzer could not handle the case
-where a variable is reassigned to a non-null value in a different branch or a
-different function, resulting in giving the false positive that null value can
-be dereferenced.
+Figure~\ref{fig:bugs}(c) shows a code snippet with the {\it TypeMismatch} bug
+in Document Viewer.  While the return type of a Java native method {\tt search}
+is {\tt List<PageTextBox>}, the return type of the corresponding C function
+{\tt search} is {\tt jobjectArray} that corresponds to the Java built-in array
+container. The return type mismatch does not have an effect on linking between
+Java native methods and C functions. However, since it is a unspecified case in
+JNI specification, interoperation via such native methods may behave
+differently on different JVMs~\cite{LeeASE20}. 
 
-In summary, we can conclude that our analyzer is practical and useful enough,
-in that we could find previously unknown bugs/security vulnerabilities using
-our analyzer.
+
+Figure~\ref{fig:bugs}(d) shows a code fragment with the {\it WrongSignature}
+bug in PrBoom. C tries to get an ID of a Java method {\tt OnMessage} with a
+signature \texttt{(LJava/lang/String;I)V}, but the Java method has a different
+signature \texttt{(LJava/lang/String;)V} taking sole String parameter. Because
+the two signatures are not equal to each other, C always obtains {\tt null}
+value instead of an ID and a Java exception is thrown in this example. In
+addition, it may introduce errors in subsequent instructions when using the
+return value without null check or calling JNI functions without handling the
+thrown Java exception~\cite{jniexcept}.
+
+%First example denotes null dereference bug. A null is stored in variable tmp, and
+%it is updated into non-null value under certain condition. However, tmp is passed
+%to a C function even if it is still null, and it is dereferenced there
+%without proper check.
+
+%Second example denotes a bug where C function is missing. The name for target C
+%function is decided with convention, and the java package's name is used
+%for deciding the name. It seems that package name is changed during development,
+%but the function name in the C source code was not changed respectively, resulting
+%in missing function bug.
+
+%In third example, the return type of the function is List, which is an object.
+%However, in C, the return type of the function is defined as "jarray", which
+%should be used for array, not object.
+%
+%In the final example, it demonstrates the case where wrong signature is used
+%for dispatching java method from C, using "GetMethodID" function. An interesting
+%point is that, the signatures were defined in C macro, and the wrong signature
+%was the same as the next one.
+
+%We manually inspected the source code if the reported alarms are false positive
+%or not. No false positives were found for latter three kinds of bugs.  There
+%were some false positive for the first bug, the null dereference bug. The
+%reason for these false positives were mainly due to, again, imprecise
+%intra-language dataflow. For example, the analyzer could not handle the case
+%where a variable is reassigned to a non-null value in a different branch or a
+%different function, resulting in giving the false positive that null value can
+%be dereferenced.
+
+%In summary, we can conclude that our analyzer is practical and useful enough,
+%in that we could find previously unknown bugs/security vulnerabilities using
+%our analyzer.
