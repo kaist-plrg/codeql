@@ -1,180 +1,79 @@
-\newcommand{\req}[1]{RQ#1}
-
 \section{Evaluation}
-%In this section, we show the feasibility of the approach of using declarative
-%analysis for multilingual program, and the effectiveness of its
-%implementation. More specifically, we set three research questions as follow:
+In this section, we show the feasibility of the approach of using declarative
+analysis for multilingual program, and the effectiveness of its
+implementation. More specifically, we set three research questions as follow:
 
-%RQ1) Feasibility: Is it possible to implement a working static analyzer for multilingual program in declarative style?
-%
-%RQ2) Performance: How is the speed and precision of implemented analyzer, compared to the state-of-the-art analyzer?
-%
-%RQ3) Usefulness: How practical is the implemented analyzer?
+RQ1) Feasibility: Is it possible to implement a working static analyzer for multilingual program in declarative style?
 
-To show the effectiveness of our approach, we evaluate our analyzer with the
-following three research questions:
-\begin{itemize}
-  \item \req{1}: {\it (Feasibility)} Can our tool analyze JNI programs that use
-    various JNI inteoperations?
+RQ2) Performance: How is the speed and precision of implemented analyzer, compared to the state-of-the-art analyzer?
 
-  \item \req{2}: {\it (Performance)} How precise and scalable is our tool for
-    real-world JNI program analysis compared to Lee's analyzer~\cite{LeeASE20}?
+RQ3) Usefulness: How practical is the implemented analyzer?
 
-  \item \req{3}: {\it (Usefulness)} Can our tool analyze the same types of bugs
-    the state-of-the-art JNI program analyzers can detect?
-\end{itemize}
+To answer RQ1, we tested our implemented analyzer with NativeFlowBench, which
+is a small set of benchmarks manually crafted by authors of JN-SAF[2], with the
+purpose of testing dataflow analyzer for JNI programs. It consists of 23
+android applications featuring various interactions between C and Java, some of
+which contain a malicious code pattern that tries to leak sensitive user data.
+The analyzer should successfully recognize and report those patterns for each
+application, if any. The result showws that our approach is feasible enough,
+in that we could correctly draw call graph, find field access target, and
+find data leaks from the benchmarks.
 
-%To answer RQ1, we tested our implemented analyzer with NativeFlowBench, which
-%is a small set of benchmarks manually crafted by authors of JN-SAF[2], with the
-%purpose of testing dataflow analyzer for JNI programs. It consists of 23
-%android applications featuring various interactions between C and Java, some of
-%which contain a malicious code pattern that tries to leak sensitive user data.
-%The analyzer should successfully recognize and report those patterns for each
-%application, if any. The result showws that our approach is feasible enough,
-%in that we could correctly draw call graph, find field access target, and
-%find data leaks from the benchmarks.
+To answer RQ2, we applied our analyzer to 42 real-world android applications
+collected from F-Droid[9], a repository for open-source android application.
+These 42 apps are selected by first scannig the apps that feature JNI from the
+repository, and among them, selecting those that we could successfully compile.
+The line number of collected code ragnes from hundreds of lines, to hundreds of
+thousands of lines.  We compared our analyzer with Lee's state-of-the-art JNI
+analyzer[3], and confirmed that our analyzer outperforms in terms of
+scalability and precision.
 
-For \req{1}, we analyze benchmarks in NativeFlowBench~\cite{nativeflowbench,
-JN-SAF} using our tool. The benchmarks contain 23 JNI Android applications that
-use various JNI interoperations and leak sensitive data from {\it sources} to
-{\it sinks} across language boundaries via the interoperations. We also compare
-analysis results of our tool to results of Lee's analyzer and JN-SAF. We use
-compiled versions of the benchmarks for JN-SAF because it targets compiled JNI
-programs, and use source code of the benchmarks for ours and Lee's analyzer.
+To answer RQ3, we implemented various kinds of bug checkers, introduced in
+previous researches[1][3], on top of our analyzer. We ran our bug checker on
+the 42 applications of F-Droid mentioned above, and detected 33 bugs,
+including \inred{25} newly found bugs.
 
-%To answer RQ2, we applied our analyzer to 42 real-world android applications
-%collected from F-Droid[9], a repository for open-source android application.
-%These 42 apps are selected by first scannig the apps that feature JNI from the
-%repository, and among them, selecting those that we could successfully compile.
-%The line number of collected code ragnes from hundreds of lines, to hundreds of
-%thousands of lines.  We compared our analyzer with Lee's state-of-the-art JNI
-%analyzer[3], and confirmed that our analyzer outperforms in terms of
-%scalability and precision.
-
-For \req{2}, we compare analysis results of our tool and Lee's analyzer on 42
-real-world JNI Android applications downloaded from F-Droid, a repository of
-open-source Android applications~\cite{fdroid}. We first classified
-applications of F-Droid into JNI or non-JNI applications. Then, we selected the
-42 applications out of all the JNI applications as our analysis targets,
-because they are only applications that are compiled without errors.
-
-%To answer RQ2, we applied our analyzer to 42 real-world android applications
-%collected from F-Droid[9], a repository for open-source android application.
-%These 42 apps are selected by first scannig the apps that feature JNI from the
-%repository, and among them, selecting those that we could successfully compile.
-%The line number of collected code ragnes from hundreds of lines, to hundreds of
-%thousands of lines.  We compared our analyzer with Lee's state-of-the-art JNI
-%analyzer[3], and confirmed that our analyzer outperforms in terms of
-%scalability and precision.
-
-
-%To answer RQ1, we tested our implemented analyzer with NativeFlowBench, which
-%is a small set of benchmarks manually crafted by authors of JN-SAF[2], with the
-%purpose of testing dataflow analyzer for JNI programs. It consists of 23
-%android applications featuring various interactions between C and Java, some of
-%which contain a malicious code pattern that tries to leak sensitive user data.
-%The analyzer should successfully recognize and report those patterns for each
-%application, if any. The result showws that our approach is feasible enough,
-%in that we could correctly draw call graph, find field access target, and
-%find data leaks from the benchmarks.
-
-%tool on benchmarks in NativeFlowBench~\cite{nativeflowbench, JN-SAF}. The
-%benchmarks include 23 Android JNI applications that use various JNI
-%interoperation features. Because JN-SAF targets compiled JNI programs, we use
-%compiled versions of the benchmarks for JN-SAF and source code of the
-%benchmarks for Lee's analyzer and our tool. 
-
-
-%To answer RQ3, we implemented various kinds of bug checkers, introduced in
-%previous researches[1][3], on top of our analyzer. We ran our bug checker on
-%the 42 applications of F-Droid mentioned above, and detected 33 bugs,
-%including \inred{25} newly found bugs.
-
-For \req{3}, we detect JNI interoperation bugs in the 42 real-world Android
-applications using our tool. We implemented a checker detecting four types of
-bugs on top of our tool using the query language of CodeQL. We chose our target
-JNI interoperation bugs as the same as the targets of previous research's
-client analyses~\cite{LeeASE20, ILEA}.
-
-
-\subsection{\req{1}: Feasibility}
+\subsection{RQ1: Feasibility}
 \input{tableRQ1}
-Table~\ref{table:RQ1} shows analysis results of our analyzer, Lee's analyzer,
-and JN-SAF on 23 benchmarks in NativeFlowBench.  The {\it Benchmark} columns
-denote benchmark names, the {\it Precision} columns denote analysis results of
-Lee's analyzer and ours, and the {\it Dataflow} columns denote analysis results
-of JN-SAF and ours.  Lee's analyzer and JN-SAF have different analysis purposes
-each other; Lee's analyzer constructs call graphs of JNI programs, and JN-SAF
-detects data leakages from sources to sinks. For fair comparison, we compare
-ours and Lee's analyzer for the precision of resolving targets of foreign
-function calls, and compare ours and JN-SAF for the data leakage detection
-results. We marked each analysis result as success($\bigcirc$) or
-failure($\times$). In the precision comparison, an analysis succeeds if
-it precisely resolves targets of all foreign function calls between Java and C,
-and it fails otherwise. In the dataflow comparison, an analysis succeeds
-if it reports all data leakages correctly without false positivies or
-negatives.
+Table~\ref{table:RQ1} shows the analysis result for 23 benchmarks in
+NativeFlowBench.  The "Benchmark" columns denote the benchmark names, and rest
+of columns denote whether the analysis result for corresponding benchmark is
+correct(O), incorrect(X), or not available(-) in terms of two criteria for each
+of the analyzers. For the "Precision" columns we call the analysis result is
+correct if every function call (call from Java to C, call from C to Java)
+target and field access (field read from C to Java, field write from C to Java)
+target is precisely determined. For "Dataflow" columns, it's considered correct
+if every data leak is reported correctly without false positives nor false
+negatives. 
 
+For precision, we compare our result with Lee's analyzer, since JN-SAF does not
+provide the function call / field access target information. Except for two
+benchmarks, our analyzer could correctly determine all targets for function
+calls and field access correctly.  One of two exception benchmarks was
+\textit{icc\_java\_to\_native}, which reported two more suprious call edges for
+a function call of android library function from C to Java. The other exception
+was \textit{native\_complexdata\_stringop}, where string manipulation functions
+such as strcpy or strcat from C standard library were used to create the string
+value that indicates the target field's name. Since the inner-flow analysis
+could not properly model these string manipulation functions, analyzer could
+not correctly determine the field access target. Still, the overall result is
+superior to the Lee's, which could not precisely analyze the 4 additional
+benchmarks.
 
-%of columns denote whether the analysis result for corresponding benchmark is
-%correct(O), incorrect(X), or not available(-) in terms of two criteria for each
-%of the analyzers. For the "Precision" columns we call the analysis result is
-%correct if every function call (call from Java to C, call from C to Java)
-%target and field access (field read from C to Java, field write from C to Java)
-%target is precisely determined. For "Dataflow" columns, it's considered correct
-%if every data leak is reported correctly without false positives nor false
-%negatives. 
+For the dataflow result, we compare the result with JN-SAF. There were 3
+benchmarks that our analyzer failed to detect the leak. Two of them are related
+to \textit{inter component communication}(ICC), which is a android-specific
+feature and was out of scope for our implementation. The other one involves
+dataflow via array. The data is stored in array and read. Since our base
+analyzer could not model the data flow through array, this kind of leak was not
+detected. Whether JN-SAF could detect the leak in this case is not available
+from the paper, but we believe the would be modeled in sound manner,
+considering their result for benchmark "native\_noleak\_array" showed false
+positive. 
 
-%For precision, we compare our result with Lee's analyzer, since JN-SAF does not
-%provide the function call / field access target information. Except for two
-%benchmarks, our analyzer could correctly determine all targets for function
-%calls and field access correctly.  One of two exception benchmarks was
-%\textit{icc\_java\_to\_native}, which reported two more suprious call edges for
-%a function call of android library function from C to Java. The other exception
-%was \textit{native\_complexdata\_stringop}, where string manipulation functions
-%such as strcpy or strcat from C standard library were used to create the string
-%value that indicates the target field's name. Since the inner-flow analysis
-%could not properly model these string manipulation functions, analyzer could
-%not correctly determine the field access target. Still, the overall result is
-%superior to the Lee's, which could not precisely analyze the 4 additional
-%benchmarks.
-
-In the precision comparison, our tool successfully analyzed 21 out of 23
-benchmarks, while Lee's analyzer failed in three more benchmarks than ours. We
-manually confirmed that the two common failures of Lee's and ours are
-originated from built-in structs and functions in C; {\it
-icc\_java\_to\_native} stores Java class information in the Android built-in
-structure {\tt android\_app} and {\it native\_complexdata\_stringop} generates
-a Java method name by concatenating two string values via the {\tt strcat}
-built-in function. Because ours and Lee's analyzer do not handle such built-in
-structs and functions, they failed to analyze the two benchmarks.  Lee's
-analyzer failed to analyze the three more benchmarks due to native entry points
-or the benchmarks~\cite{nativeactivity}. FlowDroid~\cite{Flowdroid} used by
-Lee's analyzer performs the whole-program analysis from Android entry points.
-Because the benchmarks have entry points only in C differently from monolingual
-Android applications, FlowDroid cannot find entries from which its analysis
-starts.  Contrary to Lee's analyzer, our tool performs the query-based
-analysis, which can resolve targets of foreign function calls regardless of
-program entries.
-
-
-In the dataflow comparison, our tool found data leakages correctly in 19
-benchmarks but reported false alarms for four benchmarks, while JN-SAF analyzes
-21 benchmarks correctly. The one common failure is originated from the string
-concatenation as we described. {\it icc\_javatonative} and {\it
-icc\_nativetojava} leak data via the Android inter-component communication that
-is beyond the scope of this paper. The remaining two different failures of ours
-and JN-SAF come from their array analysis policies. {\it native\_leak\_array}
-stores sensitive data in an array, and then retreives the data from the array
-and leaks it. On the other hand, {\it native\_noleak\_array} stores sensitive
-data in an array as well, but retrieves another element from the array and uses
-it. Because distinguishing different index of an array is challenging, JN-SAF
-tracks every value retrieved from the array if the array contains the sensitive
-data. The policy enables JN-SAF to analyze {\it native\_leak\_array} correctly,
-but introduce false alarm in {\it native\_noleak\_array} at the same time. In
-contrast, because CodeQL does not track dataflows depending on arrays by
-default, our tool does not report false alarm in {\it native\_noleak\_array}
-but cannot find the data leakage in {\it native\_leak\_array}.
+As a result, we could conclude that it is feasible to implement static analysis
+in declarative style, in that it shows competable analysis result for the
+benchmark, NativeFlowBench.
 
 
 \subsection{RQ2: Performance}
