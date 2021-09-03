@@ -6,8 +6,7 @@ We describe three closely related categories of work below.
 Among various language representations of JNI programs, studies dealing with
 pairs of languages are most closed related.  For JNI programs consisting of
 Java and C source codes, ILEA~\cite{ILEA} extends the Java Virtual Machine
-Language (JVML) and Jlint\footnote{\url{http://artho.com/jlint/manual.html}},
-which is a JVML dataflow analyzer, to integrate C codes into one language.
+Language (JVML) and Jlint\footnote{\url{http://artho.com/jlint/manual.html}}, which is a JVML dataflow analyzer, to integrate C codes into one language.
 Since a modest extension of JVML cannot fully support C semantics like memory
 models, it extremely over-approximates C operations such as read and write
 through pointers.  Lee et al.~\cite{LeeASE20} proposed a general approach to
@@ -73,8 +72,7 @@ Bravenboer and Smaragdakis proposed the \doop framework~\cite{doop} using Datalo
 that showed dramatic speedups for the Java points-to analysis.  They explain that
 the modularity and declarativeness of Datalog rules are the keys to improve
 performance~\cite{doopWorkshop}.  In addition, researchers have improved
-analysis backends, declarative language engines%~\cite{bddbddb[37], µZ[16], Soufflé, madsen2016}.
-
+analysis backends, declarative language engines~\cite{whaley2005D, hoder2011muz, souffle, madsen2016}.
 Avgustinov et al.~\cite{ql2016} proposed QL, a declarative and object-oriented
 query language to be compiled into Datalog and runs on a relational DB, and static
 analyzers implemented QL which scale to millions of lines of code.
