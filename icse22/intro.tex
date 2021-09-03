@@ -35,7 +35,7 @@ analysis to detect bugs and security vulnerabilities cross language boundaries
 using the summaries. The second approach generates an abstraction
 of each module written in each language in an IR that can
 incorporate both languages, and performs
-a target analysis using a top-down general-purpose analyzer
+a target analysis using a general-purpose analyzer
 running on the IR~\cite{hybridroid, cpython}.
 While both approaches can detect bugs and security vulnerabilities
 in multilingual programs, they often suffer from performance overhead.
@@ -64,9 +64,8 @@ the form of a set of datafacts.  The biggest advantage of a declarative-style an
 \textit{query-based} analysis; a target analysis is specified in
 special rules called queries. Only such datafacts that are
 necessary to evaluate the query are computed.
-Unlike the previous approaches where general-purpose static
-analyzers generate all possible summaries, which may lead to
-unnecessary computations, our approach does not spend time
+Unlike all the previous approaches leverage general-purpose static analyzers,
+which may lead to unnecessary computations, our approach does not spend time
 on generating unnecessary summaries or computing irrelevant datafacts.
 
 
