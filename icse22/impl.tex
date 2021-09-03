@@ -1,3 +1,11 @@
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.47\textwidth]{img/codeql}
+  \caption{Overall structure of JN-QL}
+  \label{fig:codeql}
+\end{figure}
+
 \section{Implementation}\label{sec:impl}
 In this section, we show how we applied our idea of declarative style static
 analysis for multilingual program to implement the proof-of-concept dataflow
@@ -15,8 +23,7 @@ predicate isOneTwoThree(int n) {
   n = 3
 }
 \end{lstlisting}
-
-QL is also an object-oriented language, and it support class definition:
+QL is also an object-oriented language supporting class definitions:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneTwoThree extends int {
   OneTwoThree() { // characteristic predicate
@@ -33,16 +40,6 @@ Basically, defining class is not really different to defining predicate.  Class
 is just set of elements that satisfy the predicate called "characteristic
 predicate". For more detailed information about QL, one can refer to the
 paper[6] or the official document[7].
-
-\begin{figure}[t]
-  \centering
-  \vspace{2mm}
-  \includegraphics[width=0.5\textwidth]{img/codeql}
-  \vspace*{-1.5em}
-  \caption{Overall structure of JN-QL}
-  \label{fig:codeql}
-\vspace*{-.5em}
-\end{figure}
 
 Figure~\ref{fig:codeql} shows the overall structure of JN-QL. First, it generates database
 for each language, C++ and Java, and merge it to one database. This corresponds
@@ -62,7 +59,6 @@ two steps: first, the extracted information from compiler is stored in the
 human readable file format called trap files, and second, these trap files are
 then finalized into database, written in binary format.
 
-\inred{TODO: Explain this code briefly with caption?}
 \begin{lstlisting}[style=java,numbers=none,xleftmargin=2.5em]
 //Example of trap file
 #10017=@"class;hello.HelloJNI"
@@ -77,7 +73,7 @@ params(#10067,#10044,0,#10061,#10067)
 paramName(#10067,"java_callback_param")
 \end{lstlisting}
 
-In order to create a database for two languages, JN-QL performs first step for
+To create a database for two languages, JN-QL performs first step for
 each languages separately to get two sets of trap files.  Next step would be to
 perform finalization step on merged set of trap files. However, a problem is that
 both of trap files have table with duplicated name, so simply merging them would not work.
@@ -124,8 +120,7 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
   |
     node2.asExpr() = upd.getAFirstUse()
   )
-  or
-  // Flow through this
+  or  // Flow through this
   ...
 }
 \end{lstlisting}
@@ -207,7 +202,7 @@ method name. For example, the target function name for the method call
 cfunction would be Java\_fully\_\_qualified\_\_class\_\_name\_cfunction.
 Based on this convention, we can define the predicate viableCallableJ2C
 so that f = viablaCallableJ2C(m) holds when f.toString() = "Java\_" + 
-m.className() + "\_" + "m.toString() holds. \inred{Include concrete code?}
+m.className() + "\_" + "m.toString() holds.
 
 \textbf{C to Java} The interaction from C to Java is more complex, and
 requires more detailed implementation. The biggest difference is that
@@ -234,7 +229,6 @@ predicate viableCallableC2J by connecting the call edge from "Call<type>Method"
 call to the method m, if there is a flow to mid from call to "GetMethodID", and
 string values that flow into name argument and sig argument of the "GetMethodID"
 corresponds with that of method m.
-\inred{Include concrete code?}
 
 Other than the predicate viableCallable, there are also other predicates that
 are extended. Most of them are specialized "step" predicates, where the purpose
