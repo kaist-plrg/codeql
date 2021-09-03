@@ -55,139 +55,157 @@ Finally, using the merged database and merged library, a user can write a query 
 perform a client-analysis, and evaluate it to produce its analysis result.
 
 \subsection{Creating Databases}
-The first step is to generate database for each of two languages.  For
-compiled languages such as C and Java, CodeQL generates database by running
-the compiler for each language. While the compiler is running, CodeQL monitors
-the behavior of compiler and extracts information it needs, and create database
-with that information.  Creation of database for one language is performed in
-two steps: first, the extracted information from compiler is stored in the
-human readable file format called trap files, and second, these trap files are
-then finalized into database, written in binary format.
+For compiled languages such as C and Java, CodeQL generates their database
+by compiling source programs.  When a compiler compiles a program,
+CodeQL monitors the compiler to extract necessary information and
+creates a database with the extracted information.
+CodeQL creates a database for a single language in two steps:
+1) it stores the extracted information from a compiler in a trap
+file, a human readable file format, and 2) it fianlizes trap files
+into databases in the binary format. For example, the
+following shows a sample trap file:
 
-\begin{lstlisting}[style=java,numbers=none,xleftmargin=2.5em]
-//Example of trap file
-#10017=@"class;hello.HelloJNI"
-...
+\begin{lstlisting}[style=java,numbers=none]
+#10017=@"class;hello.HelloJNI"  ...
 #10044=@"type;int"
-primitives(#10044,"int")
-...
-#10061=@"callable;{#10017}.java_callback({#10044}){#10044}"
-...
+primitives(#10044,"int")  ...
+#10061=@"callable;{#10017}.java_callback({#10044}){#10044}"  ...
 #10067=@"params;{#10061};0"
 params(#10067,#10044,0,#10061,#10067)
 paramName(#10067,"java_callback_param")
 \end{lstlisting}
+which describes the parameter information about \javacode{java\_callback}.
 
-To create a database for two languages, JN-QL performs first step for
-each languages separately to get two sets of trap files.  Next step would be to
-perform finalization step on merged set of trap files. However, a problem is that
-both of trap files have table with duplicated name, so simply merging them would not work.
-The solution is to add prefix to name of each table. For example, if both
-database have tables named "@expr", the table from C would be renamed as
-"@cpp\_expr", and the table from Java would be renamed as "@java\_expr". After
-renaming each table, the second step can be applied to finalize the database on
-which the query can be evaluated.
-
-\subsection{Lifting Libraries}
-CodeQL provides various libraries for each languages, which consists of some
-pre-defined predicates and classes that can be useful for user to implement
-analysis on their own taste. Dataflow analysis library is one of them, and both
-C and Java supports this dataflow analysis library. Two dataflow analysis
-library have same framework: they share same classes such as "Node", and some
-predicates such as "simpleLocalFlowStep".
-
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{subfigure}[t]{0.5\textwidth}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
-// cpp/dataflow/internal/DataFlowUtil.qll
-class Node extends TNode {
-  ...
-}
-predicate simpleLocalFlowStep(Node nodeFrom, Node nodeTo) {
-  // Expr -> Expr
-  exprToExprStep_nocfg(
-    nodeFrom.asExpr(),
-    nodeTo.asExpr()
+class Node extends TNode { ... }
+predicate simpleLocalFlowStep(Node from, Node to) {
+  exprToExprStep_nocfg( // Expr -> Expr
+    from.asExpr(),
+    to.asExpr()
   )
-  or
-  // Assignment -> LValue post-update node
-  ...
+  or ...  // Assignment -> LValue post-update node
 }
-class Node extends TNode {
-  ...
-}
-// java/dataflow/internal/DataFlowUtil.qll
+\end{lstlisting}
+    \vspace*{-.5em}
+    \caption{c/dataflow/internal/DataFlowUtil.qll}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+class Node extends TNode { ... }
 predicate simpleLocalFlowStep(Node node1, Node node2) {
   // Variable flow steps through
   // adjacent def-use and use-use pairs.
   exists(SsaExplicitUpdate upd |
     upd.getDefiningExpr().(VariableAssign).getSource()
-    = node1.asExpr() or
+      = node1.asExpr() or
     upd.getDefiningExpr().(AssignOp) = node1.asExpr()
   |
     node2.asExpr() = upd.getAFirstUse()
   )
-  or  // Flow through this
-  ...
+  or ...  // Flow through this
 }
 \end{lstlisting}
-However, these two implementations are not compatible, that is, although they have the same name,
-we can not use "Node" class of C as an argument for "simpleLocalFlowStep" predicate of Java or vice versa.
-Therefore, we lift each of the library into the same level so that classes and predicates become compatible.
-First, we encapsulated each of original dataflow into CodeQL's module, named CPP and JAVA so that
-original classes and predicated can be distinguished with lifted ones.
-A class can be lifted by first defining sum type, which denotes that the lifted class would be either from C or
-Java, and then make the lifted class be of that type. We also implemented two member predicates that can cast
-the lifted class into each of corresponding class.
+    \vspace*{-.5em}
+    \caption{java/dataflow/internal/DataFlowUtil.qll}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{QL libraries for C and Java}
+  \label{fig:qll}
+\end{figure}
+
+To create a single database for both C and Java, JN-QL maintains
+a separate trap file for each language and then merges them.
+Note that both trap files may have tables with the same name.
+To avoid name conflicts in a merged database, we add a
+language-specific prefix to each table.
+For example, if both trap files have tables named \codeql{@expr},
+we rename the table from C as \codeql{@c\_expr},
+and the table from Java as \codeql{@java\_expr"}.
+After renaming such tables, we can safely finalize the trap files into
+databases on which queries can be evaluated.
+
+\subsection{Lifting Libraries}
+
+CodeQL provides various libraries for C and Java, including
+pre-defined predicates and classes for users to implement their own analyses.
+A dataflow analysis library is such a library, which supports both C and Java.
+For example, Figure~\ref{fig:qll} shows sample QL libraries for C and Java,
+which uses the same class name \ccode{Node} and the same predicate
+name \ccode{simpleLocalFlowStep}.
+However, even with the same name, the class \ccode{Node} in C and the
+class \javacode{Node} in Java are different classes, which are incompatible.
+The same applies to the predicate \ccode{simpleLocalFlowStep}.
+In other words, we can not use the class \ccode{Node} in C as an
+argument of the predicate \javacode{simpleLocalFlowStep} in Java or vice versa.
+
+To make classes and predicates in C and Java become compatible,
+we lift each library to the common level.
+First, we encapsulate each of the original dataflows in a CodeQL
+module named C and JAVA so that we can distinguish the original
+classes and predicates by lifted ones.
+We can lift a class by first defining a sum type, denoting that
+the lifted class comes either from C or Java, and then making the
+lifted class be of that type.  We also implement two member predicates
+that can cast the lifted class into the C or Java class:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 private newtype TNode =
   TJavaNode(JAVA::Node n)
   or
-  TCppNode(CPP::Node n)
+  TCNode(C::Node n)
 class Node extends TNode {
   JAVA::Node asJava() {
     this = TJavaNode(result)
   }
-  CPP::Node asCpp() {
-    this = TCppNode(result)
+  C::Node asC() {
+    this = TCNode(result)
   }
   ...
 }
 \end{lstlisting}
-
-A predicate can be lifted by combining two original predicates with "or"
-connectives.  For each original predicate, each of the arguments and return
-values are casted down to corresponding language's class. After lifting, the
-lifted predicate shows equivalent behavior as the original ones if all the
-arguments are from the same language.
+Similarly, we can lift a predicate by combining two original predicates with
+the \codeql{or} connective. For each original predicate, we cast down
+each of the arguments and return values to the class of its corresponding language:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate simpleLocalFlowStep(Node node1, Node node2) {
   JAVA::simpleLocalFlowStep(
     node1.asJava(), node2.asJava()
   )
   or
-  CPP::simpleLocalFlowStep(
-    node1.asCpp(), node2.asCpp()
+  C::simpleLocalFlowStep(
+    node1.asC(), node2.asC()
   )
 }
 \end{lstlisting}
-\subsection{Merging Libraries}
+After lifting, lifted predicates show the equivalent behaviors as the
+original ones if all the arguments are from the same language.
 
+
+\subsection{Merging Libraries}
 After the library is lifted, the last step is to extend some predicates to
 reflect the semantics of interoperation between languages. The interaction from
 Java to C, or C to Java are identified, and some predicates are extended to
 model their behaviors. As an concrete example, Let's take a look how the predicate
 named viableCallable can be extended.
+
+\begin{figure}[t]
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
-result.asJava()
-  = JAVA::viableCallable(c.asJava()) or
-result.asCpp()
-  = CPP::viableCallable(c.asCpp()) or
-result.asCpp()
-  = viableCallableJ2C(c.asJava()) or
-result.asJava()
-  = viableCallableC2J(c.asCpp())
+  result.asJava() = JAVA::viableCallable(c.asJava())
+  or
+  result.asC() = C::viableCallable(c.asC())
+  or
+  result.asC() = viableCallableJ2C(c.asJava())
+  or
+  result.asJava() = viableCallableC2J(c.asC())
 }
 \end{lstlisting}
+\caption{libray merge}
+\end{figure}
+
 The first two lines are result of lifting, and they take advantage of the
 original predicates from dataflow library.  They handle the call edges from
 Java to Java, and from C to C.
