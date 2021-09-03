@@ -7,13 +7,16 @@
 \end{figure}
 
 \section{Implementation}\label{sec:impl}
-In this section, we show how we applied our idea of declarative style static
-analysis for multilingual program to implement the proof-of-concept dataflow
-analysis tool for JNI programs using CodeQL, which we named JN-QL. CodeQL is a
-static analysis engine that transforms source code into database, and performs
-analysis by evaluating "query", written in declarative language called QL
-(Query Language). In QL, defining rules are don via defining "predicates",
-which has the following form:
+In this section, we present JN-QL, a prototype implementation of our
+approach to a declarative static analysis for multilingual programs,
+in the case of dataflow analysis for JNI programs using CodeQL~\cite{codeql}.
+
+\subsection{CodeQL}
+CodeQL is a static analysis engine that transforms source code
+programs into databases, and performs analysis by evaluating queries
+written in the declarative language called QL (Query Language).
+In QL, one can define rules by defining ``predicates'' or ``classes.''
+For example, the following QL code defines the predicate \codeql{isOneTwoThree}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneTwoThree(int n) {
   n = 1
@@ -23,7 +26,7 @@ predicate isOneTwoThree(int n) {
   n = 3
 }
 \end{lstlisting}
-QL is also an object-oriented language supporting class definitions:
+and the following definition defines the class \codeql{OneTwoThree}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneTwoThree extends int {
   OneTwoThree() { // characteristic predicate
@@ -35,23 +38,25 @@ class OneTwoThree extends int {
   }
 }
 \end{lstlisting}
+A class defines a set of elements that satisfy the predicate called
+``\codeql{characteristic predicate}.''
+For more information about QL, one can refer to \citet{ql2016}'s paper
+or the official document~\cite{codeql}.
 
-Basically, defining class is not really different to defining predicate.  Class
-is just set of elements that satisfy the predicate called "characteristic
-predicate". For more detailed information about QL, one can refer to the
-paper[6] or the official document[7].
+Figure~\ref{fig:codeql} presents the overall structure of JN-QL.
+First, it generates databases for both languages, C\footnote{
+Even though JN-QL analyzes JNI programs written in Java and both C and
+C++, this paper refers to C only fore presentation brevity.} and
+Java, and merges them to one database.  This corresponds
+to the step of extracting syntactic datafacts from source code programs.
+Then, we merge the common datafacts and rules in both languages,
+which are parts of their libraries that CodeQL provides, into one merged library.
+Finally, using the merged database and merged library, a user can write a query to
+perform a client-analysis, and evaluate it to produce its analysis result.
 
-Figure~\ref{fig:codeql} shows the overall structure of JN-QL. First, it generates database
-for each language, C++ and Java, and merge it to one database. This corresponds
-to a step of extracting syntactic data-facts from the source code. Then, we
-merge two existing dataflow analysis framework, which are part of the library
-that CodeQL provides as a form of library, into one merged library. Finally,
-using the merged database and merged library, the user can write a query to
-perform the client-analysis, and evaluate it to get analysis result.
-
-\subsection{Create database}
+\subsection{Creating Databases}
 The first step is to generate database for each of two languages.  For
-compiled languages such as C++ and Java, CodeQL generates database by running
+compiled languages such as C and Java, CodeQL generates database by running
 the compiler for each language. While the compiler is running, CodeQL monitors
 the behavior of compiler and extracts information it needs, and create database
 with that information.  Creation of database for one language is performed in
@@ -78,16 +83,16 @@ each languages separately to get two sets of trap files.  Next step would be to
 perform finalization step on merged set of trap files. However, a problem is that
 both of trap files have table with duplicated name, so simply merging them would not work.
 The solution is to add prefix to name of each table. For example, if both
-database have tables named "@expr", the table from C++ would be renamed as
+database have tables named "@expr", the table from C would be renamed as
 "@cpp\_expr", and the table from Java would be renamed as "@java\_expr". After
 renaming each table, the second step can be applied to finalize the database on
 which the query can be evaluated.
 
-\subsection{Lift library}
+\subsection{Lifting Libraries}
 CodeQL provides various libraries for each languages, which consists of some
 pre-defined predicates and classes that can be useful for user to implement
 analysis on their own taste. Dataflow analysis library is one of them, and both
-C++ and Java supports this dataflow analysis library. Two dataflow analysis
+C and Java supports this dataflow analysis library. Two dataflow analysis
 library have same framework: they share same classes such as "Node", and some
 predicates such as "simpleLocalFlowStep".
 
@@ -125,11 +130,11 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
 }
 \end{lstlisting}
 However, these two implementations are not compatible, that is, although they have the same name,
-we can not use "Node" class of C++ as an argument for "simpleLocalFlowStep" predicate of Java or vice versa.
+we can not use "Node" class of C as an argument for "simpleLocalFlowStep" predicate of Java or vice versa.
 Therefore, we lift each of the library into the same level so that classes and predicates become compatible.
 First, we encapsulated each of original dataflow into CodeQL's module, named CPP and JAVA so that
 original classes and predicated can be distinguished with lifted ones.
-A class can be lifted by first defining sum type, which denotes that the lifted class would be either from C++ or
+A class can be lifted by first defining sum type, which denotes that the lifted class would be either from C or
 Java, and then make the lifted class be of that type. We also implemented two member predicates that can cast
 the lifted class into each of corresponding class.
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
@@ -164,7 +169,7 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
   )
 }
 \end{lstlisting}
-\subsection{Merge library}
+\subsection{Merging Libraries}
 
 After the library is lifted, the last step is to extend some predicates to
 reflect the semantics of interoperation between languages. The interaction from
@@ -189,8 +194,8 @@ Java to Java, and from C to C.
 
 Next two lines are the result of merging library, and they are responsible for
 inter-language call edges.  The predicate "viableCallableJ2C" finds call edges
-from Java to C++, and the predicate "viableCallableC2J" finds call edges from
-C++ to Java. These two call edges have different characteristic, and they
+from Java to C, and the predicate "viableCallableC2J" finds call edges from
+C to Java. These two call edges have different characteristic, and they
 are implemented in different way.
 
 \textbf{Java to C} The interaction from Java to C is done by Java code
