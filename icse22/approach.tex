@@ -129,11 +129,6 @@ datafacts that can be derived. The rules are usually evaluated in a bottom-up
 and modular manner, that is, each rule is evaluated one-by-one, after every
 rule it depends on is evaluated.
 
-\subsection{\mbox{Declarative Analysis for Multiple Languages}}
-
-In the following, we illustrate how we can compose two declarative style static analyzers
-to perform analysis on multilingual program.
-
 \begin{figure}[t]
   \centering
   \vspace{2mm}
@@ -143,55 +138,64 @@ to perform analysis on multilingual program.
 %\vspace*{-.5em}
 \end{figure}
 
-Figure~\ref{fig:overview2} illustrates the overview of how declarative style analysis can be
-extended to multilingual analysis. The main difference is that the evaluator
-now gets two sets of syntactic datafacts extracted from both language, and the
-rules also should be merged, with taking inter operation-semantics into account by
-extending some rules.
+\subsection{\mbox{Declarative Analysis for Multiple Languages}}
+Now, we explain how we can compose two declarative-style static analyzers
+for monolingual programs to perform analysis on multilingual programs.
 
-In order to easily merge two sets of rules or each languages, two rules should
-conform to the same framework, that is, they should have same sets of helper
-datafacts (although the rule for deriving helper datafacts might differ).
-Given two sets of rules, the first thing to do id to identify the syntactic
-parts of program where interaction can happen.  Then, based on the information
-regarding these parts, new rules for generating proper helper datafacts are
-defined, so that the inter operation semantic is properly modeled.
+Figure~\ref{fig:overview2} illustrates how we support multilingual
+analysis in a declarative style in the case of two languages as an
+example. The declarative language engine now gets two sets of
+syntactic datafacts extracted from different languages. In addition,
+the rules from different languages are also merged, taking the
+interoperation semantics into account by extending corresponding
+rules.
 
-One thing to note here is that already-defined intra language rules for helper
+To merge sets of rules from multiple languages easily,
+the rules from multiple languages should share ``common datafacts''
+that exist in each language. While each language shares the same set of
+common datafacts, the rules for deriving them may differ in different languages.
+Given sets of rules for multiple programming languages,
+we first identify syntactic parts of a given program where
+interactions between different languages can happen.
+Then, using this interoperation information,
+we define new rules generating necessary datafacts to model
+the interoperation semantics.
+One thing to note here is that pre-defined intra-language rules for common
 datafacts and newly-defined inter-language rules can be treated independently;
-defining new helper rules can be done without considering or modifying the 
-previous implementation.
+we can define new rules without considering or modifying existing
+implementation.
 
-Let's illustrate this extension with the example of dataflow analysis above.
-First, we are given two rules for the helper datafact "step", for each language
-respectively:
+Let us revisit the dataflow analysis example for multilingual programs
+writtin in the language A and the language B.
+First, we merge each set of rules from each language.
+For example, we merge the rules for the datafact \datalog{step} from each language:
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
-step(a,b) :- step_A(a,b)
-step(a,b) :- step_B(a,b)
+step(a, b) :- step_A(a, b)
+step(a, b) :- step_B(a, b)
 \end{lstlisting}
-In order to take the inter-language dataflow into account, one should find out
-how a data of one language can be passed to different language beyond language
-boundary.  One way to pass data in one language into another is via function
-call, shown as in the example below:
+To take inter-language dataflows into account, we should also specify
+how a data of one language can be passed to another language cross language
+boundaries.  For example, one can pass data in one language into
+another by a function call as shown below:
 
 \begin{lstlisting}[style=java,xleftmargin=2.5em]
 public void main() { // Language A
   int x = SOURCE();
   B::f(x);
 }
-void f(int param) { // Language B
+void f(int param) {  // Language B
   printf("\%d", param);
 }
 \end{lstlisting}
-
-Here, the variable x in language A is passed to the parameter of a function f
-in language B. We can define the datafact to reflect this kind of information,
-foreignArgParam(a,b,i), which indicates that a is an i-th argument of a foreign
-function call to a function whose i-th parameter is b. In above example, we
-could derive the datafact, foreignArgParam(x, param, 0). Using this datafact,
-we can add new rule for deriving the helper datafact step as follows:
+The variable \javacode{x} in the language A is passed to the parameter
+of a function \javacode{f} in the language B.  To reflect such a data flow,
+we can define the datafact \datalog{foreignArgParam(a, b, i)},
+which denotes that \datalog{a} is the \datalog{i}-th argument of a foreign
+function call to a function whose \datalog{i}-th parameter is \datalog{b}.
+From the above example, we can derive the datafact \datalog{foreignArgParam(x, param, 0)}.
+Using this datafact, we can add a new rule to derive the common datafact
+\datalog{step} as follows:
 \begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
-step(a,b) :- foreignArgParam(a,b,i)
+step(a, b) :- foreignArgParam(a, b, i)
 \end{lstlisting}
-so that dataflow through foreign function call also can be considered in this
-framework.
+which enables dataflows via foreign function calls cross language boundaries.
