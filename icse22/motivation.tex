@@ -1,29 +1,25 @@
 \section{Motivation}
 In this section, we show how multilanguage interactions work using a
-simple example code, and explain challenges that are difficult to handle
+simple example code, and explain the main challenge that is difficult to handle
 by the previous approaches but our declarative-style analysis can handle.
 
-\subsection{Example target multilingual program}
-
-Let's consider two multilingual programs, written in (Java-like) language A
-and (C-like) language B.
 \begin{figure}[t]
   \centering
   \vspace{2mm}
   \begin{subfigure}[t]{0.5\textwidth}
     \begin{lstlisting}[style=java,xleftmargin=2.5em]
-public void main() { //Language A
+public void main() {
   Node node = null;
   B::f(node);
 }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Language A}
+    \caption{Method in language A calling a function in language B}
     \label{fig:exam1:langA}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
     \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
-void f(Node* param) { //Language B
+void f(Node* param) {
   if(param != NULL) {
     Node* ptr = param;
     ptr->next = new Node;
@@ -31,24 +27,19 @@ void f(Node* param) { //Language B
 }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Language B}
+    \caption{Function in language B receiving null from language A}
     \label{fig:exam1:langB}
   \end{subfigure}
   \vspace*{-.5em}
-  \caption{Prgram 1}
+  \caption{Multilingual code in language A and language B}
   \label{fig:exam1}
 \end{figure}
-
-In the first program(Figure \ref{fig:exam1}), value null from language A is
-passed to the parameter of function language B via calling it. Then, in
-language B, it is checked whether the parameter has null value or not, and only
-when it is not null, the parameter is safely dereferenced.
 
 \begin{figure}[t]
   \centering
   \vspace{2mm}
   \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
-void f(Node* param) { //Language B
+void f(Node* param) {
   Node* ptr = param;
   Node* next;
   if(condition()) {
@@ -60,40 +51,61 @@ void f(Node* param) { //Language B
 }
   \end{lstlisting}
   \vspace*{-.5em}
-  \caption{Program 2}
+  \caption{Code in language B with a conditional statement}
   \label{fig:exam2}
 \end{figure}
 
-In the second program(Figure \ref{fig:exam2}), the code for language A is same
-as before. The difference is in code for language B. This time, the code does
-not check whether or not the parameter is null. Instead, there is another
-if-statement, which is not directly related parameter, but affects value of
-  another variable.
+\subsection{Interactions between Multilingual Modules}
 
-\subsection{Previous approaches for performing analysis on target program}
+Let us consider two multilingual programs written in a Java-like language A
+and a C-like language B.
 
-Let's assume that we want to perform dataflow analysis for these programs.
-What we are interested is whether the value null from language A can be
-dereferenced in language B or not. In the first program, the parameter is
-dereferenced only if it is not null, so there is no such a bug. Note that in
-order to correctly conclude that there is no error, the control flow should be
-considered. On the other hand, in second program, since we do not check the
-value of parameter, it should be reported that null dereference error might
-happen.
+The first program in Figure~\ref{fig:exam1} has two parts:
+Figure~\ref{fig:exam1}(a) shows a method \texttt{main} in language A,
+and Figure~\ref{fig:exam1}(b) shows a function \texttt{f} in language B.
+The method \texttt{main} calls the function \texttt{f} with the argument
+\texttt{node} whose value is \texttt{null}, which passes the null
+value from language A to language B. The function \texttt{f} then
+checks whether the value of its parameter \texttt{param} is null
+and dereferences it only when it is not null.
 
-In previous approaches[2][3], existing analyzers are utilized to generate
-\textit{summaries}. Then the actual target-analysis, the dataflow analysis, is
-performed on these summaries. The problem is that since such existing analyzers
-are mostly general purpose, unnecessary calculations which are not needed for
-target-analysis would happen during genrerating the summaries, resultingin the
-performance overhead. For example, unlike the first program where calculating
-information about if-statement and generating summary regarding it
-would be required. calculating the information about if-statement in the second
-program is not necessary for detecting the dataflow from null to ptr, yet there
-is no easy way to "turn off" such heavy computation for this specific
-if-statement.
+The second program has the same method in Figure~\ref{fig:exam2}(a)
+and the function \texttt{f} in Figure~\ref{fig:exam2}.
+Even though the value of \texttt{f}'s parameter \texttt{param} may be \texttt{null},
+\texttt{f} does not check its value and simply dereferences it on line 13.
+In addition, \texttt{f} has an extra conditional statement on lines 8--12,
+which is irrelevant to \texttt{param}.
 
-\subsection{Declarative style multilingual program analysis}
+\subsection{Previous Approaches}
+Now, let us perform a dataflow analysis on these programs to detect
+the null dereference bug, that is, whether the null value from
+language A can be dereferenced in language B or not.
+In the first program, since the parameter of \texttt{f} is
+dereferenced only when it is not null, it does not have the bug.
+Note that to conclude the absence of the bug correctly,
+the analysis should also consider control flows.
+On the other hand, in the second program, since \texttt{f} does not
+check the value of its parameter, it may have the null dereference bug.
+
+The previous approaches either 1) utilize existing analyzers for
+languages A and B to generate their summaries and perform the
+target dataflow analysis~\cite{LeeASE20,JN-SAF}, or 2) abstract 
+the behaviors of the code written in A and B into a single form and
+perform the target analysis~\cite{HybriDroid,PyC}
+The problem is that since such existing analyzers are mostly general-purpose,
+which may have unnecessary computations that are not necessary for the target analysis,
+resulting in performance overhead.
+For example, even though the analysis of the conditional statement in Figure~\ref{fig:exam2}
+is not relevant to the detection of the null dereference bug on line 13,
+the conventional target analysis in the previous approaches computes
+the information about the conditional statement during its analysis.
+This performance overhead would become critical in multilingual analysis
+because the analysis of the interactions between different languages would require
+the analysis of immense analysis information in both languages.
+
+
+%\subsection{Declarative style multilingual program analysis}
+\subsection{Our Approach}
 
 By using declarative style analysis, we can solve the problem mentioned above.
 The main reason is in its query-based analysis: the target-analysis is
