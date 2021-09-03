@@ -37,15 +37,14 @@ paper[6] or the official document[7].
 \begin{figure}[t]
   \centering
   \vspace{2mm}
-  \includegraphics[width=0.5\textwidth]{img/Fig1}
+  \includegraphics[width=0.5\textwidth]{img/codeql}
   \vspace*{-1.5em}
-  \caption{the overview of how declarative style analysis can be
-  extended to multilingual analysis}
-  \label{fig:Fig1}
+  \caption{Overall structure of JN-QL}
+  \label{fig:codeql}
 \vspace*{-.5em}
 \end{figure}
 
-Figure~\ref{fig:Fig1} shows the overall structure of JN-QL. First, it generates database
+Figure~\ref{fig:codeql} shows the overall structure of JN-QL. First, it generates database
 for each language, C++ and Java, and merge it to one database. This corresponds
 to a step of extracting syntactic data-facts from the source code. Then, we
 merge two existing dataflow analysis framework, which are part of the library
