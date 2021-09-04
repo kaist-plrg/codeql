@@ -14,7 +14,7 @@ The second approach abstracts the behaviors of
 each part written in a single language into a single form
 and performs a target analysis using existing top-down analyzers.
 While they can utilize the full features of existing static analyzers,
-they often suffer from the analysis performance overhead.
+they often \inred{fail to analyze within a limited time budget}.
 Because existing static analyzers are general purpose, in the
 sense that they support abstractions of all the language features,
 they may waste their analysis time on the features that may not be
@@ -35,7 +35,7 @@ As a proof-of-concept, we implement a JNI program static analyzer
 on top of CodeQL, which detects bugs and security vulnerabilities by tracking
 dataflows over language boundaries between Java and C.
 Our evaluation shows that the analyzer is {\it precise} in that it analyzes
-dataflows with higher precision and is {\it scalable} in that it detects the
-same types of bugs and security vulnerabilities \inred{14x} faster on average than the
-state-of-the-art analyzers.
+dataflows with higher precision and is {\it scalable} in that it \inred{succeeds
+to analyze apps that the state-of-the-art analyzers fail and detects same types
+of bugs and security vulnerabilities.}
 \end{abstract}

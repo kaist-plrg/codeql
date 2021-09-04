@@ -38,7 +38,7 @@ incorporate both languages, and performs
 a target analysis using a general-purpose analyzer
 running on the IR~\cite{hybridroid, cpython}.
 While both approaches can detect bugs and security vulnerabilities
-in multilingual programs, they often suffer from performance overhead.
+in multilingual programs, they often \inred{fail to analyze within a limited time budget}.
 Because they utilize the full features of expensive general-purpose analyzers,
 they may waste their analysis time on the features that are irrelevant to
 the target analysis.
@@ -82,12 +82,13 @@ efficient algorithms for evaluating queries, thus enabling simple and fast query
 We evaluated the analyzer using real-world Android JNI applications
 to see whether its performance is comparable to that of the existing work.
 Our experimental results show that our analyzer outperforms the
-state-of-the-art JNI analyzer, \jnsaf, in terms of scalability.  Our analyzer
-shows \inred{14x} speedup on average without analysis precision degradation.
+state-of-the-art JNI analyzer, \lees, in terms of scalability.  Our analyzer
+shows \inred{better scalability} without analysis precision degradation.
 In addition,  we could easily develop various kinds of bug detectors
 reported in the literature on top of our analyzer, thanks to the power of CodeQL.
-Using these bug detectors, we found 25 new bugs and
-vulnerabilities from real-world applications.
+Using these bug detectors, we found \inred{25 new bugs and vulnerabilities from
+real-world applications, among them 12 bugs were from the apps that \lees
+failed due to a timeout or out of memory}.
 
 The contributions of this paper include the following:
 \begin{itemize}
@@ -102,7 +103,7 @@ The contributions of this paper include the following:
     features of CodeQL. 
 
 \item We show the practical usefulness of the JNI program analyzer for real-world
-  JNI programs. Our tool detected the same kinds of bugs and security
-    vulnerabilities as the state-of-the-art JNI program analyzer, \jnsaf,
-and it is more precise and \inred{14x} faster on average than \jnsaf.
+  JNI programs. Our tool \inred{analyzed more apps within a timeout than the
+    state-of-the-art JNI program analyzer, \lees, and detected the same kinds of bugs
+    and security vulnerabilities precisely.}
 \end{itemize}
