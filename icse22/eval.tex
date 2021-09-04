@@ -1,4 +1,5 @@
 \newcommand{\req}[1]{RQ#1}
+\input{tableRQ1}
 
 \section{Evaluation}\label{sec:eval}
 %In this section, we show the feasibility of the approach of using declarative
@@ -98,7 +99,6 @@ client analyses~\cite{LeeASE20, ILEA}.
 
 
 \subsection{\req{1}: Feasibility}
-\input{tableRQ1}
 Table~\ref{table:RQ1} shows analysis results of our analyzer, Lee's analyzer,
 and JN-SAF on 23 benchmarks in NativeFlowBench.  The {\it Benchmark} columns
 denote benchmark names, the {\it Precision} columns denote analysis results of
@@ -157,6 +157,7 @@ starts.  Contrary to Lee's analyzer, our tool performs the query-based
 analysis, which can resolve targets of foreign function calls regardless of
 program entries.
 
+\input{tableRQ2}
 
 In the dataflow comparison, our tool found data leakages correctly in 19
 benchmarks but reported false alarms for four benchmarks, while JN-SAF analyzes
@@ -179,7 +180,6 @@ native\_leak\_array}.
 
 
 \subsection{RQ2: Performance}
-\input{tableRQ2}
 Table~\ref{table:RQ2} shows analysis results of our tool on real-world Android
 JNI applications. Out of 42 applications we analyzed, we summarize analysis
 results of 25 applications that have interoperation from C to Java.\footnote{We
@@ -218,7 +218,7 @@ to resolve the foreign function calls.
   \vspace{2mm}
   \includegraphics[width=0.5\textwidth]{img/graph}
   \vspace*{-1.5em}
-  \caption{Analysis time comparison between ours and ASE'20}
+  \caption{Analysis time of ours and ASE'20}
   \label{fig:graph}
 \vspace*{-.5em}
 \end{figure}
