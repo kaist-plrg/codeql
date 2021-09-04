@@ -184,12 +184,12 @@ After lifting, lifted predicates show the equivalent behaviors as the
 original ones if all the arguments are from the same language.
 
 
+
 \subsection{Merging Libraries}
-After the library is lifted, the last step is to extend some predicates to
-reflect the semantics of interoperation between languages. The interaction from
-Java to C, or C to Java are identified, and some predicates are extended to
-model their behaviors. As an concrete example, Let's take a look how the predicate
-named viableCallable can be extended.
+After lifting libraries for different languages, we extend predicates to
+reflect the interoperation semantics between multiple languages.
+We identified various interactions from Java to C and from C to Java
+and extended predicates to model their behaviors.
 
 \begin{figure}[t]
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
@@ -203,58 +203,67 @@ DataFlowCallable viableCallable(DataFlowCall c) {
   result.asJava() = viableCallableC2J(c.asC())
 }
 \end{lstlisting}
-\caption{libray merge}
+\caption{libray merge}\label{fig:merge}
 \end{figure}
 
-The first two lines are result of lifting, and they take advantage of the
-original predicates from dataflow library.  They handle the call edges from
-Java to Java, and from C to C.
+For example, Figure~\ref{fig:merge} shows how we extend the predicate
+named \codeql{viableCallable}.
+Lines 2 and 4 show the results of lifting, and they take advantage of the
+original predicates from the dataflow libraries.  They handle
+intra-language call edges from Java to Java and from C to C.
+Lines 6 and 8 show the results of merging libraries, and they are
+for inter-language call edges.  The predicate \codeql{viableCallableJ2C} finds call edges
+from Java to C, and the predicate \codeql{viableCallableC2J} finds call edges from
+C to Java. Because these two call edges have different characteristics, we
+implemented them differently.
 
-Next two lines are the result of merging library, and they are responsible for
-inter-language call edges.  The predicate "viableCallableJ2C" finds call edges
-from Java to C, and the predicate "viableCallableC2J" finds call edges from
-C to Java. These two call edges have different characteristic, and they
-are implemented in different way.
+%\medskip
+\textbf{Java to C.} In JNI programs, one can make interactions from
+Java to C by calling native functions in C from Java code. The target
+of such a function call is determined in a static manner.
+The target function should follow the JNI naming convention, which is adding
+\codeql{Java\_} as prefix, 
+followed by a fully qualified name of its class and the additional \codeql{\_}, to the method name.
+For example, the target function name for a function call of
+\codeql{cfunction} would be \codeql{Java\_fully\_qualified\_class\_name\_cfunction}.
+With this convention, we can define \codeql{viableCallableJ2C}
+so that \codeql{f = viablaCallableJ2C(m)} holds when
+\codeql{f.toString() = "Java\_" + m.className() + "\_" + "m.toString()} holds.
 
-\textbf{Java to C} The interaction from Java to C is done by Java code
-calling native function in C, possibly with some arguments. The function
-call target is determined in static manner. The target function should
-follow the JNI naming convention, which is adding "Java\_" as prefix, 
-followed by fully qualified name of class and additional "\_", to the
-method name. For example, the target function name for the method call
-cfunction would be Java\_fully\_\_qualified\_\_class\_\_name\_cfunction.
-Based on this convention, we can define the predicate viableCallableJ2C
-so that f = viablaCallableJ2C(m) holds when f.toString() = "Java\_" + 
-m.className() + "\_" + "m.toString() holds.
 
-\textbf{C to Java} The interaction from C to Java is more complex, and
-requires more detailed implementation. The biggest difference is that
-the method call from C to Java requires the run-time value of variables.
-First, C calls the interface function "GetMethodID(name, sig)" to get "method
-ID" of the method whose name matches the first argument, and the type signature
-matches the second argument passed to this function. This method id is stored
-at a variable, say "mid", and actual method call is done by calling another
-interface function, "Call<type>Method(obj, mid, args...)". Calling this interface
-function corresponds to call the method that mid indicates, with the "this object" as
-obj, and the arguments as args.
+\medskip
+\textbf{C to Java.} The interaction from C to Java is more complex and
+requires more careful implementation than the interaction from Java to C.
+The primary difference is that a method call from C to Java requires
+the runtime values of variables, which may not be always possible.
+First, C code calls the interface function \ccode{GetMethodID(name, sig)}
+to get the ``method ID'' of the method whose name matches the first argument
+and the type signature matches the second argument passed to this function.
+This method ID is stored at a variable, say \ccode{mid}, and
+an actual method call invokdes another
+interface function, \ccode{Call<type>Method(obj, mid, args...)}. Calling this interface 
+function corresponds to calling the method that \ccode{mid} indicates
+with \ccode{obj} as ``this object'' and \ccode{args} as the arguments.
 
-In order to correctly handle this method call, we have to answer these
-questions: "what string values does 'name' or 'sig' have when GetMethodID is
-called", and "what method ID value does 'mid' have when Call<type>Method is
-called". Note that what we need to answer to this question is the dataflow
-analysis. Although inter-language dataflow is needed to soundly answer to the
-questions, in practice intra-language dataflow analysis is enough in most
-situations. Therefore, we implemented two "inner-flow" analysis module for C,
-which find all the dataflow from string literal to the argument of interface
-function, and the dataflow from interface function call result to the argument
-of interface function. Based on these two modules, we can implement the
-predicate viableCallableC2J by connecting the call edge from "Call<type>Method"
-call to the method m, if there is a flow to mid from call to "GetMethodID", and
-string values that flow into name argument and sig argument of the "GetMethodID"
-corresponds with that of method m.
+To correctly handle this method call, we should be able to answer these
+questions: ``When we call \ccode{GetMethodID},
+what are the string values of \ccode{name} and \ccode{sig}?'' and
+``When we call \ccode{Call<type>Method}, what is the method ID value of \ccode{mid}?''
+Answering these questions requires dataflow analysis;
+to soundly answer to them, inter-language dataflow analysis is necessary.
+However, in practice, intra-language dataflow analysis is enough in most cases.
+Therefore, we implemented two ``intra-flow'' analysis modules for C,
+which find 1) dataflows from string literals to the arguments of interface functions,
+and 2) dataflows from interface function call results to the arguments of interface functions.
+Using these modules, we can implement the
+predicate \codeql{viableCallableC2J} by adding a call edge from a \ccode{Call<type>Method}
+call to the method \ccode{m}, if there is a flow to \ccode{mid} from a
+call to \ccode{GetMethodID}, and string values that flow into the
+arguments \ccode{name} and \ccode{sig} of \ccode{GetMethodID} that
+correspond to the name and the type signature of the method \ccode{m}.
 
-Other than the predicate viableCallable, there are also other predicates that
-are extended. Most of them are specialized "step" predicates, where the purpose
-of extension is to consider other JNI interface functions, such as
-findClass or GetFieldID. The extensions are done in similar as handling
-call from C to Java mentioned above.
+In addition to the predicate \codeql{viableCallable},
+we extended more predicates to consider other JNI interface functions such as
+\ccode{findClass} and \ccode{GetFieldID}.
+Most of such extended predicates are specialized \codeql{step} predicates.
+We extended them in a similar way to the calls from C to Java described above.
