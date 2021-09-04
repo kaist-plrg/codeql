@@ -145,7 +145,7 @@ method or field IDs necessary to resolve the JNI uses.
   \vspace*{-.5em}
   \caption{Analysis time of \ours and \lees}
   \label{fig:graph}
-\vspace*{-.5em}
+\vspace*{-1em}
 \end{figure}
 
 \ours is scalable in that it can analyze large-scale programs. The analysis
@@ -162,17 +162,17 @@ re-creation to obtain various analysis results of the program.
 % re-creation to obtain various analysis results of the program.
 
 
-\inred{Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
-The x-axis denotes labels of apps and the y-axis denotes analysis
-time in seconds. We omit eight apps \lees failed to analyze in
-the graph. \lees analyzed 12 apps faster than \ours, but the gap
-of the analysis time was less than two minutes. On the other hand,
-\ours analyzed five apps faster than \lees, and \lees took
-lots of time in the summary generation for three apps of them. In
-addition, \lees failed to analyze all the large size apps that have
-more than about 400,000 lines of code in eight hours. On contrary,
-\ours analyzed huge apps that have about three million lines of
-code in about ten minutes.}
+Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
+The x-axis denotes the labels of apps and the y-axis denotes the analysis
+time in seconds. We omit eight apps \lees failed to analyze.
+\lees analyzed 12 apps faster than \ours, but the difference is
+less than two minutes. On the other hand,
+\ours analyzed five apps faster than \lees, and \lees took much time
+in summary generation for three apps of them. In 
+addition, while \lees failed to analyze all the large-scale apps that have
+more than about 400,000 lines of code in eight hours,
+\ours analyzed about three million lines of
+code in about ten minutes.
 
 % Figure~\ref{fig:graph} shows the analysis time of \ours compared to
 % JN-Sum. Out of \inred{17} apps except for \inred{8} apps JN-Sum failed to
@@ -212,7 +212,6 @@ that previous research~\cite{ILEA, LeeASE20} defined as follows:
 //EmulatorActivity.java
 String tmp = null;
 String folder = Util.GetInternalAppStorage(activity);
-
 if (folder != null) {
   tmp = folder + "tmp";
   Util.CreateDirectory(tmp);
@@ -269,7 +268,6 @@ void OnInfoMessage(String msg, int displayType);
 //jni_doom.h
 #define CB_CLASS_MSG_SIG  "(Ljava/lang/String;I)V"
 #define CB_CLASS_INFMSG_SIG  "(Ljava/lang/String;I)V"
-
 //jni_doom.c
 mSendStr = (*env)->GetMethodID(env, jNativesCls,
                        "OnMessage", CB_CLASS_MSG_SIG);
@@ -280,8 +278,8 @@ mSendStr = (*env)->GetMethodID(env, jNativesCls,
   \end{subfigure}
   \vspace*{-.5em}
   \caption{Four kinds of JNI interoperation bugs}
-  \vspace*{-1em}
   \label{fig:bugs}
+  \vspace*{-1em}
 \end{figure}
 
 Table~\ref{table:RQ3} summarizes the bug detection results of 19 out of 42
