@@ -149,8 +149,7 @@ it without re-creation to obtain various analysis results of the program.
 \subsection{RQ3: Usefulness}
 \input{tableRQ3}
 The bug checker of \ours detects four kinds of JNI interoperation bugs
-that previous research~\cite{ILEA, LeeASE20} defined as the follows:
-
+that previous research~\cite{ILEA, LeeASE20} defined as follows:
 
 \begin{itemize}
   \item {\it NullDereference}: dereferencing the {\tt null} value of Java in C
@@ -246,18 +245,16 @@ mSendStr = (*env)->GetMethodID(env, jNativesCls, "OnMessage", CB_CLASS_MSG_SIG);
 \end{figure}
 
 Table~\ref{table:RQ3} summarizes the bug detection results of 19 out of 42
-apps, on which \ours reported true or false alarms.  The first
-column denotes app names, the second and third columns denotes the
-number of true and false positives of {\it NullDereference} respectively, and
-the fourth to six columns denote the number of true positives of {\it
-MissingFun}, {\it TypeMismatch}, and {\it WrongSig} respectively. We omit the
-number of false positivies of the last three bug types, because \ours
-reported only true positives on them. We classified the reported alarms into
-true or false positives by manual inspection of source code. 
+apps, on which \ours reported possible bugs.  The first
+column shows app names, the second and the third columns show the
+number of true and false positives for {\it NullDereference}, respectively, and
+the fourth to six columns show the number of true positives for {\it
+MissingFun}, {\it TypeMismatch}, and {\it WrongSig}, respectively.
+\ours did not report any false positives for the last three bug kinds.
+We confirmed true and false positives by manual inspection of the source code. 
 
-
-\ours found 33 genuine bugs, but reported 24 false positives in 19
-apps. All false positives are reported only in the {\it
+\inred{\ours found 33 genuine bugs, but reported 24 false positives in 19 apps.
+All false positives are reported only in the {\it
 NullDereference} bug detection; \ours reported five true and 24 false alarms
 of {\it NullDereference} in 11 apps, nine true alarms of {\it MissingFun} in
 three apps, 17 true alarms of {\it TypeMismatch} in eight apps, and two true
@@ -267,7 +264,7 @@ one of the main causes is conditionally sanitized variables.  Many apps
 have a code pattern that assigns a value to a variable only if the variable has
 the {\tt null} value. Because our analysis does not support the
 path-sensitivity that analyzes each execution path separately, it reports that
-the variable may still have {\tt null} even after the conditional assignment. 
+the variable may still have {\tt null} even after the conditional assignment.}
 
 
 
