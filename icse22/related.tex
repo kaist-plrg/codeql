@@ -39,11 +39,11 @@ query-based analysis and can compute target properties effectively without
 expensive and redundant summary generation.
 
 Other studies deal with binaries rather than C/C++ source code.  Fourtounis et
-al.~\cite{scanning} proposed a lightweight reverse engineering technique to
+al.~\cite{scanning} proposed a light-weight reverse engineering technique to
 recover Java method calls from binaries instead of performing heavy analyses on
 binary code.  Their reverse engineering generates datafacts of Java method
 calls from binaries, which can be used in further declarative style Java
-analyses. While the approach is lightweight but targets only Java method call
+analyses. While the approach is light-weight but targets only Java method call
 identification in binaries, our approach analyzes dataflows across language
 boundaries between Java and C seamlessly.  JN-SAF~\cite{JN-SAF} defines a
 unified dataflow summary to represent dataflows in both Java bytecode and
@@ -57,43 +57,50 @@ dataflows when C source code is available.
 
 
 \subsection{Static Analysis for the other FFIs}
-Android applications have another FFI between Java and JavaScript to maximize
-their portability.  Android hybrid apps use JavaScript code to be run on
-multiple browsers and can communicate with native Java code.
-HybriDroid~\cite{hybridroid} analyzes Java and JavaScript at the same time on
-the top of the WALA framework~\cite{WALA} to detect programmer errors on interlanguage
-communications and to track private data leakages.  Bae et al.~\cite{BaeICSE19}
-tackled the expensive analysis of HybriDroid and proposed a light-weight type
-system covering types of bug in HybriDroid.  However, their type system does not
-cover tracking flows of private data.  Jin et al.~\cite{jin2014code} proposed a
-static detection of code injection attacks from JavaScript to Java.  To avoid
-expensive whole multilingual program analyses, they manually model APIs in the
-PhoneGap\footnote{\url{https://cordova.apache.org/}} framework and apply a taint
-analysis on JavaScript only.
+Android supports a FFI between Java and JavaScript.  Android hybrid apps are
+written in both Java and JavaScript, taking advantage of portability from
+JavaScript and device resources accessibility from Java.
+HybriDroid~\cite{hybridroid} implemented on top of WALA~\cite{WALA} analyzes
+Java and JavaScript parts seamlessly to detect programmer errors on language
+interoperation and to track data leakages across language boundaries.  Bae et
+al.~\cite{BaeICSE19} tackled the expensive analysis of HybriDroid and proposed
+a light-weight type system covering the same kinds of programmer errors in
+Android hybrid apps.  Jin et al.~\cite{jin2014code} proposed a static detection
+of code injection attacks from JavaScript to Java.  Because the attacks target
+hybrid apps containing user defined JavaScript parts and Java parts of a
+development framework, they manually modeled the Java parts and performed a
+taint analysis for JavaScript with the models.
+
 
 Python supports the interoperability mechanism with C~\cite{PythonC}.
 Developers often import performance-oriented C code to high-level Python code.
-Very recent work~\cite{sas2021} proposed a Python-C analyzer by reusing each
-analyzer in the Mopsa framework~\cite{Mopsa}.  Their target properties require
-precise context-sensitive value analyses.  Our approach easily activates only
-the required features of each analyzer for such target properties.
+Recent work~\cite{sas2021} proposed a Python-C analyzer by reusing existing
+Python and C analyzers built on top of the MOPSA framework~\cite{Mopsa}.  \inred{Their
+target properties require precise context-sensitive value analyses.  Our
+approach easily activates only the required features of each analyzer for such
+target properties.}
+
 
 % furr2005 OCaml and C
-Furr and Foster~\cite{furr2005, furr2008} proposed a multilingual type inference
-system for the native OCaml with foreign C FFI.  No out-of-bounds accesses and
-no type casting in the C code were their assumptions.
+Furr and Foster~\cite{furr2005, furr2008} proposed a multilingual type
+inference system for the native OCaml with foreign C FFI.  \inred{No
+out-of-bounds accesses and no type casting in the C code were their
+assumptions.}
+
 
 \subsection{Declarative-style analysis}
 Declarative-style analysis alleviates challenges in crafting a static program
-analyzer and thus Datalog~\cite{allen2015D, allen2015stagedD, alpuente2010D, doop, dawson1996D, naik2006D, reps1994D, smaragdakis2014D, whaley2005D} has become a dominant
-DSL for static analysis~\cite{scholz2016}.
-Bravenboer and Smaragdakis proposed the \doop framework~\cite{doop} using Datalog
-that showed dramatic speedups for the Java points-to analysis.  They explain that
-the modularity and declarativeness of Datalog rules are the keys to improve
-performance~\cite{doopWorkshop}.  In addition, researchers have improved
-analysis backends, declarative language engines~\cite{whaley2005D, hoder2011muz, souffle, madsen2016}.
-Avgustinov et al.~\cite{ql2016} proposed QL, a declarative and object-oriented
-query language to be compiled into Datalog and runs on a relational DB, and static
-analyzers implemented QL which scale to millions of lines of code.
-Our approach successfully inherits the fast and easy analysis of declarative-style
-and emphasizes the benefits with the problem of multilingual program analysis.
+analyzer and thus Datalog~\cite{allen2015D, allen2015stagedD, alpuente2010D,
+doop, dawson1996D, naik2006D, reps1994D, smaragdakis2014D, whaley2005D} has
+become a dominant DSL for static analysis~\cite{scholz2016}.  Bravenboer and
+Smaragdakis proposed the \doop framework~\cite{doop} using Datalog and showed
+dramatic speedups for the Java points-to analysis.  They explain that the
+modularity and declarativeness of Datalog rules are keys in the performance
+improvement~\cite{doopWorkshop}.  Researchers also have improved static
+analysis backends using declarative language engines~\cite{whaley2005D,
+hoder2011muz, souffle, madsen2016}.  Avgustinov et al.~\cite{ql2016} proposed
+QL, a declarative and object-oriented query language that can be compiled into
+Datalog and runs on a relational database. Using QL, they developed a static
+analyzer that is scalable to large-size programs that have about millions of
+lines of code.  Our approach inherits the benefits from the approach and
+extends analysis targets from monolingual to multilingual programs.
