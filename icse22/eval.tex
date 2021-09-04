@@ -78,6 +78,7 @@ analysis, which can resolve the targets of foreign function calls regardless of 
 In the dataflow comparison, \ours found data leakages correctly in 20
 benchmarks but reported false negatives for three benchmarks, while JN-SAF
 analyzes 21 benchmarks correctly. 
+The one common failure comes from string concatenation, as we discussed.
 {\it icc\_javatonative} and {\it icc\_nativetojava} leak data via the Android
 inter-component communication that is beyond the scope of \ours.
 The remaining two different failures of \ours and JN-SAF come from their array analysis policies.
@@ -89,58 +90,59 @@ tracks every value retrieved from an array if the array contains sensitive data.
 Such over-approximation enables JN-SAF to analyze {\it
 native\_leak\_array} correctly but introduces a false alarm for {\it
 native\_noleak\_array}.  In contrast, because CodeQL does not
-track dataflows depending on arrays by default, \ours does not report
+track dataflows on arrays by default, \ours does not report
 a false alarm for {\it native\_noleak\_array} but cannot find the data leakage in {\it
 native\_leak\_array}.
 
 
 \subsection{RQ2: Performance}
-Table~\ref{table:RQ2} shows analysis results of \ours on real-world Android
-JNI apps. Out of 42 apps we analyzed, we summarize analysis
-results of 25 apps that have interoperation from C to Java.\footnote{We
-list the full analysis results up in our supplementary material.} The first
-column denotes app names, the second to fourth columns denote database
-creation time of C, Java, and their merged database respectively, the fifth
-column denotes query processing time, and the sixth denotes total analysis time
-include the database creation and query processing. The seventh to ninth and
-the tenth to twelfth denote the number of C-to-Java function calls and
-C-to-Java field accesses, respectively. The sub-columns {\bf \#Precise}, {\bf
-\#Resolved}, and {\bf Total} represent the number of precisely resolved,
-resolved, and total foreign function call-sites, respectively. We counted a
-resolved call-site as precise, when our analysis finds a single target method
-or field at the call-site.
+Table~\ref{table:RQ2} summarizes the analysis results of \ours on real-world Android JNI apps.
+Out of 42 apps we analyzed, we show the analysis
+results of 25 apps that have interoperations from C to Java\footnote{We
+report the full analysis results in our supplementary material.}.
+The first column shows app names, the second to the fourth columns show database
+creation time of C, Java, and their merged database, respectively, the fifth
+shows query processing time, and the sixth shows the total analysis time.
+{\bf C->Java Function Call} and {\bf C->Java Field Access}
+show the numbers of C-to-Java function calls and
+C-to-Java field accesses, respectively. We collectively call them
+\emph{JNI uses}.
+The sub-columns {\bf \#Precise}, {\bf \#Resolved}, and {\bf Total}
+represent the numbers of precisely resolved, 
+resolved, and the total JNI uses, respectively.
+We considered a resolved JNI use as precise, when \ours finds a single target method
+or a single field at the JNI use.
 
 
-\ours resolved 1076 out of 1171 (92\%) foreign function calls, including
-347 out of 404 (86\%) C-to-Java method calls and 729 out of 767 (95\%)
-C-to-Java field accesses. In addition, 1008 (86\%) resolved foreign function
-calls are precies. The results show that \ours resolves more foreign
-function calls even precisley than JN-Sum that \inred{...} on the same
-dataset. \ours failed to resolve 95 (8\%) foreign function calls because
+\ours resolved 1,076 out of 1,171 (92\%) JNI uses, including
+347 out of 404 (86\%) C-to-Java function calls and 729 out of 767 (95\%)
+C-to-Java field accesses. In addition, 1,008 (86\%) resolved JNI uses are precies.
+\inred{The results show that \ours resolves more JNI uses even precisley than JN-Sum
+that ... on the same dataset.}
+\ours failed to resolve 95 (8\%) JNI uses because
 of complex language semantics such as arrays and function pointers. Because
-CodeQL does not track dataflows depending on C function pointers as well as
-arrays we descibed, \ours failed to analyze method or field IDs required
-to resolve the foreign function calls.
+CodeQL does not track dataflows on C function pointers and arrays,
+\ours failed to analyze method or field IDs necessary to resolve the JNI uses.
 
 \begin{figure}[t]
   \centering
   \vspace{2mm}
-  \includegraphics[width=0.5\textwidth]{img/graph}
+  \includegraphics[width=0.48\textwidth]{img/graph}
   \vspace*{-1.5em}
-  \caption{Analysis time of \ours and ASE'20}
+  \caption{Analysis time of \ours and \lees}
   \label{fig:graph}
 \vspace*{-.5em}
 \end{figure}
 
-\ours is scalable even for large-scale programs as well. The analysis
+\ours is scalable in that it can analyze large-scale programs. The analysis
 time was 161.3 seconds on average for each app, including 103.8 seconds
-for the DB creation and 57.5 seconds for the query processing. The DB creation
-usually took more time than the query processing except for {\it Graph 89}, and
-the DB creation time was almost linear to the size of code. \ours took
+for DB creation and 57.5 seconds for query processing.  DB creation
+took more time than query processing except for {\it Graph 89}, and
+the DB creation time was almost linear to the code size. \ours took
 about 12 minutes at most to analyze {\it Tileless Map} having about one million
-lines of code. Figure~\ref{fig:graph} visualizes analysis time of \ours
+lines of code. Figure~\ref{fig:graph} shows the analysis time of \ours
 compared to JN-Sum. \inred{describe the comparison result...}  Note
-that once we create database for a program, we can evaluate multiple queries on
+that once we create a database for a program, we can evaluate multiple queries on
 it without re-creation to obtain various analysis results of the program.
 
 
