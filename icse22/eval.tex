@@ -183,9 +183,17 @@ native\_leak\_array}.
 Table~\ref{table:RQ2} shows analysis results of our tool on real-world Android
 JNI applications. Out of 42 applications we analyzed, we summarize analysis
 results of 25 applications that have interoperation from C to Java.\footnote{We
-list full analysis results up in our supplementary material.} \inred{The first column
-denotes application names, the second to fourth columns show database creation
-time for C code, Java code, and ...}
+list the full analysis results up in our supplementary material.} The first
+column denotes application names, the second to fourth columns denote database
+creation time of C, Java, and their merged database respectively, the fifth
+column denotes query processing time, and the sixth denotes total analysis time
+include the database creation and query processing. The seventh to ninth and
+the tenth to twelfth denote the number of C-to-Java function calls and
+C-to-Java field accesses, respectively. The sub-columns {\bf #Precise}, {\bf
+#Resolved}, and {\bf Total} represent the number of precisely resolved,
+resolved, and total foreign function call-sites, respectively. We counted a
+resolved call-site as precise, when our analysis finds a single target method
+or field at the call-site.
 
 %The "time" column denotes the time for creating database and evaluating query.
 %The average time for creating DB was 103.8 seconds, and average time for
@@ -412,10 +420,10 @@ performance overhead~\cite{hwang2021justgen}.
 }
 
 Figure~\ref{fig:bugs}(b) shows a code snippet with the {\it MissingFun} bug in
-ObscuraCam. As described in \inred{Section~\ref{}}, JNI has a C function naming
-convention for JVMs to link Java native methods to the corresponding C
-functions~\cite{jninaming}. While a Java class {\tt JpegRedaction} declaring a
-native method {\tt redactRegions} belongs to a package
+ObscuraCam. As described in Section~\ref{sec:merging}, JNI has a C function
+naming convention for JVMs to link Java native methods to the corresponding C
+functions. While a Java class {\tt JpegRedaction} declaring a native method
+{\tt redactRegions} belongs to a package
 \texttt{org.witness.obscuracam.photo.jpegredaction}, the corresponding C
 function is named with a wrong package name
 \texttt{org.witness.securesmartcam.jpegredaction}.  When calling the native
