@@ -1,41 +1,60 @@
 \section{Related Work}\label{sec:related}
 %We propose the declarative-style static analysis of multilingual programs and
 %actualize our approach as the JNI dataflow analyzer.
-We describe three closely related categories of work below.
-\subsection{Static analysis for multilingual JNI}
-Among various language representations of JNI programs, studies dealing with
-pairs of languages are most closed related.  For JNI programs consisting of
-Java and C source codes, ILEA~\cite{ILEA} extends the Java Virtual Machine
-Language (JVML) and Jlint\footnote{\url{http://artho.com/jlint/manual.html}}, which is a JVML dataflow analyzer, to integrate C codes into one language.
-Since a modest extension of JVML cannot fully support C semantics like memory
-models, it extremely over-approximates C operations such as read and write
-through pointers.  Lee et al.~\cite{LeeASE20} proposed a general approach to
-analyze multilingual programs in the form of host and guest languages.  Their
-approach first analyzes a guest language (C, in their implementation) to extract
-semantic summaries (by Infer\footnote{\url{https://fbinfer.com/}}), translates
-and integrates the summaries into a host language (Java), and then utilizes host
-language analyzer (Flowdroid~\cite{Flowdroid}).  While their approach can
-leverage the full features of existing static analyzers, ours inherits the
+%We describe three closely related categories of work below.
+\subsection{Static analysis for JNI programs}
+%Among various language representations of JNI programs, studies dealing with
+%pairs of languages are most closed related.  
+%For JNI programs consisting of Java and C source codes, ILEA~\cite{ILEA}
+%extends the Java Virtual Machine Language (JVML) and
+%Jlint\footnote{\url{http://artho.com/jlint/manual.html}}, which is a JVML
+%dataflow analyzer, to integrate C codes into one language.  Since a modest
+%extension of JVML cannot fully support C semantics like memory models, it
+%extremely over-approximates C operations such as read and write through
+%pointers.  Lee et al.~\cite{LeeASE20} proposed a general approach to analyze
+%multilingual programs in the form of host and guest languages.  Their approach
+%first analyzes a guest language (C, in their implementation) to extract
+%semantic summaries (by Infer\footnote{\url{https://fbinfer.com/}}), translates
+%and integrates the summaries into a host language (Java), and then utilizes
+%host language analyzer (Flowdroid~\cite{Flowdroid}).  While their approach can
+%leverage the full features of existing static analyzers, ours inherits the
+%query-based analysis and can compute target properties effectively without
+%expensive and redundant summary generation.
+
+For JNI programs consisting of Java and C source code, ILEA~\cite{ILEA} extends
+the Java Virtual Machine Language (JVML) and
+Jlint\footnote{\url{http://artho.com/jlint/manual.html}}, a dataflow analyzer
+for Java bytecode, to compile both Java and C code to the extended JVML and
+analyze the integrated programs.  Since the modest extension of JVML cannot
+fully support C semantics like the C memory model, it extremely
+over-approximates C operations such as read and write through pointers.  Lee et
+al.~\cite{LeeASE20} proposed a general approach to analyze multilingual
+programs written in both {\it host} and {\it guest} languages.  Their approach
+first uses a guest language analyzer to extract semantics summaries from parts
+written in the guest language, C in their implementation, translates and
+integrates the summaries into a host language, Java, and then performs the
+whole-program analysis using a host language analyzer.  While their approach
+leverages the full features of existing static analyzers, ours inherits the
 query-based analysis and can compute target properties effectively without
 expensive and redundant summary generation.
 
-Other studies deal with binaries rather than C/C++.
-Fourtounis et al.~\cite{scanning} proposed a lightweight reverse engineering
-technique to recover Java method calls in binary codes instead of performing
-heavy analyses on binary code.  Their reverse engineering generates the data
-facts of the Java calls with declarative style analyses for Java.
-Their reverse engineering is lightweight yet targeting on Java method calls in
-binary, in contrast, our approach targets on two general declarative style
-analyses for each language and their interoperations seamlessly.
-JN-SAF~\cite{JN-SAF} defines a unified summary in order to handle Java bytecode
-and binary at once.  It extracts the summaries for each method with a Java
-bytecode dataflow analyzer and a binary symbolic execution and composes the
-summaries in a bottom-up manner to detect security vulnerabilities.
-It sacrifices propagating dataflow facts until a fixed point by breaking a cycle
-in the call graph arbitrarily to mitigate expensive computations from the
-dataflow analysis and symbolic execution.  Our approach is scalable for the JNI
-dataflow analysis even without sacrificing fixed point computations when C
-source code is available.
+Other studies deal with binaries rather than C/C++ source code.  Fourtounis et
+al.~\cite{scanning} proposed a lightweight reverse engineering technique to
+recover Java method calls from binaries instead of performing heavy analyses on
+binary code.  Their reverse engineering generates datafacts of Java method
+calls from binaries, which can be used in further declarative style Java
+analyses. While the approach is lightweight but targets only Java method call
+identification in binaries, our approach analyzes dataflows across language
+boundaries between Java and C seamlessly.  JN-SAF~\cite{JN-SAF} defines a
+unified dataflow summary to represent dataflows in both Java bytecode and
+binary.  It extracts summaries from each Java method with a Java static
+analyzer and from each native function with a binary symbolic execution, and
+composes the summaries in a bottom-up manner to find data leakages over
+language boundaries.  It sacrifices performance to analyze every possible
+dataflow from binaries using the expensive symbolic execution. On contrary, our
+approach is scalable in that the query-based approach analyzes only necessary
+dataflows when C source code is available.
+
 
 \subsection{Static Analysis for the other FFIs}
 Android applications have another FFI between Java and JavaScript to maximize
