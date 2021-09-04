@@ -191,7 +191,8 @@ reflect the interoperation semantics between multiple languages.
 We identified various interactions from Java to C and from C to Java
 and extended predicates to model their behaviors.
 
-\begin{figure}[t]
+For example, the following shows how we extend the predicate
+named \codeql{viableCallable}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
   result.asJava() = JAVA::viableCallable(c.asJava())
@@ -203,11 +204,6 @@ DataFlowCallable viableCallable(DataFlowCall c) {
   result.asJava() = viableCallableC2J(c.asC())
 }
 \end{lstlisting}
-\caption{library merge}\label{fig:merge}
-\end{figure}
-
-For example, Figure~\ref{fig:merge} shows how we extend the predicate
-named \codeql{viableCallable}.
 Lines 2 and 4 show the results of lifting, and they take advantage of the
 original predicates from the dataflow libraries.  They handle
 intra-language call edges from Java to Java and from C to C.
