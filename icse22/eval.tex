@@ -165,7 +165,7 @@ that previous research~\cite{ILEA, LeeASE20} defined as follows:
   \centering
   \vspace{2mm}
   \begin{subfigure}[t]{0.5\textwidth}
-    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
 //EmulatorActivity.java
 String tmp = null;
 String folder = Util.GetInternalAppStorage(activity);
@@ -174,9 +174,9 @@ if (folder != null) {
   tmp = folder + "tmp";
   Util.CreateDirectory(tmp);
 }
-
 EmulatorActivity.nativeInitGraph89(..., tmp);
-
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
 //wrappercommonjni.c
 void nativeInitGraph89(..., jstring tmp_dir) {
    (*env)->GetStringUTFChars(env, tmp_dir, 0);
@@ -188,7 +188,7 @@ void nativeInitGraph89(..., jstring tmp_dir) {
     \label{fig:bug1}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
 //JpegRedaction.java
 package org.witness.obscuracam.photo.jpegredaction;
 
@@ -196,7 +196,8 @@ public class JpegRedaction {
   private native void redactRegions(...);
   ...
 }
-
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
 //JpegRedaction.cpp
 void
 Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) {
@@ -208,32 +209,32 @@ Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) 
     \label{fig:bug2}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
 //MuPdfPage.java
 private native static List<PageTextBox> search(...);
-
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
 //mupdfdroidbridge.c
-jobjectArray search(...){
-   ...
- }
+jobjectArray search(...){ ... }
     \end{lstlisting}
     \vspace*{-.5em}
     \caption{TypeMismatch}
     \label{fig:bug3}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
 //PrBoomActivity.java
 void OnMessage(String text);
 void OnInfoMessage(String msg, int displayType);
-
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
 //jni_doom.h
 #define CB_CLASS_MSG_SIG  "(Ljava/lang/String;I)V"
 #define CB_CLASS_INFMSG_SIG  "(Ljava/lang/String;I)V"
 
 //jni_doom.c
-mSendStr = (*env)->GetMethodID(env, jNativesCls, "OnMessage", CB_CLASS_MSG_SIG);
-
+mSendStr = (*env)->GetMethodID(env, jNativesCls,
+                       "OnMessage", CB_CLASS_MSG_SIG);
     \end{lstlisting}
     \vspace*{-.5em}
     \caption{WrongSignature}
@@ -241,6 +242,7 @@ mSendStr = (*env)->GetMethodID(env, jNativesCls, "OnMessage", CB_CLASS_MSG_SIG);
   \end{subfigure}
   \vspace*{-.5em}
   \caption{Four kinds of JNI interoperation bugs}
+  \vspace*{-1em}
   \label{fig:bugs}
 \end{figure}
 
@@ -253,35 +255,32 @@ MissingFun}, {\it TypeMismatch}, and {\it WrongSig}, respectively.
 \ours did not report any false positives for the last three bug kinds.
 We confirmed true and false positives by manual inspection of the source code. 
 
-\inred{\ours found 33 genuine bugs but reported 21 false positives in 19 apps.
+\ours found 33 genuine bugs, but reported 21 false positives in 19 apps.
 All false positives are reported only in the {\it NullDereference} bug
 detection; \ours reported five true and 21 false alarms of {\it
-NullDereference} in 11 apps, nine true alarms of {\it MissingFun} in three
-apps, 17 true alarms of {\it TypeMismatch} in eight apps, and two true alarms
-of {\it WrongSignature} in two apps. We manually checked that the false
-positives come from diverse over-approximation issues of static analyses but
-one of the main causes is conditionally sanitized variables.  Many apps have a
-code pattern that assigns a value to a variable only if the variable has the
-{\tt null} value. Because our analysis does not support the path-sensitivity
-that analyzes each execution path separately, it reports that the variable may
-still have {\tt null} even after the conditional assignment.}
+NullDereference} in 11 apps, nine true alarms of {\it MissingFun} in
+three apps, 17 true alarms of {\it TypeMismatch} in eight apps, and two true
+alarms of {\it WrongSignature} in two apps. We manually checked that the false
+positives come from diverse over-approximation issues of static analyses, but
+one of the main causes is conditionally sanitized variables.  Many apps
+have a code pattern that assigns a value to a variable only if the variable has
+the {\tt null} value. Because our analysis does not support the
+path-sensitivity that analyzes each execution path separately, it reports that
+the variable may still have {\tt null} even after the conditional assignment.
 
+Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours
+detected from real-world apps using simplified code.
 
-
-Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs our
-tool detected.  For brievity, we simplified code snippets excerpted from
-real-world apps. 
-
-Figure~\ref{fig:bugs}(a) shows a code fragment with the {\it NullDerefence} bug
-in Graph 89. Java may calls a C function {\tt nativeInitGraph89} with {\tt
-null} value as the last argument, because a Java variable {\tt tmp} has {\tt
-null} when a function {\tt GetInternalAppStorage} returns {\tt null}.  The C
-function calls a JNI function {\tt GetStringUTFChars} with the value as the
-second argument, without null check of the value. However, because the JNI
+Figure~\ref{fig:bugs}(a) shows a pattern in Graph 89 with the {\it NullDerefence} bug.
+The Java code may call a C function {\tt nativeInitGraph89} with {\tt
+null} as its last argument, because the variable {\tt tmp} has {\tt
+null} when the method {\tt GetInternalAppStorage} returns {\tt null}.  The C
+function calls a JNI function {\tt GetStringUTFChars} with the value as its
+second argument, without checking whether it is {\tt null}. However, because the JNI
 specification describes that the second argument of the functions must not be
-{\tt null}~\cite{getstringutfchars}, the JNI function may behave unexpectedly.
+{\tt null}~\cite{getstringutfchars}, the function may behave unexpectedly.
 Note that calling JNI functions with wrong arguments may introduce various
-unexpected executions, since JVMs do not validate the arguments because of the
+unexpected behaviors, since JVMs do not validate the arguments because of
 performance overhead~\cite{hwang2021justgen}.
 
 \renewcommand{\texttt}[1]{%
@@ -295,34 +294,33 @@ performance overhead~\cite{hwang2021justgen}.
   \endgroup
 }
 
-Figure~\ref{fig:bugs}(b) shows a code snippet with the {\it MissingFun} bug in
-ObscuraCam. As described in Section~\ref{sec:merging}, JNI has a C function
-naming convention for JVMs to link Java native methods to the corresponding C
+Figure~\ref{fig:bugs}(b) shows a pattern in ObscuraCam with the {\it MissingFun} bug.
+As described in Section~\ref{sec:merging}, JNI has a C function
+naming convention for JVMs to link Java native methods to their corresponding C
 functions. While a Java class {\tt JpegRedaction} declaring a native method
 {\tt redactRegions} belongs to a package
 \texttt{org.witness.obscuracam.photo.jpegredaction}, the corresponding C
 function is named with a wrong package name
 \texttt{org.witness.securesmartcam.jpegredaction}.  When calling the native
-method, JVM fails to link the native method because of the wrongly named C
-function.
+method, JVM fails to link it because of the wrongly named C function.
 
 
-Figure~\ref{fig:bugs}(c) shows a code snippet with the {\it TypeMismatch} bug
-in Document Viewer.  While the return type of a Java native method {\tt search}
+Figure~\ref{fig:bugs}(c) shows a pattern in Document Viewer with the {\it TypeMismatch} bug.
+While the return type of a Java native method {\tt search}
 is {\tt List<PageTextBox>}, the return type of the corresponding C function
-{\tt search} is {\tt jobjectArray} that corresponds to the Java built-in array
-container. The return type mismatch does not have an effect on linking between
-Java native methods and C functions. However, since it is a unspecified case in
-JNI specification, interoperation via such native methods may behave
+{\tt search} is {\tt jobjectArray} corresponding to the Java built-in array
+container. The return type mismatch has no effect on linking between
+Java native methods and C functions. However, since it is an unspecified case in
+the JNI specification, interoperations via such native methods may behave
 differently on different JVMs~\cite{LeeASE20}. 
 
 
-Figure~\ref{fig:bugs}(d) shows a code fragment with the {\it WrongSignature}
-bug in PrBoom. C tries to get an ID of a Java method {\tt OnMessage} with a
+Figure~\ref{fig:bugs}(d) shows a pattern in PrBoom with the {\it WrongSignature} bug.
+The C code tries to get an ID of a Java method {\tt OnMessage} with a
 signature \texttt{(LJava/lang/String;I)V}, but the Java method has a different
-signature \texttt{(LJava/lang/String;)V} taking sole String parameter. Because
-the two signatures are not equal to each other, C always obtains {\tt null}
-value instead of an ID and a Java exception is thrown in this example. In
+signature \texttt{(LJava/lang/String;)V} taking a sole String argument. Because
+the two signatures do not match, the C code always receives {\tt null}
+instead of a method ID, and this example throws a Java exception. In
 addition, it may introduce errors in subsequent instructions when using the
-return value without null check or calling JNI functions without handling the
+return value without null checking or calling JNI functions without handling the
 thrown Java exception~\cite{jniexcept}.
