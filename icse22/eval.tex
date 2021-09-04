@@ -7,7 +7,7 @@ To show the effectiveness of our approach, we evaluate our analyzer
 JN-QL with the following three research questions:
 \begin{itemize}
   \item \textbf{\req{1}: Feasibility.} Can \ours analyze JNI programs that use
-    various JNI inteoperations?
+    various JNI interoperations?
 
   \item \textbf{\req{2}: Performance.} How precise and scalable is \ours for
     real-world JNI program analysis compared to JN-Sum~\cite{LeeASE20}?
@@ -116,8 +116,8 @@ or a single field at the JNI use.
 
 \ours resolved 1,076 out of 1,171 (92\%) JNI uses, including
 347 out of 404 (86\%) C-to-Java function calls and 729 out of 767 (95\%)
-C-to-Java field accesses. In addition, 1,008 (86\%) resolved JNI uses are precies.
-\inred{The results show that \ours resolves more JNI uses even precisley than JN-Sum
+C-to-Java field accesses. In addition, 1,008 (86\%) resolved JNI uses are precise.
+\inred{The results show that \ours resolves more JNI uses even precisely than JN-Sum
 that ... on the same dataset.}
 \ours failed to resolve 95 (8\%) JNI uses because
 of complex language semantics such as arrays and function pointers. Because
@@ -271,7 +271,7 @@ the variable may still have {\tt null} even after the conditional assignment.
 Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours
 detected from real-world apps using simplified code.
 
-Figure~\ref{fig:bugs}(a) shows a pattern in Graph 89 with the {\it NullDerefence} bug.
+Figure~\ref{fig:bugs}(a) shows a pattern in Graph 89 with the {\it NullDereference} bug.
 The Java code may call a C function {\tt nativeInitGraph89} with {\tt
 null} as its last argument, because the variable {\tt tmp} has {\tt
 null} when the method {\tt GetInternalAppStorage} returns {\tt null}.  The C

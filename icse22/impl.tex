@@ -61,7 +61,7 @@ CodeQL monitors the compiler to extract necessary information and
 creates a database with the extracted information.
 CodeQL creates a database for a single language in two steps:
 1) it stores the extracted information from a compiler in a trap
-file, a human readable file format, and 2) it fianlizes trap files
+file, a human readable file format, and 2) it finalizes trap files
 into databases in the binary format. For example, the
 following shows a sample trap file:
 
@@ -203,7 +203,7 @@ DataFlowCallable viableCallable(DataFlowCall c) {
   result.asJava() = viableCallableC2J(c.asC())
 }
 \end{lstlisting}
-\caption{libray merge}\label{fig:merge}
+\caption{library merge}\label{fig:merge}
 \end{figure}
 
 For example, Figure~\ref{fig:merge} shows how we extend the predicate
@@ -240,7 +240,7 @@ First, C code calls the interface function \ccode{GetMethodID(name, sig)}
 to get the ``method ID'' of the method whose name matches the first argument
 and the type signature matches the second argument passed to this function.
 This method ID is stored at a variable, say \ccode{mid}, and
-an actual method call invokdes another
+an actual method call is invoked by another
 interface function, \ccode{Call<type>Method(obj, mid, args...)}. Calling this interface 
 function corresponds to calling the method that \ccode{mid} indicates
 with \ccode{obj} as ``this object'' and \ccode{args} as the arguments.
