@@ -114,15 +114,19 @@ We considered a resolved JNI use as precise, when \ours finds a single target me
 or a single field at the JNI use.
 
 
-\ours resolved 1,076 out of 1,171 (92\%) JNI uses, including
-347 out of 404 (86\%) C-to-Java function calls and 729 out of 767 (95\%)
-C-to-Java field accesses. In addition, 1,008 (86\%) resolved JNI uses are precies.
-\inred{The results show that \ours resolves more JNI uses even precisley than JN-Sum
-that ... on the same dataset.}
-\ours failed to resolve 95 (8\%) JNI uses because
-of complex language semantics such as arrays and function pointers. Because
-CodeQL does not track dataflows on C function pointers and arrays,
-\ours failed to analyze method or field IDs necessary to resolve the JNI uses.
+\ours resolved 1,076 out of 1,171 (92\%) JNI uses, including 347 out of 404
+(86\%) C-to-Java function calls and 729 out of 767 (95\%) C-to-Java field
+accesses. In addition, 1,008 (86\%) resolved JNI uses are precies.  The results
+show that \ours resolves more JNI uses even precisley than JN-Sum. JN-Sum
+failed to analyze \inred{1} apps because of an error, \inred{4} apps because of
+lacks of memory spaces, and \inred{3} apps even in \inred{8} hours.  In
+addition, JN-Sum resolved 71\% and precisely resolved 46\% out of JNI uses in
+the remaining \inred{17} apps, which shows significantly imprecise results
+than \ours. \ours failed to resolve 95 (8\%) JNI uses because of complex
+language semantics such as arrays and function pointers.  Because CodeQL does
+not track dataflows on C function pointers and arrays, \ours failed to analyze
+method or field IDs necessary to resolve the JNI uses.
+
 
 \begin{figure}[t]
   \centering
@@ -135,15 +139,28 @@ CodeQL does not track dataflows on C function pointers and arrays,
 \end{figure}
 
 \ours is scalable in that it can analyze large-scale programs. The analysis
-time was 161.3 seconds on average for each app, including 103.8 seconds
-for DB creation and 57.5 seconds for query processing.  DB creation
-took more time than query processing except for {\it Graph 89}, and
-the DB creation time was almost linear to the code size. \ours took
-about 12 minutes at most to analyze {\it Tileless Map} having about one million
-lines of code. Figure~\ref{fig:graph} shows the analysis time of \ours
-compared to JN-Sum. \inred{describe the comparison result...}  Note
-that once we create a database for a program, we can evaluate multiple queries on
-it without re-creation to obtain various analysis results of the program.
+time was 161.3 seconds on average for each app, including 103.8 seconds for DB
+creation and 57.5 seconds for query processing.  DB creation took more time
+than query processing except for {\it Graph 89}, and the DB creation time was
+almost linear to the code size. \ours took about 12 minutes at most to analyze
+{\it Tileless Map} having about one million lines of code.  Note that once we
+create a database for a program, we can evaluate multiple queries on it without
+re-creation to obtain various analysis results of the program.
+
+
+\inred{Figure~\ref{fig:graph} shows the analysis time of \ours compared to
+JN-Sum. Out of \inred{17} apps except for \inred{8} apps JN-Sum failed to
+analyze, JN-Sum analyzed \inred{12} apps faster than \ours. JN-Sum took about
+\inred{32} seconds on average to analyze each of them and \ours took and \ours
+was about \inred{56} seconds.  On the other hand, \ours analyzed \inred{5} apps
+faster than JN-Sum. The average analysis time of JN-Sum was about \inred{30}
+minutes, but ours was about just \inred{1} minutes. While JN-Sum usually
+analyzed small size apps faster than \ours but it took lots of time in the
+summary generation phase for some large size apps, the analysis time of \ours
+is almost linear to the size of apps.  In addition, JN-Sum failed to analyze
+all the large size apps that have more than about 400,000 lines of code in
+eight hours. Different from JN-Sum, \ours analyzed huge apps that have about
+three million lines of code in about ten minutes.}
 
 
 \subsection{RQ3: Usefulness}
@@ -267,6 +284,8 @@ have a code pattern that assigns a value to a variable only if the variable has
 the {\tt null} value. Because our analysis does not support the
 path-sensitivity that analyzes each execution path separately, it reports that
 the variable may still have {\tt null} even after the conditional assignment.
+\inred{Note that 12 out of 33 bugs \ours found JN-Sum was not able to find
+because of the memory or scalability issues.}
 
 Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours
 detected from real-world apps using simplified code.
