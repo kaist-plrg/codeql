@@ -253,18 +253,18 @@ MissingFun}, {\it TypeMismatch}, and {\it WrongSig}, respectively.
 \ours did not report any false positives for the last three bug kinds.
 We confirmed true and false positives by manual inspection of the source code. 
 
-\inred{\ours found 33 genuine bugs, but reported 24 false positives in 19 apps.
-All false positives are reported only in the {\it
-NullDereference} bug detection; \ours reported five true and 24 false alarms
-of {\it NullDereference} in 11 apps, nine true alarms of {\it MissingFun} in
-three apps, 17 true alarms of {\it TypeMismatch} in eight apps, and two true
-alarms of {\it WrongSignature} in two apps. We manually checked that the false
-positives come from diverse over-approximation issues in static analyses but
-one of the main causes is conditionally sanitized variables.  Many apps
-have a code pattern that assigns a value to a variable only if the variable has
-the {\tt null} value. Because our analysis does not support the
-path-sensitivity that analyzes each execution path separately, it reports that
-the variable may still have {\tt null} even after the conditional assignment.}
+\inred{\ours found 33 genuine bugs but reported 21 false positives in 19 apps.
+All false positives are reported only in the {\it NullDereference} bug
+detection; \ours reported five true and 21 false alarms of {\it
+NullDereference} in 11 apps, nine true alarms of {\it MissingFun} in three
+apps, 17 true alarms of {\it TypeMismatch} in eight apps, and two true alarms
+of {\it WrongSignature} in two apps. We manually checked that the false
+positives come from diverse over-approximation issues of static analyses but
+one of the main causes is conditionally sanitized variables.  Many apps have a
+code pattern that assigns a value to a variable only if the variable has the
+{\tt null} value. Because our analysis does not support the path-sensitivity
+that analyzes each execution path separately, it reports that the variable may
+still have {\tt null} even after the conditional assignment.}
 
 
 
