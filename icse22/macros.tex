@@ -123,16 +123,15 @@
   captionpos=b
 }
 
-\definecolor{eclipsegreen}{HTML}{008000}
-\definecolor{eclipseblue}{HTML}{0000FF}
-\definecolor{eclipsegray}{HTML}{808080}
-\definecolor{eclipseoperator}{HTML}{8000FF}
+\definecolor{pblue}{rgb}{0.13,0.13,1}
+\definecolor{pgreen}{rgb}{0,0.5,0}
+\definecolor{pred}{rgb}{0.9,0,0}
+\definecolor{pgrey}{rgb}{0.46,0.45,0.48}
 \lstdefinestyle{commoncode}{
   style=common,
-  keywordstyle=\bfseries\color{eclipseblue},
-  commentstyle=\itshape\color{eclipsegreen},
-  %identifierstyle=\color{blue},
-  stringstyle=\color{eclipsegray},
+  keywordstyle=\color{pblue}\bfseries,
+  commentstyle=\color{pgreen},
+  stringstyle=\color{purple},
   numbers=left,
   stepnumber=1,
 }
@@ -140,9 +139,7 @@
   style=commoncode,
   language=C++,
   classoffset=1, % starting new class
-  %otherkeywords={>,<,.,;,-,!,=,~},
-  morekeywords={>,<,.,;,-,!,=,~},
-  keywordstyle=\color{eclipseoperator},
+  morekeywords={>,<,.,;,-,!,=,~,NULL},
   numbers=left,
   stepnumber=1,
 }
@@ -151,8 +148,7 @@
   language=C++,
   classoffset=1, % starting new class
   %otherkeywords={>,<,.,;,-,!,=,~},
-  morekeywords={>,<,.,;,-,!,=,~,extends},
-  keywordstyle=\color{eclipseoperator},
+  morekeywords={>,<,.,;,-,!,=,~,extends,predicate},
   numbers=left,
   stepnumber=1,
 }
@@ -177,10 +173,10 @@
 \newcommand{\x}{{\textsf{x}}}
 
 % Keywords
-\newcommand{\javacode}[1]{\text{\lstinline[style=commoncode,numbers=none]!#1!}}
-\newcommand{\ccode}[1]{\text{\lstinline[style=commoncode,numbers=none]!#1!}}
+\newcommand{\javacode}[1]{\text{\lstinline[style=java,numbers=none]!#1!}}
+\newcommand{\ccode}[1]{\text{\lstinline[style=cpp,numbers=none]!#1!}}
 \newcommand{\datalog}[1]{\text{\lstinline[style=myDatalog,numbers=none]!#1!}}
-\newcommand{\codeql}[1]{\text{\lstinline[style=commoncode,numbers=none]!#1!}}
+\newcommand{\codeql}[1]{\text{\lstinline[style=codeql,numbers=none]!#1!}}
 
 % Table 1
 \newcommand{\myhead}[3]{
