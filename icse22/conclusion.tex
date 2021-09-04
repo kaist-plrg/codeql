@@ -1,8 +1,19 @@
 \section{Conclusion}\label{sec:conclude}
-Dataflow anlysis of multi lingual programs are important,
-but previous approaches are not pratical enough.
-We propose a new method of analysis in declaritve style.
-We suggested genralized approach,
-then implement into JNI analyzer using CodeQL.
-Experimnet show that it shows much faster speed and better precision.
-Also, we found some bugs.
+Multilingual programs are often vulnerable to bugs or security issues
+more than monolingual programs due to the language interoperation semantics
+via FFIs.  To prevent the issues, existing approaches leverages general-purpose
+analyzers for monolingual programs.  Plenty of features in general-purpose
+analyzers are harmful for scalability when the features are irrelevant to target
+analysis properties.  Our approach extracts syntactic datafacts from the
+parts written in different languages separately and defines additional rules to
+describe the interaction between different languages.  Ours can effectively
+check target properties in multilingual, thanks to the query-based-analysis
+feature from a declarative-style analysis.  We implement the prototype
+declarative-style JNI program analyzer on top of CodeQL.  Our analyzer showed
+better scalability without analysis precision degradation compared to the
+state-of-the-art JNI analyzer, \lees.  Moreover, we could easily develop
+various kinds of bug detectors on top of our analyzer.  Using these bug detectors,
+we found 33 true bugs and vulnerabilities from real-world applications, and 12 out
+of 33 bugs are from the applications that \lees failed to analyze.  We believe
+that our approach is applicable to various FFIs and can prevent interoperation
+bugs and vulnerabilities in multilingual programs.

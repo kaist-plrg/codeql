@@ -14,11 +14,10 @@ The second approach abstracts the behaviors of
 each part written in a single language into a single form
 and performs a target analysis using existing top-down analyzers.
 While they can utilize the full features of existing static analyzers,
-they often suffer from the analysis performance overhead.
-Because existing static analyzers are general purpose, in the
-sense that they support abstractions of all the language features,
+they often fail to analyze large-scale real-world applications.
+Because existing static analyzers support abstractions of all the language features,
 they may waste their analysis time on the features that may not be
-relevant to summary generation for the target analysis. 
+relevant to the target analysis. 
 
 In this paper, we propose a simple and effective declarative-style static
 analysis for multilingual programs for the first time.
@@ -30,12 +29,12 @@ languages separately and defines additional rules to describe the interaction
 between different languages.  Because our approach works directly on datafacts
 extracted from programs and inherits the query-based-analysis
 feature from a declarative-style analysis, it can effectively check target
-properties in multilingual programs without expensive and redundant summary generation.
-As a proof-of-concept, we implement a JNI program static analyzer
+properties in multilingual programs without irrelevant computations.
+As a proof-of-concept, we implement a JNI program static analyzer \ours
 on top of CodeQL, which detects bugs and security vulnerabilities by tracking
 dataflows over language boundaries between Java and C.
-Our evaluation shows that the analyzer is {\it precise} in that it analyzes
-dataflows with higher precision and is {\it scalable} in that it detects the
-same types of bugs and security vulnerabilities \inred{14x} faster on average than the
-state-of-the-art analyzers.
+Our evaluation shows that \ours is {\it precise} in that it analyzes
+dataflows with higher precision and is {\it scalable} in that it analyzes
+more applications than the state-of-the-art analyzers.
+It also reported 33 genuine bugs in real-world JNI Android applications.
 \end{abstract}

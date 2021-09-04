@@ -7,7 +7,7 @@ To show the effectiveness of our approach, we evaluate our analyzer
 JN-QL with the following three research questions:
 \begin{itemize}
   \item \textbf{\req{1}: Feasibility.} Can \ours analyze JNI programs that use
-    various JNI inteoperations?
+    various JNI interoperations?
 
   \item \textbf{\req{2}: Performance.} How precise and scalable is \ours for
     real-world JNI program analysis compared to JN-Sum~\cite{LeeASE20}?
@@ -290,7 +290,7 @@ because of the memory or scalability issues.}
 Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours
 detected from real-world apps using simplified code.
 
-Figure~\ref{fig:bugs}(a) shows a pattern in Graph 89 with the {\it NullDerefence} bug.
+Figure~\ref{fig:bugs}(a) shows a pattern in Graph 89 with the {\it NullDereference} bug.
 The Java code may call a C function {\tt nativeInitGraph89} with {\tt
 null} as its last argument, because the variable {\tt tmp} has {\tt
 null} when the method {\tt GetInternalAppStorage} returns {\tt null}.  The C
