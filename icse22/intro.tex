@@ -38,7 +38,7 @@ incorporate both languages, and performs
 a target analysis using a general-purpose analyzer
 running on the IR~\cite{hybridroid, cpython}.
 While both approaches can detect bugs and security vulnerabilities
-in multilingual programs, they often \inred{fail to analyze within a limited time budget}.
+in multilingual programs, they often fail to analyze large-scale real-world applications.
 Because they utilize the full features of expensive general-purpose analyzers,
 they may waste their analysis time on the features that are irrelevant to
 the target analysis.
@@ -83,16 +83,16 @@ We evaluated the analyzer using real-world Android JNI applications
 to see whether its performance is comparable to that of the existing work.
 Our experimental results show that our analyzer outperforms the
 state-of-the-art JNI analyzer, \lees, in terms of scalability.  Our analyzer
-shows \inred{better scalability} without analysis precision degradation.
+shows better scalability without analysis precision degradation.
 In addition,  we could easily develop various kinds of bug detectors
 reported in the literature on top of our analyzer, thanks to the power of CodeQL.
-Using these bug detectors, we found \inred{25 new bugs and vulnerabilities from
-real-world applications, among them 12 bugs were from the apps that \lees
-failed due to a timeout or out of memory}.
+Using these bug detectors, we found 33 true bugs and vulnerabilities from
+real-world applications, among them 12 bugs are from the applications that \lees
+failed to analyze.
 
 The contributions of this paper include the following:
 \begin{itemize}
-  \item We propose a simple and effective declarative-style static analysis for
+  \item We propose a simple and effective declarative static analysis for
     multilingual programs for the first time. Our approach analyzes dataflows
     over language boundaries seamlessly without complex, expensive,
     and unnecessary computation.
@@ -103,7 +103,7 @@ The contributions of this paper include the following:
     features of CodeQL. 
 
 \item We show the practical usefulness of the JNI program analyzer for real-world
-  JNI programs. Our tool \inred{analyzed more apps within a timeout than the
+  JNI programs. Our tool analyzed more applications than the
     state-of-the-art JNI program analyzer, \lees, and detected the same kinds of bugs
-    and security vulnerabilities precisely.}
+    and security vulnerabilities precisely.
 \end{itemize}
