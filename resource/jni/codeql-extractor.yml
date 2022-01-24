@@ -1,0 +1,21 @@
+name: "jni"
+display_name: "JNI"
+file_types:
+  - name: java
+    display_name: Java sources
+    extensions:
+      - .java
+  - name: c
+    display_name: C sources
+    extensions:
+      - .c
+      - .h
+  - name: cpp
+    display_name: C++ sources
+    extensions:
+      - .cc
+      - .cpp
+      - .cxx
+      - .hh
+      - .hpp
+      - .hxx

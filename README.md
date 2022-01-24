@@ -7,6 +7,8 @@ codeql-cli version: 2.7.5 (https://github.com/github/codeql-cli-binaries/release
 `
 export CODEQL_HOME=`pwd`
 export PATH="$CODEQL_HOME/bin:$PATH"
+
+export JAVA_HOME="path/to/java/"
 `
 
 2. run

@@ -1,0 +1,5 @@
+name: jni
+version: 0.0.0
+dbscheme: merged.dbscheme
+extractor: jni
+library: true

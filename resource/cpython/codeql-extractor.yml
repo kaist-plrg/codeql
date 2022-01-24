@@ -1,0 +1,21 @@
+name: "cpython"
+display_name: "CPYTHON"
+file_types:
+  - name: python
+    display_name: Python sources
+    extensions:
+      - .py
+  - name: c
+    display_name: C sources
+    extensions:
+      - .c
+      - .h
+  - name: cpp
+    display_name: C++ sources
+    extensions:
+      - .cc
+      - .cpp
+      - .cxx
+      - .hh
+      - .hpp
+      - .hxx
