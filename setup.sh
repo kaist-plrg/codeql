@@ -1,4 +1,4 @@
-echo "unzipping binary..."
-rm -rf bin
+echo "unzipping cli binary..."
+rm -rf cli
 unzip -q codeql.zip
-mv codeql bin
+mv codeql cli
