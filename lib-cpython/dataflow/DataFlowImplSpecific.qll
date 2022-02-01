@@ -4,6 +4,7 @@ module Private {
 
 module Public {
   import DataFlowImplCommon
+  import DataFlowMerged
 }
 
 module Original {

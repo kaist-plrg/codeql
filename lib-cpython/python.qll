@@ -1,4 +1,4 @@
 module PYTHON {
   import python.python
-  //import cpp.semmle.code.cpp.dataflow.DataFlow::DataFlow
+  import python.semmle.python.dataflow.new.DataFlow::DataFlow
 }
