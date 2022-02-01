@@ -28,6 +28,9 @@ lib-jni/cpp
 lib-cpython/python
 lib-cpython/cpp
 
+# auto-generated merged library
+DataFlowmerged.qll
+
 # fdroid
 download
 extracted
