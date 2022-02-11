@@ -1,5 +1,5 @@
-all:
-	g++ cpython.cpp -o cpython.o
+all: clean
+	python3 setup.py build_ext --inplace	
 
 clean:
-	rm cpython.o
+	rm -r build
