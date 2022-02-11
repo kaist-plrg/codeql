@@ -1,6 +1,6 @@
 # codeql
 
-codeql-cli version: 2.7.5 (https://github.com/github/codeql-cli-binaries/releases)
+codeql-cli version: 2.8.0 (https://github.com/github/codeql-cli-binaries/releases)
 
 # SETUP 
 1. set environment variable:
