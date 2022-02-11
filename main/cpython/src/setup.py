@@ -17,7 +17,7 @@ setup(
             # the qualified name of the extension module to build
             'cmodule',
             # the files to compile into our module relative to ``setup.py``
-            ['cmodule/cmodule.c'],
+            ['cmodule.c'],
         ),
     ]
 )
