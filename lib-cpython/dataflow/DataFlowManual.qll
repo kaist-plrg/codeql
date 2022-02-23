@@ -296,6 +296,10 @@ predicate parameterMatch(ParameterPosition p0, ArgumentPosition p1) {
   PYTHON::parameterMatch(p0.asPythonParameterPosition(), p1.asPythonArgumentPosition())
   or
   CPP::parameterMatch(p0.asCppParameterPosition(), p1.asCppArgumentPosition())
+  or
+  p0.asPythonParameterPosition() = p1.asCppArgumentPosition()
+  or
+  p0.asCppParameterPosition() = p1.asPythonArgumentPosition()
 }
 Node exprNode(DataFlowExpr p0) {
   result.asPythonNode() = PYTHON::exprNode(p0.asPythonDataFlowExpr())
