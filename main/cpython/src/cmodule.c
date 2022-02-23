@@ -2,7 +2,7 @@
 #include <Python.h>
 
 static PyObject*
-f(PyObject* self, PyObject* python_arg)
+f_impl(PyObject* self, PyObject* python_arg)
 {
     unsigned long c_arg = PyLong_AsUnsignedLong(python_arg);
     PyObject* result = PyLong_FromUnsignedLong(c_arg);
@@ -14,7 +14,7 @@ f(PyObject* self, PyObject* python_arg)
 struct PyMethodDef methods[] = {
     {
       "f",
-      (PyCFunction) f,
+      (PyCFunction) f_impl,
       METH_O,
       "identity" 
     },
