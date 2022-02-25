@@ -2,6 +2,7 @@ module Private {
   import DataFlowManual
   import PyMethodDef
   import ViableCallable
+  import Step
 }
 
 module Public {

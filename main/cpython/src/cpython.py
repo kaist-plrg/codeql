@@ -1,5 +1,7 @@
-from cmodule import f
+from cmodule import f, g
 
-x = f(42);
+val0 = 42;
+val1 = f(val0);
+val2 = g(43, val1);
 
-print(x)
+print(val2)

@@ -129,6 +129,12 @@ class Node extends TNode {
     or
     asCppNode().hasLocationInfo(p0, p1, p2, p3, p4)
   }
+  
+  string getLocation() {
+    result = asPythonNode().getLocation().toString()
+    or
+    result = asCppNode().getLocation().toString()
+  }
 }
 private newtype TArgumentPosition =
   TPythonArgumentPosition(PYTHON::ArgumentPosition c)
@@ -296,10 +302,6 @@ predicate parameterMatch(ParameterPosition p0, ArgumentPosition p1) {
   PYTHON::parameterMatch(p0.asPythonParameterPosition(), p1.asPythonArgumentPosition())
   or
   CPP::parameterMatch(p0.asCppParameterPosition(), p1.asCppArgumentPosition())
-  or
-  p0.asPythonParameterPosition() = p1.asCppArgumentPosition()
-  or
-  p0.asCppParameterPosition() = p1.asPythonArgumentPosition()
 }
 Node exprNode(DataFlowExpr p0) {
   result.asPythonNode() = PYTHON::exprNode(p0.asPythonDataFlowExpr())
@@ -382,9 +384,7 @@ predicate nodeIsHidden(Node p0) {
 predicate isParameterNode(Node p0, DataFlowCallable p1, ParameterPosition p2) {
   PYTHON::isParameterNode(p0.asPythonNode(), p1.asPythonDataFlowCallable(), p2.asPythonParameterPosition())
   or
-  if p1.isNativeFunction()
-  then CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition() + 1)
-  else CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition())
+  CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition())
 }
 predicate isArgumentNode(Node p0, DataFlowCall p1, ArgumentPosition p2) {
   PYTHON::isArgumentNode(p0.asPythonNode(), p1.asPythonDataFlowCall(), p2.asPythonArgumentPosition())
@@ -400,11 +400,15 @@ predicate storeStep(Node p0, Content p1, Node p2) {
   PYTHON::storeStep(p0.asPythonNode(), p1.asPythonContent(), p2.asPythonNode())
   or
   CPP::storeStep(p0.asCppNode(), p1.asCppContent(), p2.asCppNode())
+  or
+  p2cArgParamStoreStep(p0, p1.asPythonContent(), p2)
 }
 predicate readStep(Node p0, Content p1, Node p2) {
   PYTHON::readStep(p0.asPythonNode(), p1.asPythonContent(), p2.asPythonNode())
   or
   CPP::readStep(p0.asCppNode(), p1.asCppContent(), p2.asCppNode())
+  or
+  pythonTupleObjectReadStep(p0.asCppNode(), p1.asPythonContent(), p2.asCppNode())
 }
 predicate allowParameterReturnInSelf(ParamNode p0) {
   PYTHON::allowParameterReturnInSelf(p0.asPythonNode().(PYTHON::ParamNode))

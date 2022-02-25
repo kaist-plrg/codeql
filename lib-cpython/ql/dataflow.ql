@@ -11,11 +11,13 @@ class MyConfig extends Configuration {
   }
 
   override predicate isSink(Node n) {
-    any()
+    n.getLocation().matches("%cmodule%")
+    or
+    n.getLocation().matches("%cpython.py%")
   }
 }
 
 from MyConfig cfg, Node src, Node sink
 where
   cfg.hasFlow(src, sink)
-select node2string(src), sink
+select src, sink
