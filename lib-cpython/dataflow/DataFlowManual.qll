@@ -211,9 +211,9 @@ class ReturnNode extends Node {
 
   /* member predicates for ReturnNode */
   ReturnKind getKind() {
-    result.asPythonReturnKind() = asPythonReturnNode().getKind()
+    result.toString() = asPythonReturnNode().getKind().toString()
     or
-    result.asCppReturnKind() = asCppReturnNode().getKind()
+    result.toString() = asCppReturnNode().getKind().toString()
   }
 }
 class OutNode extends Node {
@@ -327,6 +327,12 @@ predicate simpleLocalFlowStep(Node p0, Node p1) {
   PYTHON::simpleLocalFlowStep(p0.asPythonNode(), p1.asPythonNode())
   or
   CPP::simpleLocalFlowStep(p0.asCppNode(), p1.asCppNode())
+  or
+  exists(CPP::Call call |
+    call = p1.asCppNode().asExpr() |
+    call.toString().matches("%PyLong_%") and
+    p0.asCppNode().asExpr() = call.getArgument(0)
+  )
 }
 predicate additionalLambdaFlowStep(Node p0, Node p1, boolean p2) {
   PYTHON::additionalLambdaFlowStep(p0.asPythonNode(), p1.asPythonNode(), p2)
