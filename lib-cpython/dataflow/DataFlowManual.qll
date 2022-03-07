@@ -55,6 +55,11 @@ class DataFlowCall extends TDataFlowCall {
     or
     result.asCppDataFlowCallable() = asCppDataFlowCall().getEnclosingCallable()
   }
+  string getLocation() {
+    result = asPythonDataFlowCall().getLocation().toString()
+    or
+    result = asCppDataFlowCall().getLocation().toString()
+  }
 }
 private newtype TDataFlowType =
   TPythonDataFlowType(PYTHON::DataFlowType c)
@@ -113,6 +118,10 @@ private newtype TNode =
   TPythonNode(PYTHON::Node c)
   or
   TCppNode(CPP::Node c)
+  or
+  TVirtualArgNode(DataFlowCall c) {
+    exists(p2cViableCallable(c))
+  }
 class Node extends TNode {
   PYTHON::Node asPythonNode() { this = TPythonNode(result) }
   CPP::Node asCppNode() { this = TCppNode(result) }
@@ -134,6 +143,19 @@ class Node extends TNode {
     result = asPythonNode().getLocation().toString()
     or
     result = asCppNode().getLocation().toString()
+  }
+}
+class VirtualArgNode extends Node, TVirtualArgNode {
+  override string toString() {
+    result = "virtual arg of " + getCall().toString()
+  }
+  
+  override string getLocation() {
+    result = getCall().getLocation().toString()
+  }
+
+  DataFlowCall getCall() {
+    this = TVirtualArgNode(result)
   }
 }
 private newtype TArgumentPosition =
@@ -302,6 +324,10 @@ predicate parameterMatch(ParameterPosition p0, ArgumentPosition p1) {
   PYTHON::parameterMatch(p0.asPythonParameterPosition(), p1.asPythonArgumentPosition())
   or
   CPP::parameterMatch(p0.asCppParameterPosition(), p1.asCppArgumentPosition())
+  or
+  p0.asPythonParameterPosition() = p1.asCppArgumentPosition()
+  or
+  p0.asCppParameterPosition() = p1.asPythonArgumentPosition()
 }
 Node exprNode(DataFlowExpr p0) {
   result.asPythonNode() = PYTHON::exprNode(p0.asPythonDataFlowExpr())
@@ -360,11 +386,15 @@ DataFlowType getNodeType(Node p0) {
   result.asPythonDataFlowType() = PYTHON::getNodeType(p0.asPythonNode())
   or
   result.asCppDataFlowType() = CPP::getNodeType(p0.asCppNode())
+  or
+  result.asPythonDataFlowType() = PYTHON::TAnyFlow() and p0 instanceof VirtualArgNode
 }
 predicate jumpStep(Node p0, Node p1) {
   PYTHON::jumpStep(p0.asPythonNode(), p1.asPythonNode())
   or
   CPP::jumpStep(p0.asCppNode(), p1.asCppNode())
+  or
+  p2cArgParamJumpStep(p0, p1)
 }
 predicate clearsContent(Node p0, Content p1) {
   PYTHON::clearsContent(p0.asPythonNode(), p1.asPythonContent())
@@ -384,12 +414,17 @@ predicate nodeIsHidden(Node p0) {
 predicate isParameterNode(Node p0, DataFlowCallable p1, ParameterPosition p2) {
   PYTHON::isParameterNode(p0.asPythonNode(), p1.asPythonDataFlowCallable(), p2.asPythonParameterPosition())
   or
-  CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition())
+  if p1.isNativeFunction()
+  then CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition() + 1)
+  else CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition())
+  /* TODO: Depending on flag, set position as virtual */
 }
 predicate isArgumentNode(Node p0, DataFlowCall p1, ArgumentPosition p2) {
   PYTHON::isArgumentNode(p0.asPythonNode(), p1.asPythonDataFlowCall(), p2.asPythonArgumentPosition())
   or
   CPP::isArgumentNode(p0.asCppNode(), p1.asCppDataFlowCall(), p2.asCppArgumentPosition())
+  or
+  p1 = p0.(VirtualArgNode).getCall() and p2.asPythonArgumentPosition() = 0
 }
 predicate lambdaCreation(Node p0, LambdaCallKind p1, DataFlowCallable p2) {
   PYTHON::lambdaCreation(p0.asPythonNode(), p1.asPythonLambdaCallKind(), p2.asPythonDataFlowCallable())
@@ -401,7 +436,7 @@ predicate storeStep(Node p0, Content p1, Node p2) {
   or
   CPP::storeStep(p0.asCppNode(), p1.asCppContent(), p2.asCppNode())
   or
-  p2cArgParamStoreStep(p0, p1.asPythonContent(), p2)
+  virtualArgStoreStep(p0, p1.asPythonContent(), p2)
 }
 predicate readStep(Node p0, Content p1, Node p2) {
   PYTHON::readStep(p0.asPythonNode(), p1.asPythonContent(), p2.asPythonNode())

@@ -13,10 +13,12 @@ f_impl(PyObject* self, PyObject* python_arg)
 static PyObject*
 g_impl(PyObject* self, PyObject* tuple)
 {
-    unsigned long elem1, elem2;
-    PyArg_ParseTuple(tuple, "LL", &elem1, &elem2);
-    printf("g(%lu, %lu)\n", elem1, elem2);
-    PyObject* result2 = PyLong_FromUnsignedLong(elem2);
+    unsigned long elem1;
+    PyObject* elem2;
+    PyArg_ParseTuple(tuple, "LO", &elem1, &elem2);
+    printf("g(%lu, func)\n", elem1);
+    PyObject* args = Py_BuildValue("(L)", elem1);
+    PyObject* result2 = PyObject_CallObject(elem2, args);
     return result2;
 }
 

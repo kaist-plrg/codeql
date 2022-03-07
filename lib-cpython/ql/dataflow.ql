@@ -17,6 +17,12 @@ class MyConfig extends Configuration {
   }
 }
 
+/*
+from int n, string stage, int nodes, int fields, int conscand, int states, int tuples, MyConfig cfg
+where stageStats(n, stage, nodes, fields, conscand, states, tuples, cfg)
+select n, stage, nodes, fields, conscand, states, tuples
+*/
+
 from MyConfig cfg, Node src, Node sink
 where
   cfg.hasFlow(src, sink)
