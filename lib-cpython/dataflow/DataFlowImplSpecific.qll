@@ -3,6 +3,7 @@ module Private {
   import PyMethodDef
   import ViableCallable
   import Step
+  import InnerFlow
 }
 
 module Public {

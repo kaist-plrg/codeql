@@ -437,6 +437,8 @@ predicate storeStep(Node p0, Content p1, Node p2) {
   CPP::storeStep(p0.asCppNode(), p1.asCppContent(), p2.asCppNode())
   or
   virtualArgStoreStep(p0, p1.asPythonContent(), p2)
+  or
+  buildValueStoreStep(p0.asCppNode(), p1.asPythonContent(), p2.asCppNode())
 }
 predicate readStep(Node p0, Content p1, Node p2) {
   PYTHON::readStep(p0.asPythonNode(), p1.asPythonContent(), p2.asPythonNode())
@@ -444,6 +446,8 @@ predicate readStep(Node p0, Content p1, Node p2) {
   CPP::readStep(p0.asCppNode(), p1.asCppContent(), p2.asCppNode())
   or
   pythonTupleObjectReadStep(p0.asCppNode(), p1.asPythonContent(), p2.asCppNode())
+  or
+  c2pArgParamReadStep(p0.asCppNode(), p1.asPythonContent(), p2.asPythonNode())
 }
 predicate allowParameterReturnInSelf(ParamNode p0) {
   PYTHON::allowParameterReturnInSelf(p0.asPythonNode().(PYTHON::ParamNode))
