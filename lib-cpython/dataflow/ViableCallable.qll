@@ -12,3 +12,13 @@ DataFlowCallable p2cViableCallable(DataFlowCall call) {
     )
   )
 }
+
+DataFlowCallable c2pViableCallable(DataFlowCall call) {
+  exists(
+    CPP::ArgNode funcArg
+    |
+    call.asCppDataFlowCall().toString().matches("%PyObject_Call%")
+    and funcArg.argumentOf(call.asCppDataFlowCall(), 0)
+    and result.asPythonDataFlowCallable() = getPyFunc(funcArg)
+  )
+}

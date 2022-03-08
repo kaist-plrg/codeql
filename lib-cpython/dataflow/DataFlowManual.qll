@@ -340,6 +340,8 @@ DataFlowCallable viableCallable(DataFlowCall p0) {
   result.asCppDataFlowCallable() = CPP::viableCallable(p0.asCppDataFlowCall())
   or
   result = p2cViableCallable(p0)
+  or
+  result = c2pViableCallable(p0)
 }
 OutNode getAnOutNode(DataFlowCall p0, ReturnKind p1) {
   result.asPythonOutNode() = PYTHON::getAnOutNode(p0.asPythonDataFlowCall(), p1.asPythonReturnKind())
@@ -447,7 +449,7 @@ predicate readStep(Node p0, Content p1, Node p2) {
   or
   pythonTupleObjectReadStep(p0.asCppNode(), p1.asPythonContent(), p2.asCppNode())
   or
-  c2pArgParamReadStep(p0.asCppNode(), p1.asPythonContent(), p2.asPythonNode())
+  c2pArgParamReadStep(p0, p1.asPythonContent(), p2)
 }
 predicate allowParameterReturnInSelf(ParamNode p0) {
   PYTHON::allowParameterReturnInSelf(p0.asPythonNode().(PYTHON::ParamNode))

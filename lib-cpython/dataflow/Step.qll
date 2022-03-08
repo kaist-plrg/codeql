@@ -31,19 +31,18 @@ predicate pythonTupleObjectReadStep(CPP::Node tup, PYTHON::TupleElementContent c
     and elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(2 + c.getIndex())
   )
 }
-predicate c2pArgParamReadStep(CPP::ArgNode arg, PYTHON::TupleElementContent c, PYTHON::ParamNode param) {
+predicate c2pArgParamReadStep(ArgNode arg, PYTHON::TupleElementContent c, ParamNode param) {
   exists(
-    CPP::DataFlowCall call,
-    CPP::ArgNode funcArg,
-    PYTHON::DataFlowCallable func,
-    PYTHON::ParameterPosition ppos
+    DataFlowCall call,
+    DataFlowCallable func,
+    ArgumentPosition apos,
+    ParameterPosition ppos
     |
-    call.toString().matches("%PyObject_Call%")
-    and funcArg.argumentOf(call, 0)
-    and arg.argumentOf(call, 1)
-    and func = getPyFunc(funcArg)
+    func = c2pViableCallable(call)
+    and arg.argumentOf(call, apos)
+    and apos.asCppArgumentPosition() = 1
     and param.isParameterOf(func, ppos)
-    and ppos = c.getIndex()
+    and ppos.asPythonParameterPosition() = c.getIndex()
   )
 }
 
