@@ -23,9 +23,16 @@ private newtype TContent =
   TPythonContent(PYTHON::Content c)
   or
   TCppContent(CPP::Content c)
+  or
+  TMergedContent(PYTHON::AttributeContent c1, CPP::FieldContent c2) {
+    exists(PyMemberDef member |
+      member.getName() = c1.getAttribute()
+      and member.getField() = c2.getField()
+    )
+  }
 class Content extends TContent {
-  PYTHON::Content asPythonContent() { this = TPythonContent(result) }
-  CPP::Content asCppContent() { this = TCppContent(result) }
+  PYTHON::Content asPythonContent() { this = TPythonContent(result) or this = TMergedContent(result, _) }
+  CPP::Content asCppContent() { this = TCppContent(result) or this = TMergedContent(_, result) }
 
   string toString() {
     result = asPythonContent().toString()
@@ -416,17 +423,19 @@ predicate nodeIsHidden(Node p0) {
 predicate isParameterNode(Node p0, DataFlowCallable p1, ParameterPosition p2) {
   PYTHON::isParameterNode(p0.asPythonNode(), p1.asPythonDataFlowCallable(), p2.asPythonParameterPosition())
   or
-  if p1.isNativeFunction()
-  then CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition() + 1)
-  else CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition())
+  CPP::isParameterNode(p0.asCppNode(), p1.asCppDataFlowCallable(), p2.asCppParameterPosition())
   /* TODO: Depending on flag, set position as virtual */
 }
 predicate isArgumentNode(Node p0, DataFlowCall p1, ArgumentPosition p2) {
-  PYTHON::isArgumentNode(p0.asPythonNode(), p1.asPythonDataFlowCall(), p2.asPythonArgumentPosition())
+  (
+    if exists(p2cViableCallable(p1)) and p1.asPythonDataFlowCall() instanceof PYTHON::FunctionCall
+    then PYTHON::isArgumentNode(p0.asPythonNode(), p1.asPythonDataFlowCall(), p2.asPythonArgumentPosition() - 1)
+    else PYTHON::isArgumentNode(p0.asPythonNode(), p1.asPythonDataFlowCall(), p2.asPythonArgumentPosition())
+  )
   or
   CPP::isArgumentNode(p0.asCppNode(), p1.asCppDataFlowCall(), p2.asCppArgumentPosition())
   or
-  p1 = p0.(VirtualArgNode).getCall() and p2.asPythonArgumentPosition() = 0
+  p1 = p0.(VirtualArgNode).getCall() and p2.asPythonArgumentPosition() = 1
 }
 predicate lambdaCreation(Node p0, LambdaCallKind p1, DataFlowCallable p2) {
   PYTHON::lambdaCreation(p0.asPythonNode(), p1.asPythonLambdaCallKind(), p2.asPythonDataFlowCallable())

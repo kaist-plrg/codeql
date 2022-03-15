@@ -3,9 +3,12 @@ private import DataFlowImplSpecific::Private
 private import DataFlowImplSpecific::Original
 
 DataFlowCallable p2cViableCallable(DataFlowCall call) {
-  exists(string name |
+  exists(
+    PYTHON::Expr f,
+    string name |
     result.isNativeFunction()
-    and name = call.asPythonDataFlowCall().getNode().getNode().(PYTHON::Call).getFunc().toString()
+    and f = call.asPythonDataFlowCall().getNode().getNode().(PYTHON::Call).getFunc()
+    and ( f.toString() = name or f.(PYTHON::Attribute).getName() = name )
     and exists(PyMethodDef md |
       md.getName() = name
       and md.getMeth() = result.asCppDataFlowCallable()

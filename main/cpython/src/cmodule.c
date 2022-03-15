@@ -1,5 +1,7 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+#include <stddef.h>
+#include "structmember.h"
 
 static PyObject*
 f_impl(PyObject* self, PyObject* python_arg)
@@ -22,9 +24,23 @@ g_impl(PyObject* self, PyObject* tuple)
     return result2;
 }
 
+typedef struct {
+  PyObject_HEAD
+  unsigned long field;
+} Object;
+
+static PyObject*
+h_impl(Object* self, PyObject* tuple)
+{
+    int n;
+    PyArg_ParseTuple(tuple, "i", &n);
+    self->field = n;
+    Py_RETURN_NONE;
+}
+
 /* =========================================== */
 
-struct PyMethodDef methods[] = {
+struct PyMethodDef functions[] = {
     {
       "f",
       (PyCFunction) f_impl,
@@ -35,9 +51,42 @@ struct PyMethodDef methods[] = {
       "g",
       (PyCFunction) g_impl,
       METH_VARARGS,
-      "second arg" 
+      "apply" 
     },
     {NULL},
+};
+
+struct PyMethodDef methods[] = {
+    {
+      "h",
+      (PyCFunction) h_impl,
+      METH_VARARGS,
+      "set to 42"
+    },
+    {NULL},
+};
+
+struct PyMemberDef members[] = {
+    {
+      "field",
+      T_ULONG,
+      offsetof(Object, field),
+      0,
+      "basic field" 
+    },
+    {NULL},
+};
+
+static PyTypeObject ObjectType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "cmodule.Cobject",
+    .tp_doc = "C object",
+    .tp_basicsize = sizeof(Object),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_new = PyType_GenericNew,
+    .tp_methods = methods,
+    .tp_members = members,
 };
 
 struct PyModuleDef cmodule = {
@@ -45,11 +94,26 @@ struct PyModuleDef cmodule = {
     "cmodule",
     "c module",
     -1,
-    methods,
+    functions,
 };
 
 PyMODINIT_FUNC
 PyInit_cmodule(void)
 {
-    return PyModule_Create(&cmodule);
+    PyObject* m = PyModule_Create(&cmodule);
+    if (m == NULL)
+        return NULL;
+
+    if (PyType_Ready(&ObjectType) < 0)
+        return NULL;
+
+    Py_INCREF(&ObjectType);
+    if (PyModule_AddObject(m, "Cobject", (PyObject *) &ObjectType) < 0)
+    {
+      Py_DECREF(&ObjectType);
+      Py_DECREF(m);
+      return NULL;
+    }
+
+    return m;
 }

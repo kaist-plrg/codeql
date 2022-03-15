@@ -11,7 +11,7 @@ predicate virtualArgStoreStep(ArgNode arg, PYTHON::TupleElementContent c, Virtua
     call = varg.getCall()
     and not arg instanceof VirtualArgNode
     and arg.argumentOf(call, apos)
-    and apos.asPythonArgumentPosition() = c.getIndex()
+    and apos.asPythonArgumentPosition() - 1 = c.getIndex()
   )
 }
 predicate buildValueStoreStep(CPP::ArgNode arg, PYTHON::TupleElementContent c, CPP::Node callNode) {
@@ -56,6 +56,6 @@ predicate p2cArgParamJumpStep(VirtualArgNode arg, ParamNode param) {
     and func = p2cViableCallable(call)
     // and func.isvararg()
     and param.isParameterOf(func, ppos)
-    and ppos.asCppParameterPosition() = 0
+    and ppos.asCppParameterPosition() = 1
   )
 }

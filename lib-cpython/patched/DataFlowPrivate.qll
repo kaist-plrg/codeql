@@ -699,9 +699,9 @@ class DataFlowModuleScope extends DataFlowCallable, TModule {
  * TODO: Add `TClassMethodCall` mapping `cls` appropriately.
  */
 newtype TDataFlowCall =
-  TFunctionCall(CallNode call) { /*call = any(FunctionValue f).getAFunctionCall()*/ any() } or
+  TFunctionCall(CallNode call) { /*call = any(FunctionValue f).getAFunctionCall()*/ not call.getFunction() instanceof AttrNode } or
   /** Bound methods need to make room for the explicit self parameter */
-  TMethodCall(CallNode call) { call = any(FunctionValue f).getAMethodCall() } or
+  TMethodCall(CallNode call) { /*call = any(FunctionValue f).getAMethodCall() */ call.getFunction() instanceof AttrNode } or
   TClassCall(CallNode call) { call = any(ClassValue c).getACall() } or
   TSpecialCall(SpecialMethodCallNode special)
 
@@ -761,19 +761,19 @@ class FunctionCall extends DataFlowCall, TFunctionCall {
  */
 class MethodCall extends DataFlowCall, TMethodCall {
   CallNode call;
-  FunctionValue bm;
+  //FunctionValue bm;
 
   MethodCall() {
-    this = TMethodCall(call) and
-    call = bm.getACall()
+    this = TMethodCall(call) //and
+    //call = bm.getACall()
   }
 
-  private CallableValue getCallableValue() { result = bm }
+  private CallableValue getCallableValue() { /*result = bm*/ call = result.getACall() }
 
   override string toString() { result = call.toString() }
 
   override Node getArg(int n) {
-    n > 0 and result = getArg(call, TShiftOneUp(), this.getCallableValue(), n)
+    n > 0 and result = /*getArg(call, TShiftOneUp(), this.getCallableValue(), n)*/ TCfgNode(call.getArg(n - 1))
     or
     n = 0 and result = TCfgNode(call.getFunction().(AttrNode).getObject())
   }

@@ -1,6 +1,6 @@
 module Private {
   import DataFlowManual
-  import PyMethodDef
+  import PyDef
   import ViableCallable
   import Step
   import InnerFlow
