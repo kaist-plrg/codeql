@@ -26,10 +26,10 @@ function rewriteDBSchemes(dir, lang1, lang2, rewritter1, rewritter2) {
   console.log(`making new dbscheme in lib-${dir} by merging lib/${lang1} and lib/${lang2}`);
 
   // variables
-  const DBSCHEME1 = walk(`lib/${lang1}`, 'dbscheme')[0];
-  const DBSCHEME2 = walk(`lib/${lang2}`, 'dbscheme')[0];
-  const STAT1 = DBSCHEME1 + ".stats";
-  const STAT2 = DBSCHEME2 + ".stats";
+  const STAT1 = walk(`lib/${lang1}/ql`, 'stats')[0];
+  const STAT2 = walk(`lib/${lang2}/ql`, 'stats')[0];
+  const DBSCHEME1 = STAT1.slice(0, -6);
+  const DBSCHEME2 = STAT2.slice(0, -6);
   const DBSCHEME = `lib-${dir}/merged.dbscheme`;
   const STAT = DBSCHEME + ".stats";
 
