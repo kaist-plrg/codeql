@@ -7,7 +7,7 @@ module PythonFunctionFlow {
 
     override predicate isSource(Node n) {
       n.asExpr() instanceof FunctionExpr
-      and n.getLocation().toString().matches("%cpython%")
+      and not n.getLocation().toString().matches("%Library%")
     }
 
     override predicate isSink(Node n) {
