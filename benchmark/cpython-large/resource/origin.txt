@@ -1,0 +1,6 @@
+git@github.com:ilanschnell/bitarray.git
+git@github.com:doukremt/distance.git
+git@github.com:caseman/noise.git
+git@github.com:WojciechMula/pyahocorasick.git
+git@github.com:ztane/python-Levenshtein.git
+git@github.com:ajakubek/python-llist.git
