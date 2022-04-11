@@ -43,6 +43,7 @@ if [[ $st -le 4 ]] && [[ $fn -ge 4 ]]; then
     node rewrite-lib.js
     node rewrite-dbscheme.js
     ( cd lib-jni ; ./patch.sh )
+    ( cd lib-cpython ; ./patch.sh )
   else
     echo "   skip"
   fi
