@@ -25,10 +25,34 @@ predicate buildValueStoreStep(CPP::ArgNode arg, PYTHON::TupleElementContent c, C
 
 predicate pythonTupleObjectReadStep(CPP::Node tup, PYTHON::TupleElementContent c, CPP::Node elem) {
   exists(CPP::Call call |
-    // PyArg_ParseTuple
-    call.toString().matches("%PyArg_ParseTuple%")
-    and tup.asExpr() = call.getArgument(0)
-    and elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(2 + c.getIndex())
+    (
+      // PyArg_ParseTuple
+      call.getTarget().toString().matches("%PyArg_ParseTuple%")
+      and tup.asExpr() = call.getArgument(0)
+      and elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(2 + c.getIndex())
+    )
+    or
+    (
+      // PyTuple_GetItem
+      call.getTarget().toString().matches("%PyTuple_GetItem%")
+      and tup.asExpr() = call.getArgument(0)
+      and elem.asExpr() = call
+      and c.getIndex().toString() = call.getArgument(1).toString()
+    )
+    or
+    (
+      // PyArg_UnpackTuple
+      call.getTarget().toString().matches("%PyArg_UnpackTuple%")
+      and tup.asExpr() = call.getArgument(0)
+      and elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(4 + c.getIndex())
+    )
+    or
+    (
+      // PyArg_ParseTupleAndKeywords
+      call.getTarget().toString().matches("%PyArg_ParseTupleAndKeywords%")
+      and tup.asExpr() = call.getArgument(0)
+      and elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(4 + c.getIndex())
+    )
   )
 }
 predicate c2pArgParamReadStep(ArgNode arg, PYTHON::TupleElementContent c, ParamNode param) {
