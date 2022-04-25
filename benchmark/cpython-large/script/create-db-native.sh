@@ -14,6 +14,6 @@ mkdir db
 
 for app in ${apps[@]}; do
   echo "========$app========"
-  cp resource/Makefile $app
-  $CODEQL_HOME/script/create-cpython-db.sh $app db/$app
+  cp resource/Makefile src/$app
+  $CODEQL_HOME/script/create-cpython-db.sh src/$app db/$app
 done

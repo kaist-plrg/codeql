@@ -31,7 +31,9 @@ lib-cpython/cpp
 # auto-generated merged library
 DataFlowMerged.qll
 
-# fdroid
+# benchmark
+benchmark/*/src
+## fdroid
 download
 extracted
 cmdline-tools
