@@ -48,3 +48,24 @@ class PyMemberDef extends ClassAggregateLiteral {
   Struct getBase() { result.toString() = getOffsetExpr().getChild(0).toString() }
   Field getField() { result = getOffsetExpr().getChild(1).(FieldAccess).getTarget() }
 }
+
+class PyTypeObject extends ClassAggregateLiteral {
+  
+  /* PyTypeObject */
+  PyTypeObject() { getActualType().toString() = "_typeobject" }
+    
+  Expr getFieldExprByName(string name) {
+    exists(Field f |
+      result = getFieldExpr(f)
+      and f.toString() = name
+    )
+  }
+
+  Expr getNameExpr() { result = getFieldExprByName("tp_name") }
+  Expr getNewMethExpr() { result = getFieldExprByName("tp_new") }
+  Expr getInitMethExpr() { result = getFieldExprByName("tp_init") }
+
+  string getName() { result = getNameExpr().toString().splitAt(".", 1) }
+  Function getNewMeth() { result = getNewMethExpr().(FunctionAccess).getTarget() }
+  Function getInitMeth() { result = getInitMethExpr().(FunctionAccess).getTarget() }
+}

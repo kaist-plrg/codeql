@@ -6,12 +6,19 @@ DataFlowCallable p2cViableCallable(DataFlowCall call) {
   exists(
     PYTHON::Expr f,
     string name |
-    result.isNativeFunction()
-    and f = call.asPythonDataFlowCall().getNode().getNode().(PYTHON::Call).getFunc()
+    f = call.asPythonDataFlowCall().getNode().getNode().(PYTHON::Call).getFunc()
     and ( f.toString() = name or f.(PYTHON::Attribute).getName() = name )
-    and exists(PyMethodDef md |
-      md.getName() = name
-      and md.getMeth() = result.asCppDataFlowCallable()
+    and (
+      exists(PyMethodDef md |
+        md.getName() = name
+        and md.getMeth() = result.asCppDataFlowCallable()
+      )
+      or
+      // __init__ and __new__
+      exists(PyTypeObject ty |
+        ty.getName() = name
+        and [ty.getNewMeth(), ty.getInitMeth()] = result.asCppDataFlowCallable()
+      )
     )
   )
 }
