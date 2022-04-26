@@ -1,7 +1,0 @@
-app1: p->c function call
-app2: module.f() instead of f()
-app3: varargs
-app4: return from p->c function call
-app5: c->p function call
-app6: p->c method call
-app7: p<->c member read/write
