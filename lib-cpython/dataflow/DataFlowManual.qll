@@ -369,6 +369,10 @@ predicate simpleLocalFlowStep(Node p0, Node p1) {
     call = p1.asCppNode().asExpr() |
     call.toString().matches("%PyLong_%") and
     p0.asCppNode().asExpr() = call.getArgument(0)
+    or
+    call.toString().matches("%Py_BuildValue%") and
+    call.getArgument(0).toString() = ["O", "S"] and
+    p0.asCppNode().asExpr() = call.getArgument(1)
   )
 }
 predicate additionalLambdaFlowStep(Node p0, Node p1, boolean p2) {

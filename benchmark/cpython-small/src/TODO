@@ -1,0 +1,10 @@
+keyword arg (p->c)
+different protocols for c->p call
+
+minor:
+PyList_Get/Set
+PyTuple_Get/Set
+PyDict_Get/Set
+PyObject_GetAttr/SetAttr
+
+

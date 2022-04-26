@@ -32,7 +32,8 @@ lib-cpython/cpp
 DataFlowMerged.qll
 
 # benchmark
-benchmark/*/src
+benchmark/jni-small/src
+benchmark/cpython-large/src
 ## fdroid
 download
 extracted
