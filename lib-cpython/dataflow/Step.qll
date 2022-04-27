@@ -22,7 +22,26 @@ predicate buildValueStoreStep(CPP::ArgNode arg, PYTHON::TupleElementContent c, C
     and c.getIndex() = apos - 1
   )
 }
+predicate setAttrStep(CPP::ArgNode val, PYTHON::AttributeContent c, CPP::PostUpdateNode postObj) {
+  exists(CPP::Call call, CPP::ArgNode obj, CPP::ArgNode name |
+    call.toString().matches("%PyObject_SetAttrString%")
+    and obj.argumentOf(call, 0)
+    and name.argumentOf(call, 1)
+    and val.argumentOf(call, 2)
+    |
+    c.getAttribute() = name.toString()
+    and postObj.getPreUpdateNode() = obj
+  )
+}
+predicate customStoreStep(Node prev, Content c, Node next) {
+  virtualArgStoreStep(prev, c.asPythonContent(), next)
+  or
+  buildValueStoreStep(prev.asCppNode(), c.asPythonContent(), next.asCppNode())
+  or
+  setAttrStep(prev.asCppNode(), c.asPythonContent(), next.asCppNode())
+}
 
+/* read */
 predicate pythonTupleObjectReadStep(CPP::Node tup, PYTHON::TupleElementContent c, CPP::Node elem) {
   exists(CPP::Call call |
     (
@@ -68,6 +87,23 @@ predicate c2pArgParamReadStep(ArgNode arg, PYTHON::TupleElementContent c, ParamN
     and param.isParameterOf(func, ppos)
     and ppos.asPythonParameterPosition() = c.getIndex()
   )
+}
+predicate getAttrStep(CPP::ArgNode obj, PYTHON::AttributeContent c, CPP::Node callNode) {
+  exists(CPP::Call call, CPP::ArgNode name |
+    call = callNode.asExpr()
+    and obj.argumentOf(call, 0)
+    and name.argumentOf(call, 1)
+    |
+    call.toString().matches("%PyObject_GetAttrString%")
+    and c.getAttribute() = name.toString()
+  )
+}
+predicate customReadStep(Node prev, Content c, Node next) {
+  pythonTupleObjectReadStep(prev.asCppNode(), c.asPythonContent(), next.asCppNode())
+  or
+  c2pArgParamReadStep(prev, c.asPythonContent(), next)
+  or
+  getAttrStep(prev.asCppNode(), c.asPythonContent(), next.asCppNode())
 }
 
 predicate p2cArgParamJumpStep(VirtualArgNode arg, ParamNode param) {
