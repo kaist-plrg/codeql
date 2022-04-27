@@ -119,3 +119,15 @@ predicate p2cArgParamJumpStep(VirtualArgNode arg, ParamNode param) {
     and ppos.asCppParameterPosition() = 1
   )
 }
+
+predicate pyJumpStep(Node prev, Node next) {
+  exists(CPP::Call call |
+    call = next.asCppNode().asExpr() |
+    call.toString().matches("%PyLong_%") and
+    prev.asCppNode().asExpr() = call.getArgument(0)
+    or
+    call.toString().matches("%Py_BuildValue%") and
+    call.getArgument(0).toString() = ["O", "S"] and
+    prev.asCppNode().asExpr() = call.getArgument(1)
+  )
+}

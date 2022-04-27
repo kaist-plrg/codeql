@@ -364,16 +364,6 @@ predicate simpleLocalFlowStep(Node p0, Node p1) {
   PYTHON::simpleLocalFlowStep(p0.asPythonNode(), p1.asPythonNode())
   or
   CPP::simpleLocalFlowStep(p0.asCppNode(), p1.asCppNode())
-  or
-  exists(CPP::Call call |
-    call = p1.asCppNode().asExpr() |
-    call.toString().matches("%PyLong_%") and
-    p0.asCppNode().asExpr() = call.getArgument(0)
-    or
-    call.toString().matches("%Py_BuildValue%") and
-    call.getArgument(0).toString() = ["O", "S"] and
-    p0.asCppNode().asExpr() = call.getArgument(1)
-  )
 }
 predicate additionalLambdaFlowStep(Node p0, Node p1, boolean p2) {
   PYTHON::additionalLambdaFlowStep(p0.asPythonNode(), p1.asPythonNode(), p2)
@@ -408,6 +398,8 @@ predicate jumpStep(Node p0, Node p1) {
   CPP::jumpStep(p0.asCppNode(), p1.asCppNode())
   or
   p2cArgParamJumpStep(p0, p1)
+  or
+  pyJumpStep(p0,p1)
 }
 predicate clearsContent(Node p0, Content p1) {
   PYTHON::clearsContent(p0.asPythonNode(), p1.asPythonContent())
