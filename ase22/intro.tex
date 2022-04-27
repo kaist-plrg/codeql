@@ -1,0 +1,75 @@
+\section{Introduction}
+With the success of Datalog[??], declarative style analyses have become one of
+widely used analysis techniques. Datalog consists of three parts: a database of
+facts, rules deriving new facts from existing facts, and a query system
+extracting all facts related to specific properties by applying the rules to
+the facts. Inspired by Datalog, declarative style analyzers detect possible
+bugs and security vulnerabilities by transforming program source code to facts
+and extracting new facts from the facts via a sequence of queries. DOOP[??] is
+a declarative style analysis framework conducting points-to analysis for Java
+programs, and CodeQL[??] is a declarative semantic code analysis engine
+maintained by Github, which performs data-flow analysis to detect security
+vulnerabilities for C++, C\#, and JavaScript programs. Recently, Glean[??], an
+experimental declarative query system, has been developed by Meta, on which
+users can query information about code structures for JavaScript and Hack
+programs.  Declarative style analyzers broaden their analysis targets to
+diverse programming languages. Because the query system is independent of
+analysis target languages, only required extensions for an additional target
+language support include a schema of the database containing facts,
+language-specific rules, and a front-end transforming programs written in the
+target language to facts. With the extensions, declarative analyzers can
+analyze various properties in programs written in the new target language,
+using a sequence of queries and the query system.  DOOP currently supports
+Python program analysis to detect tensor shape mismatching bugs in TensorFlow
+based Python ML models[??]. CodeQL can track data-flows not only in C++, C\#,
+and JavaScript, but also in Java, Ruby, Python, and Swift programs.
+Furthermore, Glean has a plan to support diverse target programming languages
+including Python, Java, C++, Rust, and Haskell.
+
+While the analyzers target multiple programming languages, they have limited
+application to multilingual programs written in two or more programming
+languages. Multilingual programs have been widely developed in various
+application domains[5, 8]. However, multilingual programs are often vulnerable
+to bugs or security issues more than monolingual programs. A large-scale study
+on the code quality of multilingual programs[6] reported that using multiple
+languages together correlates with higher error-proneness. Moreover, [7] showed
+that two or three times more bugs and security issues had been reported on the
+language interoperation than on the intraoperation in widely-used open-source
+JNI programs such as OpenJ9 and VLC.
+
+In this paper, we propose a systematic engineering methodology that extends a
+declarative style analyzer supporting multiple target languages to support
+multilingual program analysis as well. Our approach separates a database of
+facts into multiple logical language spaces to put all facts of a multilingual
+program into the database together by placing facts of different language parts
+in different language spaces. Existing language-specific rules derive new facts
+from facts in the corresponding language space. To handle language
+interoperation in multilingual programs, we define language-interoperation
+rules referring to language interoperation semantics, which derive new facts
+from facts across language spaces. The extensions enable the query system to
+extract facts in multilingual programs, considering language interoperation.
+
+To evaluate the practicality of our approach, we develop a proof-of-concept
+declarative style analyzer for multilingual programs by extending CodeQL. Our
+analyzer tracks data-flows across language boundaries for two types of
+multilingual programs: Java-C programs written in both Java and C, and Python-C
+programs written in both Python and C. The extension is simple enough in that
+it requires only a few lines of modifications of CodeQL and additional
+language-interpretation rules. We also implement a bug checker on the top of
+the analyzer to detect data-flow related interoperation bugs in Java-C and
+Python-C programs. In our evaluation, we show that our tool successfully
+tracked data-flows across Java-C and Python-C language boundaries and detected
+genuine interoperation bugs in real-world multilingual programs.
+
+The contributions of this paper are as followed:
+\begin{itemize}
+\item We propose an engineering method that extends a declarative style analyzer
+supporting multiple target languages to support multilingual program analysis.
+
+\item We implement a proof-of-concept declarative style data-flow analyzer for two
+types of multilingual programs, Java-C and Python-C, by extending CodeQL.
+
+\item We show the practical usefulness of our analyzer in the sense that it detects
+data-flow related bugs at language boundaries of real-world multilingual
+programs.
+\end{itemize}

@@ -1,0 +1,179 @@
+\section{Motivation}
+In this section, we show how multilanguage interactions work using a
+simple example code, and explain the main challenge that is difficult to handle
+by the previous approaches but our declarative-style analysis can handle.
+
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+public void main() {
+  Node node = null;
+  B::f(node);
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{Method in language A calling a function in language B}
+    \label{fig:exam1:langA}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
+void f(Node* param) {
+  if(param != NULL) {
+    Node* ptr = param;
+    ptr->next = new Node;
+  }
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{Function in language B receiving null from language A}
+    \label{fig:exam1:langB}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{Multilingual code in language A and language B}
+  \label{fig:exam1}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
+void f(Node* param) {
+  Node* ptr = param;
+  Node* next;
+  if(condition()) {
+    next = NULL;
+  } else {
+    next = new Node;
+  }
+  ptr->next = next;
+}
+  \end{lstlisting}
+  \vspace*{-.5em}
+  \caption{Code in language B with a conditional statement}
+  \label{fig:exam2}
+\end{figure}
+
+\subsection{Interactions between Multilingual Modules}
+
+Let us consider two multilingual programs written in a Java-like language A
+and a C-like language B.
+
+The first program in Figure~\ref{fig:exam1} has two parts:
+Figure~\ref{fig:exam1}(a) shows a method \javacode{main} in language A,
+and Figure~\ref{fig:exam1}(b) shows a function \ccode{f} in language B.
+The method \javacode{main} calls the function \ccode{f} with the argument
+\javacode{node} whose value is \javacode{null}, which passes the null
+value from language A to language B. The function \ccode{f} then
+checks whether the value of its parameter \ccode{param} is null
+and dereferences it only when it is not null.
+
+The second program has the same method in Figure~\ref{fig:exam2}(a)
+and the function \ccode{f} in Figure~\ref{fig:exam2}.
+Even though the value of \ccode{f}'s parameter \ccode{param} may be \javacode{null},
+\ccode{f} does not check its value and simply dereferences it on line 13.
+In addition, \ccode{f} has an extra conditional statement on lines 8--12,
+which is irrelevant to \ccode{param}.
+
+\subsection{Previous Approaches}
+Now, let us perform a dataflow analysis on these programs to detect
+the null dereference bug, that is, whether the null value from
+language A can be dereferenced in language B or not.
+In the first program, since the parameter of \ccode{f} is
+dereferenced only when it is not null, it does not have the bug.
+Note that to conclude the absence of the bug correctly,
+the analysis should also consider control flows.
+On the other hand, in the second program, since \ccode{f} does not
+check the value of its parameter, it may have the null dereference bug.
+
+The previous approaches either 1) utilize existing analyzers for
+languages A and B to generate their summaries and perform the
+target dataflow analysis~\cite{LeeASE20,JN-SAF}, or 2) abstract 
+the behaviors of the code written in A and B into a single form and
+perform the target analysis~\cite{hybridroid,sas2021}
+The problem is that since such existing analyzers are mostly general-purpose,
+which may have unnecessary computations that are not necessary for the target analysis,
+these approaches may result in performance overhead.
+For example, even though the analysis of the conditional statement in Figure~\ref{fig:exam2}
+is not relevant to the detection of the null dereference bug on line 13,
+the conventional target analysis in the previous approaches computes
+the information about the conditional statement during its analysis.
+This performance overhead would become critical in multilingual analysis
+because the analysis of the interactions between different languages would require
+the analysis of immense analysis information in both languages.
+
+
+%\subsection{Declarative style multilingual program analysis}
+\subsection{Our Approach}
+
+Finally, our approach is based on a declarative-style analysis, which
+alleviates the performance overhead problem of the previous approaches.
+The main benefit of the approach comes from its query-based analysis:
+a target analysis is
+specified in terms of \textit{queries}, and only relevant datafacts and rules
+are used for evaluating queries, reducing the amount of computation.
+
+To illustrate, we first explain a declarative dataflow analysis of the
+first program considering necessary control flows. Then, we explain
+how the computation of control flows for the second program can be
+reduced by a declarative analysis.
+
+For the first program, the target analysis is to find \datalog{flow(a, b)},
+which denotes that there is a dataflow from \datalog{node a} to \datalog{node b},
+where \datalog{node} represents a program entity that can hold a run-time
+value, such as a variable, a literal, and a function parameter.
+We can define the rule for this datafact as the transitive closure of
+the datafact named \datalog{step}:
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+flow(a, b) :- step(a, b)
+flow(a, b) :- step(a, c), flow(c, b)
+\end{lstlisting}
+where \datalog{step(a, b)} denotes a direct data
+flow from \datalog{node a} to \datalog{node b}.
+Because \datalog{step} denotes both an intra-language flow and an inter-language flow,
+the following datafacts are generated:
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+step(null, node)  // A -> A
+step(node, param) // A -> B
+\end{lstlisting}
+Since the conditional statement on line 6 checks whether \ccode{param}
+is null, the null value does not flow into the variable \datalog{ptr}.
+Therefore, our rule should not generate the datafact \datalog{step(param, ptr)}.
+One way to implement it is using ``guard'': the datafact \datalog{guard(node, cond)}
+indicates that \datalog{node} is in the scope of the conditional
+statement whose condition is \datalog{cond}.
+In the first program, the \datalog{ptr} node is guarded with the condition
+``\ccode{param \!= NULL},'' and we can express it as the datafact
+\datalog{guard(ptr, "param \!= NULL")}.
+Using this datafact \codeql{guard}, we can give an additional condition to the
+datafact \datalog{step}. For example, we can express that
+\datalog{step(a, b)} does not hold if \datalog{node b} is in the scope of
+a conditional statement and is guarded by a proper condition like null checking.
+
+Now, let us consider the second program. Using the same approach, we
+can generate the following datafacts, including flows cross language boundaries:
+
+\begin{lstlisting}[style=myDatalog,xleftmargin=2.5em]
+step(null,  node)  // A -> A
+step(node,  param) // A -> B
+step(param, ptr)   // B -> B
+step(ptr,   [dereference of ptr]) // B -> B
+\end{lstlisting}
+Then, the analysis can compute
+\datalog{flow(null, [dereference of ptr])},
+and the analyzer concludes that the second program has the null dereference bug.
+Note that the trace of \datalog{step}s does not contain any nodes
+inside the conditional statement.  Therefore, in the process of
+detecting the bug, the analysis does not need to consider the
+irrelevant nodes in the conditional statement.
+Unlike previous approaches that consider every conditional statement
+regardless of whether the analysis of the conditional statement is
+necessary or not, our approach does not require analysis of irrelevant code.
+
+In the remainder of this paper, we formalize the general approach of a
+declarative static analysis for multilingual programs (Section~\ref{sec:approach}), show a
+specific implementation of the approach for JNI programs in the form of dataflow
+analysis, implemented in CodeQL (Section~\ref{sec:impl}), discuss the evaluation results of
+the implementation (Section~\ref{sec:eval}) and related work (Section~\ref{sec:related}), and
+conclude (Section~\ref{sec:conclude}).

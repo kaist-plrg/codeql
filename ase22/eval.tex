@@ -1,0 +1,364 @@
+\newcommand{\req}[1]{RQ#1}
+\input{tableRQ1}
+
+\section{Evaluation}\label{sec:eval}
+
+To show the effectiveness of our approach, we evaluate our analyzer
+JN-QL with the following three research questions:
+\begin{itemize}
+  \item \textbf{\req{1}: Feasibility.} Can \ours analyze JNI programs that use
+    various JNI interoperations?
+
+  \item \textbf{\req{2}: Performance.} How precise and scalable is \ours for
+    real-world JNI program analysis compared to JN-Sum~\cite{LeeASE20}?
+
+  \item \textbf{\req{3}: Usefulness.} Can \ours analyze the same kinds of bugs
+    the state-of-the-art JNI program analyzers can detect?
+\end{itemize}
+
+For \req{1}, we analyze the benchmarks in NativeFlowBench~\cite{nativeflowbench,
+JN-SAF} using \ours. The benchmarks contain 23 JNI Android applications (apps) that
+use various JNI interoperations and sensitive data leakage from {\it sources} to
+{\it sinks} across language boundaries via the interoperations. We compare
+the analysis results of \ours to the results of JN-Sum and JN-SAF. We use
+compiled versions of the benchmarks for JN-SAF because it targets compiled JNI
+programs and uses the source code of the benchmarks for \ours and JN-Sum.
+
+For \req{2}, we compare the analysis results of \ours and JN-Sum on 42
+real-world JNI Android apps downloaded from F-Droid, a repository of
+open-source Android apps~\cite{fdroid}. We first classified
+F-Droid apps into JNI and non-JNI apps. Then, we selected
+all 42 apps that can be compiled without any errors as our analysis targets.
+
+For \req{3}, we detect JNI interoperation bugs in the 42 real-world Android
+apps using \ours. We implemented a checker detecting four kinds of
+bugs on top of \ours using the query language of CodeQL. We chose our target
+JNI interoperation bugs as the same as the targets of the client
+analysis of the previous research~\cite{LeeASE20, ILEA}.
+
+
+\subsection{\req{1}: Feasibility}
+Table~\ref{table:RQ1} summarizes the analysis results of \ours, JN-Sum,
+and \jnsaf on 23 benchmarks in NativeFlowBench.
+The {\bf Benchmark} columns show the benchmark names,
+{\bf Precision} show the analysis results of 
+JN-Sum and \ours, and {\bf Dataflow} show the analysis results of JN-SAF and \ours.
+JN-Sum and JN-SAF have different analysis purposes from
+each other; JN-Sum constructs call graphs of JNI programs, and JN-SAF
+detects data leakages from sources to sinks.  For fair comparison, we compare
+\ours and JN-Sum for the precision of resolving targets of foreign
+function calls, and compare \ours and JN-SAF for the data leakage detection results.
+We marked each analysis result as a success ($\bigcirc$) or failure ($\times$).
+In the precision comparison, an analysis succeeds if
+it precisely resolves targets of all foreign function calls between Java and C, and it fails otherwise.
+In the dataflow comparison, an analysis succeeds
+if it reports all data leakages correctly without any false positives or negatives.
+
+
+In the precision comparison, \ours successfully analyzed 21 out of 23
+benchmarks, while JN-Sum failed in three more benchmarks than \ours.
+We manually confirmed that the two failures both in \lees and \ours
+come from built-in structs and functions in C; {\it
+icc\_javatonative} stores Java class information in the Android built-in
+struct {\tt android\_app} and {\it native\_complexdata\_stringop} generates
+a Java field name by concatenating two string values via the {\tt strcat} built-in function.
+  Because \ours and JN-Sum do not handle such built-in
+structs and functions, they failed to analyze the two benchmarks.
+  \lees failed to analyze three more benchmarks due to native entry points
+of the benchmarks~\cite{nativeactivity}.
+  FlowDroid~\cite{Flowdroid} used by JN-Sum performs a whole-program
+analysis from Android entry points. 
+  Because the benchmarks have entry points only in C differently from monolingual
+Android apps, FlowDroid cannot find entries from which its analysis starts.
+  Contrary to JN-Sum, \ours performs a query-based
+analysis, which can resolve the targets of foreign function calls regardless of program entries.
+
+\input{tableRQ2}
+
+In the dataflow comparison, \ours found data leakages correctly in 20
+benchmarks but reported false negatives for three benchmarks, while JN-SAF
+analyzes 21 benchmarks correctly. 
+The one common failure comes from string concatenation, as we discussed.
+{\it icc\_javatonative} and {\it icc\_nativetojava} leak data via the Android
+inter-component communication that is beyond the scope of \ours.
+The remaining two different failures of \ours and JN-SAF come from their array analysis policies.
+{\it native\_leak\_array} stores sensitive data in an array, retrieves the data from the array,
+and leaks it.  On the other hand, {\it native\_noleak\_array} stores sensitive
+data in an array as well, but it retrieves another element from the array and uses it.
+Because analyzing different indices of an array is challenging, JN-SAF
+tracks every value retrieved from an array if the array contains sensitive data.
+Such over-approximation enables JN-SAF to analyze {\it
+native\_leak\_array} correctly but introduces a false alarm for {\it
+native\_noleak\_array}.  In contrast, because CodeQL does not
+track dataflows on arrays, \ours does not report
+a false alarm for {\it native\_noleak\_array} but cannot find the leakage in {\it
+native\_leak\_array}.
+
+\subsection{RQ2: Performance}
+Table~\ref{table:RQ2} summarizes the analysis results of \ours on real-world Android JNI apps.
+Out of 42 apps we analyzed, we show the analysis
+results of 25 apps that have interoperations from C to Java\footnote{We
+report the full analysis results in our supplementary material.}.
+The first column shows app names, the second to the fourth columns show database
+creation time of C, Java, and their merged database, respectively, the fifth
+shows query processing time, and the sixth shows the total analysis time.
+{\bf C->Java Function Call} and {\bf C->Java Field Access}
+show the numbers of C-to-Java function calls and
+C-to-Java field accesses, respectively. We collectively call them
+\emph{JNI uses}.
+The sub-columns {\bf \#Precise}, {\bf \#Resolved}, and {\bf Total}
+represent the numbers of precisely resolved, 
+resolved, and the total JNI uses, respectively.
+We considered a resolved JNI use as precise, when \ours finds a single target method
+or a single field at the JNI use.
+
+
+\ours resolved 1,076 out of 1,171 (92\%) JNI uses, including 347 out of 404
+(86\%) C-to-Java function calls and 729 out of 767 (95\%) C-to-Java field
+accesses. In addition, 1,008 (86\%) resolved JNI uses are precise.
+The results show that \ours resolves more JNI uses
+even precisely than \lees. \lees failed to analyze one app
+because of an error, four apps due to the lack of memory spaces,
+and three apps even in eight hours.  In addition, \lees resolved
+71\% and precisely resolved 46\% of JNI uses in the remaining 17
+apps, which shows significantly imprecise results than \ours.
+%
+% The results
+% show that \ours resolves more JNI uses even precisley than JN-Sum. JN-Sum
+% failed to analyze \inred{1} apps because of an error, \inred{4} apps because of
+% lacks of memory spaces, and \inred{3} apps even in \inred{8} hours.  In
+% addition, JN-Sum resolved 71\% and precisely resolved 46\% out of JNI uses in
+% the remaining \inred{17} apps, which shows significantly imprecise results
+% than \ours.
+\ours failed to resolve 95 (8\%) JNI uses because of complex
+language semantics such as arrays and function pointers.  Because CodeQL does
+not track dataflows on C function pointers and arrays, \ours failed to analyze
+method or field IDs necessary to resolve the JNI uses.
+
+
+
+
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.47\textwidth]{img/graph}
+  \vspace*{-.5em}
+  \caption{Analysis time of \ours and \lees}
+  \label{fig:graph}
+\vspace*{-1em}
+\end{figure}
+
+\ours is scalable in that it can analyze large-scale programs. The analysis
+time was 161.3 seconds on average for each app, including 103.8 seconds for DB
+creation and 57.5 seconds for query processing.  DB creation took more time
+than query processing except for {\it Graph 89}, and the DB creation time was
+almost linear to the code size. \ours took about 12 minutes at most to analyze
+{\it Tileless Map} having about one million lines of code.
+Note that once we create a database
+for a program, we can evaluate multiple queries on it without
+re-creation to obtain various analysis results of the program.
+%   Note that once we
+% create a database for a program, we can evaluate multiple queries on it without
+% re-creation to obtain various analysis results of the program.
+
+
+Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
+The x-axis denotes the labels of apps and the y-axis denotes the analysis
+time in seconds. We omit eight apps \lees failed to analyze.
+\lees analyzed 12 apps faster than \ours, but the difference is
+less than two minutes. On the other hand,
+\ours analyzed five apps faster than \lees, and \lees took much time
+in summary generation for three apps of them. In 
+addition, while \lees failed to analyze all the large-scale apps that have
+more than about 400,000 lines of code in eight hours,
+\ours analyzed about three million lines of
+code in about ten minutes.
+
+% Figure~\ref{fig:graph} shows the analysis time of \ours compared to
+% JN-Sum. Out of \inred{17} apps except for \inred{8} apps JN-Sum failed to
+% analyze, JN-Sum analyzed \inred{12} apps faster than \ours. JN-Sum took about
+% \inred{32} seconds on average to analyze each of them and \ours took and \ours
+% was about \inred{56} seconds.  On the other hand, \ours analyzed \inred{5} apps
+% faster than JN-Sum. The average analysis time of JN-Sum was about \inred{30}
+% minutes, but ours was about just \inred{1} minutes. While JN-Sum usually
+% analyzed small size apps faster than \ours but it took lots of time in the
+% summary generation phase for some large size apps, the analysis time of \ours
+% is almost linear to the size of apps.  In addition, JN-Sum failed to analyze
+% all the large size apps that have more than about 400,000 lines of code in
+% eight hours. Different from JN-Sum, \ours analyzed huge apps that have about
+% three million lines of code in about ten minutes.
+
+
+\subsection{RQ3: Usefulness}
+\input{tableRQ3}
+The bug checker of \ours detects four kinds of JNI interoperation bugs
+that previous research~\cite{ILEA, LeeASE20} defined as follows:
+
+\begin{itemize}
+  \item {\it NullDereference}: dereferencing the {\tt null} value of Java in C
+  \item {\it MissingFun}: calling a missing Java method from C
+  \item {\it TypeMismatch}: declaring a C function with a different signature
+    from its corresponding Java native method
+  \item {\it WrongSignature}: calling a Java method using a method ID with a
+    wrong signature in C
+\end{itemize}
+
+
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+//EmulatorActivity.java
+String tmp = null;
+String folder = Util.GetInternalAppStorage(activity);
+if (folder != null) {
+  tmp = folder + "tmp";
+  Util.CreateDirectory(tmp);
+}
+EmulatorActivity.nativeInitGraph89(..., tmp);
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//wrappercommonjni.c
+void nativeInitGraph89(..., jstring tmp_dir) {
+   (*env)->GetStringUTFChars(env, tmp_dir, 0); ...
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{NullDereference}
+    \label{fig:bug1}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+//JpegRedaction.java
+package org.witness.obscuracam.photo.jpegredaction;
+
+public class JpegRedaction {
+  private native void redactRegions(...); ...
+}
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//JpegRedaction.cpp
+void Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) { ... }
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{MissingFun}
+    \label{fig:bug2}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+//MuPdfPage.java
+private native static List<PageTextBox> search(...);
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//mupdfdroidbridge.c
+jobjectArray search(...){ ... }
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{TypeMismatch}
+    \label{fig:bug3}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+//PrBoomActivity.java
+void OnMessage(String text);
+void OnInfoMessage(String msg, int displayType);
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//jni_doom.h
+#define CB_CLASS_MSG_SIG  "(Ljava/lang/String;I)V"
+#define CB_CLASS_INFMSG_SIG  "(Ljava/lang/String;I)V"
+//jni_doom.c
+mSendStr = (*env)->GetMethodID(env, jNativesCls,
+                       "OnMessage", CB_CLASS_MSG_SIG);
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{WrongSignature}
+    \label{fig:bug3}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{Four kinds of JNI interoperation bugs}
+  \label{fig:bugs}
+  \vspace*{-1em}
+\end{figure}
+
+Table~\ref{table:RQ3} summarizes the bug detection results of 19 out of 42
+apps, on which \ours reported possible bugs.  The first
+column shows app names, the second and the third columns show the
+number of true and false positives for {\it NullDereference}, respectively, and
+the fourth to six columns show the number of true positives for {\it
+MissingFun}, {\it TypeMismatch}, and {\it WrongSig}, respectively.
+\ours did not report any false positives for the last three bug kinds.
+We confirmed true and false positives by manual inspection of the source code. 
+
+\ours found 33 genuine bugs, but reported 21 false positives in 19 apps.
+All false positives are reported only in the {\it NullDereference} bug
+detection; \ours reported five true and 21 false alarms of {\it
+NullDereference} in 11 apps, nine true alarms of {\it MissingFun} in
+three apps, 17 true alarms of {\it TypeMismatch} in eight apps, and two true
+alarms of {\it WrongSignature} in two apps. We manually checked that the false
+positives come from diverse over-approximation issues of static analyses, but
+one of the main causes is conditionally sanitized variables.  Many apps
+have a code pattern that assigns a value to a variable only if the variable has
+the {\tt null} value. Because our analysis does not support the
+path-sensitivity that analyzes each execution path separately, it reports that
+the variable may still have {\tt null} even after the conditional assignment.
+Note that \lees could not find 12 out of 33 bugs
+due to memory or scalability issues.
+
+Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours
+detected from real-world apps using simplified code.
+
+Figure~\ref{fig:bugs}(a) shows a pattern in Graph 89 with the {\it NullDereference} bug.
+The Java code may call a C function {\tt nativeInitGraph89} with {\tt
+null} as its last argument, because the variable {\tt tmp} has {\tt
+null} when the method {\tt GetInternalAppStorage} returns {\tt null}.  The C
+function calls a JNI function {\tt GetStringUTFChars} with the value as its
+second argument, without checking whether it is {\tt null}. However, because the JNI
+specification describes that the second argument of the functions must not be
+{\tt null}~\cite{getstringutfchars}, the function may behave unexpectedly.
+Note that calling JNI functions with wrong arguments may introduce various
+unexpected behaviors, since JVMs do not validate the arguments because of
+performance overhead~\cite{hwang2021justgen}.
+
+\renewcommand{\texttt}[1]{%
+  \begingroup
+  \ttfamily
+  \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\discretionary{}{}{}}%
+  \begingroup\lccode`~=`[\lowercase{\endgroup\def~}{[\discretionary{}{}{}}%
+  \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\discretionary{}{}{}}%
+  \catcode`/=\active\catcode`[=\active\catcode`.=\active
+  \scantokens{#1\noexpand}%
+  \endgroup
+}
+
+Figure~\ref{fig:bugs}(b) shows a pattern in ObscuraCam with the {\it MissingFun} bug.
+As described in Section~\ref{sec:merging}, JNI has a C function
+naming convention for JVMs to link Java native methods to their corresponding C
+functions. While a Java class {\tt JpegRedaction} declaring a native method
+{\tt redactRegions} belongs to a package
+\texttt{org.witness.obscuracam.photo.jpegredaction}, the corresponding C
+function is named with a wrong package name
+\texttt{org.witness.securesmartcam.jpegredaction}.  When calling the native
+method, JVM fails to link it because of the wrongly named C function.
+
+
+Figure~\ref{fig:bugs}(c) shows a pattern in Document Viewer with the {\it TypeMismatch} bug.
+While the return type of a Java native method {\tt search}
+is {\tt List<PageTextBox>}, the return type of the corresponding C function
+{\tt search} is {\tt jobjectArray} corresponding to the Java built-in array
+container. The return type mismatch has no effect on linking between
+Java native methods and C functions. However, since it is an unspecified case in
+the JNI specification, interoperations via such native methods may behave
+differently on different JVMs~\cite{LeeASE20}. 
+
+
+Figure~\ref{fig:bugs}(d) shows a pattern in PrBoom with the {\it WrongSignature} bug.
+The C code tries to get an ID of a Java method {\tt OnMessage} with a
+signature \texttt{(LJava/lang/String;I)V}, but the method has a different
+signature \texttt{(LJava/lang/String;)V} with one String argument. Because
+the signatures do not match, the C code always receives {\tt null}
+instead of a method ID, and this example throws a Java exception. In
+addition, it may introduce errors in subsequent instructions when using the
+return value without null checking or calling JNI functions without handling the
+thrown Java exception~\cite{jniexcept}.

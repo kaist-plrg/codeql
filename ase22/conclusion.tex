@@ -1,0 +1,13 @@
+\section{Conclusion}\label{sec:conclude}
+Multilingual programs are often vulnerable to bugs and security issues.
+To prevent them, existing tools have leveraged general-purpose
+monolingual analyzers, which cannot handle large-scale real-world applications.
+To overcome the scalability problem, we propose a declarative-style multilingual analysis
+taking advantage of its efficient query-based analysis.
+Our prototype implementation \ours built on top of CodeQL
+showed better scalability without analysis precision degradation than the
+state-of-the-art JNI analyzer, \lees.  Using \ours, we found
+33 true bugs and vulnerabilities from real-world applications,
+12 of which are from applications that \lees failed to analyze.
+We believe that our approach is applicable to various multilingual programs
+beyond JNI applications.

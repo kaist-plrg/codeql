@@ -1,0 +1,265 @@
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.47\textwidth]{img/codeql.pdf}
+  \caption{Overall structure of JN-QL}
+  \label{fig:codeql}
+\end{figure}
+
+\section{Implementation}\label{sec:impl}
+In this section, we present JN-QL, a prototype implementation of our
+approach to a declarative static analysis for multilingual programs,
+in the case of dataflow analysis for JNI programs using CodeQL~\cite{codeql}.
+
+\subsection{CodeQL}
+CodeQL is a static analysis engine that transforms source code
+programs into databases, and performs analysis by evaluating queries
+written in the declarative language called QL (Query Language).
+In QL, one can define rules by defining ``predicates'' or ``classes.''
+For example, the following QL code defines the predicate \codeql{isOneTwoThree}:
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+predicate isOneTwoThree(int n) {
+  n = 1
+  or
+  n = 2
+  or
+  n = 3
+}
+\end{lstlisting}
+and the following definition defines the class \codeql{OneTwoThree}:
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+class OneTwoThree extends int {
+  OneTwoThree() { // characteristic predicate
+    this = 1
+    or
+    this = 2
+    or
+    this = 3
+  }
+}
+\end{lstlisting}
+A class defines a set of elements that satisfy the predicate called
+``characteristic predicate.''
+For more information about QL, one can refer to \citet{ql2016}'s paper
+or the official document~\cite{codeql}.
+
+Figure~\ref{fig:codeql} presents the overall structure of JN-QL.
+First, it generates databases for both languages, C\footnote{
+Even though JN-QL analyzes JNI programs written in Java and both C and
+C++, this paper refers to C only fore presentation brevity.} and
+Java, and merges them to one database.  This corresponds
+to the step of extracting syntactic datafacts from source code programs.
+Then, we merge the common datafacts and rules in both languages,
+which are parts of their libraries that CodeQL provides, into one merged library.
+Finally, using the merged database and merged library, a user can write a query to
+perform a client-analysis, and evaluate it to produce its analysis result.
+
+\subsection{Creating Databases}
+For compiled languages such as C and Java, CodeQL generates their database
+by compiling source programs.  When a compiler compiles a program,
+CodeQL monitors the compiler to extract necessary information and
+creates a database with the extracted information.
+CodeQL creates a database for a single language in two steps:
+1) it stores the extracted information from a compiler in a trap
+file, a human readable file format, and 2) it finalizes trap files
+into databases in the binary format. For example, the
+following shows a sample trap file:
+
+\begin{lstlisting}[style=java,numbers=none]
+#10017=@"class;hello.HelloJNI"  ...
+#10044=@"type;int"
+primitives(#10044,"int")  ...
+#10061=@"callable;{#10017}.java_callback({#10044}){#10044}"  ...
+#10067=@"params;{#10061};0"
+params(#10067,#10044,0,#10061,#10067)
+paramName(#10067,"java_callback_param")
+\end{lstlisting}
+which describes the parameter information about \javacode{java\_callback}.
+
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{subfigure}[t]{0.5\textwidth}
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+class Node extends TNode { ... }
+predicate simpleLocalFlowStep(Node from, Node to) {
+  exprToExprStep_nocfg( // Expr -> Expr
+    from.asExpr(),
+    to.asExpr()
+  )
+  or ...  // Assignment -> LValue post-update node
+}
+\end{lstlisting}
+    \vspace*{-.5em}
+    \caption{c/dataflow/internal/DataFlowUtil.qll}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+class Node extends TNode { ... }
+predicate simpleLocalFlowStep(Node node1, Node node2) {
+  // Variable flow steps through
+  // adjacent def-use and use-use pairs.
+  exists(SsaExplicitUpdate upd |
+    upd.getDefiningExpr().(VariableAssign).getSource()
+      = node1.asExpr() or
+    upd.getDefiningExpr().(AssignOp) = node1.asExpr()
+  |
+    node2.asExpr() = upd.getAFirstUse()
+  )
+  or ...  // Flow through this
+}
+\end{lstlisting}
+    \vspace*{-.5em}
+    \caption{java/dataflow/internal/DataFlowUtil.qll}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{QL libraries for C and Java}
+  \label{fig:qll}
+\end{figure}
+
+To create a single database for both C and Java, JN-QL maintains
+a separate trap file for each language and then merges them.
+Note that both trap files may have tables with the same name.
+To avoid name conflicts in a merged database, we add a
+language-specific prefix to each table.
+For example, if both trap files have tables named \codeql{@expr},
+we rename the table from C as \codeql{@c\_expr},
+and the table from Java as \codeql{@java\_expr"}.
+After renaming such tables, we can safely finalize the trap files into
+databases on which queries can be evaluated.
+
+\subsection{Lifting Libraries}
+
+CodeQL provides various libraries for C and Java, including
+pre-defined predicates and classes for users to implement their own analyses.
+A dataflow analysis library is such a library, which supports both C and Java.
+For example, Figure~\ref{fig:qll} shows sample QL libraries for C and Java,
+which uses the same class name \ccode{Node} and the same predicate
+name \ccode{simpleLocalFlowStep}.
+However, even with the same name, the class \ccode{Node} in C and the
+class \javacode{Node} in Java are different classes, which are incompatible.
+The same applies to the predicate \ccode{simpleLocalFlowStep}.
+In other words, we can not use the class \ccode{Node} in C as an
+argument of the predicate \javacode{simpleLocalFlowStep} in Java or vice versa.
+
+To make classes and predicates in C and Java become compatible,
+we lift each library to the common level.
+First, we encapsulate each of the original dataflows in a CodeQL
+module named C and JAVA so that we can distinguish the original
+classes and predicates by lifted ones.
+We can lift a class by first defining a sum type, denoting that
+the lifted class comes either from C or Java, and then making the
+lifted class be of that type.  We also implement two member predicates
+that can cast the lifted class into the C or Java class:
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+private newtype TNode =
+  TJavaNode(JAVA::Node n)
+  or
+  TCNode(C::Node n)
+class Node extends TNode {
+  JAVA::Node asJava() {
+    this = TJavaNode(result)
+  }
+  C::Node asC() {
+    this = TCNode(result)
+  }
+  ...
+}
+\end{lstlisting}
+Similarly, we can lift a predicate by combining two original predicates with
+the \codeql{or} connective. For each original predicate, we cast down
+each of the arguments and return values to the class of its corresponding language:
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+predicate simpleLocalFlowStep(Node node1, Node node2) {
+  JAVA::simpleLocalFlowStep(
+    node1.asJava(), node2.asJava()
+  )
+  or
+  C::simpleLocalFlowStep(
+    node1.asC(), node2.asC()
+  )
+}
+\end{lstlisting}
+After lifting, lifted predicates show the equivalent behaviors as the
+original ones if all the arguments are from the same language.
+
+
+
+\subsection{Merging Libraries}\label{sec:merging}
+After lifting libraries for different languages, we extend predicates to
+reflect the interoperation semantics between multiple languages.
+We identified various interactions from Java to C and from C to Java
+and extended predicates to model their behaviors.
+
+For example, the following shows how we extend the predicate
+named \codeql{viableCallable}:
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+DataFlowCallable viableCallable(DataFlowCall c) {
+  result.asJava() = JAVA::viableCallable(c.asJava())
+  or
+  result.asC() = C::viableCallable(c.asC())
+  or
+  result.asC() = viableCallableJ2C(c.asJava())
+  or
+  result.asJava() = viableCallableC2J(c.asC())
+}
+\end{lstlisting}
+Lines 2 and 4 show the results of lifting, and they take advantage of the
+original predicates from the dataflow libraries.  They handle
+intra-language call edges from Java to Java and from C to C.
+Lines 6 and 8 show the results of merging libraries, and they are
+for inter-language call edges.  The predicate \codeql{viableCallableJ2C} finds call edges
+from Java to C, and the predicate \codeql{viableCallableC2J} finds call edges from
+C to Java. Because these two call edges have different characteristics, we
+implemented them differently.
+
+%\medskip
+\textbf{Java to C.} In JNI programs, one can make interactions from
+Java to C by calling native functions in C from Java code. The target
+of such a function call is determined in a static manner.
+The target function should follow the JNI naming convention, which is adding
+\codeql{Java\_} as prefix, 
+followed by a fully qualified name of its class and the additional \codeql{\_}, to the method name.
+For example, the target function name for a function call of
+\codeql{cfunction} would be \codeql{Java\_fully\_qualified\_class\_name\_cfunction}.
+With this convention, we can define \codeql{viableCallableJ2C}
+so that \codeql{f = viablaCallableJ2C(m)} holds when
+\codeql{f.toString() = "Java\_" + m.className() + "\_" + "m.toString()} holds.
+
+
+\medskip
+\textbf{C to Java.} The interaction from C to Java is more complex and
+requires more careful implementation than the interaction from Java to C.
+The primary difference is that a method call from C to Java requires
+the runtime values of variables, which may not be always possible.
+First, C code calls the interface function \ccode{GetMethodID(name, sig)}
+to get the ``method ID'' of the method whose name matches the first argument
+and the type signature matches the second argument passed to this function.
+This method ID is stored at a variable, say \ccode{mid}, and
+an actual method call is invoked by another
+interface function, \ccode{Call<type>Method(obj, mid, args...)}. Calling this interface 
+function corresponds to calling the method that \ccode{mid} indicates
+with \ccode{obj} as ``this object'' and \ccode{args} as the arguments.
+
+To correctly handle this method call, we should be able to answer these
+questions: ``When we call \ccode{GetMethodID},
+what are the string values of \ccode{name} and \ccode{sig}?'' and
+``When we call \ccode{Call<type>Method}, what is the method ID value of \ccode{mid}?''
+Answering these questions requires dataflow analysis;
+to soundly answer to them, inter-language dataflow analysis is necessary.
+However, in practice, intra-language dataflow analysis is enough in most cases.
+Therefore, we implemented two ``intra-flow'' analysis modules for C,
+which find 1) dataflows from string literals to the arguments of interface functions,
+and 2) dataflows from interface function call results to the arguments of interface functions.
+Using these modules, we can implement the
+predicate \codeql{viableCallableC2J} by adding a call edge from a \ccode{Call<type>Method}
+call to the method \ccode{m}, if there is a flow to \ccode{mid} from a
+call to \ccode{GetMethodID}, and string values that flow into the
+arguments \ccode{name} and \ccode{sig} of \ccode{GetMethodID} that
+correspond to the name and the type signature of the method \ccode{m}.
+
+In addition to the predicate \codeql{viableCallable},
+we extended more predicates to consider other JNI interface functions such as
+\ccode{findClass} and \ccode{GetFieldID}.
+Most of such extended predicates are specialized \codeql{step} predicates.
+We extended them in a similar way to the calls from C to Java described above.
