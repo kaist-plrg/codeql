@@ -38,8 +38,6 @@ void f() {
   \label{fig:exam}
 \end{figure}
 
-\subsection{}
-
 Let us consider a hypothetical multilingual program written in a Python-like language A
 and a C-like language B.
 
@@ -50,12 +48,47 @@ Figure~\ref{fig:exam}(b) shows a function \ccode{f} in language B.  The method
 from language B.  Then, the function \ccode{f} calls back the method \javacode{m2} in language A
 using API function, using the string value \"m2\" to indicate the name of method.
 
-\subsection{Analyses of single language programs}
-1. create db -> different 
+\subsection{Analyses of single-language programs}
+FIrst, let\s look at how the analysis for language A can be done.
+As a first step,, the database of facts are created from the source code. THe
+facts created in this way may contain some syntactic information about the
+source code. For example, we can think of two kinds of facts: MethodAt(l, name) which
+indicates that the method name 'name' is defined at line number l,
+and CallAt(l, name), which indicates there is a call to a method named 'name' at line l.
+Specifically, the program at Figure~\ref{fig:exam}(a) would be transformed into
+the following facts:
 
-2. rules -> Note that the name of result data is same
+MethodAt(2, m1)
+MethodAt(3, m2)
+CallAt(7, m1)
 
-3. query system -> Note that they are identical
+Next, there are rules that derice new facts from the known facts.
+In this example, we would want to define the rule for generating the facts of
+CallEdge(l1, l2), which indicates there is an call edge from the call expression at line l1
+to the method definition at line l2. Using the know facts of MethodAt and CallAt,
+we can define the rule like folowing:
+
+CallEdge(l1, l2) :-
+    CallAt(l1, call\_name),
+    MethodAt(l2, meth\_name),
+    call\_name = meth\_name.
+
+The meaning of this rule is straight forward. Whenever there is a method definition
+and a method call with the sane name, then there is c call edge between them.
+By applying this rule on top of facts obtained above, we would
+get this new fact:
+
+CallEdge(7, 2).
+
+Finally, there is a query system that is used for extracting certain sets of facts
+that meet certain condition. For example, we can simply make a query to find every calledge
+using following query:
+
+?- CallEdge(X, Y).
+
+which should output the result of X=7 and Y=2.
+
+
 
 \subsection{Analysis of multilingual program}
 1. create db -> by simply merging two
