@@ -1,0 +1,65 @@
+\section{Overview}
+In this section, we show an overview of how declarative style analysis
+targetting multiple languages is performed with example of call graph
+construction as a client analysis,
+and demonstrate our approach to extend the analyzer to support analysis
+across languages.
+
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+import f
+
+def m1():
+    f()
+def m2():
+    pass
+
+m1()
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{Method in language A calling a function in language B}
+    \label{fig:exam:langA}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
+void f() {
+    CallMethod("m2");
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{Function in language B}
+    \label{fig:exam:langB}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{Multilingual code in language A and language B}
+  \label{fig:exam}
+\end{figure}
+
+\subsection{}
+
+Let us consider a hypothetical multilingual program written in a Python-like language A
+and a C-like language B.
+
+The program in Figure~\ref{fig:exam} has two parts: Figure~\ref{fig:exam}(a)
+shows a method \javacode{m1}, \javacode{m2} in language A, and
+Figure~\ref{fig:exam}(b) shows a function \ccode{f} in language B.  The method
+\javacode{m1} is called from top level of language A, and it calls the the function \ccode{f}
+from language B.  Then, the function \ccode{f} calls back the method \javacode{m2} in language A
+using API function, using the string value \"m2\" to indicate the name of method.
+
+\subsection{Analyses of single language programs}
+1. create db -> different 
+
+2. rules -> Note that the name of result data is same
+
+3. query system -> Note that they are identical
+
+\subsection{Analysis of multilingual program}
+1. create db -> by simply merging two
+
+2. rules -> intra: same, inter: new
+
+3. Query system -> exactly same as before, but now reports more call edge
