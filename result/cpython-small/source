@@ -1,0 +1,3 @@
+|      src       |             sink              |                                            col2                                            |                                    col3                                    |
++----------------+-------------------------------+--------------------------------------------------------------------------------------------+----------------------------------------------------------------------------+
+| call to SOURCE | ControlFlowNode for getData() | file:///Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/source/module.c:10:12:10:17 | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/source/import.py:6 |

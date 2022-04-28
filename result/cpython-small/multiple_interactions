@@ -1,0 +1,3 @@
+|             src              |    sink    |                                            col2                                            |                                                   col3                                                    |
++------------------------------+------------+--------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| ControlFlowNode for SOURCE() | python_arg | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/multiple_interactions/import.py:18 | file:///Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/multiple_interactions/module.c:20:10:20:19 |

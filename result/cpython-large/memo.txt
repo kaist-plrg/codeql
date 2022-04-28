@@ -1,0 +1,6 @@
+bitarray -> 그럴듯 12/50
+distance -> g = getattr(module, "f") + context insensitivity
+noise -> g = module.f
+pyahocorasick -> 그럴듯 10/43
+python-Levenshtein -> no test
+python-llist -> 그럴듯, but lots of them are implicit function call) 12/30

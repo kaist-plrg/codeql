@@ -1,0 +1,3 @@
+|              src               |              sink               |                                       col2                                        |                                       col3                                        |
++--------------------------------+---------------------------------+-----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------+
+| ControlFlowNode for NOSOURCE() | ControlFlowNode for Attribute() | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/source_clean/import.py:16 | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/source_clean/import.py:18 |

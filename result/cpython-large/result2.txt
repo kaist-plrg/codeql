@@ -1,0 +1,180 @@
+bitarray
+|   arg    |                    call                    |                                                      col2                                                      | col3 |
++----------+--------------------------------------------+----------------------------------------------------------------------------------------------------------------+------+
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:3733:27:3733:30       |   66 |
+| it       | call to PyObject_GC_UnTrack                | bitarray/bitarray/_bitarray.c:3492:25:3492:26       |    0 |
+| it       | call to PyObject_GC_Del                    | bitarray/bitarray/_bitarray.c:3494:21:3494:22       |    0 |
+| it       | call to PyObject_GC_Track                  | bitarray/bitarray/_bitarray.c:3472:23:3472:24       |    1 |
+| args     | call to _PyArg_ParseTupleAndKeywords_SizeT | bitarray/bitarray/_bitarray.c:3326:38:3326:41       | 3755 |
+| buffer   | call to PyObject_GetBuffer                 | bitarray/bitarray/_bitarray.c:3245:28:3245:33       |   44 |
+| obj      | call to PyObject_Free                      | bitarray/bitarray/_bitarray.c:3263:22:3263:24       |    0 |
+| it       | call to PyObject_GC_UnTrack                | bitarray/bitarray/_bitarray.c:3072:25:3072:26       |    0 |
+| it       | call to PyObject_GC_Del                    | bitarray/bitarray/_bitarray.c:3075:21:3075:22       |    0 |
+| it       | call to PyObject_GC_Track                  | bitarray/bitarray/_bitarray.c:3047:23:3047:24       |    1 |
+| it       | call to PyObject_GC_UnTrack                | bitarray/bitarray/_bitarray.c:2969:25:2969:26       |    0 |
+| it       | call to PyObject_GC_Del                    | bitarray/bitarray/_bitarray.c:2971:21:2971:22       |    0 |
+| it       | call to PyObject_GC_Track                  | bitarray/bitarray/_bitarray.c:2938:23:2938:24       |    1 |
+| list     | call to PyList_Append                      | bitarray/bitarray/_bitarray.c:2879:27:2879:30       |    1 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:2707:27:2707:30       |  123 |
+| dict     | call to PyDict_SetItem                     | bitarray/bitarray/_bitarray.c:2649:28:2649:31       |    1 |
+| codedict | call to PyDict_Next                        | bitarray/bitarray/_bitarray.c:2595:24:2595:31       |  175 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:2457:27:2457:30       |   72 |
+| iterable | call to PyObject_GetIter                   | bitarray/bitarray/_bitarray.c:2463:29:2463:36       |   28 |
+| codedict | call to PyDict_GetItem                     | bitarray/bitarray/_bitarray.c:2470:32:2470:39       |   43 |
+| codedict | call to PyDict_Size                        | bitarray/bitarray/_bitarray.c:2429:21:2429:28       |  199 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:1671:27:1671:30       |   13 |
+| args     | call to _PyArg_ParseTupleAndKeywords_SizeT | bitarray/bitarray/_bitarray.c:1608:38:1608:41       |   17 |
+| f        | call to _PyObject_CallMethod_SizeT         | bitarray/bitarray/_bitarray.c:1562:35:1562:35       |   26 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:1501:27:1501:30       |   39 |
+| f        | call to _PyObject_CallMethod_SizeT         | bitarray/bitarray/_bitarray.c:1512:37:1512:37       |   21 |
+| list     | call to PyList_SetItem                     | bitarray/bitarray/_bitarray.c:1420:28:1420:31       |    1 |
+| args     | call to _PyArg_ParseTupleAndKeywords_SizeT | bitarray/bitarray/_bitarray.c:1391:38:1391:41       |   17 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:1328:27:1328:30       | 1785 |
+| list     | call to PyList_Size                        | bitarray/bitarray/_bitarray.c:1338:25:1338:28       |    1 |
+| list     | call to PyList_Append                      | bitarray/bitarray/_bitarray.c:1341:43:1341:46       |    1 |
+| self     | call to PyObject_GetAttrString             | bitarray/bitarray/_bitarray.c:1206:48:1206:51       |    0 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:1173:27:1173:30       |   18 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:1146:27:1146:30       |    6 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:1077:27:1077:30       | 1744 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:987:27:987:30         |  122 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_bitarray.c:849:27:849:30         |   24 |
+| obj      | call to PyObject_GetIter                   | bitarray/bitarray/_bitarray.c:752:29:752:31         | 1815 |
+| self     | call to PyObject_ClearWeakRefs             | bitarray/bitarray/_bitarray.c:148:45:148:48         |    0 |
+| obj      | call to PyObject_Free                      | bitarray/bitarray/_bitarray.c:130:26:130:28         |    0 |
+| func     | call to PyObject_CallFunctionObjArgs       | bitarray/bitarray/pythoncapi_compat.h:253:41:253:44 |    0 |
+| func     | call to PyObject_CallFunctionObjArgs       | bitarray/bitarray/pythoncapi_compat.h:242:41:242:44 |    0 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_util.c:727:27:727:30             |   40 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_util.c:652:27:652:30             |   59 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_util.c:588:27:588:30             |   96 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_util.c:488:27:488:30             | 1746 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_util.c:277:27:277:30             | 1831 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_util.c:208:27:208:30             | 1854 |
+| args     | call to _PyArg_ParseTuple_SizeT            | bitarray/bitarray/_util.c:115:27:115:30             | 1901 |
+| obj      | call to PyObject_IsInstance                | bitarray/bitarray/_util.c:26:29:26:31               | 2271 |
+distance
+|       arg       |                call                 |                                                   col2                                                    | col3 |
++-----------------+-------------------------------------+-----------------------------------------------------------------------------------------------------------+------+
+| args            | call to PyArg_ParseTupleAndKeywords | distance/cdistance/distance.c:525:35:525:38    |    0 |
+| arg2            | call to PyObject_GetIter            | distance/cdistance/distance.c:532:31:532:34    |    0 |
+| args            | call to PyArg_ParseTupleAndKeywords | distance/cdistance/distance.c:481:35:481:38    |    2 |
+| arg2            | call to PyObject_GetIter            | distance/cdistance/distance.c:490:31:490:34    |    2 |
+| args            | call to PyArg_ParseTupleAndKeywords | distance/cdistance/distance.c:409:35:409:38    |    5 |
+| otr             | call to PyObject_IsTrue             | distance/cdistance/distance.c:412:47:412:49    |    0 |
+| args            | call to PyArg_ParseTupleAndKeywords | distance/cdistance/distance.c:361:35:361:38    |   10 |
+| onorm           | call to PyObject_IsTrue             | distance/cdistance/distance.c:364:45:364:49    |    0 |
+| args            | call to PyArg_ParseTupleAndKeywords | distance/cdistance/distance.c:308:35:308:38    |   10 |
+| args            | call to PyArg_ParseTupleAndKeywords | distance/cdistance/distance.c:249:35:249:38    |    0 |
+| opos            | call to PyObject_IsTrue             | distance/cdistance/distance.c:252:43:252:46    |    0 |
+| args            | call to PyArg_ParseTupleAndKeywords | distance/cdistance/distance.c:128:35:128:38    |    0 |
+| odo_normalize   | call to PyObject_IsTrue             | distance/cdistance/distance.c:132:55:132:67    |    0 |
+| ... ? ... : ... | call to PyObject_RichCompareBool    | distance/cdistance/fastcomp.c:47:11:47:23      |    0 |
+| ... ? ... : ... | call to PyObject_RichCompareBool    | distance/cdistance/fastcomp.c:69:13:69:25      |    0 |
+| ... ? ... : ... | call to PyObject_RichCompareBool    | distance/cdistance/fastcomp.c:73:14:73:26      |    0 |
+| ... ? ... : ... | call to PyObject_RichCompareBool    | distance/cdistance/hamming.c:13:10:13:22       |    0 |
+| ... ? ... : ... | call to PyObject_RichCompareBool    | distance/cdistance/lcsubstrings.c:36:11:36:23  |    0 |
+| ... ? ... : ... | call to PyObject_RichCompareBool    | distance/cdistance/levenshtein.c:150:11:150:23 |    0 |
+| ... ? ... : ... | call to PyObject_RichCompareBool    | distance/cdistance/levenshtein.c:63:11:63:23   |    0 |
+noise
+| arg  |                call                 |                                           col2                                            | col3 |
++------+-------------------------------------+-------------------------------------------------------------------------------------------+------+
+| args | call to PyArg_ParseTupleAndKeywords | noise/_perlin.c:220:35:220:38  |    0 |
+| args | call to PyArg_ParseTupleAndKeywords | noise/_perlin.c:130:35:130:38  |    0 |
+| args | call to PyArg_ParseTupleAndKeywords | noise/_perlin.c:52:35:52:38    |    0 |
+| args | call to PyArg_ParseTupleAndKeywords | noise/_simplex.c:360:35:360:38 |    0 |
+| args | call to PyArg_ParseTupleAndKeywords | noise/_simplex.c:334:35:334:38 |    0 |
+| args | call to PyArg_ParseTupleAndKeywords | noise/_simplex.c:269:35:269:38 |    0 |
+pyahocorasick
+|     arg      |                    call                    |                                                                 col2                                                                 | col3 |
++--------------+--------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------+------+
+| nodes        | call to PyList_Append                      | pyahocorasick/Automaton.c:1127:24:1127:28                                 |    0 |
+| edges        | call to PyList_Append                      | pyahocorasick/Automaton.c:1133:28:1133:32                                 |    0 |
+| fail         | call to PyList_Append                      | pyahocorasick/Automaton.c:1139:28:1139:31                                 |    0 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:982:27:982:30                                   |    9 |
+| args         | call to _PyArg_ParseTupleAndKeywords_SizeT | pyahocorasick/Automaton.c:893:41:893:44                                   |  307 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:742:35:742:38                                   |   60 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:759:35:759:38                                   |   60 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:789:35:789:38                                   |   60 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:675:35:675:38                                   |  341 |
+| callback     | call to _PyObject_CallFunction_SizeT       | pyahocorasick/Automaton.c:701:61:701:68                                   |   20 |
+| callback     | call to _PyObject_CallFunction_SizeT       | pyahocorasick/Automaton.c:703:61:703:68                                   |   20 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:540:37:540:40                                   |  323 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:443:31:443:34                                   |   60 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:218:43:218:46                                   |  858 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/Automaton.c:226:43:226:46                                   |  858 |
+| self         | call to PyObject_Free                      | pyahocorasick/Automaton.c:188:18:188:21                                   |    6 |
+| args         | call to PyTuple_Size                       | pyahocorasick/Automaton.c:107:31:107:34                                   |  103 |
+| args         | call to _PyArg_ParseTuple_SizeT            | pyahocorasick/Automaton.c:119:34:119:37                                   |  103 |
+| args         | call to _PyArg_ParseTuple_SizeT            | pyahocorasick/Automaton.c:155:33:155:36                                   |  103 |
+| args         | call to _PyArg_ParseTuple_SizeT            | pyahocorasick/Automaton.c:164:38:164:41                                   |  103 |
+| self         | call to PyObject_Free                      | pyahocorasick/AutomatonItemsIter.c:114:18:114:21                          |    0 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/AutomatonSearchIter.c:312:33:312:36                         |  121 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/AutomatonSearchIter.c:323:31:323:34                         |  121 |
+| flag         | call to PyObject_IsTrue                    | pyahocorasick/AutomatonSearchIter.c:325:33:325:36                         |    2 |
+| self         | call to PyObject_Free                      | pyahocorasick/AutomatonSearchIter.c:139:18:139:21                         |    0 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/AutomatonSearchIterLong.c:160:30:160:33                     |  121 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/AutomatonSearchIterLong.c:171:28:171:31                     |  121 |
+| flag         | call to PyObject_IsTrue                    | pyahocorasick/AutomatonSearchIterLong.c:173:33:173:36                     |    2 |
+| self         | call to PyObject_Free                      | pyahocorasick/AutomatonSearchIterLong.c:60:18:60:21                       |    0 |
+| values       | call to PyList_GetItem                     | pyahocorasick/Automaton_pickle.c:427:39:427:44                            |    0 |
+| values       | call to PyList_GetItem                     | pyahocorasick/Automaton_pickle.c:484:42:484:47                            |    0 |
+| values       | call to PyList_Append                      | pyahocorasick/Automaton_pickle.c:154:33:154:38                            |    0 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/utils.c:390:32:390:35                                       |  704 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/utils.c:308:30:308:33                                       |  350 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/utils.c:332:30:332:33                                       |  350 |
+| obj          | call to PyTuple_GetItem                    | pyahocorasick/utils.c:251:69:251:71                                       |  384 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/src/custompickle/pyhelpers.c:20:33:20:36                    |   81 |
+| args         | call to PyTuple_GetItem                    | pyahocorasick/src/custompickle/pyhelpers.c:38:47:38:50                    |   81 |
+| bytes_list   | call to PyList_GetItem                     | pyahocorasick/src/pickle/pickle_data.c:76:34:76:43                        |    1 |
+| bytes_list   | call to PyList_SetItem                     | pyahocorasick/src/pickle/pickle_data.c:86:30:86:39                        |    1 |
+| bytes_list   | call to PyList_Append                      | pyahocorasick/src/pickle/pickle_data.c:42:38:42:47                        |    1 |
+| deserializer | call to _PyObject_CallFunction_SizeT       | pyahocorasick/src/custompickle/load/module_automaton_load.c:162:50:162:61 |   24 |
+| serializer   | call to PyObject_CallFunctionObjArgs       | pyahocorasick/src/custompickle/save/automaton_save.c:108:57:108:66        |    0 |
+python-Levenshtein
+| arg  |           call            |                                                           col2                                                           | col3 |
++------+---------------------------+--------------------------------------------------------------------------------------------------------------------------+------+
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:2057:26:2057:29 |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:1992:26:1992:29 |    8 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:1862:26:1862:29 |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:1826:26:1826:29 |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:1727:26:1727:29 |    4 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:1604:26:1604:29 |    4 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:1325:26:1325:29 |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:1048:26:1048:29 |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:976:26:976:29   |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:889:26:889:29   |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:851:26:851:29   |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:802:26:802:29   |    0 |
+| args | call to PyArg_UnpackTuple | python-Levenshtein/Levenshtein/_levenshtein.c:721:26:721:29   |    6 |
+python-llist
+|      arg      |               call               |                                                 col2                                                 | col3 |
++---------------+----------------------------------+------------------------------------------------------------------------------------------------------+------+
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:1775:28:1775:31 |    0 |
+| args          | call to PyTuple_SetItem          | python-llist/src/dllist.c:1463:25:1463:28 |    1 |
+| iterator_type | call to PyObject_CallObject      | python-llist/src/dllist.c:1470:34:1470:46 |    0 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:1143:28:1143:31 |   24 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:1112:28:1112:31 |   24 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:1063:28:1063:31 |    8 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:1009:28:1009:31 |   26 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:978:28:978:31   |   26 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:932:28:932:31   |    8 |
+| value         | call to PyObject_RichCompareBool | python-llist/src/dllist.c:755:24:755:28   |    0 |
+| value         | call to PyObject_RichCompareBool | python-llist/src/dllist.c:802:24:802:28   |    0 |
+| value         | call to PyObject_Hash            | python-llist/src/dllist.c:710:45:710:49   |    0 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:645:28:645:31   |  828 |
+| self          | call to PyObject_ClearWeakRefs   | python-llist/src/dllist.c:582:43:582:46   |    0 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/dllist.c:245:28:245:31   |  435 |
+| args          | call to PyTuple_SetItem          | python-llist/src/dllist.c:93:29:93:32     |    1 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/sllist.c:1739:28:1739:31 |    0 |
+| value         | call to PyObject_Hash            | python-llist/src/sllist.c:1546:45:1546:49 |    0 |
+| args          | call to PyTuple_SetItem          | python-llist/src/sllist.c:1428:25:1428:28 |    1 |
+| iterator_type | call to PyObject_CallObject      | python-llist/src/sllist.c:1435:34:1435:46 |    0 |
+| arg           | call to PyArg_UnpackTuple        | python-llist/src/sllist.c:910:28:910:30   |   24 |
+| arg           | call to PyArg_UnpackTuple        | python-llist/src/sllist.c:846:28:846:30   |   24 |
+| arg           | call to PyArg_UnpackTuple        | python-llist/src/sllist.c:790:28:790:30   |   26 |
+| arg           | call to PyArg_UnpackTuple        | python-llist/src/sllist.c:736:28:736:30   |   26 |
+| value         | call to PyObject_RichCompareBool | python-llist/src/sllist.c:545:24:545:28   |    0 |
+| value         | call to PyObject_RichCompareBool | python-llist/src/sllist.c:592:24:592:28   |    0 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/sllist.c:494:28:494:31   |  700 |
+| self          | call to PyObject_ClearWeakRefs   | python-llist/src/sllist.c:348:43:348:46   |    0 |
+| args          | call to PyArg_UnpackTuple        | python-llist/src/sllist.c:147:28:147:31   |  342 |
+| args          | call to PyTuple_SetItem          | python-llist/src/sllist.c:75:29:75:32     |    1 |

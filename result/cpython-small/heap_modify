@@ -1,0 +1,3 @@
+|      src       |             sink              |                                              col2                                               |                                       col3                                       |
++----------------+-------------------------------+-------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| call to SOURCE | ControlFlowNode for Attribute | file:///Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/heap_modify/module.c:10:22:10:27 | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/heap_modify/import.py:12 |

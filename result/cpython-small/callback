@@ -1,0 +1,3 @@
+|             src              | sink |                                     col2                                      |                                             col3                                             |
++------------------------------+------+-------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ControlFlowNode for SOURCE() | ret  | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/callback/import.py:13 | file:///Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/callback/module.c:19:10:19:12 |

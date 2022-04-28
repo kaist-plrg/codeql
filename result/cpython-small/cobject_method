@@ -1,0 +1,3 @@
+|             src              |    sink    |                                        col2                                        |                                                col3                                                |
++------------------------------+------------+------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| ControlFlowNode for SOURCE() | python_arg | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/cobject_method/import.py:7 | file:///Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/cobject_method/module.c:14:10:14:19 |

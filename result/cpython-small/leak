@@ -1,0 +1,3 @@
+|             src              |    sink    |                                   col2                                   |                                           col3                                           |
++------------------------------+------------+--------------------------------------------------------------------------+------------------------------------------------------------------------------------------+
+| ControlFlowNode for SOURCE() | python_arg | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/leak/import.py:6 | file:///Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/leak/module.c:10:10:10:19 |

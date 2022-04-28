@@ -1,0 +1,3 @@
+|             src              | sink |                                       col2                                        |                                               col3                                               |
++------------------------------+------+-----------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
+| ControlFlowNode for SOURCE() | data | /Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/complex_data/import.py:21 | file:///Users/ydongjun/PLRG/codeql/benchmark/cpython-small/src/complex_data/module.c:11:10:11:13 |
