@@ -1,9 +1,8 @@
 \section{Overview}
 In this section, we show an overview of how declarative style analysis
 targetting multiple languages is performed with example of call graph
-construction as a client analysis,
-and demonstrate our approach to extend the analyzer to support analysis
-across languages.
+construction as a client analysis, and demonstrate our approach to extend the
+analyzer to support analysis across languages.
 
 \begin{figure}[t]
   \centering
@@ -24,7 +23,7 @@ m1()
     \label{fig:exam:langA}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \begin{lstlisting}[style=cpp,firstnumber=5,xleftmargin=2.5em]
+    \begin{lstlisting}[style=cpp,firstnumber=9,xleftmargin=2.5em]
 void f() {
     CallMethod("m2");
 }
@@ -38,61 +37,177 @@ void f() {
   \label{fig:exam}
 \end{figure}
 
-Let us consider a hypothetical multilingual program written in a Python-like language A
+Let us consider a multilingual program written in a Python-like language A
 and a C-like language B.
 
 The program in Figure~\ref{fig:exam} has two parts: Figure~\ref{fig:exam}(a)
 shows a method \javacode{m1}, \javacode{m2} in language A, and
 Figure~\ref{fig:exam}(b) shows a function \ccode{f} in language B.  The method
-\javacode{m1} is called from top level of language A, and it calls the the function \ccode{f}
-from language B.  Then, the function \ccode{f} calls back the method \javacode{m2} in language A
-using API function, using the string value \"m2\" to indicate the name of method.
+\javacode{m1} is called from top level of language A, and it calls the the
+function \ccode{f} from language B.  Then, the function \ccode{f} calls back
+the method \javacode{m2} in language A using API function, using the string
+value "m2" to indicate the name of method.
 
 \subsection{Analyses of single-language programs}
-FIrst, let\'s look at how the analysis for language A can be done.
-As a first step, the database of facts are created from the source code. THe
-facts created in this way may contain some syntactic information about the
-source code. For example, we can think of two kinds of facts: MethodAt(l, name) which
-indicates that the method name 'name' is defined at line number l,
-and CallAt(l, name), which indicates there is a call to a method named 'name' at line l.
-Specifically, the program at Figure~\ref{fig:exam}(a) would be transformed into
-the following facts:
+First, let's consider a hypothetical declarative style analyzer, that supports
+language A.  As a first step, the database of facts are created from the source
+code. THe facts created in this way may contain some syntactic information
+about the source code. For example, we can think of two kinds of facts:
+MethodAt(l, name) which indicates that the method name 'name' is defined at
+line number l, and CallAt(l, name), which indicates there is a call to a method
+named 'name' at line l.  Specifically, the program at Figure~\ref{fig:exam}(a)
+would be transformed into the following facts:
 
-MethodAt(2, m1)
-MethodAt(3, m2)
-CallAt(7, m1)
+MethodAt(3, "m1")
 
-Next, there are rules that derice new facts from the known facts.
-In this example, we would want to define the rule for generating the facts of
-CallEdge(l1, l2), which indicates there is an call edge from the call expression at line l1
-to the method definition at line l2. Using the know facts of MethodAt and CallAt,
-we can define the rule like folowing:
+CallAt(4, "f")
+
+MethodAt(5, "m2")
+
+CallAt(8, "m1")
+
+Next, there are rules that derice new facts from the known facts.  In this
+example, we would want to define the rule for generating the facts of
+CallEdge(l1, l2), which indicates there is an call edge from the call
+expression at line l1 to the method definition at line l2. Using the know facts
+of MethodAt and CallAt, we can define the rule like folowing:
 
 CallEdge(l1, l2) :-
+
     CallAt(l1, call\_name),
+    
     MethodAt(l2, meth\_name),
+    
     call\_name = meth\_name.
 
-The meaning of this rule is straight forward. Whenever there is a method definition
-and a method call with the sane name, then there is c call edge between them.
-By applying this rule on top of facts obtained above, we would
+The meaning of this rule is straight forward. Whenever there is a method
+definition and a method call with the sane name, then there is c call edge
+between them.  By applying this rule on top of facts obtained above, we would
 get this new fact:
 
-CallEdge(7, 2).
+CallEdge(7, 3).
 
-Finally, there is a query system that is used for extracting certain sets of facts
-that meet certain condition. For example, we can simply make a query to find every calledge
-using following query:
+Finally, there is a query system that is used for extracting certain sets of
+facts that meet certain condition. For example, we can simply make a query to
+find every calledge using following query:
 
 ?- CallEdge(X, Y).
 
-which should output the result of X=7 and Y=2.
+which should output the analysis result of (X, Y) = (7, 2).
 
+This time, let's look at how the analyzer is extended to support the analysis
+of B. Similar to language A, the first step is to create database. For language
+B, we can have the rules of FunctionAt, CallAt, and Argument as follows:
 
+FunctionAt(9, "f")
+
+CallAt(10, "CallMethod")
+
+Argument(10, 0, "m2")
+
+where Argument(l, i, arg) would mean that the function call at line l would
+have arg as the ith argument.  Then we can define the rule for CallEdge in
+similar manner:
+
+CallEdge(l1, l2) :-
+    CallAt(l1, call\_name),
+    FunctionAt(l2, func\_name),
+    call\_name = func\_name.
+
+It is important thing to note here is that, the same name of "CallEdge" is used
+for this rule. The rationale for the developer of analyzers to use the same
+name here, is that the exact same query can be reused. For example, we can use
+the exact same query
+
+?- CallEdge(X, Y).
+
+to find all possible set of call edges. In this case, the output would be empty
+as the analyzer is not considering the source code from A.
 
 \subsection{Analysis of multilingual program}
-1. create db -> by simply merging two
+So far, we have seen how a declarative analyzer designed for one language can
+be extended to support another language. Now, we can take aadvantage of this
 
-2. rules -> intra: same, inter: new
+Again, the first step is to create merged database that can separated into 2
+logical language spaces. In this example, the merged database would look like
+this:
 
-3. Query system -> exactly same as before, but now reports more call edge
+MethodAt\_A(3, "m1")
+
+CallAt\_A(4, "f")
+
+MethodAt\_A(5, "m2")
+
+CallAt\_A(8, "m1")
+
+FunctionAt\_B(9, "f")
+
+CallAt\_B(10, "CallMethod")
+
+Argument\_B(10, 0, "m2")
+
+Then, the next step is to define the rule for CallEdge.  The new rule will be
+composed of three parts: language-specific rule for A, lanuguage-specific rule
+for B, and language-interoperations rules:
+
+CallEdge(l1, l2) :-
+
+    CallEdge\_A(l1, l2)
+    
+    ;
+    
+    CallEdge\_B(l1, l2)
+
+    ;
+
+    CallEdge\_AB(l1, l2)
+
+    ;
+
+    CallEdge\_BA(l1, l2).
+
+For language-specific rules for CallEdge\_A and CallEdge\_B can be defined same
+as before.  For language-interoperation rule, both call from A to B and B to A
+should be considered. In our example language, call from A to B is similar to
+normal method call from B to B, so the rule for CallEdge\_AB can be defined in
+similar way:
+
+CallEdge\_AB(l1, l2) :-
+
+    CallAt\_A(l1, call\_name),
+    
+    FunctionAt\_B(l2, func\_name),
+    
+    call\_name = func\_name.
+
+For the rule for CallEdge\_BA, the situation is a bit trickier.  Since the
+method call is done via an api function call, we weill have to consider this
+semantics.
+
+CallEdge\_BA(l1, l2) :-
+
+    CallAt\_B(l1, "CallMethod"),
+    
+    Argument\_B(l1, 0, arg),
+    
+    MethodAt\_A(l2, meth\_name),
+    
+    arg = meth\_name.
+
+After fully defining the rule for CallEdge, then we can reuse the query system
+just as before to findout every possible calledge:
+
+?- CallEdge(X, Y).
+which will give us the output, (X, Y) = (7, 3), (4, 9), (10, 5)
+
+It is interesting to see what is the only required task for this extension.
+Most of the parts in original analyzers is reused, and the only requirements
+are the additional language-interoperation rules, in this case,
+language-interoperation rules for CallEdge\_AB and CallEdge\_BA. Rest of the
+part can be constructed in automated way.
+
+Starting from the next section, we formally present our approach to extend the
+analyzer targeting multiple lanugaes to support multilingual analysis, specific
+implementation details on extedning CodeQL to support Java-C programs and
+Python-C programs, and demonstrate our experimental result with the
+proof-of-concept implementation.
