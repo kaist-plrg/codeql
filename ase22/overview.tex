@@ -1,14 +1,41 @@
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
 \section{Overview}
 In this section, we show an overview of how declarative style analysis
 targetting multiple languages is performed with example of call graph
 construction as a client analysis, and demonstrate our approach to extend the
 analyzer to support analysis across languages.
 
+\lstdefinestyle{mpython}{
+    language=python,
+    morekeywords={def},
+    keywordstyle=\bfseries\color{blue!40!black},
+    stringstyle=\color{red!40!black},
+    basicstyle=\ttfamily\footnotesize,
+    captionpos=b,
+    numbers=left,
+    numbersep=5pt,
+    tabsize=2,
+    xleftmargin=2.5em
+}
+
+\lstdefinestyle{mcpp}{
+    keywordstyle=\bfseries\color{purple!40!black},
+    language=c,
+    stringstyle=\color{green!40!black},
+    basicstyle=\ttfamily\footnotesize,
+    captionpos=b,
+    numbers=left,
+    numbersep=5pt,
+    tabsize=2,
+    xleftmargin=2.5em
+}
+
 \begin{figure}[t]
   \centering
   \vspace{2mm}
   \begin{subfigure}[t]{0.5\textwidth}
-    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+    \begin{lstlisting}[style=mpython]
 import f
 
 def m1():
@@ -19,21 +46,21 @@ def m2():
 m1()
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Method in language A calling a function in language B}
+    \caption{Code in language A}
     \label{fig:exam:langA}
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \begin{lstlisting}[style=cpp,firstnumber=9,xleftmargin=2.5em]
+    \begin{lstlisting}[style=mcpp,firstnumber=9]
 void f() {
     CallMethod("m2");
 }
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Function in language B}
+    \caption{Code in language B}
     \label{fig:exam:langB}
   \end{subfigure}
   \vspace*{-.5em}
-  \caption{Multilingual code in language A and language B}
+  \caption{Multilingual code example written in both language A and B}
   \label{fig:exam}
 \end{figure}
 
