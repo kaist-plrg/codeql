@@ -2,39 +2,45 @@
   \centering
   \vspace{2mm}
   \includegraphics[width=0.47\textwidth]{img/codeql.pdf}
-  \caption{Overall structure of JN-QL}
+  \caption{Overall structure of MultiQL}
   \label{fig:codeql}
 \end{figure}
 
 \section{Implementation}\label{sec:impl}
-In this section, we present JN-QL, a prototype implementation of our
-approach to a declarative static analysis for multilingual programs,
-in the case of dataflow analysis for JNI programs using CodeQL~\cite{codeql}.
+In this section, we present MultiQL, a prototype implementation of our
+approach of extending declarative static analysis for multilingual programs,
+in the case of dataflow analysis for JNI programs(Java-C)
+and extension module programs(Python-C) using CodeQL~\cite{codeql}.
+Dataflow analysis is an analysis to determine if a value that is created at
+certain program location, source, can flow into another certain program location, sink.
+Without loss of generality, we will mainly explain analysis of JNI program
+analysis throughout most of the section, since the difference between JNI programs and
+extension module programs is relevent only when defining
+language-interoperation rules.
+
+
 
 \subsection{CodeQL}
-CodeQL is a static analysis engine that transforms source code
-programs into databases, and performs analysis by evaluating queries
-written in the declarative language called QL (Query Language).
-In QL, one can define rules by defining ``predicates'' or ``classes.''
-For example, the following QL code defines the predicate \codeql{isOneTwoThree}:
+CodeQL is a static analysis engine that transforms source code programs into
+databases, and performs analysis by evaluating queries written in the
+declarative and object-oriented language called QL (Query Language).
+In QL, there are mainly two syntax for defining rules.
+They are defining ``predicates'' or ``classes.''
+The following QL code defines the predicate \codeql{isOneOrTwo}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
-predicate isOneTwoThree(int n) {
+predicate isOneOrTwo(int n) {
   n = 1
   or
   n = 2
-  or
-  n = 3
 }
 \end{lstlisting}
-and the following definition defines the class \codeql{OneTwoThree}:
+and the following definition defines the class \codeql{OneOrTwo}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
-class OneTwoThree extends int {
-  OneTwoThree() { // characteristic predicate
+class OneOrTwo extends int {
+  OneOrTwo() { // characteristic predicate
     this = 1
     or
     this = 2
-    or
-    this = 3
   }
 }
 \end{lstlisting}
@@ -43,9 +49,9 @@ A class defines a set of elements that satisfy the predicate called
 For more information about QL, one can refer to \citet{ql2016}'s paper
 or the official document~\cite{codeql}.
 
-Figure~\ref{fig:codeql} presents the overall structure of JN-QL.
+Figure~\ref{fig:codeql} presents the overall structure of MultiQL for JNI programs.
 First, it generates databases for both languages, C\footnote{
-Even though JN-QL analyzes JNI programs written in Java and both C and
+Even though MultiQL analyzes JNI programs written in Java and both C and
 C++, this paper refers to C only fore presentation brevity.} and
 Java, and merges them to one database.  This corresponds
 to the step of extracting syntactic datafacts from source code programs.
@@ -58,23 +64,30 @@ perform a client-analysis, and evaluate it to produce its analysis result.
 For compiled languages such as C and Java, CodeQL generates their database
 by compiling source programs.  When a compiler compiles a program,
 CodeQL monitors the compiler to extract necessary information and
-creates a database with the extracted information.
+creates a database with the extracted information. For script languages like Python,
+CodeQL uses its own extractor to directly extract the required information.
 CodeQL creates a database for a single language in two steps:
-1) it stores the extracted information from a compiler in a trap
+1) it stores the extracted information in a trap
 file, a human readable file format, and 2) it finalizes trap files
 into databases in the binary format. For example, the
-following shows a sample trap file:
+following demonstrates a sample trap file:
 
 \begin{lstlisting}[style=java,numbers=none]
-#10017=@"class;hello.HelloJNI"  ...
-#10044=@"type;int"
-primitives(#10044,"int")  ...
-#10061=@"callable;{#10017}.java_callback({#10044}){#10044}"  ...
-#10067=@"params;{#10061};0"
-params(#10067,#10044,0,#10061,#10067)
-paramName(#10067,"java_callback_param")
+#10001=@"class;myClass.MyClass"  ...
+#10002=@"type;int"
+primitives(#10002,"int")  ...
+#10003=@"callable;{#10001}.myMethod({#10002}){#10002}"  ...
+#10004=@"params;{#10003};0"
+params(#10004,#10002,0,#10003,#10004)
+paramName(#10004,"myParam")
 \end{lstlisting}
-which describes the parameter information about \javacode{java\_callback}.
+which describes the parameter information about \javacode{myMethod}.
+Here, each line of \javacode{primitives(...)},
+\javacode{params(...)}, and
+\javacode{paramName(...)}
+corresponds to one fact, which will be
+finally stored in each table of database.
+
 
 \begin{figure}[t]
   \centering
@@ -117,14 +130,14 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
   \label{fig:qll}
 \end{figure}
 
-To create a single database for both C and Java, JN-QL maintains
+To create a single database for both C and Java, MultiQL maintains
 a separate trap file for each language and then merges them.
 Note that both trap files may have tables with the same name.
 To avoid name conflicts in a merged database, we add a
 language-specific prefix to each table.
-For example, if both trap files have tables named \codeql{@expr},
-we rename the table from C as \codeql{@c\_expr},
-and the table from Java as \codeql{@java\_expr"}.
+For example, if both trap files have tables named \codeql{@params},
+we rename the table from C as \codeql{@c\_params},
+and the table from Java as \codeql{@java\_params"}.
 After renaming such tables, we can safely finalize the trap files into
 databases on which queries can be evaluated.
 
@@ -183,12 +196,18 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
 After lifting, lifted predicates show the equivalent behaviors as the
 original ones if all the arguments are from the same language.
 
+The process of lifting could be effectively automated with the aid of
+QL's compile message. First, try to compile a query without actually
+importing the library, then the QL compiler will give error message
+that contains all the iinformation about required yet missing predicates and classes,
+such as name, arity or signature of each predicate. Using this information,
+the lifted predicates and classes can be automatically synthesized, without
+manually searching for what are the required ones.
 
-
-\subsection{Merging Libraries}\label{sec:merging}
+\subsection{Merging Libraries: Java-C}\label{sec:merging}
 After lifting libraries for different languages, we extend predicates to
 reflect the interoperation semantics between multiple languages.
-We identified various interactions from Java to C and from C to Java
+For analyzer for JNI programs, We identified various interactions from Java to C and from C to Java
 and extended predicates to model their behaviors.
 
 For example, the following shows how we extend the predicate
@@ -204,6 +223,8 @@ DataFlowCallable viableCallable(DataFlowCall c) {
   result.asJava() = viableCallableC2J(c.asC())
 }
 \end{lstlisting}
+This predicate finds the call edge from the call expression to its
+target, and is required for finding data flows through the fnction arguments and returns.
 Lines 2 and 4 show the results of lifting, and they take advantage of the
 original predicates from the dataflow libraries.  They handle
 intra-language call edges from Java to Java and from C to C.
@@ -223,14 +244,14 @@ followed by a fully qualified name of its class and the additional \codeql{\_}, 
 For example, the target function name for a function call of
 \codeql{cfunction} would be \codeql{Java\_fully\_qualified\_class\_name\_cfunction}.
 With this convention, we can define \codeql{viableCallableJ2C}
-so that \codeql{f = viablaCallableJ2C(m)} holds when
-\codeql{f.toString() = "Java\_" + m.className() + "\_" + "m.toString()} holds.
+so that \codeql{f = viablaCallableJ2C(call)} holds when
+\codeql{f.toString() = "Java\_" + call.getTarget().className() + "\_" + "call.getTarget().getName()} holds.
 
 
 \medskip
 \textbf{C to Java.} The interaction from C to Java is more complex and
 requires more careful implementation than the interaction from Java to C.
-The primary difference is that a method call from C to Java requires
+The primary difference is that a method call from C to Java requires knowing
 the runtime values of variables, which may not be always possible.
 First, C code calls the interface function \ccode{GetMethodID(name, sig)}
 to get the ``method ID'' of the method whose name matches the first argument
@@ -263,3 +284,80 @@ we extended more predicates to consider other JNI interface functions such as
 \ccode{findClass} and \ccode{GetFieldID}.
 Most of such extended predicates are specialized \codeql{step} predicates.
 We extended them in a similar way to the calls from C to Java described above.
+
+\subsection{Merging Libraries: Python-C}\label{sec:merging2}
+The extension module programs requires its own modelling for its own interoperation
+semantics to be analyzed.
+The following is the extension of the predicate \codeql{viableCallable}
+for extension module programs:
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+DataFlowCallable viableCallable(DataFlowCall c) {
+  result.asPython() = PYTHON::viableCallable(c.asPython())
+  or
+  result.asC() = C::viableCallable(c.asC())
+  or
+  result.asC() = viableCallableP2C(c.asPython())
+  or
+  result.asPython() = viableCallableC2P(c.asC())
+}
+\end{lstlisting}
+Again, line 2 and line 4 are direct outcomes of the process of lifting,
+and all we have to newly define is the language-interoperation predicates,
+\codeql{viableCallableP2C} and \codeql{viableCallableC2P}. 
+
+\textbf{Python to C.} Similar to JNI programs, in python program with 
+extension modules, one can make interactions from
+Python to C by importing and calling C functions that are exported via
+extension modules. There is a C structure "PyMethodDef"
+that stores the information about the c function that is exported. If we define
+the structure
+
+\begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+struct PyMethodDef methods[] = {
+  {
+    .ml_name = "cfunction",
+    .ml_meth = cfunction_imp,
+    ...
+  },
+  ...
+}
+\end{lstlisting}
+
+then the Python code can import cfunction and the call expression cfunction()
+will resolve to the actual function cfunction\_impl defined in C code. To model
+this behavior, we can define \codeql{viableCallableP2C} so that \codeql{f =
+viablaCallableP2C(call)} holds when \codeql{f = def.getFunc()} and
+\codeql{call.getTarget().toString() = def.getName()} holds.
+
+\medskip
+\textbf{C to Python.} The interaction from C to Python also requires
+the runtime values of variables, which makes the analysis a bit complex. 
+C code calls the interface function \ccode{PyObject\_CallObject(func, args)}
+where func is the python function object, and the args is the python tuple
+object. Finding call target of this API function call simply reduces to answering the
+question: ``what is the value of \ccode{func}?'' Again, we define
+``intra-flows'' for both Python and C to answer this question efficiently: 1) dataflows from 
+python function any to arguments in Python and 2) dataflow from any parameters to the first argument of
+\ccode{PyObject\_CallObject} in C. Then, the value that \ccode{func} may have
+is found via three big steps: finding flow from Python function to an argument, from the argument to
+a c parameter, and from the parameter to the variable \ccode{func}.
+
+\textbf{Args and Params.} After finding the call target of the given call
+expression, Then we have to connect the dataflow from the arguments to
+aprameters.  This is tirivial for JNI programs, but in case of extension module
+programs, it requires a bit of effort. When you call a c function from the
+Python code with arguments, then all the arguments are implicitly packed in a
+tuple, and that tuple is passed to c function as a single argument. Then the
+writter of c function should manually call API function,
+\ccode{PyArg\_ParseTuple} to unpack this tuple to get each individual
+arguments. This behavior is modelled by creating virtual argument node which is
+a virtual Python tuple object, and create the store step from the real argument
+to the virtual argument.  By doing so. the real argument will flow to the real
+use site of in three steps: 1) store step from the argument to virtual
+argument, 2) function-in step from virtual argument to the parameter of target
+C function, and 3) read step from the parameter to its tuple-read API fuction.
+The similar thing happens when there is a call from C to Python. The actual
+argument of C API function is a tuple object, but this tuple is implicitly
+unpacked and each element is assigned to each parameter of Python method.
+Again, the solution is to create virtual parameter in Python, and create the
+read step from the virtual tuple parameter to actual parameters.
