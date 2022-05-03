@@ -4,39 +4,40 @@ Declarative style analyzers detect possible bugs and
 security vulnerabilities by 1) transforming program source code to "database"
 of "facts", 2) generating new facts from the known facts via applying
 "rules", and 3) extracting all facts related to specific properties by
-applying the rules to the facts via "query system".  DOOP[??] is a
+applying the rules to the facts via "query system".  DOOP~\cite{doop} is a
 declarative style analysis framework conducting points-to analysis for Java
-programs, and CodeQL[??] is a declarative semantic code analysis engine
+programs, and CodeQL~\cite{codeql} is a declarative semantic code analysis engine
 maintained by Github, which performs data-flow analysis to detect security
-vulnerabilities in Java programs.  Recently, Glean[??], an experimental
+vulnerabilities in Java programs.  Recently, Glean~\cite{glean}, an experimental
 declarative query system, has been developed by Meta, on which users can query
 information about code structures for JavaScript and Hack programs.
 
-Declarative style analyzers broaden their analysis targets to
-diverse programming languages. Because the query system is independent of
-analysis target languages, only required extensions for an additional target
-language support include a new schema of the database containing facts,
-new language-specific rules, and a front-end transforming programs written in the
+Declarative style analyzers broaden their analysis targets to diverse
+programming languages. Because the query system is independent of analysis
+target languages, only required extensions for an additional target language
+support include a new schema of the database containing facts, new
+language-specific rules, and a front-end transforming programs written in the
 target language to facts. With the extensions, declarative analyzers can
 analyze various properties in programs written in the new target language,
 using a sequence of queries and the query system.  DOOP currently supports
 Python program analysis to detect tensor shape mismatching bugs in TensorFlow
-based Python ML models[??]. CodeQL was originally desinged for Java programs,
-and now it can track data-flows not only in Java but also in C++, C\#, JavaScript,
-Ruby, Python, and \inred{Swift} programs.  Furthermore, Glean has a plan to support
-diverse target programming languages including Python, Java, C++, Rust, and
-Haskell.
+based Python ML models~\cite{lagouvardos2020static}. CodeQL was originally
+desinged for Java programs, and now it can track data-flows not only in Java
+but also in C++, C\#, JavaScript, Ruby, and Python programs.  Furthermore,
+Glean has a plan to support diverse target programming languages including
+Python, Java, C++, Rust, and Haskell.
 
 While the analyzers target multiple programming languages, they do not directly
-support the analysis of multilingual programs written in two or more programming
-languages. Multilingual programs have been widely developed in various
-application domains[5, 8]. However, multilingual programs are often vulnerable
-to bugs or security issues more than monolingual programs. A large-scale study
-on the code quality of multilingual programs[6] reported that using multiple
-languages together correlates with higher error-proneness. Moreover, [7] showed
-that two or three times more bugs and security issues had been reported on the
-language interoperation than on the intraoperation in widely-used open-source
-JNI programs such as OpenJ9 and VLC.
+support the analysis of multilingual programs written in two or more
+programming languages. Multilingual programs have been widely developed in
+various application domains~\cite{kochhar2016large, mergendahlcross}. However,
+multilingual programs are often vulnerable to bugs or security issues more than
+monolingual programs. A large-scale study on the code quality of multilingual
+programs~\cite{kochhar2016large} reported that using multiple languages
+together correlates with higher error-proneness. Moreover,
+\cite{grichi2020impact}~showed that two or three times more bugs and security
+issues had been reported on the language interoperation than on the
+intraoperation in widely-used open-source JNI programs such as OpenJ9 and VLC.
 
 In this paper, we propose a systematic engineering methodology that extends a
 declarative style analyzer supporting multiple target languages to support
