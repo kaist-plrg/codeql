@@ -1,0 +1,24 @@
+========bitarray========
+Took 19378 ms for python
+Took 3082 ms for cpp
+Took 13537 ms for merged
+========distance========
+Took 16722 ms for python
+Took 2354 ms for cpp
+Took 11594 ms for merged
+========noise========
+Took 18790 ms for python
+Took 2430 ms for cpp
+Took 12222 ms for merged
+========pyahocorasick========
+Took 19179 ms for python
+Took 2620 ms for cpp
+Took 13118 ms for merged
+========python-Levenshtein========
+Took 17187 ms for python
+Took 3144 ms for cpp
+Took 12686 ms for merged
+========python-llist========
+Took 17047 ms for python
+Took 2853 ms for cpp
+Took 11986 ms for merged
