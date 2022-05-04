@@ -278,11 +278,11 @@ function main() {
     printBody();
   }
   else if (stage == 1) {
-    origMerged = readLines('dataflow/DataFlowmerged.qll');
+    origMerged = readLines('dataflow/DataFlowMerged.qll');
     rewriteBody();
   }
   else if (stage == 2) {
-    origMerged = readLines('dataflow/DataFlowmerged.qll');
+    origMerged = readLines('dataflow/DataFlowMerged.qll');
     rewriteBody();
   }
   else {

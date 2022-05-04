@@ -24,6 +24,10 @@ module PythonFunctionFlow {
 }
 private import PythonFunctionFlow
 
+private module Step{
+  import dataflow.Step
+}
+
 module CppParamFlow {
   private import dataflow.DataFlowImplSpecific::Original::CPP
   private import cpp.semmle.code.cpp.dataflow.internal.DataFlowImpl
@@ -34,7 +38,8 @@ module CppParamFlow {
     override predicate isSource(Node n) {
       n instanceof ParamNode
       or
-      n instanceof PostUpdateNode //parse_tuple(tup, "I", &x);
+      //n instanceof PostUpdateNode //parse_tuple(tup, "I", &x);
+      Step::pythonTupleObjectReadStep(_, _, n)
       // TODO: optimization
     }
 

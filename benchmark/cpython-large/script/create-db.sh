@@ -15,5 +15,5 @@ mkdir db
 for app in ${apps[@]}; do
   echo "========$app========"
   cp resource/Makefile src/$app
-  $CODEQL_HOME/script/cpython/create-db.sh src/$app db/$app
+  $CODEQL_HOME/script/cpython/create-db.sh src/$app db/$app | grep "Took"
 done
