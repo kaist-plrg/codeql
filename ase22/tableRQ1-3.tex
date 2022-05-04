@@ -1,0 +1,22 @@
+\begin{table*}[t]
+  \vspace{2mm}
+  \caption{Analysis results of the ExtModuleFlowBench benchmarks}
+  \label{table:RQ1-3}
+  \vspace*{-1em}
+  \centering
+  \small
+\renewcommand{\arraystretch}{.9}
+  \begin{tabular}{@{}l|c||l|c@{}}
+    %\myhead{Benchmark}{Dataflow}
+    callback                    & $\bigcirc$  & multiple\_module             & $\bigcirc$  \\
+    cobject\_member             & $\bigcirc$  & noleak                       & $\bigcirc$  \\
+    cobject\_method             & $\bigcirc$  & noleak\_array                & $\bigcirc$  \\
+    complexdata                 & $\bigcirc$  & nosource                     & $\bigcirc$  \\
+    complexdata\_stringop       & $\times$    & parse\_arg                   & $\bigcirc$  \\
+    heap\_modify                & $\bigcirc$  & set\_field\_from\_arg        & $\times$    \\
+    import\_module              & $\bigcirc$  & set\_field\_from\_arg\_field & $\times$    \\
+    leak                        & $\bigcirc$  & set\_field\_from\_native     & $\times$    \\
+    leak\_array                 & $\times$    & source                       & $\bigcirc$  \\
+    multiple\_interactions      & $\bigcirc$  & source\_clean                & $\times$
+  \end{tabular}
+\end{table*}

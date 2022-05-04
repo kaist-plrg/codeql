@@ -4,41 +4,53 @@
 \section{Evaluation}\label{sec:eval}
 
 To show the effectiveness of our approach, we evaluate our analyzer
-JN-QL with the following three research questions:
+\ours with the following two research questions:
 \begin{itemize}
-  \item \textbf{\req{1}: Feasibility.} Can \ours analyze JNI programs that use
-    various JNI interoperations?
+  \item \textbf{\req{1}: Feasibility.} Can \ours correctly analyze multilingual programs that use
+    various interoperations?
 
-  \item \textbf{\req{2}: Performance.} How precise and scalable is \ours for
-    real-world JNI program analysis compared to JN-Sum~\cite{LeeASE20}?
-
-  \item \textbf{\req{3}: Usefulness.} Can \ours analyze the same kinds of bugs
-    the state-of-the-art JNI program analyzers can detect?
+  \item \textbf{\req{2}: Usefulness.} Can \ours detect the dataflow related bugs that
+    the state-of-the-art multilingual program analyzers can detect?
 \end{itemize}
 
-For \req{1}, we analyze the benchmarks in NativeFlowBench~\cite{nativeflowbench,
-JN-SAF} using \ours. The benchmarks contain 23 JNI Android applications (apps) that
+For \req{1}, we perform dataflow analysis on set of four benchmarks using \ours.
+Two benchmarks are for JNI programs.
+The first benchmark is NativeFlowBench~\cite{nativeflowbench,
+JN-SAF} which is created by authors of JN-SAF as a benchmark for
+dataflow analysis of JNI programs. It contains 23 JNI Android applications (apps) that
 use various JNI interoperations and sensitive data leakage from {\it sources} to
-{\it sinks} across language boundaries via the interoperations. We compare
+{\it sinks} across language boundaries via the interoperations.
+We compare
 the analysis results of \ours to the results of JN-Sum and JN-SAF. We use
 compiled versions of the benchmarks for JN-SAF because it targets compiled JNI
 programs and uses the source code of the benchmarks for \ours and JN-Sum.
+The second benchmark consists of real-world JNI Android apps downloaded from F-Droid, a repository of
+open-source Android apps~\cite{fdroid}.
+%We first classified
+%F-Droid apps into JNI and non-JNI apps. Then, we selected
+%all 42 apps that can be compiled without any errors as our analysis targets.
+Another two benchmarks are for extension module programs.
+The first bench is ExtModuleFlowBench which contains 20
+extension moudle programs. We created this benchmark by
+referring to NativeFlowBench. We converted each app in 
+NativeFlowBench into corresponding extension module programs, except for
+the apps that contains JNI-Specific interoperation features. Instead, several new programs
+that reflect the extension module-specific interoperations are added to ExtModuleFlowBench.
+Similar to NativeFlowBench, the programs contain hypothetical API calls
+named SOURCE() and SINK(), and the value from SOURCE can flow to function
+call of SINK across language boundary.
+The second benchmark consists of 6 public github repositories that implement extension modules.
+Each repository consists of the library that is written in C, and test codes that is written in Python.
 
-For \req{2}, we compare the analysis results of \ours and JN-Sum on 42
-real-world JNI Android apps downloaded from F-Droid, a repository of
-open-source Android apps~\cite{fdroid}. We first classified
-F-Droid apps into JNI and non-JNI apps. Then, we selected
-all 42 apps that can be compiled without any errors as our analysis targets.
-
-For \req{3}, we detect JNI interoperation bugs in the 42 real-world Android
+For \req{2}, we specifically detect JNI interoperation bugs in the 42 real-world Android
 apps using \ours. We implemented a checker detecting four kinds of
 bugs on top of \ours using the query language of CodeQL. We chose our target
 JNI interoperation bugs as the same as the targets of the client
 analysis of the previous research~\cite{LeeASE20, ILEA}.
-
+% Mention reason for not using python? (benchmark = lib-testcode => no place for bug)
 
 \subsection{\req{1}: Feasibility}
-Table~\ref{table:RQ1} summarizes the analysis results of \ours, JN-Sum,
+\textbf{NativeFlowBench} Table~\ref{table:RQ1} summarizes the analysis results of \ours, JN-Sum,
 and \jnsaf on 23 benchmarks in NativeFlowBench.
 The {\bf Benchmark} columns show the benchmark names,
 {\bf Precision} show the analysis results of 
@@ -94,8 +106,7 @@ track dataflows on arrays, \ours does not report
 a false alarm for {\it native\_noleak\_array} but cannot find the leakage in {\it
 native\_leak\_array}.
 
-\subsection{RQ2: Performance}
-Table~\ref{table:RQ2} summarizes the analysis results of \ours on real-world Android JNI apps.
+\textbf{F-Droid} Table~\ref{table:RQ2} summarizes the analysis results of \ours on real-world Android JNI apps.
 Out of 42 apps we analyzed, we show the analysis
 results of 25 apps that have interoperations from C to Java\footnote{We
 report the full analysis results in our supplementary material.}.
@@ -188,8 +199,29 @@ code in about ten minutes.
 % eight hours. Different from JN-Sum, \ours analyzed huge apps that have about
 % three million lines of code in about ten minutes.
 
+\input{tableRQ1-3}
 
-\subsection{RQ3: Usefulness}
+\textbf{ExtModuleFlowBench}
+Table~\ref{table:RQ1-3} summarizes the analysis results of \ours.
+The {\bf Benchmark} columns show the benchmark names,
+and {\bf Dataflow} columns show the analysis results of \ours.
+The analysis succeeds if it reports all data flow from SOURCE() to SINK() without any false positives or negatives.
+The dataflow is analyzed correctly in 14
+benchmarks but failures were reported for six benchmarks.
+Among six failures, the reason for two of them,
+{\it complexdata\_stringop} and {\it leak\_array}, are already discussed.
+Additional four failures, {\it set\_field\_from*} and {\it source\_clean}
+are due to use of virtual args. In these benchmarks, a python object is
+passed to a C function as an argument. The C function modifies the field
+of this object, causing a side effect on the object. CodeQL dataflow library
+usually correctly handles this kind of side effect. However, the use of virtual arg model
+in these benchmarks was not properly reflected, and the modifications made in C function
+was not properly propagated to Python.
+
+\textbf{Github Repository with Extension Modules}
+
+
+\subsection{RQ2: Usefulness}
 \input{tableRQ3}
 The bug checker of \ours detects four kinds of JNI interoperation bugs
 that previous research~\cite{ILEA, LeeASE20} defined as follows:
