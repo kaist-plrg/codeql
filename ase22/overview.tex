@@ -1,27 +1,32 @@
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 
-\section{Overview}
+\section{Declarative Style Analysis for Multilingual Programs}
 %In this section, we show an overview of how declarative style analysis
 %targetting multiple languages is performed with example of call graph
 %construction as a client analysis, and demonstrate our approach to extend the
 %analyzer to support analysis across languages.
+This section describes the overview of our extension for multilingual program
+analysis. Then, we describe how an example declarative style analysis works
+about a call graph construction example in two different monolingual code and
+how we extend the analysis to construct a unified call graph across languages.
 
-This section describes how declarative style analysis constructs call graphs
-for two different monolingual code and how we extend the analysis to construct
-a unified call graph across languages.
-Figure~\ref{fig:exam} shows a multilingual code example written in both (a)
-Python-like language {\it A} and (b) C-like language {\it B}. In {\it A}, there
-are two functions, {\tt m1} at line~3 and {\tt m2} at line~5. The function {\tt
-m1} calls the function {\tt f} in {\it B} via language interoperation between
-{\it A} and {\it B}, and the function {\tt m2} does nothing. At line~8 in {\it
-A}, the expression {\tt m1()} calls the function {\tt m2} defined at line~3 to
-invoke the function {\tt f} in {\it B}.
-The {\tt f} function in {\it B} calls the {\tt CallMethod} function with a
-string value {\tt "m2"} to invoke the function {\tt m2} in {\it A}, using the
-string value argument as the target function name.
-%Thus, the code example performs the bidirectional interoperation between {\it
-%A} and {\it B}, which calls the function {\tt f} written in {\it A} from {\it
-%B} and calls the function {\tt m2} written in {\it B} from {\it A}.
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.47\textwidth]{img/ov2.png}
+  \caption{Declarative analysis for multilingual programs}
+  \label{fig:ov2}
+%\vspace*{-.5em}
+\end{figure}
+
+\subsection{Overview}
+Figure~\ref{fig:ov2} illustrates how we support multilingual analysis in a
+declarative style in the case of two languages as an example. The declarative
+language engine now gets two sets of syntactic facts extracted from different
+languages. In addition, new language-interoperation rules are defined on top of
+the original language-specific rules from different languages to take the
+interoperation semantics into account. Then, the same query is performed to get
+the actual analysis.
 
 \lstdefinestyle{mpython}{
     language=python,
@@ -122,6 +127,24 @@ replaced with the elements.
   keepspaces=true,
   mathescape
 }
+
+This section describes how the example declarative style analysis constructs call graphs
+for two different monolingual code and how we extend the analysis to construct
+a unified call graph across languages.
+Figure~\ref{fig:exam} shows a multilingual code example written in both (a)
+Python-like language {\it A} and (b) C-like language {\it B}. In {\it A}, there
+are two functions, {\tt m1} at line~3 and {\tt m2} at line~5. The function {\tt
+m1} calls the function {\tt f} in {\it B} via language interoperation between
+{\it A} and {\it B}, and the function {\tt m2} does nothing. At line~8 in {\it
+A}, the expression {\tt m1()} calls the function {\tt m2} defined at line~3 to
+invoke the function {\tt f} in {\it B}.
+The {\tt f} function in {\it B} calls the {\tt CallMethod} function with a
+string value {\tt "m2"} to invoke the function {\tt m2} in {\it A}, using the
+string value argument as the target function name.
+%Thus, the code example performs the bidirectional interoperation between {\it
+%A} and {\it B}, which calls the function {\tt f} written in {\it A} from {\it
+%B} and calls the function {\tt m2} written in {\it B} from {\it A}.
+
 
 At first, A declarative style analysis creates a database of facts for the
 code. Initial facts are just syntactic information extracted from the code.
