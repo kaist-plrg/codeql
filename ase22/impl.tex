@@ -6,10 +6,12 @@
   \label{fig:codeql}
 \end{figure}
 
-\section{Implementation}\label{sec:impl}
-In this section, we present MultiQL, a prototype implementation of our
-approach of extending declarative static analysis for multilingual programs,
-in the case of dataflow analysis for JNI programs(Java-C)
+%\section{Implementation}\label{sec:impl}
+\section{MultiQL: Extension of CodeQL for multilingual program analysis}\label{sec:impl}
+In this section, we present MultiQL, a prototype extension of CodeQL for
+multilingual program analysis. 
+MultiQL tracks dataflows across language boundaries in two types of
+multilingual programs: Java-C programs interperating JNI programs(Java-C)
 and extension module programs(Python-C) using CodeQL~\cite{codeql}.
 Dataflow analysis is an analysis to determine if a value that is created at
 certain program location, source, can flow into another certain program location, sink.
@@ -17,6 +19,17 @@ Without loss of generality, we will mainly explain analysis of JNI program
 analysis throughout most of the section, since the difference between JNI programs and
 extension module programs is relevent only when defining
 language-interoperation rules.
+
+%In this section, we present MultiQL, a prototype implementation of our
+%approach of extending declarative static analysis for multilingual programs,
+%in the case of dataflow analysis for JNI programs(Java-C)
+%and extension module programs(Python-C) using CodeQL~\cite{codeql}.
+%Dataflow analysis is an analysis to determine if a value that is created at
+%certain program location, source, can flow into another certain program location, sink.
+%Without loss of generality, we will mainly explain analysis of JNI program
+%analysis throughout most of the section, since the difference between JNI programs and
+%extension module programs is relevent only when defining
+%language-interoperation rules.
 
 
 
