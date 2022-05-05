@@ -213,19 +213,15 @@
 \newcommand{\codeql}[1]{\text{\lstinline[style=codeql,numbers=none]!#1!}}
 
 % Table 1
-\newcommand{\myhead}[3]{
+\newcommand{\myhead}[2]{
   \multicolumn{1}{c|}{\multirow{2}{*}{\textbf{#1}}} &
-  \multicolumn{2}{c|}{\textbf{#2}} &
-  \multicolumn{2}{c||}{\textbf{#3}} &
+  \multicolumn{2}{c||}{\textbf{#2}} &
   \multicolumn{1}{c|}{\multirow{2}{*}{\textbf{#1}}} &
-  \multicolumn{2}{c|}{\textbf{#2}} &
-  \multicolumn{2}{c}{\textbf{#3}}
+  \multicolumn{2}{c}{\textbf{#2}}
   %\\\cline{2-5}\cline{7-10}
-  \\\hhline{~|----||~|----}
-  & \textbf{\lees} & \textbf{\ours}
+  \\\hhline{~|--||~|--}
   & \textbf{\jnsaf} & \textbf{\ours} &
-  & \textbf{\lees} & \textbf{\ours}
-  & \textbf{\jnsaf} & \textbf{\ours}\\\hhline{=|=|=|=|=||=|=|=|=|=}
+  & \textbf{\jnsaf} & \textbf{\ours}\\\hhline{=|=|=||=|=|=}
 }
 \definecolor{palegreen}{rgb}{0.6, 0.98, 0.6}
 \definecolor{pastelgreen}{rgb}{0.47, 0.87, 0.47}

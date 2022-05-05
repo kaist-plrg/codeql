@@ -55,47 +55,40 @@ analysis of the previous research~\cite{LeeASE20, ILEA}.
 \subsection{\req{1}: Feasibility}
 We demonstrate the analysis result on 4 benchmark suites.
 
-\textbf{NativeFlowBench} Table~\ref{table:RQ1-1} summarizes the analysis results of \ours, JN-Sum,
-and \jnsaf on 23 benchmarks in NativeFlowBench.
+\textbf{NativeFlowBench} Table~\ref{table:RQ1-1} summarizes the analysis results of \ours and \jnsaf on 23 benchmarks in NativeFlowBench.
 The {\bf Benchmark} columns show the benchmark names,
-{\bf Precision} show the analysis results of 
-JN-Sum and \ours, and {\bf Dataflow} show the analysis results of JN-SAF and \ours.
-JN-Sum and JN-SAF have different analysis purposes from
-each other; JN-Sum constructs call graphs of JNI programs, and JN-SAF
-detects data leakages from sources to sinks.  For fair comparison, we compare
-\ours and JN-Sum for the precision of resolving targets of foreign
-function calls, and compare \ours and JN-SAF for the data leakage detection results.
+and {\bf Dataflow} show the analysis results of JN-SAF and \ours.
 We marked each analysis result as a success ($\bigcirc$) or failure ($\times$).
-In the precision comparison, an analysis succeeds if
-it precisely resolves targets of all foreign function calls between Java and C, and it fails otherwise.
-In the dataflow comparison, an analysis succeeds
-if it reports all data leakages correctly without any false positives or negatives.
+An analysis succeeds if it reports all data leakages correctly without any false positives or negatives.
 
-
-In the precision comparison, \ours successfully analyzed 21 out of 23
-benchmarks, while JN-Sum failed in three more benchmarks than \ours.
-We manually confirmed that the two failures both in \lees and \ours
-come from built-in structs and functions in C; {\it
-icc\_javatonative} stores Java class information in the Android built-in
-struct {\tt android\_app} and {\it native\_complexdata\_stringop} generates
-a Java field name by concatenating two string values via the {\tt strcat} built-in function.
-  Because \ours and JN-Sum do not handle such built-in
-structs and functions, they failed to analyze the two benchmarks.
-  \lees failed to analyze three more benchmarks due to native entry points
-of the benchmarks~\cite{nativeactivity}.
-  FlowDroid~\cite{Flowdroid} used by JN-Sum performs a whole-program
-analysis from Android entry points. 
-  Because the benchmarks have entry points only in C differently from monolingual
-Android apps, FlowDroid cannot find entries from which its analysis starts.
-  Contrary to JN-Sum, \ours performs a query-based
-analysis, which can resolve the targets of foreign function calls regardless of program entries.
+%In the precision comparison, \ours successfully analyzed 21 out of 23
+%benchmarks, while JN-Sum failed in three more benchmarks than \ours.
+%We manually confirmed that the two failures both in \lees and \ours
+%come from built-in structs and functions in C; {\it
+%icc\_javatonative} stores Java class information in the Android built-in
+%struct {\tt android\_app} and {\it native\_complexdata\_stringop} generates
+%a Java field name by concatenating two string values via the {\tt strcat} built-in function.
+%  Because \ours and JN-Sum do not handle such built-in
+%structs and functions, they failed to analyze the two benchmarks.
+%  \lees failed to analyze three more benchmarks due to native entry points
+%of the benchmarks~\cite{nativeactivity}.
+%  FlowDroid~\cite{Flowdroid} used by JN-Sum performs a whole-program
+%analysis from Android entry points. 
+%  Because the benchmarks have entry points only in C differently from monolingual
+%Android apps, FlowDroid cannot find entries from which its analysis starts.
+%  Contrary to JN-Sum, \ours performs a query-based
+%analysis, which can resolve the targets of foreign function calls regardless of program entries.
 
 \input{tableRQ1-2}
 
 In the dataflow comparison, \ours found data leakages correctly in 20
 benchmarks but reported false negatives for three benchmarks, while JN-SAF
 analyzes 21 benchmarks correctly. 
-The one common failure comes from string concatenation, as we discussed.
+The one common failure comes from string concatenation.
+{\it native\_complexdata\_stringop} generates
+a Java field name by concatenating two string values via the {\tt strcat} built-in function.
+Because \ours and JN-Sum do not handle such built-in
+function, they failed to analyze the benchmark.
 {\it icc\_javatonative} and {\it icc\_nativetojava} leak data via the Android
 inter-component communication that is beyond the scope of \ours.
 The remaining two different failures of \ours and JN-SAF come from their array analysis policies.
@@ -152,15 +145,15 @@ not track dataflows on C function pointers and arrays, \ours failed to analyze
 method or field IDs necessary to resolve the JNI uses.
 
 
-\begin{figure}[t]
-  \centering
-  \vspace{2mm}
-  \includegraphics[width=0.47\textwidth]{img/graph}
-  \vspace*{-.5em}
-  \caption{Analysis time of \ours and \lees}
-  \label{fig:graph}
-\vspace*{-1em}
-\end{figure}
+%\begin{figure}[t]
+%  \centering
+%  \vspace{2mm}
+%  \includegraphics[width=0.47\textwidth]{img/graph}
+%  \vspace*{-.5em}
+%  \caption{Analysis time of \ours and \lees}
+%  \label{fig:graph}
+%\vspace*{-1em}
+%\end{figure}
 
 \ours is scalable in that it can analyze large-scale programs. The analysis
 time was 161.3 seconds on average for each app, including 103.8 seconds for DB
@@ -175,18 +168,18 @@ re-creation to obtain various analysis results of the program.
 % create a database for a program, we can evaluate multiple queries on it without
 % re-creation to obtain various analysis results of the program.
 
-\inred{(Maybe we don't need this paragraph?)}
-Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
-The x-axis denotes the labels of apps and the y-axis denotes the analysis
-time in seconds. We omit eight apps \lees failed to analyze.
-\lees analyzed 12 apps faster than \ours, but the difference is
-less than two minutes. On the other hand,
-\ours analyzed five apps faster than \lees, and \lees took much time
-in summary generation for three apps of them. In 
-addition, while \lees failed to analyze all the large-scale apps that have
-more than about 400,000 lines of code in eight hours,
-\ours analyzed about three million lines of
-code in about ten minutes.
+%\inred{(Maybe we don't need this paragraph?)}
+%Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
+%The x-axis denotes the labels of apps and the y-axis denotes the analysis
+%time in seconds. We omit eight apps \lees failed to analyze.
+%\lees analyzed 12 apps faster than \ours, but the difference is
+%less than two minutes. On the other hand,
+%\ours analyzed five apps faster than \lees, and \lees took much time
+%in summary generation for three apps of them. In 
+%addition, while \lees failed to analyze all the large-scale apps that have
+%more than about 400,000 lines of code in eight hours,
+%\ours analyzed about three million lines of
+%code in about ten minutes.
 
 % Figure~\ref{fig:graph} shows the analysis time of \ours compared to
 % JN-Sum. Out of \inred{17} apps except for \inred{8} apps JN-Sum failed to
@@ -226,23 +219,24 @@ was not properly propagated to Python.
 
 \textbf{Github}
 Table~\ref{table:RQ1-4} summarizes the dataflow analysis results for six public
-repositories in github that contain extension modules.
-The first column shows repository names, the second to the fourth columns
-show database creation time of C, Java, and their merged database,
-respectively, the fifth shows query processing time, and the sixth shows the
-total analysis time.  The last coulmn denotes the analysis result if
-applicable. {\bf \#Total} denotes the total number of target API function
-calls. The target API functions are extension module API function calls where
-its first arguments are expected to be Python object.  The target functions are
-selected by finding function calls with prefix \ccode{PyObject\_},
-\ccode{PyList\_}, \ccode{PyTuple\_}, \ccode{PyDict\_}, and \ccode{PyArg\_}.
-{\bf \#Resoved} denothes whether the analyzer could find the python object that
-flows into the argument of each API function calls.
+repositories in github that contain extension modules.  The first column shows
+repository names, the second to the fourth columns show database creation time
+of C, Java, and their merged database, respectively, the fifth shows query
+processing time, and the sixth shows the total analysis time.  The last coulmn
+denotes the analysis result if applicable. {\bf \#Total} denotes the total
+number of target API function calls. The target API functions are extension
+module API function calls where its first arguments are expected to be Python
+object.  The target functions are selected by finding function calls with
+prefix \ccode{PyObject\_}, \ccode{PyList\_}, \ccode{PyTuple\_},
+\ccode{PyDict\_}, and \ccode{PyArg\_}.  {\bf \#Resoved} denothes whether the
+analyzer could find the python object that flows into the argument of each API
+function calls.
 
-The analysis time is dominated by python analysis. When CodeQL performs analysis for python,
-it creates database for every builtin libraries of python, and some predicates are
-also evaluated on this database. The improvement in performance of CodeQL's Python analysis
-would also make our extended multilingual analyzer run faster.
+The analysis time is dominated by python analysis.  When CodeQL performs
+analysis for python, it creates database for every builtin libraries of python,
+and some predicates are also evaluated on this database. The improvement in
+performance of CodeQL's Python analysis would also make our extended
+multilingual analyzer run faster.
 
 The analysis result was applicable for three out of six benchmarks.
 One of them, {\it python-Levenshtein} did not contain the Python code
