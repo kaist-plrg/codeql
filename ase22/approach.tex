@@ -16,23 +16,23 @@ static analysis for multilingual programs.
 
 \subsection{Declarative Analysis for a Single Language}
 
-A declarative analysis~\cite{doop} consists of facts and rules, and queries:
-\[
-  \begin{array}{llll}
-f & ::= & p(\overline{elem | x}) & \mbox{fact}\\
-r & ::= & f\ \mbox{:-}\ \overline{\neg^? f} & \mbox{rule}\\
-q & ::= & \mbox{?-} \overline{f}\ &  \mbox{query}
-\end{array}
-\]
-A fact ``$f = p(\overline{elem | x})$'' denotes a relation $p$
-between elements $\overline{elem}$ or variables $\overline{x}$.
-A rule ``$r = f'\ \mbox{:-}\ \overline{\neg^? f}$'' denotes that
-a fact $f'$ can be derived from other facts $\overline{f}$;
-$f'$ holds if all the facts $d \in \{\overline{\neg^? f}\}$ hold
-and all the facts $\neg d \in \{\overline{\neg^? d}\}$ does not hold.
-A query ``$\mbox{?-} \overline{f}$'' outputs all possible mappings from
-variables to elements, such that it will make all facts in $\overline{f}$ hold.
-
+%A declarative analysis~\cite{doop} consists of facts and rules, and queries:
+%\[
+%  \begin{array}{llll}
+%f & ::= & p(\overline{elem | x}) & \mbox{fact}\\
+%r & ::= & f\ \mbox{:-}\ \overline{\neg^? f} & \mbox{rule}\\
+%q & ::= & \mbox{?-} \overline{f}\ &  \mbox{query}
+%\end{array}
+%\]
+%A fact ``$f = p(\overline{elem | x})$'' denotes a relation $p$
+%between elements $\overline{elem}$ or variables $\overline{x}$.
+%A rule ``$r = f'\ \mbox{:-}\ \overline{\neg^? f}$'' denotes that
+%a fact $f'$ can be derived from other facts $\overline{f}$;
+%$f'$ holds if all the facts $d \in \{\overline{\neg^? f}\}$ hold
+%and all the facts $\neg d \in \{\overline{\neg^? d}\}$ does not hold.
+%A query ``$\mbox{?-} \overline{f}$'' outputs all possible mappings from
+%variables to elements, such that it will make all facts in $\overline{f}$ hold.
+%
 Figure~\ref{fig:ov1} presents the overview of how a
 declarative-style analysis works for monolingual programs.
 The analysis consists of three steps.
