@@ -1,5 +1,4 @@
 \section{Background}\label{sec:background} 
-
 \begin{figure}[t]
   \centering
   \vspace{2mm}
@@ -10,13 +9,20 @@
 %\vspace*{-.5em}
 \end{figure}
 
-Figure~\ref{fig:ov1} presents the overview of how a declarative style analysis
-works.  The analysis consists of three steps.  First, a given program gets
-converted into database of syntactic facts.  Second, the rules that generate
-new facts are defined, and a declarative language engine evaluates the rules
-with the given facts, producing new facts.  Finally, the query is executed to
-extract all the facts that meet certain conditions, which correspond to the
-analysis result.
+Figure~\ref{fig:ov1} presents the overview of how a declarative-style
+analysis works.  The analysis consists of three steps.  First, a given program
+gets converted into syntactic facts.  Second, the rules that generate new facts
+are defined, which correspond to the implementation of the analysis.  Finally,
+the query system takes a sequence of queries and evaluates the rules with the
+given facts, producing an analysis result for the queries.
+
+%Figure~\ref{fig:ov1} presents the overview of how a declarative style analysis
+%works. The analysis consists of three steps.  First, a given program gets
+%converted into database of syntactic facts.  Second, the rules that generate
+%new facts are defined, and a declarative language engine evaluates the rules
+%with the given facts, producing new facts.  Finally, the query is executed to
+%extract all the facts that meet certain conditions, which correspond to the
+%analysis result.
 
 \textbf{Step 1: Extracting syntactic facts.}
 The first step is to extract syntactic facts from a given source code.
@@ -24,20 +30,19 @@ Syntactic facts include facts about certain AST nodes and
 the parent-child relationship between nodes. For example, consider
 the following code:
 
-\begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+\begin{lstlisting}[style=mcpp]
 function f() {
   return 42;
 }
 \end{lstlisting}
-We can define a syntactic fact of the form {\tt FunctionAt(ln, name)},
-where {\tt ln} denotes the line number and {\tt name}
-denotes a name of the function defined at line {\tt ln}.
-Therefore, we can extract the fact {\tt FunctionAt(1, "f")}.
-Another example syntactic fact is {\tt EnclosingStmt(ln1, ln2, i)},
-which denotes that the function at line {\tt ln1} has the statement
-at line {\tt ln2} as the {\tt i}-th subexpression.
-For example, we can extract the following syntactic facts:
-{\tt EnclosingStmt(1, 2, 0)}.
+We can define a syntactic fact of the form {\tt FunctionAt(ln, name)}, where
+{\tt ln} denotes the line number and {\tt name} denotes a name of the function
+defined at line {\tt ln}.  Therefore, we can extract the fact {\tt
+FunctionAt(1, "f")}.  Another example syntactic fact is {\tt EnclosingStmt(ln1,
+ln2, i)}, which denotes that the function at line {\tt ln1} has the statement
+at line {\tt ln2} as the {\tt i}-th statement in the function body.  For
+example, we can extract the following syntactic facts: {\tt EnclosingStmt(1, 2,
+0)}.
 
 In a sense, these syntactic facts serve as building blocks for the
 common Intermediate Representation (IR) of multiple languages.
@@ -53,20 +58,45 @@ without re-extracting them from the source code.
 
 \textbf{Step 2: Defining rules.}
 The next step is to define rules to generate new facts out of known facts.
-%This step corresponds to actually implementing the algorithm of a
-%static analysis in a declarative style.
-For example, recall that we can define a call graph
-{\tt CallEdge(l1, l2)} using the facts
-named {\tt FunctionAt} and {\tt CallAt}.
-The defined rules are evaluated with declarative engines to finding all possible
-facts that can be derived. The rules are usually evaluated in a bottom-up
-and modular manner. Each rule is evaluated one-by-one, after every
-rule it depends on is evaluated. 
+This step corresponds to actually implementing the algorithm of a static
+analysis in a declarative style.  For example, we can define a dataflow
+analysis {\tt Flow(x, z)},  which denotes that there is a dataflow from {\tt x}
+to {\tt z}, where {\tt x} and {\tt z} represents a program entity that can hold
+a run-time value, such as a variable, a literal, and a function parameter.  We
+can define the rule for this fact as the transitive closure of the fact named
+{\tt Step}:
+
+\begin{lstlisting}
+Flow(x, z) :- Step(x, z)
+Flow(x, z) :- Step(x, y), Flow(y, z)
+\end{lstlisting}
+
+\noindent
+where {\tt Step(x, z)} denotes a direct data flow from {\tt x} to {\tt z}. The
+rule derives a new fact {\tt Flow(x, z)} if there is a fact {\tt Step(x, z)} or
+there are two facts {\tt Step(x, y)} and {\tt Flow(y, z)}.
+
+%The next step is to define rules to generate new facts out of known facts.
+%%This step corresponds to actually implementing the algorithm of a
+%%static analysis in a declarative style.
+%For example, recall that we can define a call graph
+%{\tt CallEdge(l1, l2)} using the facts
+%named {\tt FunctionAt} and {\tt CallAt}.
+%The defined rules are evaluated with declarative engines to finding all possible
+%facts that can be derived. The rules are usually evaluated in a bottom-up
+%and modular manner. Each rule is evaluated one-by-one, after every
+%rule it depends on is evaluated. 
 
 \textbf{Step 3: Performing queries.}
-The final step is to perform queries via query system.
-The result of the query corresponds to actual result of client analysis.
-A query consists of set of facts, where some of the facts would have
-varaibles as arguments. Given a query, the query sytem will find all possible
-assignment on variables, that will make every facts would hold under
-the assignment.
+The final step is to simply evaluate the defined rules with the given facts.
+The query system evaluates the rules to find all possible facts that can be
+derived, and produces an analysis result for queries. The rules are usually
+evaluated in a bottom-up and modular manner, that is, each rule is evaluated
+one-by-one, after every rule it depends on is evaluated.
+
+%The final step is to perform queries via query system.
+%The result of the query corresponds to actual result of client analysis.
+%A query consists of set of facts, where some of the facts would have
+%varaibles as arguments. Given a query, the query sytem will find all possible
+%assignment on variables, that will make every facts would hold under
+%the assignment.
