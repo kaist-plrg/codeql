@@ -1,5 +1,23 @@
 \section{Related Work}\label{sec:related}
-\subsection{Static Analysis for JNI Programs}
+
+\subsection{Declarative-Style Analysis}
+Declarative-style analysis alleviates the challenges in crafting a static program
+analyzer, and thus, Datalog~\cite{allen2015D, allen2015stagedD, alpuente2010D,
+doop, dawson1996D, naik2006D, reps1994D, smaragdakis2014D, whaley2005D} has
+become a promising DSL for static analysis~\cite{scholz2016}.
+The \doop framework~\cite{doop} using Datalog showed
+dramatic speedups for the Java points-to analysis.  The
+modularity and declarativeness of Datalog rules are keys in performance
+improvement~\cite{doopWorkshop}.  Researchers also have improved static
+analysis backends using declarative language engines~\cite{whaley2005D,
+hoder2011muz, souffle, madsen2016}.  Avgustinov et al.~\cite{ql2016} proposed
+QL, a declarative and object-oriented query language that can be compiled into
+Datalog and runs on a relational database. Using QL, they developed a static
+analyzer that is scalable to large-size programs with millions of lines of
+code.  Our approach inherits the benefits from the approach and
+extends analysis targets from monolingual to multilingual programs.
+
+\subsection{Static Analysis for Multilingual Programs}
 For JNI program analysis, ILEA~\cite{ILEA} extends
 the Java Virtual Machine Language (JVML) and Jlint, a dataflow analyzer for
 Java bytecode, to compile both Java and C code to the extended JVML and analyze
@@ -11,10 +29,11 @@ proposed a general approach to analyzing multilingual programs written in both
 language analyzer to extract semantics summaries from the parts written in the
 guest language, C in their implementation, translates and integrates the
 summaries into a host language, Java, and then performs the whole-program
-analysis using a host language analyzer.  While their approach leverages the
-full features of existing static analyzers, \ours inherits the query-based
-analysis and can compute target properties effectively without expensive and
-redundant computation.
+analysis using a host language analyzer. 
+%While their approach leverages the
+%full features of existing static analyzers, \ours inherits the query-based
+%analysis and can compute target properties effectively without expensive and
+%redundant computation.
 
 Researchers also studied binaries rather than C/C++ source code
 for JNI program analysis.  \citet{scanning} proposed a lightweight reverse engineering technique to
@@ -28,13 +47,12 @@ unified dataflow summary to represent dataflows in both Java bytecode and
 binary.  It extracts summaries from each Java method with a Java static
 analyzer and from each native function with a binary symbolic execution, and
 composes the summaries in a bottom-up manner to find data leakages over
-language boundaries.  It sacrifices the performance to analyze every possible
-dataflow from binaries using the expensive symbolic execution. On the contrary, our
-approach is scalable in that the query-based approach analyzes only necessary
-dataflows when C source code is available.
+language boundaries.
+%It sacrifices the performance to analyze every possible
+%dataflow from binaries using the expensive symbolic execution. On the contrary, our
+%approach is scalable in that the query-based approach analyzes only necessary
+%dataflows when C source code is available.
 
-
-\subsection{Static Analysis for Other FFIs}
 Android supports an FFI between Java and JavaScript.  Android hybrid apps are
 written in both Java and JavaScript, taking advantage of the portability from
 JavaScript and device resource accessibility from Java.
@@ -54,22 +72,4 @@ Recent work~\cite{sas2021} proposed a Python-C analyzer by reusing existing
 Python and C analyzers built on top of the same framework, MOPSA~\cite{Mopsa}.
 They leverage the full features of the analyzers within the same framework to
 perform precise context-sensitive value analyses. On the contrary, our work focuses
-on query-based bug detection for large-scale multilingual programs. 
-
-
-\subsection{Declarative-Style Analysis}
-Declarative-style analysis alleviates the challenges in crafting a static program
-analyzer, and thus, Datalog~\cite{allen2015D, allen2015stagedD, alpuente2010D,
-doop, dawson1996D, naik2006D, reps1994D, smaragdakis2014D, whaley2005D} has
-become a promising DSL for static analysis~\cite{scholz2016}.
-The \doop framework~\cite{doop} using Datalog showed
-dramatic speedups for the Java points-to analysis.  The
-modularity and declarativeness of Datalog rules are keys in performance
-improvement~\cite{doopWorkshop}.  Researchers also have improved static
-analysis backends using declarative language engines~\cite{whaley2005D,
-hoder2011muz, souffle, madsen2016}.  Avgustinov et al.~\cite{ql2016} proposed
-QL, a declarative and object-oriented query language that can be compiled into
-Datalog and runs on a relational database. Using QL, they developed a static
-analyzer that is scalable to large-size programs with millions of lines of
-code.  Our approach inherits the benefits from the approach and
-extends analysis targets from monolingual to multilingual programs.
+on dataflow analysis on multilingual programs. 
