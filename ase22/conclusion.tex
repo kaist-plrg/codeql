@@ -1,12 +1,15 @@
 \section{Conclusion}\label{sec:conclude}
 In this paper, we suggested the methodology of extending a declarative style
 anlyzer that targets multiple languages into a analyzer that can analyze the
-multilingual programs. Our approach is inspired from the observation that the
-
-
+multilingual programs. First we create the database of fact that can be divided
+into multiple logical language spaces, where each language space consists of
+original facts. Then we define additional language-interoperation rules that
+will generate the facts that reflect interoperation semantics between languages.
+Finally, we perform the original query to obtain the analysis result.
 Based on this approach, we build our prototype implementation \ours on top of
-CodeQL.  Using \ours, Also, we find 33 true bugs and vulnerabilities from
-real-world applications, 12 of which are from applications that \lees failed to
-detect.  We believe that our approach is applicable to analysis for other kinds
-of multilingual programs beyond Java-C or Python-C, and to various types of
-analysi beyond dataflow analysis.
+CodeQL.  Using \ours, we could sucessfully perform dataflow analysis on various
+benchmark suites of JNI programs and extension module programs.  Also, we find
+33 true bugs and vulnerabilities from real-world applications, 12 of which are
+from applications that \lees failed to detect.  We believe that our approach is
+applicable to analysis for other kinds of multilingual programs beyond Java-C
+or Python-C, and to various types of analysi beyond dataflow analysis.
