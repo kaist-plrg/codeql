@@ -1,0 +1,21 @@
+\begin{table*}[t]
+  \vspace{2mm}
+  \caption{Analysis results of the real-world extension module programs}
+  \label{table:RQ1-4}
+  \vspace*{-1em}
+  \centering
+  \small
+\renewcommand{\arraystretch}{.9}
+  \begin{tabular}{l||r|r|r|r|r||r|r}
+    \multirow{3}{*}{\textbf{Repository}} & \multicolumn{5}{c||}{\textbf{Time (sec.)}} & \multicolumn{2}{c}{\multirow{2}{*}{\textbf{API function calls}}} \\\hhline{~||-----||~~}
+    & \multicolumn{3}{c|}{\textbf{DB Creation}} & \multicolumn{1}{c|}{\multirow{2}{*}{\textbf{Query}}} & \multicolumn{1}{c||}{\multirow{2}{*}{\textbf{Total}}} & \multicolumn{2}{c}{}  \\\hhline{~||---~|~||--}
+    & \multicolumn{1}{c|}{\textbf{C}} & \multicolumn{1}{c|}{\textbf{Python}} & \multicolumn{1}{c|}{\textbf{Merged}} & \multicolumn{1}{c|}{} & \multicolumn{1}{c||}{} & \multicolumn{1}{c|}{\textbf{\# Resolved}} & \multicolumn{1}{c}{\textbf{\# Total}} \\\hhline{=#*{4}{=|}=#=|=}
+  1. bitarray           & 19.378 & 3.082 & 13.537 & 197.556 & 233.553 & 38 & 50 \\
+  2. distance           & 16.722 & 2.354 & 11.594 & 134.895 & 165.565 & -  & -  \\
+  3. noise              & 18.79  & 2.43  & 12.222 & 148.021 & 181.463 & -  & -  \\
+  4. pyahocorasick      & 19.179 & 2.62  & 13.118 & 172.62  & 207.537 & 33 & 43 \\
+  5. python-Levenshtein & 17.187 & 3.144 & 12.686 & 153.95  & 186.967 & -  & -  \\
+  6. python-llist       & 17.047 & 2.853 & 11.986 & 153.014 & 184.9   & 18 & 30 \\\hhline{=#*{4}{=}=#=|=}
+    \textbf{Total}       & \multicolumn{1}{r}{}  & \multicolumn{1}{r}{}     & \multicolumn{1}{r}{}       & \multicolumn{1}{r}{}                       & \multicolumn{1}{r||}{}                    & 89                         & 123                          
+  \end{tabular}
+\end{table*}

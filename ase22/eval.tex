@@ -1,5 +1,5 @@
 \newcommand{\req}[1]{RQ#1}
-\input{tableRQ1}
+\input{tableRQ1-1}
 
 \section{Evaluation}\label{sec:eval}
 
@@ -13,34 +13,37 @@ To show the effectiveness of our approach, we evaluate our analyzer
     the state-of-the-art multilingual program analyzers can detect?
 \end{itemize}
 
-For \req{1}, we perform dataflow analysis on set of four benchmarks using \ours.
-Two benchmarks are for JNI programs.
-The first benchmark is NativeFlowBench~\cite{nativeflowbench,
-JN-SAF} which is created by authors of JN-SAF as a benchmark for
-dataflow analysis of JNI programs. It contains 23 JNI Android applications (apps) that
-use various JNI interoperations and sensitive data leakage from {\it sources} to
-{\it sinks} across language boundaries via the interoperations.
-We compare
-the analysis results of \ours to the results of JN-Sum and JN-SAF. We use
-compiled versions of the benchmarks for JN-SAF because it targets compiled JNI
-programs and uses the source code of the benchmarks for \ours and JN-Sum.
-The second benchmark consists of real-world JNI Android apps downloaded from F-Droid, a repository of
-open-source Android apps~\cite{fdroid}.
-%We first classified
-%F-Droid apps into JNI and non-JNI apps. Then, we selected
-%all 42 apps that can be compiled without any errors as our analysis targets.
-Another two benchmarks are for extension module programs.
-The first bench is ExtModuleFlowBench which contains 20
-extension moudle programs. We created this benchmark by
-referring to NativeFlowBench. We converted each app in 
-NativeFlowBench into corresponding extension module programs, except for
-the apps that contains JNI-Specific interoperation features. Instead, several new programs
-that reflect the extension module-specific interoperations are added to ExtModuleFlowBench.
-Similar to NativeFlowBench, the programs contain hypothetical API calls
-named SOURCE() and SINK(), and the value from SOURCE can flow to function
-call of SINK across language boundary.
-The second benchmark consists of 6 public github repositories that implement extension modules.
-Each repository consists of the library that is written in C, and test codes that is written in Python.
+For \req{1}, we perform dataflow analysis on four benchmark suitess using \ours.
+Two benchmark suites are for JNI programs.
+The first benchmark suite is NativeFlowBench~\cite{nativeflowbench, JN-SAF} which is
+created by authors of JN-SAF for benchmarking for dataflow analysis of JNI
+programs. It contains 23 JNI Android applications (apps) that use various JNI
+interoperations and sensitive data leakage from {\it sources} to {\it sinks}
+across language boundaries via the interoperations.  We compare the analysis
+results of \ours to the results of JN-Sum and JN-SAF. We use compiled versions
+of the benchmarks for JN-SAF because it targets compiled JNI programs and uses
+the source code of the benchmarks for \ours and JN-Sum.
+The second benchmark suite consists of real-world JNI Android apps downloaded from
+F-Droid, a repository of open-source Android apps~\cite{fdroid}.  We first
+classified F-Droid apps into JNI and non-JNI apps. Then, we selected all 42
+apps that can be compiled without any errors as our analysis targets.
+
+Another two benchmark suites are for extension module programs.  The first
+benchmark suite is ExtModuleFlowBench which contains 20 extension moudle
+programs. We created this benchmark suite by referring to NativeFlowBench. We
+converted each app in NativeFlowBench into corresponding extension module
+programs, except for the apps that contains JNI-Specific interoperation
+features. Instead, programs that reflect the extension
+module-specific interoperations are added to ExtModuleFlowBench.  Similar to
+NativeFlowBench, the programs contains various forms of dataflow from
+hypothetical {\it sources} to {\it sinks} across language boundary.
+The second benchmark suite consists of 6 public github repositories that
+implement extension modules.  Each repository consists of the library that is
+written in C, and test codes that are written in Python. The test codes
+import the library code and simply call various functions in C. The benchmark is
+selected referring to the existing mulitilingual analyzer for C and
+python~\cite{}. The target analysis here is to find the possible python
+object values that can flow into the arguments of specific API function calls in C.
 
 For \req{2}, we specifically detect JNI interoperation bugs in the 42 real-world Android
 apps using \ours. We implemented a checker detecting four kinds of
@@ -50,7 +53,9 @@ analysis of the previous research~\cite{LeeASE20, ILEA}.
 % Mention reason for not using python? (benchmark = lib-testcode => no place for bug)
 
 \subsection{\req{1}: Feasibility}
-\textbf{NativeFlowBench} Table~\ref{table:RQ1} summarizes the analysis results of \ours, JN-Sum,
+We demonstrate the analysis result on 4 benchmark suites.
+
+\textbf{NativeFlowBench} Table~\ref{table:RQ1-1} summarizes the analysis results of \ours, JN-Sum,
 and \jnsaf on 23 benchmarks in NativeFlowBench.
 The {\bf Benchmark} columns show the benchmark names,
 {\bf Precision} show the analysis results of 
@@ -85,7 +90,7 @@ Android apps, FlowDroid cannot find entries from which its analysis starts.
   Contrary to JN-Sum, \ours performs a query-based
 analysis, which can resolve the targets of foreign function calls regardless of program entries.
 
-\input{tableRQ2}
+\input{tableRQ1-2}
 
 In the dataflow comparison, \ours found data leakages correctly in 20
 benchmarks but reported false negatives for three benchmarks, while JN-SAF
@@ -106,7 +111,7 @@ track dataflows on arrays, \ours does not report
 a false alarm for {\it native\_noleak\_array} but cannot find the leakage in {\it
 native\_leak\_array}.
 
-\textbf{F-Droid} Table~\ref{table:RQ2} summarizes the analysis results of \ours on real-world Android JNI apps.
+\textbf{F-Droid} Table~\ref{table:RQ1-2} summarizes the analysis results of \ours on real-world Android JNI apps.
 Out of 42 apps we analyzed, we show the analysis
 results of 25 apps that have interoperations from C to Java\footnote{We
 report the full analysis results in our supplementary material.}.
@@ -147,8 +152,6 @@ not track dataflows on C function pointers and arrays, \ours failed to analyze
 method or field IDs necessary to resolve the JNI uses.
 
 
-
-
 \begin{figure}[t]
   \centering
   \vspace{2mm}
@@ -172,7 +175,7 @@ re-creation to obtain various analysis results of the program.
 % create a database for a program, we can evaluate multiple queries on it without
 % re-creation to obtain various analysis results of the program.
 
-
+\inred{(Maybe we don't need this paragraph?)}
 Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
 The x-axis denotes the labels of apps and the y-axis denotes the analysis
 time in seconds. We omit eight apps \lees failed to analyze.
@@ -205,11 +208,12 @@ code in about ten minutes.
 Table~\ref{table:RQ1-3} summarizes the analysis results of \ours.
 The {\bf Benchmark} columns show the benchmark names,
 and {\bf Dataflow} columns show the analysis results of \ours.
-The analysis succeeds if it reports all data flow from SOURCE() to SINK() without any false positives or negatives.
+The analysis succeeds if it reports all dataflow from {\it source} to {\it sink} without any false positives or negatives.
 The dataflow is analyzed correctly in 14
 benchmarks but failures were reported for six benchmarks.
-Among six failures, the reason for two of them,
-{\it complexdata\_stringop} and {\it leak\_array}, are already discussed.
+Among six failures two of them,
+{\it complexdata\_stringop} and {\it leak\_array},
+are already discussed in NativeFlowBench section.
 Additional four failures, {\it set\_field\_from*} and {\it source\_clean}
 are due to use of virtual args. In these benchmarks, a python object is
 passed to a C function as an argument. The C function modifies the field
@@ -218,11 +222,47 @@ usually correctly handles this kind of side effect. However, the use of virtual 
 in these benchmarks was not properly reflected, and the modifications made in C function
 was not properly propagated to Python.
 
-\textbf{Github Repository with Extension Modules}
+\input{tableRQ1-4}
+
+\textbf{Github}
+Table~\ref{table:RQ1-4} summarizes the dataflow analysis results for six public
+repositories in github that contain extension modules.
+The first column shows repository names, the second to the fourth columns
+show database creation time of C, Java, and their merged database,
+respectively, the fifth shows query processing time, and the sixth shows the
+total analysis time.  The last coulmn denotes the analysis result if
+applicable. {\bf \#Total} denotes the total number of target API function
+calls. The target API functions are extension module API function calls where
+its first arguments are expected to be Python object.  The target functions are
+selected by finding function calls with prefix \ccode{PyObject\_},
+\ccode{PyList\_}, \ccode{PyTuple\_}, \ccode{PyDict\_}, and \ccode{PyArg\_}.
+{\bf \#Resoved} denothes whether the analyzer could find the python object that
+flows into the argument of each API function calls.
+
+The analysis time is dominated by python analysis. When CodeQL performs analysis for python,
+it creates database for every builtin libraries of python, and some predicates are
+also evaluated on this database. The improvement in performance of CodeQL's Python analysis
+would also make our extended multilingual analyzer run faster.
+
+The analysis result was applicable for three out of six benchmarks.
+One of them, {\it python-Levenshtein} did not contain the Python code
+that properly uses C code of extension module and thus the analysis was not applicable.
+Two of them, {\it distance} and {\it noise} were excluded due to limitation
+of CodeQL's python analysis. The use pattern of imported modules in these benchmarks
+showed highly complex behavior, and CodeQL could not handle such behaviors to properly pass the value
+across modules. In other words, CodeQL would not have been able to find correct dataflow, even
+if the C code is replaced with the python code with same functionality.
+For three benchmarks that were applicable, among 123 API function calls, the argument was
+resolved for 89 of them (72.4\%). The reason for unresolved arguments were
+mainly due to C functions that are implicitly called. For example, one can register
+a C function that is called when a python object is deallocated, but the explicit
+call site that call this function does not exist, there is not any value that
+flows into the parameter of this function. Therefore, any API function calls insde this
+destructor function can not resolve the target.
 
 
 \subsection{RQ2: Usefulness}
-\input{tableRQ3}
+\input{tableRQ2}
 The bug checker of \ours detects four kinds of JNI interoperation bugs
 that previous research~\cite{ILEA, LeeASE20} defined as follows:
 
@@ -314,7 +354,7 @@ mSendStr = (*env)->GetMethodID(env, jNativesCls,
   \vspace*{-1em}
 \end{figure}
 
-Table~\ref{table:RQ3} summarizes the bug detection results of 19 out of 42
+Table~\ref{table:RQ2} summarizes the bug detection results of 19 out of 42
 apps, on which \ours reported possible bugs.  The first
 column shows app names, the second and the third columns show the
 number of true and false positives for {\it NullDereference}, respectively, and
