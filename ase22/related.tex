@@ -18,7 +18,7 @@ code.  Our approach inherits the benefits from the approach and
 extends analysis targets from monolingual to multilingual programs.
 
 \subsection{Static Analysis for Multilingual Programs}
-For JNI program analysis, ILEA~\cite{ILEA} extends
+For Java-C program analysis, ILEA~\cite{ILEA} extends
 the Java Virtual Machine Language (JVML) and Jlint, a dataflow analyzer for
 Java bytecode, to compile both Java and C code to the extended JVML and analyze
 the integrated programs.  Since the modest extension of JVML cannot
@@ -36,7 +36,7 @@ analysis using a host language analyzer.
 %redundant computation.
 
 Researchers also studied binaries rather than C/C++ source code
-for JNI program analysis.  \citet{scanning} proposed a lightweight reverse engineering technique to
+for Java-C program analysis.  \citet{scanning} proposed a lightweight reverse engineering technique to
 recover Java method calls from binaries instead of performing heavy analyses on
 binary code.  Their reverse engineering generates datafacts of Java method
 calls from binaries, which can be used in further declarative-style Java
@@ -71,5 +71,6 @@ Developers often import performance-critical C code to high-level Python code.
 Recent work~\cite{sas2021} proposed a Python-C analyzer by reusing existing
 Python and C analyzers built on top of the same framework, MOPSA~\cite{Mopsa}.
 They leverage the full features of the analyzers within the same framework to
-perform precise context-sensitive value analyses. On the contrary, our work focuses
-on dataflow analysis on multilingual programs. 
+perform precise context-sensitive value analyses. 
+On the contrary, our work focuses on declarative style dataflow analysis on
+multilingual programs. 
