@@ -6,60 +6,133 @@
 To show the effectiveness of our approach, we evaluate our analyzer
 \ours with the following two research questions:
 \begin{itemize}
-  \item \textbf{\req{1}: Feasibility.} Can \ours correctly analyze multilingual programs that use
-    various interoperations?
+  \item \textbf{\req{1}: Feasibility.} Can \ours correctly analyze multilingual
+    programs that use various interoperations?
 
-  \item \textbf{\req{2}: Usefulness.} Can \ours detect the dataflow related bugs that
-    the state-of-the-art multilingual program analyzers can detect?
+  \item \textbf{\req{2}: Usefulness.} Can \ours detect the dataflow related
+    bugs that the state-of-the-art multilingual program analyzers can detect?
 \end{itemize}
 
-For \req{1}, we perform dataflow analysis on four benchmark suitess using \ours.
-Two benchmark suites are for JNI programs.
-The first benchmark suite is NativeFlowBench~\cite{nativeflowbench, JN-SAF} which is
-created by authors of JN-SAF for benchmarking for dataflow analysis of JNI
-programs. It contains 23 JNI Android applications (apps) that use various JNI
+For \req{1}, we perform dataflow analysis on four benchmark suites using \ours.
+Two benchmark suites are for Java-C program analysis. 
+The first benchmark suite is NativeFlowBench~\cite{nativeflowbench, JN-SAF}
+which contains 23 JNI Android applications (apps) that use various JNI
 interoperations and sensitive data leakage from {\it sources} to {\it sinks}
-across language boundaries via the interoperations.  We compare the analysis
-results of \ours to the results of JN-Sum and JN-SAF. We use compiled versions
-of the benchmarks for JN-SAF because it targets compiled JNI programs and uses
-the source code of the benchmarks for \ours and JN-Sum.
-The second benchmark suite consists of real-world JNI Android apps downloaded from
+across language boundaries via the JNI interoperations.  We compare the analysis
+results of \ours to the results of the state-of-the-art Java-C program
+analyzers, JN-Sum~\cite{LeeASE20} and JN-SAF~\cite{JN-SAF}. We use compiled
+versions of the benchmarks for JN-SAF because it targets compiled JNI programs
+and uses the source code of the benchmarks for \ours and JN-Sum.  The second
+benchmark suite consists of real-world Java-C Android apps downloaded from
 F-Droid, a repository of open-source Android apps~\cite{fdroid}.  We first
-classified F-Droid apps into JNI and non-JNI apps. Then, we selected all 42
+classified F-Droid apps into Java-C and non-Java-C apps. Then, we selected all 42
 apps that can be compiled without any errors as our analysis targets.
 
-Another two benchmark suites are for extension module programs.  The first
-benchmark suite is ExtModuleFlowBench which contains 20 extension moudle
-programs. We created this benchmark suite by referring to NativeFlowBench. We
-converted each app in NativeFlowBench into corresponding extension module
-programs, except for the apps that contains JNI-Specific interoperation
-features. Instead, programs that reflect the extension
-module-specific interoperations are added to ExtModuleFlowBench.  Similar to
-NativeFlowBench, the programs contains various forms of dataflow from
-hypothetical {\it sources} to {\it sinks} across language boundary.
-The second benchmark suite consists of 6 public github repositories that
-implement extension modules.  Each repository consists of the library that is
-written in C, and test codes that are written in Python. The test codes
-import the library code and simply call various functions in C. The benchmark is
-selected referring to the existing mulitilingual analyzer for C and
-python~\cite{}. The target analysis here is to find the possible python
-object values that can flow into the arguments of specific API function calls in C.
+The other two benchmark suites are for Python-C program analysis.  
+The first benchmark suite is ExtModuleFlowBench we developed, which contains 20
+Python-C programs.
+We converted each Java-C benchmark in the NativeFlowBench into a Python-C
+program, except for \inred{??} apps containing JNI-specific interoperation
+features, and made additional \inred{??} Python-C programs that contain Python
+Extension Module specific interoperations.
+The second benchmark suite consists of six real-world Python-C programs
+collected from public github repositories, which are analysis targets in the
+previous work~\cite{cpython}.
 
-For \req{2}, we specifically detect JNI interoperation bugs in the 42 real-world Android
-apps using \ours. We implemented a checker detecting four kinds of
-bugs on top of \ours using the query language of CodeQL. We chose our target
-JNI interoperation bugs as the same as the targets of the client
-analysis of the previous research~\cite{LeeASE20, ILEA}.
+%For \req{1}, we perform dataflow analysis on four benchmark suitess using \ours.
+%Two benchmark suites are for JNI programs.
+%The first benchmark suite is NativeFlowBench~\cite{nativeflowbench, JN-SAF} which is
+%created by authors of JN-SAF for benchmarking for dataflow analysis of JNI
+%programs. It contains 23 JNI Android applications (apps) that use various JNI
+%interoperations and sensitive data leakage from {\it sources} to {\it sinks}
+%across language boundaries via the interoperations.  We compare the analysis
+%results of \ours to the results of JN-Sum and JN-SAF. We use compiled versions
+%of the benchmarks for JN-SAF because it targets compiled JNI programs and uses
+%the source code of the benchmarks for \ours and JN-Sum.
+%The second benchmark suite consists of real-world JNI Android apps downloaded from
+%F-Droid, a repository of open-source Android apps~\cite{fdroid}.  We first
+%classified F-Droid apps into JNI and non-JNI apps. Then, we selected all 42
+%apps that can be compiled without any errors as our analysis targets.
+
+%Another two benchmark suites are for extension module programs.  The first
+%benchmark suite is ExtModuleFlowBench which contains 20 extension moudle
+%programs. We created this benchmark suite by referring to NativeFlowBench. We
+%converted each app in NativeFlowBench into corresponding extension module
+%programs, except for the apps that contains JNI-Specific interoperation
+%features. Instead, programs that reflect the extension
+%module-specific interoperations are added to ExtModuleFlowBench.  Similar to
+%NativeFlowBench, the programs contains various forms of dataflow from
+%hypothetical {\it sources} to {\it sinks} across language boundary.
+%The second benchmark suite consists of 6 public github repositories that
+%implement extension modules.  Each repository consists of the library that is
+%written in C, and test codes that are written in Python. The test codes
+%import the library code and simply call various functions in C. The benchmark is
+%selected referring to the existing mulitilingual analyzer for C and
+%python~\cite{}. The target analysis here is to find the possible python
+%object values that can flow into the arguments of specific API function calls in C.
+
+For \req{2}, we detect JNI interoperation bugs in the 42 real-world Android
+apps using \ours. 
+We implemented a checker detecting four kinds of bugs on top of \ours using the
+query language of CodeQL. We chose our target JNI interoperation bugs as the
+same as the targets of the client analysis of the previous
+research~\cite{LeeASE20, ILEA}.
 % Mention reason for not using python? (benchmark = lib-testcode => no place for bug)
 
 \subsection{\req{1}: Feasibility}
-We demonstrate the analysis result on 4 benchmark suites.
-
-\textbf{NativeFlowBench} Table~\ref{table:RQ1-1} summarizes the analysis results of \ours and \jnsaf on 23 benchmarks in NativeFlowBench.
-The {\bf Benchmark} columns show the benchmark names,
-and {\bf Dataflow} show the analysis results of JN-SAF and \ours.
+\textbf{NativeFlowBench.} Table~\ref{table:RQ1-1} summarizes the analysis
+results of \ours and \jnsaf on 23 benchmarks in NativeFlowBench.
+The {\bf Benchmark} columns show the benchmark names, and the {\bf Dataflow} columns show
+the analysis results of JN-SAF and \ours.
 We marked each analysis result as a success ($\bigcirc$) or failure ($\times$).
-An analysis succeeds if it reports all data leakages correctly without any false positives or negatives.
+An analysis succeeds if it reports all data leakages correctly without any
+false positives or negatives.
+
+\ours found data leakages correctly in 20 benchmarks but reported false
+negatives for three benchmarks, while JN-SAF analyzes 21 benchmarks correctly. 
+The one common failure comes from string concatenation.
+{\it native\_complexdata\_stringop} generates a Java field name by
+concatenating two string values via the {\tt strcat} built-in function.
+Because \ours does not handle such built-in function, it failed to analyze
+the benchmark.
+{\it icc\_javatonative} and {\it icc\_nativetojava} leak data via the Android
+inter-component communication that is beyond the scope of \ours.
+The remaining two different failures of \ours and JN-SAF come from their array
+analysis policies.
+{\it native\_leak\_array} stores sensitive data in an array, retrieves the data
+from the array, and leaks it.  
+On the other hand, {\it native\_noleak\_array} stores sensitive data in an
+array as well, but it retrieves another element from the array and uses it.
+Because analyzing different indices of an array is challenging, JN-SAF tracks
+every value retrieved from an array if the array contains sensitive data.
+Such over-approximation enables JN-SAF to analyze {\it native\_leak\_array}
+correctly but introduces a false alarm for {\it native\_noleak\_array}.  
+In contrast, because CodeQL does not track dataflows on arrays, \ours does not
+report a false alarm for {\it native\_noleak\_array} but cannot find the
+leakage in {\it native\_leak\_array}.
+
+%In the dataflow comparison, \ours found data leakages correctly in 20
+%benchmarks but reported false negatives for three benchmarks, while JN-SAF
+%analyzes 21 benchmarks correctly. 
+%The one common failure comes from string concatenation.
+%{\it native\_complexdata\_stringop} generates
+%a Java field name by concatenating two string values via the {\tt strcat} built-in function.
+%Because \ours and JN-Sum do not handle such built-in
+%function, they failed to analyze the benchmark.
+%{\it icc\_javatonative} and {\it icc\_nativetojava} leak data via the Android
+%inter-component communication that is beyond the scope of \ours.
+%The remaining two different failures of \ours and JN-SAF come from their array analysis policies.
+%{\it native\_leak\_array} stores sensitive data in an array, retrieves the data from the array,
+%and leaks it.  On the other hand, {\it native\_noleak\_array} stores sensitive
+%data in an array as well, but it retrieves another element from the array and uses it.
+%Because analyzing different indices of an array is challenging, JN-SAF
+%tracks every value retrieved from an array if the array contains sensitive data.
+%Such over-approximation enables JN-SAF to analyze {\it
+%native\_leak\_array} correctly but introduces a false alarm for {\it
+%native\_noleak\_array}.  In contrast, because CodeQL does not
+%track dataflows on arrays, \ours does not report
+%a false alarm for {\it native\_noleak\_array} but cannot find the leakage in {\it
+%native\_leak\_array}.
 
 %In the precision comparison, \ours successfully analyzed 21 out of 23
 %benchmarks, while JN-Sum failed in three more benchmarks than \ours.
@@ -81,56 +154,33 @@ An analysis succeeds if it reports all data leakages correctly without any false
 
 \input{tableRQ1-2}
 
-In the dataflow comparison, \ours found data leakages correctly in 20
-benchmarks but reported false negatives for three benchmarks, while JN-SAF
-analyzes 21 benchmarks correctly. 
-The one common failure comes from string concatenation.
-{\it native\_complexdata\_stringop} generates
-a Java field name by concatenating two string values via the {\tt strcat} built-in function.
-Because \ours and JN-Sum do not handle such built-in
-function, they failed to analyze the benchmark.
-{\it icc\_javatonative} and {\it icc\_nativetojava} leak data via the Android
-inter-component communication that is beyond the scope of \ours.
-The remaining two different failures of \ours and JN-SAF come from their array analysis policies.
-{\it native\_leak\_array} stores sensitive data in an array, retrieves the data from the array,
-and leaks it.  On the other hand, {\it native\_noleak\_array} stores sensitive
-data in an array as well, but it retrieves another element from the array and uses it.
-Because analyzing different indices of an array is challenging, JN-SAF
-tracks every value retrieved from an array if the array contains sensitive data.
-Such over-approximation enables JN-SAF to analyze {\it
-native\_leak\_array} correctly but introduces a false alarm for {\it
-native\_noleak\_array}.  In contrast, because CodeQL does not
-track dataflows on arrays, \ours does not report
-a false alarm for {\it native\_noleak\_array} but cannot find the leakage in {\it
-native\_leak\_array}.
-
-\textbf{F-Droid} Table~\ref{table:RQ1-2} summarizes the analysis results of \ours on real-world Android JNI apps.
-Out of 42 apps we analyzed, we show the analysis
-results of 25 apps that have interoperations from C to Java\footnote{We
-report the full analysis results in our supplementary material.}.
-The first column shows app names, the second to the fourth columns show database
-creation time of C, Java, and their merged database, respectively, the fifth
-shows query processing time, and the sixth shows the total analysis time.
-{\bf C->Java Function Call} and {\bf C->Java Field Access}
-show the numbers of C-to-Java function calls and
-C-to-Java field accesses, respectively. We collectively call them
-\emph{JNI uses}.
-The sub-columns {\bf \#Precise}, {\bf \#Resolved}, and {\bf Total}
-represent the numbers of precisely resolved, 
-resolved, and the total JNI uses, respectively.
-We considered a resolved JNI use as precise, when \ours finds a single target method
-or a single field at the JNI use.
+\textbf{Real-world Java-C Programs.} Table~\ref{table:RQ1-2} summarizes the
+analysis results of \ours on real-world Android Java-C apps.
+Out of 42 apps we analyzed, we show the analysis results of 25 apps that have
+interoperations from C to Java\footnote{We report the full analysis results in
+our supplementary material.}.
+The first column shows app names, the second to the fourth columns show
+database creation time of C, Java, and their merged database, respectively, the
+fifth shows query processing time, and the sixth shows the total analysis time.
+{\bf C->Java Function Call} and {\bf C->Java Field Access} show the numbers of
+C-to-Java function calls and C-to-Java field accesses, respectively. We
+collectively call them \emph{JNI uses}.
+The sub-columns {\bf \#Precise}, {\bf \#Resolved}, and {\bf Total} represent
+the numbers of precisely resolved, resolved, and the total JNI uses,
+respectively.
+We considered a resolved JNI use as precise, when \ours finds a single target
+method or a single field at the JNI use.
 
 
 \ours resolved 1,076 out of 1,171 (92\%) JNI uses, including 347 out of 404
 (86\%) C-to-Java function calls and 729 out of 767 (95\%) C-to-Java field
-accesses. In addition, 1,008 (86\%) resolved JNI uses are precise.
-The results show that \ours resolves more JNI uses
-even precisely than \lees. \lees failed to analyze one app
-because of an error, four apps due to the lack of memory spaces,
-and three apps even in eight hours.  In addition, \lees resolved
-71\% and precisely resolved 46\% of JNI uses in the remaining 17
-apps, which shows significantly imprecise results than \ours.
+accesses. 
+In addition, 1,008 (86\%) resolved JNI uses are precise.
+The results show that \ours resolves more JNI uses even precisely than \lees. 
+\lees failed to analyze one app because of an error, four apps due to the lack
+of memory spaces, and three apps even in eight hours.  
+In addition, \lees resolved 71\% and precisely resolved 46\% of JNI uses in the
+remaining 17 apps, which shows significantly imprecise results than \ours.
 %
 % The results
 % show that \ours resolves more JNI uses even precisley than JN-Sum. JN-Sum
@@ -139,10 +189,10 @@ apps, which shows significantly imprecise results than \ours.
 % addition, JN-Sum resolved 71\% and precisely resolved 46\% out of JNI uses in
 % the remaining \inred{17} apps, which shows significantly imprecise results
 % than \ours.
-\ours failed to resolve 95 (8\%) JNI uses because of complex
-language semantics such as arrays and function pointers.  Because CodeQL does
-not track dataflows on C function pointers and arrays, \ours failed to analyze
-method or field IDs necessary to resolve the JNI uses.
+\ours failed to resolve 95 (8\%) JNI uses because of complex language semantics
+such as arrays and function pointers.  
+Because CodeQL does not track dataflows on C function pointers and arrays,
+\ours failed to analyze method or field IDs necessary to resolve the JNI uses.
 
 
 %\begin{figure}[t]
@@ -155,31 +205,41 @@ method or field IDs necessary to resolve the JNI uses.
 %\vspace*{-1em}
 %\end{figure}
 
-\ours is scalable in that it can analyze large-scale programs. The analysis
-time was 161.3 seconds on average for each app, including 103.8 seconds for DB
-creation and 57.5 seconds for query processing.  DB creation took more time
-than query processing except for {\it Graph 89}, and the DB creation time was
-almost linear to the code size. \ours took about 12 minutes at most to analyze
-{\it Tileless Map} having about one million lines of code.
-Note that once we create a database
-for a program, we can evaluate multiple queries on it without
-re-creation to obtain various analysis results of the program.
+\ours is scalable in that it can analyze large-scale programs. 
+The analysis time was 161.3 seconds on average for each app, including 103.8
+seconds for DB creation and 57.5 seconds for query processing.  
+DB creation took more time than query processing except for {\it Graph 89}, and
+the DB creation time was almost linear to the code size. 
+\ours took about 12 minutes at most to analyze {\it Tileless Map} having about
+one million lines of code.
+Note that once we create a database for a program, we can evaluate multiple
+queries on it without re-creation to obtain various analysis results of the
+program.
 %   Note that once we
 % create a database for a program, we can evaluate multiple queries on it without
 % re-creation to obtain various analysis results of the program.
 
+\begin{figure}[t]
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.47\textwidth]{img/graph}
+  \vspace*{-.5em}
+  \caption{Analysis time of \ours and \lees}
+  \label{fig:graph}
+\vspace*{-1em}
+\end{figure}
+
 %\inred{(Maybe we don't need this paragraph?)}
-%Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
-%The x-axis denotes the labels of apps and the y-axis denotes the analysis
-%time in seconds. We omit eight apps \lees failed to analyze.
-%\lees analyzed 12 apps faster than \ours, but the difference is
-%less than two minutes. On the other hand,
-%\ours analyzed five apps faster than \lees, and \lees took much time
-%in summary generation for three apps of them. In 
-%addition, while \lees failed to analyze all the large-scale apps that have
-%more than about 400,000 lines of code in eight hours,
-%\ours analyzed about three million lines of
-%code in about ten minutes.
+Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
+The x-axis denotes the labels of apps and the y-axis denotes the analysis time
+in seconds. We omit eight apps \lees failed to analyze.
+\lees analyzed 12 apps faster than \ours, but the difference is less than two
+minutes. 
+On the other hand, \ours analyzed five apps faster than \lees, and \lees took
+much time in summary generation for three apps of them. 
+In addition, while \lees failed to analyze all the large-scale apps that have
+more than about 400,000 lines of code in eight hours, \ours analyzed about
+three million lines of code in about ten minutes.
 
 % Figure~\ref{fig:graph} shows the analysis time of \ours compared to
 % JN-Sum. Out of \inred{17} apps except for \inred{8} apps JN-Sum failed to
@@ -198,61 +258,116 @@ re-creation to obtain various analysis results of the program.
 \input{tableRQ1-3}
 
 \textbf{ExtModuleFlowBench}
-Table~\ref{table:RQ1-3} summarizes the analysis results of \ours.
-The {\bf Benchmark} columns show the benchmark names,
-and {\bf Dataflow} columns show the analysis results of \ours.
-The analysis succeeds if it reports all dataflow from {\it source} to {\it sink} without any false positives or negatives.
-The dataflow is analyzed correctly in 14
-benchmarks but failures were reported for six benchmarks.
-Among six failures two of them,
-{\it complexdata\_stringop} and {\it leak\_array},
-are already discussed in NativeFlowBench section.
-Additional four failures, {\it set\_field\_from*} and {\it source\_clean}
-are due to use of virtual args. In these benchmarks, a python object is
-passed to a C function as an argument. The C function modifies the field
-of this object, causing a side effect on the object. CodeQL dataflow library
-usually correctly handles this kind of side effect. However, the use of virtual arg model
-in these benchmarks was not properly reflected, and the modifications made in C function
-was not properly propagated to Python.
+Table~\ref{table:RQ1-3} summarizes the analysis results on 20 Python-C programs
+in ExtModuleFlowBench.
+The {\bf Benchmark} columns show the benchmark names, and {\bf Dataflow}
+columns show the analysis results of \ours.
+The analysis succeeds if it reports all dataflows from {\it source} to {\it
+sink} without any false positives or negatives.
+\ours tracked dataflows correctly in 14 benchmarks, but reported false
+negatives for six benchmarks.
+\ours failed in {\it complexdata\_stringop} and {\it leak\_array} due to the
+same reason in the NativeFlowBench result. 
+In the other four benchmarks, \ours failed to track dataflows for fields of
+Python objects. 
+The benchmarks change values of fields of Python objects in C code. 
+Because \ours does not handle such Python object modifications in C code, it
+reported false negatives in the benchmarks.
+
+
+%Table~\ref{table:RQ1-3} summarizes the analysis results of \ours.
+%The {\bf Benchmark} columns show the benchmark names,
+%and {\bf Dataflow} columns show the analysis results of \ours.
+%The analysis succeeds if it reports all dataflow from {\it source} to {\it sink} without any false positives or negatives.
+%The dataflow is analyzed correctly in 14
+%benchmarks but failures were reported for six benchmarks.
+%Among six failures two of them,
+%{\it complexdata\_stringop} and {\it leak\_array},
+%are already discussed in NativeFlowBench section.
+%Additional four failures, {\it set\_field\_from*} and {\it source\_clean}
+%are due to use of virtual args. In these benchmarks, a python object is
+%passed to a C function as an argument. The C function modifies the field
+%of this object, causing a side effect on the object. CodeQL dataflow library
+%usually correctly handles this kind of side effect. However, the use of virtual arg model
+%in these benchmarks was not properly reflected, and the modifications made in C function
+%was not properly propagated to Python.
 
 \input{tableRQ1-4}
 
-\textbf{Github}
-Table~\ref{table:RQ1-4} summarizes the dataflow analysis results for six public
-repositories in github that contain extension modules.  The first column shows
-repository names, the second to the fourth columns show database creation time
-of C, Java, and their merged database, respectively, the fifth shows query
-processing time, and the sixth shows the total analysis time.  The last coulmn
-denotes the analysis result if applicable. {\bf \#Total} denotes the total
-number of target API function calls. The target API functions are extension
-module API function calls where its first arguments are expected to be Python
-object.  The target functions are selected by finding function calls with
-prefix \ccode{PyObject\_}, \ccode{PyList\_}, \ccode{PyTuple\_},
-\ccode{PyDict\_}, and \ccode{PyArg\_}.  {\bf \#Resoved} denothes whether the
-analyzer could find the python object that flows into the argument of each API
-function calls.
+%\textbf{Github}
+\textbf{Real-world Python-C Programs.}
+Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on six
+real-world Python-C programs. 
+The first column shows repository names, the second to the fourth columns show
+database creation time of Python, C, and their merged database, respectively,
+the fifth shows query processing time, the sixth shows the total analysis time,
+and the last column denotes analysis results.
+{\bf \#Total} denotes the total number of Python Extension Module API function
+calls in C code. 
+%{\bf \#Resoved} denotes the number of API function calls of which the first
+%argument is identified correctly. 
+{\bf \#Resoved} denotes the number of resolved API function calls in C code.
+Because all the API functions take a Python object as the first argument, we
+counted an API function call as resolved, when \ours finds its first argument
+correctly. 
 
-The analysis time is dominated by python analysis.  When CodeQL performs
-analysis for python, it creates database for every builtin libraries of python,
-and some predicates are also evaluated on this database. The improvement in
-performance of CodeQL's Python analysis would also make our extended
-multilingual analyzer run faster.
+%Table~\ref{table:RQ1-4} summarizes the dataflow analysis results for six public
+%repositories in github that contain extension modules.  The first column shows
+%repository names, the second to the fourth columns show database creation time
+%of C, Java, and their merged database, respectively, the fifth shows query
+%processing time, and the sixth shows the total analysis time.  The last coulmn
+%denotes the analysis result if applicable. {\bf \#Total} denotes the total
+%number of target API function calls. The target API functions are extension
+%module API function calls where its first arguments are expected to be Python
+%object.  The target functions are selected by finding function calls with
+%prefix \ccode{PyObject\_}, \ccode{PyList\_}, \ccode{PyTuple\_},
+%\ccode{PyDict\_}, and \ccode{PyArg\_}.  {\bf \#Resoved} denothes whether the
+%analyzer could find the python object that flows into the argument of each API
+%function calls.
 
-The analysis result was applicable for three out of six benchmarks.
-One of them, {\it python-Levenshtein} did not contain the Python code
-that properly uses C code of extension module and thus the analysis was not applicable.
-Two of them, {\it distance} and {\it noise} were excluded due to limitation
-of CodeQL's python analysis. The use pattern of imported modules in these benchmarks
-showed highly complex behavior, and CodeQL could not handle such behaviors to properly pass the value
-across modules. In other words, CodeQL would not have been able to find correct dataflow, even
-if the C code is replaced with the python code with same functionality.
-For three benchmarks that were applicable, among 123 API function calls, the argument was
-resolved for 89 of them (72.4\%). The reason for unresolved arguments were
-mainly due to C functions that are implicitly called. For example, one can register
-a C function that is called when a python object is deallocated, but the explicit
-call site that call this function does not exist, there is not any value that
-flows into the parameter of this function. Therefore, any API function calls insde this
-destructor function can not resolve the target.
+%The analysis time is dominated by python analysis.  When CodeQL performs
+%analysis for python, it creates database for every builtin libraries of python,
+%and some predicates are also evaluated on this database. The improvement in
+%performance of CodeQL's Python analysis would also make our extended
+%multilingual analyzer run faster.
+
+Out of the six programs, we exclude three programs from our evaluation targets.
+\inred{{\it python-Levenshtein} contains both Python and C code, but its Python-C
+interoperation is not based-on Python Extension Module.
+{\it distance} and {\it noise} contain too complicated Python code for CodeQL
+to handle.}
+
+
+In the remaining three programs, \ours resolved 89 out of 123 (72.4\%) total
+API function calls. 
+It failed to resolve 34 API function calls due to implicit method calls in
+Python. 
+Python calls some methods implicitly, a class destructor for example, and C
+code can register C functions as such methods. 
+Because \ours does not handle C functions implicitly called in Python, it
+failed to resolve API functions calls in the functions.
+
+
+%The analysis result was applicable for three out of six benchmarks.
+%One of them, {\it python-Levenshtein} did not contain the Python code that
+%properly uses C code of extension module and thus the analysis was not
+%applicable.
+%Two of them, {\it distance} and {\it noise} were excluded due to limitation of
+%CodeQL's python analysis. 
+%The use pattern of imported modules in these benchmarks showed highly complex
+%behavior, and CodeQL could not handle such behaviors to properly pass the value
+%across modules. 
+%In other words, CodeQL would not have been able to find correct dataflow, even
+%if the C code is replaced with the python code with same functionality.
+%For three benchmarks that were applicable, among 121 API function calls, the
+%argument was resolved for 89 of them (72.4\%). 
+%The reason for unresolved arguments were mainly due to C functions that are
+%implicitly called. 
+%For example, one can register a C function that is called when a python object
+%is deallocated, but the explicit call site that call this function does not
+%exist, there is not any value that flows into the parameter of this function. 
+%Therefore, any API function calls insde this destructor function can not
+%resolve the target.
 
 
 \subsection{RQ2: Usefulness}
