@@ -1,28 +1,36 @@
 \begin{abstract}
-Declarative style analysis has become one of widely used analysis techniques.
-Declarative style analyzers consists of three parts: database facts, rules for
-generating new facts, and query system for extracting all facts related to
-specific properties.  Declarative style analyzers broaden their analysis
-targets to diverse programming languages. The extension is on database and
-rules are required for new language, but the query system does not require the
-extension as it can be independnet of language. However, even if the analyzers
-target multiple programming languages, it is limited to support they do not
-directly support the analysis of multilingual programs written in two or more
-programming languages.
+Declarative style analysis has become one of widely used analysis techniques
+for detecting potential bugs or security vulnerabilites.  Declarative style
+analyzers are performed in three steps: creating database of facts out of
+source code, evaluating rules for generating new facts, and performing query
+over facts to extracting all information related to specific properties via
+query system.  Declarative style analyzers broaden their analysis targets to
+diverse programming languages. In order to target a new language, the
+modification is made on first and second steps, but as the query system can be
+independnet of language, the last step can be reused.  Altough the analyzers
+target multiple programming languages, they are limited to support
+single-languaged programs only and no know declarative style analyzer support
+the analysis of multilingual programs written in two or more programming
+languages.  With the growing use of mulitilingual prgrams in diverse areas, the
+extended declarative anayzers that support the analysis of multillingual
+analysis is highly demanded.
 
-In this paper, we propose a systematic engineering methodology that extends a
-declarative style analyzer supporting multiple target languages to support
-multilingual program analysis as well. Our approach generates a merged database
-of facts that can be separated into multiple logical language spaces so that
-existing language-specific rules derive new facts from facts in the
-corresponding language space, then language-interoperation rules are defined so
-that query system can extract facts considering language interoperation.  We
-develop a proof-of-concept declarative style analyzer for multilingual programs
-by extending CodeQL that can track data-flows across language boundaries for
-two types of multilingual programs: Java-C programs and Python-C programs
-written in both Python and C.  We also implement a bug checker on the top of
-the analyzer to detect data-flow related interoperation bugs in real world
-Java-C programs.  In our evaluation, we show that our tool successfully tracked
-data-flows across Java-C and Python-C language boundaries and detected genuine
-interoperation bugs in real-world multilingual programs.
+In this paper, we propose a systematic engineering methodology that easily
+extends a declarative style analyzer supporting multiple target languages to
+support multilingual program analysis as well. The main idea is to reuse the
+existing components of original analyzer to minimize the burden of creating new
+components. Our approach generates a merged database of facts that can be
+separated into multiple logical language spaces so that existing
+language-specific rules derive new facts from facts in the corresponding
+language space, and defines language-interoperation rules that takes language
+interoperation semantics into account.  Finally, the same query is performed to
+get the analysis result considering language interoperation.  We develop a
+proof-of-concept declarative style analyzer for multilingual programs by
+extending CodeQL that can track dataflows across language boundaries for two
+types of multilingual programs: Java-C programs written in Java and C
+and Python-C programs written in Python and C.  We also implement a bug checker
+on the top of the analyzer to detect dataflow related interoperation bugs in
+real world Java-C programs.  In our evaluation, we show that our tool
+successfully tracked dataflows across Java-C and Python-C language boundaries
+and detected genuine interoperation bugs in real-world multilingual programs.
 \end{abstract}

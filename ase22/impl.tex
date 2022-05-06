@@ -63,12 +63,17 @@ class OneOrTwo extends int {
     or
     this = 2
   }
+
+  int next() {
+    resut = this + 1
+  }
 }
 \end{lstlisting}
 
 \noindent
 A class defines a set of elements that satisfy the predicate called
-``characteristic predicate.'' For more information about QL, one can refer to
+``characteristic predicate.'' A class can also have ``member predicates''
+that relate itself with other elements. For more information about QL, one can refer to
 \citet{ql2016}'s paper or the official document~\cite{codeql}.
 
 %Figure~\ref{fig:codeql} presents the overall structure of MultiQL for JNI programs.
@@ -401,7 +406,7 @@ export a C function to Python:
 struct PyMethodDef methods[] = {
   {
     .ml_name = "cfunction",
-    .ml_meth = cfunction_imp,
+    .ml_meth = cfunction_impl,
     ...
   },
   ...
@@ -413,10 +418,14 @@ The member field \ccode{ml_name} has a visible name of a C function to Python,
 and the member field \ccode{ml_meth} has the actual name of the C function.
 Thus, the \ccode{cfunction_impl} function defined in C code is invoked when
 importing and calling \ccode{cfunction} in Python code.
-\inred{To model the behavior, we can define \codeql{viableCallableP2C} so that
-\codeql{f = viablaCallableP2C(call)} holds when \codeql{f = def.getFunc()} and
-\codeql{call.getTarget().toString() = def.getName()} holds. TODO: what is the
-{\tt def}?}
+To model the behavior, we define the CodeQL class \codeql{PyMethodDef}
+and the predicate \codeql{viableCallableP2C}. \codeql{PyMethodDef} is the class
+that corresponds to the C structure \ccode{PyMethodDef}. It has
+two member predicates \codeql{getName()} and \codeql{getFunc()} whose reuslts are
+the value of the field \ccode{ml_name} and \ccode{ml_meth}, respectively.  Then we define
+\codeql{f = viablaCallableP2C(call)} holds when there exists a \codeql{PyMethodDef def}
+such that \codeql{f = def.getFunc()} and
+\codeql{call.getTarget().toString() = def.getName()} holds.
 
 In addition, we define rules that connects dataflows from arguments of
 Python-to-C function calls to a parameter of the target C function. 
@@ -425,22 +434,16 @@ packs arguments in a Python tuple object and propagates the object to the sole
 parameter of the target C function. 
 Then, the target C function unpack the tuple object into individual Python
 objects by calling the \ccode{PyArg_ParseTuple} API. 
-\inred{
-Then the
-writter of c function should manually call API function,
-\ccode{PyArg\_ParseTuple} to unpack this tuple to get each individual
-arguments. This behavior is modelled by creating virtual argument node which is
-a virtual Python tuple object, and create the store step from the real argument
-to the virtual argument.  By doing so. the real argument will flow to the real
-use site of in three steps: 1) store step from the argument to virtual
-argument, 2) function-in step from virtual argument to the parameter of target
-C function, and 3) read step from the parameter to its tuple-read API fuction.
-The similar thing happens when there is a call from C to Python. The actual
-argument of C API function is a tuple object, but this tuple is implicitly
-unpacked and each element is assigned to each parameter of Python method.
-Again, the solution is to create virtual parameter in Python, and create the
-read step from the virtual tuple parameter to actual parameters.
-}
+This means that the usual way of connecting arguments and parameters via their
+position does not work, and we need another way.
+We modelled this behavior by defining \codeql{VirtualArgNode}, a subclass of \codeql{Node},
+that corrsponds to the Python tuple object. Then we define some predicates
+for representing the flow in and out of this node. First we define the store step
+from the original argument node to the virtual argument node. Then we define
+the step from the virtual argument node to the sole parameter node in C function.
+By doing so, the flow form original argument node to the use site will be
+found in three steps: 1) from the argumentnode to the virtual argument node,
+2) from the virtual argument to the parameter node of C function, and 3) from the parameter to the out node of \ccode{PyArg_ParseTuple} API function call.
 
 
 %then the Python code can import cfunction and the call expression cfunction()
@@ -466,15 +469,15 @@ read step from the virtual tuple parameter to actual parameters.
 values of variables, similar to the interaction from C to Java. 
 To invoke Python functions in C, C code calls the interface function
 \ccode{PyObject_CallObject(func, args)}, where the \ccode{func} is a Python
-function object, and the \ccode{args} is a Python tuple object. 
+function object, and the \ccode{args} is a Python tuple object that contains
+each of argument. 
 Because C code can get Python objects only propagated from Python code as
 function arguments of the Python-to-C interoperation, we define two
 ``intra-flows'' analyses to identify Python objects assigned to \ccode{func}:
-1) dataflows from Python to C function arguments, and 2) dataflows from C
-function parameters to the first argument of \ccode{PyObject_CallObject}. 
-\inred{Then, the value that \ccode{func} may have
-is found via three big steps: finding flow from Python function to an argument, from the argument to
-a c parameter, and from the parameter to the variable \ccode{func}.}
+1) dataflows from Python function object to an argument of C function call,
+and 2) dataflows from the parameters of C functions to the first argument of \ccode{PyObject_CallObject}. 
+Using these two intra-flow analyses, we can find the actual target that should be invoked
+for the API function call \ccode{PyObject_CallObject}.
 
 
 %\textbf{Args and Params.} After finding the call target of the given call
