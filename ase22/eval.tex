@@ -32,8 +32,8 @@ The other two benchmark suites are for Python-C program analysis.
 The first benchmark suite is ExtModuleFlowBench we developed, which contains 20
 Python-C programs.
 We converted each Java-C benchmark in the NativeFlowBench into a Python-C
-program, except for \inred{??} apps containing JNI-specific interoperation
-features, and made additional \inred{??} Python-C programs that contain Python
+program, except for 8 apps containing JNI-specific interoperation
+features, and made additional 5 Python-C programs that contain Python
 Extension Module specific interoperations.
 The second benchmark suite consists of six real-world Python-C programs
 collected from public github repositories, which are analysis targets in the
@@ -332,11 +332,10 @@ correctly.
 %multilingual analyzer run faster.
 
 Out of the six programs, we exclude three programs from our evaluation targets.
-\inred{{\it python-Levenshtein} contains both Python and C code, but its Python-C
-interoperation is not based-on Python Extension Module.
+{\it python-Levenshtein} contains both Python and C code, but the Python code only contained a class that works as a wrpper for C code without actual uses cases,
+making no meaningful interaction between Python and C Code.
 {\it distance} and {\it noise} contain too complicated Python code for CodeQL
-to handle.}
-
+to handle.
 
 In the remaining three programs, \ours resolved 89 out of 123 (72.4\%) total
 API function calls. 
