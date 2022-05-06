@@ -85,16 +85,13 @@ follows:
 The fact $p(\overline{elem | x})$ denotes a relation $p$ between elements
 $\overline{elem}$ or variables $\overline{x}$. The elements are primitive
 values in the analysis, such as string and integer values.  The rule $f'\
-\mbox{:-}\ \overline{\neg^? f}$ denotes that a fact $f'$ (called head of the
-rule) is derived from other facts $\overline{f}$ (called body of the rule);
-$f'$ holds if all the facts $f \in \{\overline{\neg^?  f}\}$ hold. The optional
-prefix negation $\neg$ denotes the negative hold condition of a fact; A negated
-fact $\neg f$ holds if the fact $f$ does not hold. If multiple rules share the
-same head, then we abbreviately denote this set of rules using semicolon in a
-way that the common head is followed by the symbol $\mbox{:-}$, and each body
-separated by $;$.  The query ``$\mbox{?-} \overline{f}$'' finds all possible
-elements that make all facts in $\overline{f}$ hold if variables in
-$\overline{f}$ are replaced with the elements.
+\mbox{:-}\ \overline{\neg^? f}$ denotes that a fact $f'$ is derived from other
+facts $\overline{f}$; $f'$ holds if all the facts $f \in \{\overline{\neg^?
+f}\}$ hold. The optional prefix negation $\neg$ denotes the negative hold
+condition of a fact; A negated fact $\neg f$ holds if the fact $f$ does not
+hold. The query ``$\mbox{?-} \overline{f}$'' finds all possible elements that
+make all facts in $\overline{f}$ hold if variables in $\overline{f}$ are
+replaced with the elements.
 
 
 \subsection{Declarative call graph construction for monolingual programs}\label{lab:ovmono}
@@ -273,11 +270,10 @@ facts. We define such rules by composing language-specific rules for A,
 lanuguage-specific rules for B, and language-interoperation rules as follows:
 
 \begin{lstlisting}
-CallEdge(ln1, ln2) :-
-  CallEdge$_A$(ln1, ln2);
-  CallEdge$_B$(ln1, ln2);
-  CallEdge$_{AB}$(ln1, ln2);
-  CallEdge$_{BA}$(ln1, ln2)
+CallEdge(ln1, ln2) :- CallEdge$_A$(ln1, ln2)
+CallEdge(ln1, ln2) :- CallEdge$_B$(ln1, ln2)
+CallEdge(ln1, ln2) :- CallEdge$_{AB}$(ln1, ln2)
+CallEdge(ln1, ln2) :- CallEdge$_{BA}$(ln1, ln2)
 \end{lstlisting}
 
 %For language-specific rules for CallEdge\_A and CallEdge\_B can be defined same
