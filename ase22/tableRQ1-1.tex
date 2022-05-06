@@ -6,20 +6,20 @@
   \centering
   \small
 \renewcommand{\arraystretch}{.9}
-  \begin{tabular}{@{}l|c|c|c|c||l|c|c|c|c@{}}
-    \myhead{Benchmark}{Precision}{Dataflow}
-    icc\_javatonative                   & $\times$ & $\times$ & $\bigcirc$ & $\times$ & native\_noleak                       & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    icc\_nativetojava                   & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\times$ & native\_noleak\_array                & $\bigcirc$ & $\bigcirc$ & $\times$ & $\bigcirc$  \\
-    native\_complexdata                 & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & native\_nosource                     & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_complexdata\_stringop       & $\times$ & $\times$ & $\times$ & $\bigcirc$ & native\_pure                         & $\times$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_dynamic\_register\_multiple & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & native\_pure\_direct                 & $\times$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_heap\_modify                & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & native\_pure\_direct\_customized     & $\times$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_leak                        & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & native\_set\_field\_from\_arg        & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_leak\_array                 & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\times$ & native\_set\_field\_from\_arg\_field & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_leak\_dynamic\_register     & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & native\_set\_field\_from\_native     & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_method\_overloading         & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & native\_source                       & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_multiple\_interactions      & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & native\_source\_clean                & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$  \\
-    native\_multiple\_libraries         & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & $\bigcirc$ & \multicolumn{1}{c}{}                 & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{} & \multicolumn{1}{c}{}
+  \begin{tabular}{@{}l|c|c||l|c|c@{}}
+    \myhead{Benchmark}{Dataflow}
+    icc\_javatonative                   & $\bigcirc$ & $\times$ & native\_noleak                       & $\bigcirc$ & $\bigcirc$  \\
+    icc\_nativetojava                   & $\bigcirc$ & $\times$ & native\_noleak\_array                & $\times$ & $\bigcirc$  \\
+    native\_complexdata                 & $\bigcirc$ & $\bigcirc$ & native\_nosource                     & $\bigcirc$ & $\bigcirc$  \\
+    native\_complexdata\_stringop       & $\times$ & $\bigcirc$ & native\_pure                         & $\bigcirc$ & $\bigcirc$  \\
+    native\_dynamic\_register\_multiple & $\bigcirc$ & $\bigcirc$ & native\_pure\_direct                 & $\bigcirc$ & $\bigcirc$  \\
+    native\_heap\_modify                & $\bigcirc$ & $\bigcirc$ & native\_pure\_direct\_customized     & $\bigcirc$ & $\bigcirc$  \\
+    native\_leak                        & $\bigcirc$ & $\bigcirc$ & native\_set\_field\_from\_arg        & $\bigcirc$ & $\bigcirc$  \\
+    native\_leak\_array                 & $\bigcirc$ & $\times$ & native\_set\_field\_from\_arg\_field & $\bigcirc$ & $\bigcirc$  \\
+    native\_leak\_dynamic\_register     & $\bigcirc$ & $\bigcirc$ & native\_set\_field\_from\_native     & $\bigcirc$ & $\bigcirc$  \\
+    native\_method\_overloading         & $\bigcirc$ & $\bigcirc$ & native\_source                       & $\bigcirc$ & $\bigcirc$  \\
+    native\_multiple\_interactions      & $\bigcirc$ & $\bigcirc$ & native\_source\_clean                & $\bigcirc$ & $\bigcirc$  \\
+    native\_multiple\_libraries         & $\bigcirc$ & $\bigcirc$ & \multicolumn{1}{c}{}                 & \multicolumn{1}{c}{} & \multicolumn{1}{c}{}
   \end{tabular}
 \end{table*}
 
