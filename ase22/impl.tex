@@ -263,9 +263,15 @@ lifted classes and predicates without manually efforts.
 
 \subsection{Merging Libraries: Java-C}\label{sec:merging}
 After lifting libraries for different languages, we extend predicates to
-reflect the interoperation semantics between multiple languages.
-For analyzer for JNI programs, We identified various interactions from Java to C and from C to Java
-and extended predicates to model their behaviors.
+reflect the interoperation semantics between multiple languages.  
+For the Java-C program analysis, we identified various interactions from Java
+to C and from C to Java via JNI, and extended predicates to model their
+behaviors.
+
+%After lifting libraries for different languages, we extend predicates to
+%reflect the interoperation semantics between multiple languages.
+%For analyzer for JNI programs, We identified various interactions from Java to C and from C to Java
+%and extended predicates to model their behaviors.
 
 For example, the following shows how we extend the predicate
 named \codeql{viableCallable}:
@@ -280,11 +286,15 @@ DataFlowCallable viableCallable(DataFlowCall c) {
   result.asJava() = viableCallableC2J(c.asC())
 }
 \end{lstlisting}
-This predicate finds the call edge from the call expression to its
-target, and is required for finding data flows through the fnction arguments and returns.
+%This predicate finds the call edge from the call expression to its
+%target, and is required for finding data flows through the fnction arguments and returns.
+
+\noindent
+The predicate \codeql{viableCallable} finds call edges from call expressions to
+their targets. 
 Lines 2 and 4 show the results of lifting, and they take advantage of the
-original predicates from the dataflow libraries.  They handle
-intra-language call edges from Java to Java and from C to C.
+original predicates from the dataflow libraries.  
+They handle intra-language call edges from Java to Java and from C to C.
 Lines 6 and 8 show the results of merging libraries, and they are
 for inter-language call edges.  The predicate \codeql{viableCallableJ2C} finds call edges
 from Java to C, and the predicate \codeql{viableCallableC2J} finds call edges from
@@ -292,17 +302,18 @@ C to Java. Because these two call edges have different characteristics, we
 implemented them differently.
 
 %\medskip
-\textbf{Java to C.} In JNI programs, one can make interactions from
-Java to C by calling native functions in C from Java code. The target
-of such a function call is determined in a static manner.
+\textbf{Java to C.} In Java-C programs, one can make interactions from Java to
+C by calling native functions in C from Java code. 
+The target of such a function call is determined in a static manner.
 The target function should follow the JNI naming convention, which is adding
-\codeql{Java\_} as prefix, 
-followed by a fully qualified name of its class and the additional \codeql{\_}, to the method name.
-For example, the target function name for a function call of
-\codeql{cfunction} would be \codeql{Java\_fully\_qualified\_class\_name\_cfunction}.
-With this convention, we can define \codeql{viableCallableJ2C}
-so that \codeql{f = viablaCallableJ2C(call)} holds when
-\codeql{f.toString() = "Java\_" + call.getTarget().className() + "\_" + "call.getTarget().getName()} holds.
+\codeql{Java\_} as prefix, followed by a fully qualified name of its class and
+the additional \codeql{\_}, to the method name.
+For example, the target function name for a function call of \codeql{cfunction}
+would be \codeql{Java\_fully\_qualified\_class\_name\_cfunction}.
+With this convention, we can define \codeql{viableCallableJ2C} so that
+\codeql{f = viablaCallableJ2C(call)} holds when \codeql{f.toString() = "Java\_"
++ call.getTarget().className() + "\_" +} \\
+\codeql{call.getTarget().getName()} holds.
 
 
 \medskip
@@ -343,10 +354,16 @@ Most of such extended predicates are specialized \codeql{step} predicates.
 We extended them in a similar way to the calls from C to Java described above.
 
 \subsection{Merging Libraries: Python-C}\label{sec:merging2}
-The extension module programs requires its own modelling for its own interoperation
-semantics to be analyzed.
-The following is the extension of the predicate \codeql{viableCallable}
-for extension module programs:
+%The extension module programs requires its own modelling for its own interoperation
+%semantics to be analyzed.
+%The following is the extension of the predicate \codeql{viableCallable}
+%for extension module programs:
+
+To analyze Python-C programs, we extended predicates to model the
+interoperation semantics of Python Extension Module.
+The following shows the \codeql{viableCallable} predicate we extened for the
+Python-C program analysis: 
+
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
   result.asPython() = PYTHON::viableCallable(c.asPython())
@@ -358,18 +375,29 @@ DataFlowCallable viableCallable(DataFlowCall c) {
   result.asPython() = viableCallableC2P(c.asC())
 }
 \end{lstlisting}
-Again, line 2 and line 4 are direct outcomes of the process of lifting,
-and all we have to newly define is the language-interoperation predicates,
-\codeql{viableCallableP2C} and \codeql{viableCallableC2P}. 
 
-\textbf{Python to C.} Similar to JNI programs, in python program with 
-extension modules, one can make interactions from
-Python to C by importing and calling C functions that are exported via
-extension modules. There is a C structure "PyMethodDef"
-that stores the information about the c function that is exported. If we define
-the structure
+\noindent
+The only different parts from the Java-C program analysis are the predicates
+\codeql{viableCallableP2C} and \codeql{viableCallableC2P}, which we describe in
+next paragraphs.
 
-\begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+%Again, line 2 and line 4 are direct outcomes of the process of lifting,
+%and all we have to newly define is the language-interoperation predicates,
+%\codeql{viableCallableP2C} and \codeql{viableCallableC2P}. 
+
+\textbf{Python to C.} Similar to the interactions from Java to C, one can make
+interactions from Python to C by importing and calling functions exported from
+C. Python Extension Module provides a pre-defined C struct \ccode{PyMethodDef} to
+export a C function to Python: 
+%Similar to JNI programs,
+%in python program with 
+%extension modules, one can make interactions from
+%Python to C by importing and calling C functions that are exported via
+%extension modules. There is a C structure "PyMethodDef"
+%that stores the information about the c function that is exported. If we define
+%the structure
+
+\begin{lstlisting}[style=mcpp]
 struct PyMethodDef methods[] = {
   {
     .ml_name = "cfunction",
@@ -380,31 +408,25 @@ struct PyMethodDef methods[] = {
 }
 \end{lstlisting}
 
-then the Python code can import cfunction and the call expression cfunction()
-will resolve to the actual function cfunction\_impl defined in C code. To model
-this behavior, we can define \codeql{viableCallableP2C} so that \codeql{f =
-viablaCallableP2C(call)} holds when \codeql{f = def.getFunc()} and
-\codeql{call.getTarget().toString() = def.getName()} holds.
+\noindent
+The member field \ccode{ml_name} has a visible name of a C function to Python,
+and the member field \ccode{ml_meth} has the actual name of the C function.
+Thus, the \ccode{cfunction_impl} function defined in C code is invoked when
+importing and calling \ccode{cfunction} in Python code.
+\inred{To model the behavior, we can define \codeql{viableCallableP2C} so that
+\codeql{f = viablaCallableP2C(call)} holds when \codeql{f = def.getFunc()} and
+\codeql{call.getTarget().toString() = def.getName()} holds. TODO: what is the
+{\tt def}?}
 
-\medskip
-\textbf{C to Python.} The interaction from C to Python also requires
-the runtime values of variables, which makes the analysis a bit complex. 
-C code calls the interface function \ccode{PyObject\_CallObject(func, args)}
-where func is the python function object, and the args is the python tuple
-object. Finding call target of this API function call simply reduces to answering the
-question: ``what is the value of \ccode{func}?'' Again, we define
-``intra-flows'' for both Python and C to answer this question efficiently: 1) dataflows from 
-python function any to arguments in Python and 2) dataflow from any parameters to the first argument of
-\ccode{PyObject\_CallObject} in C. Then, the value that \ccode{func} may have
-is found via three big steps: finding flow from Python function to an argument, from the argument to
-a c parameter, and from the parameter to the variable \ccode{func}.
-
-\textbf{Args and Params.} After finding the call target of the given call
-expression, Then we have to connect the dataflow from the arguments to
-aprameters.  This is tirivial for JNI programs, but in case of extension module
-programs, it requires a bit of effort. When you call a c function from the
-Python code with arguments, then all the arguments are implicitly packed in a
-tuple, and that tuple is passed to c function as a single argument. Then the
+In addition, we define rules that connects dataflows from arguments of
+Python-to-C function calls to a parameter of the target C function. 
+Different from the Java-to-C function call semantics, Python Extension Module
+packs arguments in a Python tuple object and propagates the object to the sole
+parameter of the target C function. 
+Then, the target C function unpack the tuple object into individual Python
+objects by calling the \ccode{PyArg_ParseTuple} API. 
+\inred{
+Then the
 writter of c function should manually call API function,
 \ccode{PyArg\_ParseTuple} to unpack this tuple to get each individual
 arguments. This behavior is modelled by creating virtual argument node which is
@@ -418,3 +440,59 @@ argument of C API function is a tuple object, but this tuple is implicitly
 unpacked and each element is assigned to each parameter of Python method.
 Again, the solution is to create virtual parameter in Python, and create the
 read step from the virtual tuple parameter to actual parameters.
+}
+
+
+%then the Python code can import cfunction and the call expression cfunction()
+%will resolve to the actual function cfunction\_impl defined in C code. To model
+%this behavior, we can define \codeql{viableCallableP2C} so that \codeql{f =
+%viablaCallableP2C(call)} holds when \codeql{f = def.getFunc()} and
+%\codeql{call.getTarget().toString() = def.getName()} holds.
+
+\medskip
+%\textbf{C to Python.} The interaction from C to Python also requires
+%the runtime values of variables, which makes the analysis a bit complex. 
+%C code calls the interface function \ccode{PyObject\_CallObject(func, args)}
+%where func is the python function object, and the args is the python tuple
+%object. Finding call target of this API function call simply reduces to answering the
+%question: ``what is the value of \ccode{func}?'' Again, we define
+%``intra-flows'' for both Python and C to answer this question efficiently: 1) dataflows from 
+%python function any to arguments in Python and 2) dataflow from any parameters to the first argument of
+%\ccode{PyObject\_CallObject} in C. Then, the value that \ccode{func} may have
+%is found via three big steps: finding flow from Python function to an argument, from the argument to
+%a c parameter, and from the parameter to the variable \ccode{func}.
+
+\textbf{C to Python.} The interaction from C to Python requires the runtime
+values of variables, similar to the interaction from C to Java. 
+To invoke Python functions in C, C code calls the interface function
+\ccode{PyObject_CallObject(func, args)}, where the \ccode{func} is a Python
+function object, and the \ccode{args} is a Python tuple object. 
+Because C code can get Python objects only propagated from Python code as
+function arguments of the Python-to-C interoperation, we define two
+``intra-flows'' analyses to identify Python objects assigned to \ccode{func}:
+1) dataflows from Python to C function arguments, and 2) dataflows from C
+function parameters to the first argument of \ccode{PyObject_CallObject}. 
+\inred{Then, the value that \ccode{func} may have
+is found via three big steps: finding flow from Python function to an argument, from the argument to
+a c parameter, and from the parameter to the variable \ccode{func}.}
+
+
+%\textbf{Args and Params.} After finding the call target of the given call
+%expression, Then we have to connect the dataflow from the arguments to
+%aprameters.  This is tirivial for JNI programs, but in case of extension module
+%programs, it requires a bit of effort. When you call a c function from the
+%Python code with arguments, then all the arguments are implicitly packed in a
+%tuple, and that tuple is passed to c function as a single argument. Then the
+%writter of c function should manually call API function,
+%\ccode{PyArg\_ParseTuple} to unpack this tuple to get each individual
+%arguments. This behavior is modelled by creating virtual argument node which is
+%a virtual Python tuple object, and create the store step from the real argument
+%to the virtual argument.  By doing so. the real argument will flow to the real
+%use site of in three steps: 1) store step from the argument to virtual
+%argument, 2) function-in step from virtual argument to the parameter of target
+%C function, and 3) read step from the parameter to its tuple-read API fuction.
+%The similar thing happens when there is a call from C to Python. The actual
+%argument of C API function is a tuple object, but this tuple is implicitly
+%unpacked and each element is assigned to each parameter of Python method.
+%Again, the solution is to create virtual parameter in Python, and create the
+%read step from the virtual tuple parameter to actual parameters.
