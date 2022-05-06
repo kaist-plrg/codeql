@@ -32,12 +32,19 @@ analysis is to define language-interoperation rules.
 
 
 \subsection{CodeQL}
-CodeQL is a static analysis engine that transforms source code programs into
-databases, and performs analysis by evaluating queries written in the
-declarative and object-oriented language called QL (Query Language).
-In QL, there are mainly two syntax for defining rules.
-They are defining ``predicates'' or ``classes.''
-The following QL code defines the predicate \codeql{isOneOrTwo}:
+%CodeQL is a static analysis engine that transforms source code programs into
+%databases, and performs analysis by evaluating queries written in the
+%declarative and object-oriented language called QL (Query Language).
+%In QL, there are mainly two syntax for defining rules.
+%They are defining ``predicates'' or ``classes.''
+%The following QL code defines the predicate \codeql{isOneOrTwo}:
+
+CodeQL is a declarative static analysis engine that transforms source code into
+a database of facts and performs analyses by evaluating queries written in the
+declarative and object-oriented language called QL (Query Language).  In QL,
+one can define rules by defining ``predicates'' and ``classes.'' The following
+QL code defines the predicate \codeql{isOneOrTwo}:
+
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneOrTwo(int n) {
   n = 1
@@ -45,7 +52,10 @@ predicate isOneOrTwo(int n) {
   n = 2
 }
 \end{lstlisting}
+
+\noindent
 and the following definition defines the class \codeql{OneOrTwo}:
+
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneOrTwo extends int {
   OneOrTwo() { // characteristic predicate
@@ -55,28 +65,40 @@ class OneOrTwo extends int {
   }
 }
 \end{lstlisting}
-A class defines a set of elements that satisfy the predicate called
-``characteristic predicate.''
-For more information about QL, one can refer to \citet{ql2016}'s paper
-or the official document~\cite{codeql}.
 
-Figure~\ref{fig:codeql} presents the overall structure of MultiQL for JNI programs.
-First, it generates databases for both languages, C\footnote{
-Even though MultiQL analyzes JNI programs written in Java and both C and
-C++, this paper refers to C only fore presentation brevity.} and
-Java, and merges them to one database.  This corresponds
-to the step of extracting syntactic datafacts from source code programs.
-Then, we merge the common datafacts and rules in both languages,
-which are parts of their libraries that CodeQL provides, into one merged library.
-Finally, using the merged database and merged library, a user can write a query to
-perform a client-analysis, and evaluate it to produce its analysis result.
+\noindent
+A class defines a set of elements that satisfy the predicate called
+``characteristic predicate.'' For more information about QL, one can refer to
+\citet{ql2016}'s paper or the official document~\cite{codeql}.
+
+%Figure~\ref{fig:codeql} presents the overall structure of MultiQL for JNI programs.
+%First, it generates databases for both languages, C\footnote{
+%Even though MultiQL analyzes JNI programs written in Java and both C and
+%C++, this paper refers to C only fore presentation brevity.} and
+%Java, and merges them to one database.  This corresponds
+%to the step of extracting syntactic datafacts from source code programs.
+%Then, we merge the common datafacts and rules in both languages,
+%which are parts of their libraries that CodeQL provides, into one merged library.
+%Finally, using the merged database and merged library, a user can write a query to
+%perform a client-analysis, and evaluate it to produce its analysis result.
+
+Figure~\ref{fig:codeql} presents the overall structure of MultiQL for JNI
+programs.  First, it generates databases for both languages, C\footnote{ Even
+though MultiQL analyzes JNI programs written in Java and both C and C++, this
+paper refers to C only for presentation brevity.} and Java, and merges them to
+one database.  This corresponds to the step of extracting syntactic initial
+facts from source code.  Then, we merge the common facts and rules in both
+languages, which are parts of their libraries that CodeQL provides, into one
+merged library.  Finally, using the merged database and merged library, a user
+can write a query to perform a client-analysis, and evaluate it to produce its
+analysis result.
 
 \subsection{Creating Databases}
-For compiled languages such as C and Java, CodeQL generates their database
-by compiling source programs.  When a compiler compiles a program,
-CodeQL monitors the compiler to extract necessary information and
-creates a database with the extracted information. For script languages like Python,
-CodeQL uses its own extractor to directly extract the required information.
+For compiled languages such as C and Java, CodeQL generates their database by
+compiling source programs.  When a compiler compiles a program, CodeQL monitors
+the compiler to extract necessary information and creates a database with the
+extracted information. For script languages like Python, CodeQL uses its own
+extractor to directly extract necessary information from source code.
 CodeQL creates a database for a single language in two steps:
 1) it stores the extracted information in a trap
 file, a human readable file format, and 2) it finalizes trap files
@@ -92,13 +114,20 @@ primitives(#10002,"int")  ...
 params(#10004,#10002,0,#10003,#10004)
 paramName(#10004,"myParam")
 \end{lstlisting}
-which describes the parameter information about \javacode{myMethod}.
-Here, each line of \javacode{primitives(...)},
-\javacode{params(...)}, and
-\javacode{paramName(...)}
-corresponds to one fact, which will be
-finally stored in each table of database.
 
+\noindent
+which describes the parameter information about \javacode{myMethod}.
+\javacode{primitives(...)}, \javacode{params(...)}, and
+\javacode{paramName(...)} are facts stored in tables in the database.  The
+database manages tables based on fact types. For example, it stores the kind of
+facts \javacode{primitives(...)} in a table named \javacode{@primitives}, and
+\javacode{params(...)} in a different table named \javacode{@params}.
+
+%Here, each line of \javacode{primitives(...)},
+%\javacode{params(...)}, and
+%\javacode{paramName(...)}
+%corresponds to one fact, which will be
+%finally stored in each table of database.
 
 \begin{figure}[t]
   \centering
@@ -141,16 +170,27 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
   \label{fig:qll}
 \end{figure}
 
-To create a single database for both C and Java, MultiQL maintains
-a separate trap file for each language and then merges them.
-Note that both trap files may have tables with the same name.
-To avoid name conflicts in a merged database, we add a
-language-specific prefix to each table.
-For example, if both trap files have tables named \codeql{@params},
-we rename the table from C as \codeql{@c\_params},
-and the table from Java as \codeql{@java\_params"}.
+To create a single merged database for both C and Java, MultiQL maintains a
+separate trap file for each language and then merges them.  
+Note that both trap files may have tables with the same name.  
+To avoid name conflicts in a merged database, we add a language-specific prefix
+to each table.  
+For example, if both trap files have tables named \codeql{@params}, we rename
+the table from C as \codeql{@c\_params}, and the table from Java as
+\codeql{@java\_params}.
 After renaming such tables, we can safely finalize the trap files into
 databases on which queries can be evaluated.
+
+%To create a single database for both C and Java, MultiQL maintains
+%a separate trap file for each language and then merges them.
+%Note that both trap files may have tables with the same name.
+%To avoid name conflicts in a merged database, we add a
+%language-specific prefix to each table.
+%For example, if both trap files have tables named \codeql{@params},
+%we rename the table from C as \codeql{@c\_params},
+%and the table from Java as \codeql{@java\_params"}.
+%After renaming such tables, we can safely finalize the trap files into
+%databases on which queries can be evaluated.
 
 \subsection{Lifting Libraries}
 
@@ -207,13 +247,19 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
 After lifting, lifted predicates show the equivalent behaviors as the
 original ones if all the arguments are from the same language.
 
-The process of lifting could be effectively automated with the aid of
-QL's compile message. First, try to compile a query without actually
-importing the library, then the QL compiler will give error message
-that contains all the iinformation about required yet missing predicates and classes,
-such as name, arity or signature of each predicate. Using this information,
-the lifted predicates and classes can be automatically synthesized, without
-manually searching for what are the required ones.
+We fully automate the lifting process with the aid of QL compiler error
+messages. When compiling a query with the merged database, the QL compiler
+reports error messages containing required classes and predicates, and a
+signature of each predicate. Using this information, we synthesize lifted
+classes and predicates without manually efforts.
+
+%The process of lifting could be effectively automated with the aid of
+%QL's compile message. First, try to compile a query without actually
+%importing the library, then the QL compiler will give error message
+%that contains all the iinformation about required yet missing predicates and classes,
+%such as name, arity or signature of each predicate. Using this information,
+%the lifted predicates and classes can be automatically synthesized, without
+%manually searching for what are the required ones.
 
 \subsection{Merging Libraries: Java-C}\label{sec:merging}
 After lifting libraries for different languages, we extend predicates to
