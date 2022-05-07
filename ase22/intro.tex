@@ -61,13 +61,13 @@ analysis result.
 
 To evaluate the practicality of our approach, we develop a proof-of-concept
 declarative static analyzer for multilingual programs by extending CodeQL. Our
-analyzer tracks data-flows across language boundaries for two types of
+analyzer tracks dataflows across language boundaries for two types of
 multilingual programs: Java-C programs written in both Java and C, and Python-C
 programs written in both Python and C. The extension is simple enough in that
 it requires only a few lines of automated modifications of CodeQL and additional
 language-interopretation rules. We also implement a bug checker on the top of
-the analyzer to detect data-flow related interoperation bugs in real world Java-C programs.
-In our evaluation, we show that our tool successfully tracked data-flows across
+the analyzer to detect dataflow related interoperation bugs in real world Java-C programs.
+In our evaluation, we show that our tool successfully tracked dataflows across
 Java-C and Python-C language boundaries and detected genuine interoperation
 bugs in real-world multilingual programs.
 
@@ -76,10 +76,10 @@ The contributions of this paper are as followed:
 \item We propose an engineering method that extends a declarative static analyzer
 supporting multiple target languages to support multilingual program analysis.
 
-\item We implement a proof-of-concept declarative static data-flow analyzer for two
+\item We implement a proof-of-concept declarative static dataflow analyzer for two
 types of multilingual programs, Java-C and Python-C, by extending CodeQL.
 
 \item We show the practical usefulness of our analyzer in the sense that it detects
-data-flow related bugs at language boundaries of real-world multilingual
+dataflow related bugs at language boundaries of real-world multilingual
 programs.
 \end{itemize}
