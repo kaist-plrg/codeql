@@ -85,12 +85,19 @@
   captionpos=b
 }
 
-\lstset{
-  basicstyle=\ttfamily,
+\lstdefinestyle{mrule}{
+  basicstyle=\ttfamily\footnotesize,
   columns=fullflexible,
   keepspaces=true,
   mathescape,
 }
+
+%\lstset{
+%  basicstyle=\ttfamily\footnotesize,
+%  columns=fullflexible,
+%  keepspaces=true,
+%  mathescape,
+%}
 
 \lstdefinestyle{mpython}{
     language=python,
@@ -209,6 +216,7 @@
 % Keywords
 \newcommand{\javacode}[1]{\text{\lstinline[style=java,numbers=none]!#1!}}
 \newcommand{\ccode}[1]{\text{\lstinline[style=cpp,numbers=none]!#1!}}
+\newcommand{\rcode}[1]{\text{\lstinline[style=mrule,numbers=none]!#1!}}
 \newcommand{\datalog}[1]{\text{\lstinline[style=myDatalog,numbers=none]!#1!}}
 \newcommand{\codeql}[1]{\text{\lstinline[style=codeql,numbers=none]!#1!}}
 

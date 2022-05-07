@@ -64,9 +64,9 @@ void f() {
 %
 %The program in Figure~\ref{fig:exam} has two parts: Figure~\ref{fig:exam}(a)
 %shows a method \javacode{m1}, \javacode{m2} in language A, and
-%Figure~\ref{fig:exam}(b) shows a function \ccode{f} in language B.  The method
+%Figure~\ref{fig:exam}(b) shows a function \rcode{f} in language B.  The method
 %\javacode{m1} is called from top level of language A, and it calls the the
-%function \ccode{f} from language B.  Then, the function \ccode{f} calls back
+%function \rcode{f} from language B.  Then, the function \rcode{f} calls back
 %the method \javacode{m2} in language A using API function, using the string
 %value "m2" to indicate the name of method.
 
@@ -92,7 +92,7 @@ values in the analysis, such as string and integer values.  The rule $f'\
 facts $\overline{f}$; $f'$ holds if all the facts $f \in \{\overline{\neg^?
 f}\}$ hold. The optional prefix negation $\neg$ denotes the negative hold
 condition of a fact; A negated fact $\neg f$ holds if the fact $f$ does not
-hold. The query ``$\mbox{?-} \overline{f}$'' finds all possible elements that
+hold. The query $\mbox{?-} \overline{f}$ finds all possible elements that
 make all facts in $\overline{f}$ hold if variables in $\overline{f}$ are
 replaced with the elements.
 
@@ -105,13 +105,13 @@ for two different monolingual code and how we extend the analysis to construct
 a unified call graph across languages.
 Figure~\ref{fig:exam} shows a multilingual code example written in both (a)
 Python-like language {\it A} and (b) C-like language {\it B}. In {\it A}, there
-are two functions, {\tt m1} at line~3 and {\tt m2} at line~5. The function {\tt
-m1} calls the function {\tt f} in {\it B} via language interoperation between
-{\it A} and {\it B}, and the function {\tt m2} does nothing. At line~8 in {\it
-A}, the expression {\tt m1()} calls the function {\tt m2} defined at line~3 to
+are two functions, \rcode{m1} at line~3 and \rcode{m2} at line~5. The function \rcode{
+m1} calls the function \rcode{f} in {\it B} via language interoperation between
+{\it A} and {\it B}, and the function \rcode{m2} does nothing. At line~8 in {\it
+A}, the expression \rcode{m1()} calls the function \rcode{m2} defined at line~3 to
 invoke the function {\tt f} in {\it B}.
-The {\tt f} function in {\it B} calls the {\tt CallMethod} function with a
-string value {\tt "m2"} to invoke the function {\tt m2} in {\it A}, using the
+The \rcode{f} function in {\it B} calls the \rcode{CallMethod} function with a
+string value \rcode{"m2"} to invoke the function \rcode{m2} in {\it A}, using the
 string value argument as the target function name.
 %Thus, the code example performs the bidirectional interoperation between {\it
 %A} and {\it B}, which calls the function {\tt f} written in {\it A} from {\it
@@ -121,10 +121,10 @@ string value argument as the target function name.
 At first, A declarative style analysis creates a database of facts for the
 code. Initial facts are just syntactic information extracted from the code.
 For example, there are two kinds of facts required for the call graph
-construction; {\tt FunctionAt(ln, name)} denotes function definition
-information containing its line number {\tt ln} and the function name {\tt
-name}, and {\tt CallAt(ln, name)} denotes callsite information
-containing the callsite line number {\tt ln} and its target function name {\tt
+construction; \rcode{FunctionAt(ln, name)} denotes function definition
+information containing its line number \rcode{ln} and the function name \rcode{
+name}, and \rcode{CallAt(ln, name)} denotes callsite information
+containing the callsite line number \rcode{ln} and its target function name \rcode{
 name}. The initial facts for the Figure~\ref{fig:exam}(a) code are as follows: 
 
 %First, let's consider a hypothetical declarative style analyzer, that supports
@@ -136,7 +136,7 @@ name}. The initial facts for the Figure~\ref{fig:exam}(a) code are as follows:
 %named 'name' at line l.  Specifically, the program at Figure~\ref{fig:exam}(a)
 %would be transformed into the following facts:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 FunctionAt(3, "m1")
 CallAt(4, "f")
 FunctionAt(5, "m2")
@@ -144,9 +144,9 @@ CallAt(8, "m1")
 \end{lstlisting}
 
 Then, the analysis requires rules for the initial facts to derive new facts
-about function call relations. In this example, a kind of facts, {\tt
-CallEdge(ln1, ln2)}, denotes a call relation from a callsite at line {\tt ln1}
-to a function define at line {\tt ln2}. To derive function call relation facts,
+about function call relations. In this example, a kind of facts, \rcode{
+CallEdge(ln1, ln2)}, denotes a call relation from a callsite at line \rcode{ ln1}
+to a function define at line \rcode{ ln2}. To derive function call relation facts,
 we define a rule as follows: 
 
 %Next, there are rules that derice new facts from the known facts.  In this
@@ -155,7 +155,7 @@ we define a rule as follows:
 %expression at line l1 to the method definition at line l2. Using the know facts
 %of MethodAt and CallAt, we can define the rule like folowing:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 CallEdge(ln1, ln2) :-
   CallAt(ln1, name),
   FunctionAt(ln2, name)
@@ -167,24 +167,24 @@ CallEdge(ln1, ln2) :-
 %get this new fact:
 
 \noindent
-The rule derives a new fact {\tt CallEdge(ln1, ln2)} when a callsite at line
-{\tt ln1} has the same target function name as the name of a function defined
-at line {\tt ln2}. Therefore, a new fact can be derived from the initial facts
+The rule derives a new fact \rcode{ CallEdge(ln1, ln2)} when a callsite at line
+\rcode{ ln1} has the same target function name as the name of a function defined
+at line \rcode{ ln2}. Therefore, a new fact can be derived from the initial facts
 as follows: 
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 CallEdge(7, 3)
 \end{lstlisting}
 
 Finally, a query system extracts a set of function call relation facts when we
-make a query. Since the rule derives the {\tt CallEdge(7,3)} fact, the
-following query produces {\tt (X, Y) $\in$ \{(7, 3)\}} as a result:
+make a query. Since the rule derives the \rcode{ CallEdge(7,3)} fact, the
+following query produces \rcode{ (X, Y) $\in$ \{(7, 3)\}} as a result:
 
 %Finally, there is a query system that is used for extracting certain sets of
 %facts that meet certain condition. For example, we can simply make a query to
 %find every calledge using following query:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 ?- CallEdge(X, Y).
 \end{lstlisting}
 
@@ -194,18 +194,18 @@ Otherwise, initial facts for the Figure~\ref{fig:exam}(b) code are as follows:
 %of B. Similar to language A, the first step is to create database. For language
 %B, we can have the rules of FunctionAt, CallAt, and Argument as follows:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 ProcedureAt(9, "f")
 CallAt(10, "CallMethod")
 Argument(10, 0, "m2")
 \end{lstlisting}
 
 \noindent
-The kind of facts {\tt ProcedureAt(ln, name)} is identical to {\tt
+The kind of facts \rcode{ ProcedureAt(ln, name)} is identical to \rcode{
 FunctionAt(ln, name)} for the language {\it A}, but has a different relation
-name. The kind of facts {\tt Argument(ln, i, arg)} denotes the syntactic
-information of a function call argument, where {\tt ln} is the line number of
-the callsite, {\tt i} is the argument position, and {\tt arg} is the argument
+name. The kind of facts \rcode{ Argument(ln, i, arg)} denotes the syntactic
+information of a function call argument, where \rcode{ ln} is the line number of
+the callsite, \rcode{ i} is the argument position, and \rcode{ arg} is the argument
 value.
 
 Then, we define a slightly different rule to derive a function call relation
@@ -214,7 +214,7 @@ from the initial facts as follows:
 %have arg as the ith argument.  Then we can define the rule for CallEdge in
 %similar manner:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 CallEdge(l1, l2) :-
   CallAt(l1, name),
   ProcedureAt(l2, name)
@@ -222,8 +222,8 @@ CallEdge(l1, l2) :-
 
 \noindent
 The rule is language-specific, because it derives the same kind of facts from
-different facts for different languages.  The query system produces {\tt (X, Y)
-$\in$ \{\}} as a result of the query {\tt ?- CallEdge(X, Y)}, since there are
+different facts for different languages.  The query system produces \rcode{ (X, Y)
+$\in$ \{\}} as a result of the query \rcode{ ?- CallEdge(X, Y)}, since there are
 no facts holding for the rule.
 %Note that we can use the same query {\tt ?- CallEdge(X, Y)} to derive function
 %call relation facts for both language {\it A} code and {\it B} code, since the
@@ -254,7 +254,7 @@ corresponding language spaces respectively. The following shows the merged
 database containing the initial facts, and subscriptions of the facts denote
 logical language spaces in which the facts reside: 
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 FunctionAt$_A$(3, "m1")
 CallAt$_A$(4, "f")
 FunctionAt$_A$(5, "m2")
@@ -272,7 +272,7 @@ The next step defines a generalized rule to derive function call relation
 facts. We define such rules by composing language-specific rules for A,
 lanuguage-specific rules for B, and language-interoperation rules as follows:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 CallEdge(ln1, ln2) :- CallEdge$_A$(ln1, ln2)
 CallEdge(ln1, ln2) :- CallEdge$_B$(ln1, ln2)
 CallEdge(ln1, ln2) :- CallEdge$_{AB}$(ln1, ln2)
@@ -287,15 +287,15 @@ CallEdge(ln1, ln2) :- CallEdge$_{BA}$(ln1, ln2)
 
 \noindent 
 We slightly modify the language-specific rules for {\it A} and {\it B} to
-derive the {\tt CallEdge$_A$} and {\tt CallEdge$_B$}:
+derive the \rcode{ CallEdge$_A$} and \rcode{ CallEdge$_B$}:
 
 \begin{tabular}{ll}
-  {\begin{lstlisting}
+  {\begin{lstlisting}[style=mrule]
 CallEdge$_A$(ln1, ln2) :-
   CallAt$_A$(ln1, name),
   FunctionAt$_A$(ln2, name)
   \end{lstlisting}} & 
-  {\begin{lstlisting}
+  {\begin{lstlisting}[style=mrule]
 CallEdge$_B$(l1, l2) :-
   CallAt$_B$(l1, name),
   ProcedureAt$_B$(l2, name)
@@ -303,10 +303,10 @@ CallEdge$_B$(l1, l2) :-
 \end{tabular}
 
 \noindent
-In addition, we define additional language-interoperation rules to derive {\tt
-CallEdge$_{AB}$} and {\tt CallEdge$_{BA}$}. The kind of facts {\tt
+In addition, we define additional language-interoperation rules to derive \rcode{
+CallEdge$_{AB}$} and \rcode{ CallEdge$_{BA}$}. The kind of facts \rcode{
 CallEdge$_{AB}$} denotes a function call relation from a function written in
-the language {\it A} to a function written in the language {\it B}, and {\tt
+the language {\it A} to a function written in the language {\it B}, and \rcode{
 CallEdge$_{BA}$} denotes a function call relation in the opposite direction.
 Since the function call semantics from {\it A} to {\it B} is the same as the
 normal function calls in {\it A}, we define the interoperation rule from {\it
@@ -317,7 +317,7 @@ A} to {\it B} as follows:
 %similar to normal method call from B to B, so the rule for CallEdge\_AB can be
 %defined in similar way:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 CallEdge$_{AB}$(ln1, ln2) :-
   CallAt$_A$(ln1, name),
   ProcedureAt$_B$(ln2, name)
@@ -326,7 +326,7 @@ CallEdge$_{AB}$(ln1, ln2) :-
 \noindent
 On the other hand, the function call semantics from {\it B} to {\it A} is
 different from the normal function calls in {\it B}. The language {\it B} calls
-a function written in {\it A} by calling an interoperation API function {\tt
+a function written in {\it A} by calling an interoperation API function \rcode{
 CallMethod} with a target function name as the first argument. Thus, we define
 the interoperation rule from {\it B} to {\it A} as follows: 
 
@@ -334,7 +334,7 @@ the interoperation rule from {\it B} to {\it A} as follows:
 %method call is done via an api function call, we weill have to consider this
 %semantics.
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 CallEdge$_{BA}$(ln1, ln2) :-
   CallAt$_B$(ln1, "CallMethod"),
   Argument$_B$(ln1, 0, name),
@@ -347,8 +347,8 @@ CallEdge$_{BA}$(ln1, ln2) :-
 %?- CallEdge(X, Y).
 %which will give us the output, (X, Y) = (7, 3), (4, 9), (10, 5)
 
-Finally, when we make the same query {\tt ?- CallEdge(X, Y)}, the query system
-produces functions call relations as {\tt (X, Y) $\in$ \{(7, 3), (4, 9), (10,
+Finally, when we make the same query \rcode{ ?- CallEdge(X, Y)}, the query system
+produces functions call relations as \rcode{ (X, Y) $\in$ \{(7, 3), (4, 9), (10,
 5)\}}, which include not only call relations among functions written in a
 language, but also interopreation function call relations. 
 
