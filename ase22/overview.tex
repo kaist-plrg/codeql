@@ -1,14 +1,16 @@
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 
-\section{Declarative Style Analysis for Multilingual Programs}
+\section{Declarative Static Analysis for Multilingual Programs}
 %In this section, we show an overview of how declarative style analysis
 %targetting multiple languages is performed with example of call graph
 %construction as a client analysis, and demonstrate our approach to extend the
 %analyzer to support analysis across languages.
-This section describes the overview of our extension for multilingual program
-analysis. Then, we describe how an example declarative style analysis works
-about a call graph construction example in two different monolingual code and
-how we extend the analysis to construct a unified call graph across languages.
+This section outlines our approach to extending an existing
+declarative static analysis for multilingual program analysis.
+We show how an example declarative static analysis works
+for call graph construction in two different monolingual programs, and
+how we extend the analysis to construct a unified call graph
+encompassing language boundaries.
 
 \begin{figure}[t]
   \centering
@@ -26,7 +28,7 @@ language engine now gets two sets of syntactic facts extracted from different
 languages. In addition, new language-interoperation rules are defined on top of
 the original language-specific rules from different languages to take the
 interoperation semantics into account. Then, the same query is performed to get
-the actual analysis.
+analysis results.
 
 \begin{figure}[t]
   \centering
@@ -45,7 +47,7 @@ m1()
     \label{fig:exam:langA}
   \end{subfigure}
   \begin{subfigure}[t]{0.23\textwidth}
-    \begin{lstlisting}[style=mcpp,firstnumber=9]
+    \begin{lstlisting}[style=mcpp,firstnumber=7]
 void f() {
     CallMethod("m2");
 }
@@ -70,42 +72,42 @@ void f() {
 %the method \javacode{m2} in language A using API function, using the string
 %value "m2" to indicate the name of method.
 
-\subsection{Example declarative style analysis}
-An example declarative analysis consists of facts and rules, and queries as the
-follows:
+\subsection{Example Declarative Static Analysis}
+An example declarative static analysis consists of the following facts, rules, and queries:
 
 {\small
 \[
   \begin{array}{llll}
-    f & ::= & p(\overline{elem | x}) & \text{\sc Fact}\\
+    f & ::= & p(\overline{\embox{elem}\ |\ x}) & \text{\sc Fact}\\
     r & ::= & f\ \mbox{:-}\ \overline{\neg^? f} & \text{\sc Rule}\\
-    q & ::= & \mbox{?-} \overline{f}\ &  \text{\sc Query}
+    q & ::= & \mbox{?-}\ \overline{f}\ &  \text{\sc Query}
 \end{array}
 \]
 }
 
 \noindent
-The fact $p(\overline{elem | x})$ denotes a relation $p$ between elements
-$\overline{elem}$ or variables $\overline{x}$. The elements are primitive
+The fact $p(\overline{\embox{elem}\ |\ x})$ denotes a relation $p$ between elements
+$\overline{\embox{elem}}$ or variables $\overline{x}$. The elements are primitive
 values in the analysis, such as string and integer values.  The rule $f'\
 \mbox{:-}\ \overline{\neg^? f}$ denotes that a fact $f'$ is derived from other
 facts $\overline{f}$; $f'$ holds if all the facts $f \in \{\overline{\neg^?
-f}\}$ hold. The optional prefix negation $\neg$ denotes the negative hold
-condition of a fact; A negated fact $\neg f$ holds if the fact $f$ does not
-hold. The query $\mbox{?-} \overline{f}$ finds all possible elements that
+f}\}$ hold. The optional prefix negation $\neg$ denotes
+the negative hold condition of a fact; 
+the negated fact $\neg f$ holds if the fact $f$ does not
+hold. The query $\mbox{?-}\ \overline{f}$ finds all possible elements that
 make all facts in $\overline{f}$ hold if variables in $\overline{f}$ are
 replaced with the elements.
 
 
-\subsection{Declarative call graph construction for monolingual programs}\label{lab:ovmono}
-Figure~\ref{fig:exam} shows a multilingual code example written in both (a)
+\subsection{Declarative Call Graph Construction for Monolingual Programs}\label{lab:ovmono}
+Figure~\ref{fig:exam} shows a multilingual code example written in (a)
 Python-like language {\it A} and (b) C-like language {\it B}. In {\it A}, there
-are two functions, \rcode{m1} at line~3 and \rcode{m2} at line~5. The function \rcode{
+are two functions, \rcode{m1} on line~2 and \rcode{m2} on line~4. The function \rcode{
 m1} calls the function \rcode{f} in {\it B} via language interoperation between
-{\it A} and {\it B}, and the function \rcode{m2} does nothing. At line~8 in {\it
-A}, the expression \rcode{m1()} calls the function \rcode{m2} defined at line~3 to
-invoke the function {\tt f} in {\it B}.
-The \rcode{f} function in {\it B} calls the \rcode{CallMethod} function with a
+{\it A} and {\it B}, and the function \rcode{m2} does nothing. On line~6 in {\it
+A}, the expression \rcode{m1()} calls the function \rcode{m1} defined on line~2 to
+invoke the function \rcode{f} in {\it B}.
+The function \rcode{f} in {\it B} calls the \rcode{CallMethod} function with a
 string value \rcode{"m2"} to invoke the function \rcode{m2} in {\it A}, using the
 string value argument as the target function name.
 %Thus, the code example performs the bidirectional interoperation between {\it
@@ -113,14 +115,14 @@ string value argument as the target function name.
 %B} and calls the function {\tt m2} written in {\it B} from {\it A}.
 
 
-At first, A declarative style analysis creates a database of facts for the
+A declarative static analysis first creates a database of facts for the
 code. Initial facts are just syntactic information extracted from the code.
-For example, there are two kinds of facts required for the call graph
-construction; \rcode{FunctionAt(ln, name)} denotes function definition
+For example, there are two kinds of facts required for call graph
+construction: \rcode{FunctionAt(ln, name)} denotes function definition
 information containing its line number \rcode{ln} and the function name \rcode{
 name}, and \rcode{CallAt(ln, name)} denotes callsite information
 containing the callsite line number \rcode{ln} and its target function name \rcode{
-name}. The initial facts for the Figure~\ref{fig:exam}(a) code are as follows: 
+name}. The initial facts for the code in Figure~\ref{fig:exam}(a) are as follows: 
 
 %First, let's consider a hypothetical declarative style analyzer, that supports
 %language A.  As a first step, the database of facts are created from the source
@@ -132,16 +134,16 @@ name}. The initial facts for the Figure~\ref{fig:exam}(a) code are as follows:
 %would be transformed into the following facts:
 
 \begin{lstlisting}[style=mrule]
-FunctionAt(3, "m1")
-CallAt(4, "f")
-FunctionAt(5, "m2")
-CallAt(8, "m1")
+    FunctionAt(2, "m1")
+    CallAt(3, "f")
+    FunctionAt(4, "m2")
+    CallAt(6, "m1")
 \end{lstlisting}
 
 Then, the analysis requires rules for the initial facts to derive new facts
-about function call relations. In this example, a kind of facts, \rcode{
+about function call relations. In this example, one kind of facts, \rcode{
 CallEdge(ln1, ln2)}, denotes a call relation from a callsite at line \rcode{ ln1}
-to a function define at line \rcode{ ln2}. To derive function call relation facts,
+to a function definition at line \rcode{ ln2}. To derive function call relation facts,
 we define a rule as follows: 
 
 %Next, there are rules that derice new facts from the known facts.  In this
@@ -151,9 +153,9 @@ we define a rule as follows:
 %of MethodAt and CallAt, we can define the rule like folowing:
 
 \begin{lstlisting}[style=mrule]
-CallEdge(ln1, ln2) :-
-  CallAt(ln1, name),
-  FunctionAt(ln2, name)
+    CallEdge(ln1, ln2) :-
+      CallAt(ln1, name),
+      FunctionAt(ln2, name)
 \end{lstlisting}
 
 %The meaning of this rule is straight forward. Whenever there is a method
@@ -168,40 +170,40 @@ at line \rcode{ ln2}. Therefore, a new fact can be derived from the initial fact
 as follows: 
 
 \begin{lstlisting}[style=mrule]
-CallEdge(7, 3)
+    CallEdge(6, 2)
 \end{lstlisting}
 
 Finally, a query system extracts a set of function call relation facts when we
-make a query. Since the rule derives the \rcode{ CallEdge(7,3)} fact, the
-following query produces \rcode{ (X, Y) $\in$ \{(7, 3)\}} as a result:
+make a query. Since the rule derives the fact \rcode{ CallEdge(6,2)}, the
+following query produces \rcode{ (X, Y)\ $\in$ \{(6, 2)\}} as a result:
 
 %Finally, there is a query system that is used for extracting certain sets of
 %facts that meet certain condition. For example, we can simply make a query to
 %find every calledge using following query:
 
 \begin{lstlisting}[style=mrule]
-?- CallEdge(X, Y).
+    ?- CallEdge(X, Y).
 \end{lstlisting}
 
 
-Otherwise, initial facts for the Figure~\ref{fig:exam}(b) code are as follows: 
+Let us consider the language {\it B} case.
+The initial facts for the code in Figure~\ref{fig:exam}(b) are as follows: 
 %This time, let's look at how the analyzer is extended to support the analysis
 %of B. Similar to language A, the first step is to create database. For language
 %B, we can have the rules of FunctionAt, CallAt, and Argument as follows:
 
 \begin{lstlisting}[style=mrule]
-ProcedureAt(9, "f")
-CallAt(10, "CallMethod")
-Argument(10, 0, "m2")
+    ProcedureAt(7, "f")
+    CallAt(8, "CallMethod")
+    Argument(8, 0, "m2")
 \end{lstlisting}
 
 \noindent
-The kind of facts \rcode{ ProcedureAt(ln, name)} is identical to \rcode{
-FunctionAt(ln, name)} for the language {\it A}, but has a different relation
-name. The kind of facts \rcode{ Argument(ln, i, arg)} denotes the syntactic
-information of a function call argument, where \rcode{ ln} is the line number of
-the callsite, \rcode{ i} is the argument position, and \rcode{ arg} is the argument
-value.
+The fact \rcode{ ProcedureAt(ln, name)} denotes that a procedure of name
+\rcode{name} is defined on line \rcode{ln} similarly to
+\rcode{FunctionAt(ln, name)} for the language {\it A}.
+The fact \rcode{ Argument(ln, i, arg)} denotes that the value of
+the \rcode{i}-th argument of a function call on line \rcode{ ln} is \rcode{ arg}.
 
 Then, we define a slightly different rule to derive a function call relation
 from the initial facts as follows: 
@@ -210,16 +212,16 @@ from the initial facts as follows:
 %similar manner:
 
 \begin{lstlisting}[style=mrule]
-CallEdge(l1, l2) :-
-  CallAt(l1, name),
-  ProcedureAt(l2, name)
+    CallEdge(ln1, ln2) :-
+      CallAt(ln1, name),
+      ProcedureAt(ln2, name)
 \end{lstlisting}
 
 \noindent
-The rule is language-specific, because it derives the same kind of facts from
-different facts for different languages.  The query system produces \rcode{ (X, Y)
-$\in$ \{\}} as a result of the query \rcode{ ?- CallEdge(X, Y)}, since there are
-no facts holding for the rule.
+This rule describes the interoperation semantics across language boundaries.
+Therefore, when we make the query \rcode{ ?- CallEdge(X, Y)},
+the query system produces \rcode{ (X, Y)\ $\in$ \{\}} as a result
+since it has no facts for the language {\it A}.
 %Note that we can use the same query {\tt ?- CallEdge(X, Y)} to derive function
 %call relation facts for both language {\it A} code and {\it B} code, since the
 %kind of facts has the same relation name.  
@@ -234,7 +236,7 @@ no facts holding for the rule.
 %to find all possible set of call edges. In this case, the output would be empty
 %as the analyzer is not considering the source code from A.
 
-\subsection{Extending declarative call graph construction for multilingual programs}
+\subsection{Extension of Declarative Call Graph Construction for Multilingual Programs}
 %So far, we have seen how a declarative analyzer designed for one language can
 %be extended to support another language. Now, we can take aadvantage of this
 
@@ -244,34 +246,35 @@ no facts holding for the rule.
 
 The first step of our extension for multilingual program analysis creates a
 merged database that consists of two logical language spaces, {\it A} and {\it
-B}. Then, we store initial facts of the Figure~\ref{fig:exam}(a) and (b) to
-corresponding language spaces respectively. The following shows the merged
-database containing the initial facts, and subscriptions of the facts denote
-logical language spaces in which the facts reside: 
+B}. Then, we store the initial facts of the code in Figure~\ref{fig:exam}(a) and
+Figure~\ref{fig:exam} (b) to
+their corresponding language spaces, respectively. The following shows the merged
+database containing the initial facts, where the subscripts of the facts denote
+the logical language spaces in which the facts reside: 
 
 \begin{lstlisting}[style=mrule]
-FunctionAt$_A$(3, "m1")
-CallAt$_A$(4, "f")
-FunctionAt$_A$(5, "m2")
-CallAt$_A$(8, "m1")
-ProcedureAt$_B$(9, "f")
-CallAt$_B$(10, "CallMethod")
-Argument$_B$(10, 0, "m2")
+    FunctionAt$_A$(2, "m1")
+    CallAt$_A$(3, "f")
+    FunctionAt$_A$(4, "m2")
+    CallAt$_A$(6, "m1")
+    ProcedureAt$_B$(7, "f")
+    CallAt$_B$(8, "CallMethod")
+    Argument$_B$(8, 0, "m2")
 \end{lstlisting}
 
 %Then, the next step is to define the rule for CallEdge.  The new rule will be
 %composed of three parts: language-specific rule for A, lanuguage-specific rule
 %for B, and language-interoperations rules:
 
-The next step defines a generalized rule to derive function call relation
-facts. We define such rules by composing language-specific rules for A,
+The next step defines generalized rules to derive function call relation
+facts. We define them by composing language-specific rules for A,
 lanuguage-specific rules for B, and language-interoperation rules as follows:
 
 \begin{lstlisting}[style=mrule]
-CallEdge(ln1, ln2) :- CallEdge$_A$(ln1, ln2)
-CallEdge(ln1, ln2) :- CallEdge$_B$(ln1, ln2)
-CallEdge(ln1, ln2) :- CallEdge$_{AB}$(ln1, ln2)
-CallEdge(ln1, ln2) :- CallEdge$_{BA}$(ln1, ln2)
+    CallEdge(ln1, ln2) :- CallEdge$_A$(ln1, ln2)
+    CallEdge(ln1, ln2) :- CallEdge$_B$(ln1, ln2)
+    CallEdge(ln1, ln2) :- CallEdge$_{AB}$(ln1, ln2)
+    CallEdge(ln1, ln2) :- CallEdge$_{BA}$(ln1, ln2)
 \end{lstlisting}
 
 %For language-specific rules for CallEdge\_A and CallEdge\_B can be defined same
@@ -286,25 +289,25 @@ derive the \rcode{ CallEdge$_A$} and \rcode{ CallEdge$_B$}:
 
 \begin{tabular}{ll}
   {\begin{lstlisting}[style=mrule]
-CallEdge$_A$(ln1, ln2) :-
-  CallAt$_A$(ln1, name),
-  FunctionAt$_A$(ln2, name)
+    CallEdge$_A$(ln1, ln2) :-
+      CallAt$_A$(ln1, name),
+      FunctionAt$_A$(ln2, name)
   \end{lstlisting}} & 
   {\begin{lstlisting}[style=mrule]
-CallEdge$_B$(l1, l2) :-
-  CallAt$_B$(l1, name),
-  ProcedureAt$_B$(l2, name)
+    CallEdge$_B$(ln1, ln2) :-
+      CallAt$_B$(ln1, name),
+      ProcedureAt$_B$(ln2, name)
   \end{lstlisting}}
 \end{tabular}
 
 \noindent
 In addition, we define additional language-interoperation rules to derive \rcode{
-CallEdge$_{AB}$} and \rcode{ CallEdge$_{BA}$}. The kind of facts \rcode{
+CallEdge$_{AB}$} and \rcode{ CallEdge$_{BA}$}. The fact \rcode{
 CallEdge$_{AB}$} denotes a function call relation from a function written in
 the language {\it A} to a function written in the language {\it B}, and \rcode{
 CallEdge$_{BA}$} denotes a function call relation in the opposite direction.
 Since the function call semantics from {\it A} to {\it B} is the same as the
-normal function calls in {\it A}, we define the interoperation rule from {\it
+normal function call semantics in {\it A}, we define the interoperation rule from {\it
 A} to {\it B} as follows: 
 
 %For language-interoperation rule, both call from A to
@@ -313,14 +316,14 @@ A} to {\it B} as follows:
 %defined in similar way:
 
 \begin{lstlisting}[style=mrule]
-CallEdge$_{AB}$(ln1, ln2) :-
-  CallAt$_A$(ln1, name),
-  ProcedureAt$_B$(ln2, name)
+    CallEdge$_{AB}$(ln1, ln2) :-
+      CallAt$_A$(ln1, name),
+      ProcedureAt$_B$(ln2, name)
 \end{lstlisting}
 
 \noindent
 On the other hand, the function call semantics from {\it B} to {\it A} is
-different from the normal function calls in {\it B}. The language {\it B} calls
+different from the normal function call semantics in {\it B}. The language {\it B} calls
 a function written in {\it A} by calling an interoperation API function \rcode{
 CallMethod} with a target function name as the first argument. Thus, we define
 the interoperation rule from {\it B} to {\it A} as follows: 
@@ -330,10 +333,10 @@ the interoperation rule from {\it B} to {\it A} as follows:
 %semantics.
 
 \begin{lstlisting}[style=mrule]
-CallEdge$_{BA}$(ln1, ln2) :-
-  CallAt$_B$(ln1, "CallMethod"),
-  Argument$_B$(ln1, 0, name),
-  FunctionAt$_A$(ln2, name)
+    CallEdge$_{BA}$(ln1, ln2) :-
+      CallAt$_B$(ln1, "CallMethod"),
+      Argument$_B$(ln1, 0, name),
+      FunctionAt$_A$(ln2, name)
 \end{lstlisting}
 
 %After fully defining the rule for CallEdge, then we can reuse the query system
@@ -343,17 +346,17 @@ CallEdge$_{BA}$(ln1, ln2) :-
 %which will give us the output, (X, Y) = (7, 3), (4, 9), (10, 5)
 
 Finally, when we make the same query \rcode{ ?- CallEdge(X, Y)}, the query system
-produces functions call relations as \rcode{ (X, Y) $\in$ \{(7, 3), (4, 9), (10,
-5)\}}, which include not only call relations among functions written in a
-language, but also interopreation function call relations. 
+now produces \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), (8, 4)\}} as function call relation results,
+which include not only intraoperation call relations,
+but also interopreation call relations. 
 
 This simple example shows what our extension for multilingual program analysis
-requires. Our extension reuses most of parts of an existing declarative style
+requires. Our extension reuses most compoenents in an existing declarative static
 analysis with slight modifications. Because the modifications of a database and
-language-specific rules is trivial, we can fully automate the modification
+language-specific rules are trivial, we can fully automate the modification
 process.  The only manual part in our extension is to define additional
-language-interoperation rules. We detail a proof-of-concept extension of CodeQL
-for Java-C and Python-C programs in Section~\ref{sec:impl}.
+language-interoperation rules. We explain how we extend CodeQL to support
+multilingual program anaysis for Java-C and Python-C programs in the next section.
 
 %It is interesting to see what is the only required task for this extension.
 %Most of the parts in original analyzers is reused, and the only requirements
