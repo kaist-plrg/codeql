@@ -218,10 +218,11 @@ from the initial facts as follows:
 \end{lstlisting}
 
 \noindent
-This rule describes the interoperation semantics across language boundaries.
-Therefore, when we make the query \rcode{ ?- CallEdge(X, Y)},
+This example shows a language-specific rule;
+the same fact \rcode{CallEdge} can be derived from different facts for
+different languages. When we make the query \rcode{ ?- CallEdge(X, Y)},
 the query system produces \rcode{ (X, Y)\ $\in$ \{\}} as a result
-since it has no facts for the language {\it A}.
+since it has no facts to satisfy the rule.
 %Note that we can use the same query {\tt ?- CallEdge(X, Y)} to derive function
 %call relation facts for both language {\it A} code and {\it B} code, since the
 %kind of facts has the same relation name.  
@@ -351,7 +352,7 @@ which include not only intraoperation call relations,
 but also interopreation call relations. 
 
 This simple example shows what our extension for multilingual program analysis
-requires. Our extension reuses most compoenents in an existing declarative static
+requires. Our extension reuses most components in an existing declarative static
 analysis with slight modifications. Because the modifications of a database and
 language-specific rules are trivial, we can fully automate the modification
 process.  The only manual part in our extension is to define additional
