@@ -47,9 +47,7 @@ QL code defines the predicate \codeql{isOneOrTwo}:
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneOrTwo(int n) {
-  n = 1
-  or
-  n = 2
+  n = 1 or n = 2
 }
 \end{lstlisting}
 
@@ -58,15 +56,10 @@ and the following definition defines the class \codeql{OneOrTwo}:
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneOrTwo extends int {
-  OneOrTwo() { // characteristic predicate
-    this = 1
-    or
-    this = 2
-  }
-
-  int next() {
-    resut = this + 1
-  }
+  // characteristic predicate
+  OneOrTwo() { this = 1 or this = 2 }
+  // member predicate
+  int add(OneOrTwo that) { resut = this + that }
 }
 \end{lstlisting}
 
@@ -111,10 +104,10 @@ into databases in the binary format. For example, the
 following demonstrates a sample trap file:
 
 \begin{lstlisting}[style=java,numbers=none]
-#10001=@"class;myClass.MyClass"  ...
+#10001=@"class;myClass.MyClass"
 #10002=@"type;int"
-primitives(#10002,"int")  ...
-#10003=@"callable;{#10001}.myMethod({#10002}){#10002}"  ...
+primitives(#10002,"int")
+#10003=@"callable;{#10001}.myMethod({#10002}){#10002}"
 #10004=@"params;{#10003};0"
 params(#10004,#10002,0,#10003,#10004)
 paramName(#10004,"myParam")
@@ -140,12 +133,11 @@ facts \javacode{primitives(...)} in a table named \javacode{@primitives}, and
   \begin{subfigure}[t]{0.5\textwidth}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class Node extends TNode { ... }
-predicate simpleLocalFlowStep(Node from, Node to) {
-  exprToExprStep_nocfg( // Expr -> Expr
-    from.asExpr(),
-    to.asExpr()
-  )
-  or ...  // Assignment -> LValue post-update node
+predicate localFlowStep(Node from, Node to) {
+  // Expr -> Expr
+  exprToExprStep_nocfg(from.asExpr(), to.asExpr())
+  or // Assignment -> LValue post-update node
+  ...
 }
 \end{lstlisting}
     \vspace*{-.5em}
@@ -154,9 +146,8 @@ predicate simpleLocalFlowStep(Node from, Node to) {
   \begin{subfigure}[t]{0.5\textwidth}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class Node extends TNode { ... }
-predicate simpleLocalFlowStep(Node node1, Node node2) {
-  // Variable flow steps through
-  // adjacent def-use and use-use pairs.
+predicate localFlowStep(Node node1, Node node2) {
+  // Flow through adjacent def-use and use-use pairs.
   exists(SsaExplicitUpdate upd |
     upd.getDefiningExpr().(VariableAssign).getSource()
       = node1.asExpr() or
@@ -164,7 +155,8 @@ predicate simpleLocalFlowStep(Node node1, Node node2) {
   |
     node2.asExpr() = upd.getAFirstUse()
   )
-  or ...  // Flow through this
+  or // Flow through this
+  ...
 }
 \end{lstlisting}
     \vspace*{-.5em}
@@ -204,12 +196,12 @@ pre-defined predicates and classes for users to implement their own analyses.
 A dataflow analysis library is such a library, which supports both C and Java.
 For example, Figure~\ref{fig:qll} shows sample QL libraries for C and Java,
 which uses the same class name \ccode{Node} and the same predicate
-name \ccode{simpleLocalFlowStep}.
+name \ccode{localFlowStep}.
 However, even with the same name, the class \ccode{Node} in C and the
 class \javacode{Node} in Java are different classes, which are incompatible.
-The same applies to the predicate \ccode{simpleLocalFlowStep}.
+The same applies to the predicate \ccode{localFlowStep}.
 In other words, we can not use the class \ccode{Node} in C as an
-argument of the predicate \javacode{simpleLocalFlowStep} in Java or vice versa.
+argument of the predicate \javacode{localFlowStep} in Java or vice versa.
 
 To make classes and predicates in C and Java become compatible,
 we lift each library to the common level.
@@ -223,15 +215,10 @@ that can cast the lifted class into the C or Java class:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 private newtype TNode =
   TJavaNode(JAVA::Node n)
-  or
-  TCNode(C::Node n)
+  or TCNode(C::Node n)
 class Node extends TNode {
-  JAVA::Node asJava() {
-    this = TJavaNode(result)
-  }
-  C::Node asC() {
-    this = TCNode(result)
-  }
+  JAVA::Node asJava() { this = TJavaNode(result)}
+  C::Node asC() { this = TCNode(result) }
   ...
 }
 \end{lstlisting}
@@ -239,14 +226,9 @@ Similarly, we can lift a predicate by combining two original predicates with
 the \codeql{or} connective. For each original predicate, we cast down
 each of the arguments and return values to the class of its corresponding language:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
-predicate simpleLocalFlowStep(Node node1, Node node2) {
-  JAVA::simpleLocalFlowStep(
-    node1.asJava(), node2.asJava()
-  )
-  or
-  C::simpleLocalFlowStep(
-    node1.asC(), node2.asC()
-  )
+predicate localFlowStep(Node node1, Node node2) {
+  JAVA::localFlowStep(node1.asJava(), node2.asJava())
+  or C::localFlowStep(node1.asC(), node2.asC())
 }
 \end{lstlisting}
 After lifting, lifted predicates show the equivalent behaviors as the
@@ -256,7 +238,7 @@ We fully automate the lifting process with the aid of QL compiler error
 messages. When compiling a query with the merged database, the QL compiler
 reports error messages containing required classes and predicates, and a
 signature of each required predicate. Using the information, we synthesize
-lifted classes and predicates without manually efforts.
+lifted classes and predicates without manual efforts.
 
 %The process of lifting could be effectively automated with the aid of
 %QL's compile message. First, try to compile a query without actually
@@ -283,12 +265,9 @@ named \codeql{viableCallable}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
   result.asJava() = JAVA::viableCallable(c.asJava())
-  or
-  result.asC() = C::viableCallable(c.asC())
-  or
-  result.asC() = viableCallableJ2C(c.asJava())
-  or
-  result.asJava() = viableCallableC2J(c.asC())
+  or result.asC() = C::viableCallable(c.asC())
+  or result.asC() = viableCallableJ2C(c.asJava())
+  or result.asJava() = viableCallableC2J(c.asC())
 }
 \end{lstlisting}
 %This predicate finds the call edge from the call expression to its
@@ -372,12 +351,9 @@ Python-C program analysis:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
   result.asPython() = PYTHON::viableCallable(c.asPython())
-  or
-  result.asC() = C::viableCallable(c.asC())
-  or
-  result.asC() = viableCallableP2C(c.asPython())
-  or
-  result.asPython() = viableCallableC2P(c.asC())
+  or result.asC() = C::viableCallable(c.asC())
+  or result.asC() = viableCallableP2C(c.asPython())
+  or result.asPython() = viableCallableC2P(c.asC())
 }
 \end{lstlisting}
 
