@@ -231,9 +231,9 @@ After lifting, lifted predicates show the equivalent behaviors as the
 original ones if all the arguments are from the same language.
 
 We fully automate the lifting process using QL compiler error
-messages. When compiling a query with a merged database, the QL compiler
+messages. When compiling a query without importing the library, the QL compiler
 reports error messages containing required classes and predicates, and
-signatures of required predicates. Using the information, we
+signatures of the predicates. Using the information, we
 automatically synthesize lifted classes and predicates.
 
 %The process of lifting could be effectively automated with the aid of
