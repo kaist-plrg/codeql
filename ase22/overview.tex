@@ -30,34 +30,32 @@ the actual analysis.
 
 \begin{figure}[t]
   \centering
-  \vspace{2mm}
-  \begin{subfigure}[t]{0.5\textwidth}
+%  \vspace{2mm}
+  \begin{subfigure}[t]{0.23\textwidth}
     \begin{lstlisting}[style=mpython]
 import f
-
 def m1():
     f()
 def m2():
     pass
-
 m1()
     \end{lstlisting}
     \vspace*{-.5em}
     \caption{Code in language A}
     \label{fig:exam:langA}
   \end{subfigure}
-  \begin{subfigure}[t]{0.5\textwidth}
+  \begin{subfigure}[t]{0.23\textwidth}
     \begin{lstlisting}[style=mcpp,firstnumber=9]
 void f() {
     CallMethod("m2");
 }
     \end{lstlisting}
-    \vspace*{-.5em}
+    \vspace*{2.5em}
     \caption{Code in language B}
     \label{fig:exam:langB}
   \end{subfigure}
   \vspace*{-.5em}
-  \caption{Multilingual code example written in both language A and B}
+  \caption{Multilingual code example written in both A and B}
   \label{fig:exam}
 \end{figure}
 
@@ -75,6 +73,8 @@ void f() {
 \subsection{Example declarative style analysis}
 An example declarative analysis consists of facts and rules, and queries as the
 follows:
+
+{\small
 \[
   \begin{array}{llll}
     f & ::= & p(\overline{elem | x}) & \text{\sc Fact}\\
@@ -82,6 +82,9 @@ follows:
     q & ::= & \mbox{?-} \overline{f}\ &  \text{\sc Query}
 \end{array}
 \]
+}
+
+\noindent
 The fact $p(\overline{elem | x})$ denotes a relation $p$ between elements
 $\overline{elem}$ or variables $\overline{x}$. The elements are primitive
 values in the analysis, such as string and integer values.  The rule $f'\

@@ -1,13 +1,15 @@
-\begin{table*}[t]
+\begin{table}[t]
   \vspace{2mm}
-  \caption{Analysis results of the ExtModuleFlowBench benchmarks}
+  \caption{Analysis results of ExtModuleFlowBench}
   \label{table:RQ1-3}
   \vspace*{-1em}
   \centering
-  \small
-\renewcommand{\arraystretch}{.9}
-  \begin{tabular}{@{}l|c||l|c@{}}
-    \textbf{Benchmark} & \textbf{Dataflow} & \textbf{Benchmark} & \textbf{Dataflow} \\\hhline{=|=#=|=}
+  \footnotesize
+%\renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{l|c||l|c}
+    \textbf{Benchmark} & \textbf{Dataflow} & \textbf{Benchmark} & \textbf{Dataflow}
+%\\\hline\hline
+\\\hhline{=|=#=|=}
     callback                    & $\bigcirc$  & multiple\_module             & $\bigcirc$  \\
     cobject\_member             & $\bigcirc$  & noleak                       & $\bigcirc$  \\
     cobject\_method             & $\bigcirc$  & noleak\_array                & $\bigcirc$  \\
@@ -19,4 +21,4 @@
     leak\_array                 & $\times$    & source                       & $\bigcirc$  \\
     multiple\_interactions      & $\bigcirc$  & source\_clean                & $\times$
   \end{tabular}
-\end{table*}
+\end{table}
