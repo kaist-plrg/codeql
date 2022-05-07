@@ -1,0 +1,7 @@
+https://dl.google.com/android/repository/android-ndk-r10e-darwin-x86_64.zip android-ndk-r10e
+https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip android-ndk-r12b 
+https://dl.google.com/android/repository/android-ndk-r13b-darwin-x86_64.zip android-ndk-r13b
+https://dl.google.com/android/repository/android-ndk-r15c-darwin-x86_64.zip android-ndk-r15c
+https://dl.google.com/android/repository/android-ndk-r16b-darwin-x86_64.zip android-ndk-r16b
+https://dl.google.com/android/repository/android-ndk-r19c-darwin-x86_64.zip android-ndk-r19c
+https://dl.google.com/android/repository/android-ndk-r20b-darwin-x86_64.zip android-ndk-r20b
