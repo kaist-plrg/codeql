@@ -1,16 +1,26 @@
 \begin{table}[t]
-  \vspace{2mm}
+%  \vspace{2mm}
   \caption{Bug detection results of real-world Android JNI apps}
   \label{table:RQ2}
   \vspace*{-1em}
   \centering
   \footnotesize
-%\renewcommand{\arraystretch}{1.1}
-  \begin{tabular}{l||r|r|r|r|r} 
+\renewcommand{\arraystretch}{.9}
+  \begin{tabular}{@{}l@{}||r|r|r|r|r@{}}
     \multirow{4}{*}{\textbf{Application}} &
                                             \multicolumn{5}{c}{\textbf{Bug Kind}} \\\hhline{~||-----}
-                                          & \multicolumn{2}{c|}{\textbf{Null}}   & \multicolumn{1}{c|}{\textbf{Missing}} & \multicolumn{1}{c|}{\textbf{Type}} & \multicolumn{1}{c}{\textbf{Wrong}} \\\hhline{~||~|~|~|~|~}
-                                          & \multicolumn{2}{c|}{\textbf{Deref.}} & \multicolumn{1}{c|}{\textbf{Fun}} & \multicolumn{1}{c|}{\textbf{Mis.}} & \multicolumn{1}{c}{\textbf{\textbf{Sig.}}}  \\\hhline{~||-|-|-|-|-}
+                                          &
+                                            \multicolumn{2}{c|}{\textbf{Null
+                                            Deref.}}   &
+                                                         \multicolumn{1}{c|}{\textbf{Missing
+                                                         Fun.}} &
+                                                                  \multicolumn{1}{c|}{\textbf{Type
+                                                                  Mis.}}
+                                                                &
+                                                                  \multicolumn{1}{c}{\textbf{Wrong Sig.}} 
+%\\\hhline{~||~|~|~|~|~}
+                                          % & \multicolumn{2}{c|}{\textbf{Deref.}} & \multicolumn{1}{c|}{\textbf{Fun}} & \multicolumn{1}{c|}{\textbf{Mis.}} & \multicolumn{1}{c}{\textbf{\textbf{Sig.}}}  
+\\\hhline{~||-|-|-|-|-}
                                           & \multicolumn{1}{c|}{\textbf{\# TP}}   & \multicolumn{1}{c|}{\textbf{\# FP}} & \multicolumn{1}{c|}{\textbf{\# TP}} & \multicolumn{1}{c|}{\textbf{\# TP}} & \multicolumn{1}{c}{\textbf{\textbf{\# TP}}}  \\\hhline{=#=|=|=|=|=}
 
     APV PDF Viewer    & 0 & 1 & 0 & \cellcolor{\succcolor}2 & 0 \\ 

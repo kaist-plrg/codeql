@@ -1,13 +1,13 @@
 \begin{table}[t]
-  \vspace{2mm}
+%  \vspace{2mm}
   \caption{Analysis results of NativeFlowBench}
   \label{table:RQ1-1}
   \vspace*{-1em}
   \centering
   \footnotesize
-%\renewcommand{\arraystretch}{.9}
-  \begin{tabular}{l|c|c}
-\textbf{Benchmark} & \textbf{\jnsaf} & \textbf{\ours}\\\hline\hline
+\renewcommand{\arraystretch}{.9}
+  \begin{tabular}{l||c|c}
+\multicolumn{1}{c||}{\textbf{Benchmark}} & \textbf{\jnsaf} & \textbf{\ours}\\\hline\hline
     icc\_javatonative                   & $\bigcirc$ & $\times$\\
     icc\_nativetojava                   & $\bigcirc$ & $\times$\\
     native\_complexdata                 & $\bigcirc$ & $\bigcirc$\\
@@ -32,5 +32,6 @@
  native\_source                       & $\bigcirc$ & $\bigcirc$  \\
  native\_source\_clean                & $\bigcirc$ & $\bigcirc$
   \end{tabular}
+\vspace*{-1em}
 \end{table}
 
