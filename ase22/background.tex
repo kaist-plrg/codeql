@@ -35,13 +35,13 @@ function f() {
   return 42;
 }
 \end{lstlisting}
-We can define a syntactic fact of the form {\tt FunctionAt(ln, name)}, where
-{\tt ln} denotes the line number and {\tt name} denotes a name of the function
-defined at line {\tt ln}.  Therefore, we can extract the fact {\tt
-FunctionAt(1, "f")}.  Another example syntactic fact is {\tt EnclosingStmt(ln1,
-ln2, i)}, which denotes that the function at line {\tt ln1} has the statement
-at line {\tt ln2} as the {\tt i}-th statement in the function body.  For
-example, we can extract the following syntactic facts: {\tt EnclosingStmt(1, 2,
+We can define a syntactic fact of the form \rcode{ FunctionAt(ln, name)}, where
+\rcode{ ln} denotes the line number and \rcode{ name} denotes a name of the function
+defined at line \rcode{ ln}.  Therefore, we can extract the fact \rcode{
+FunctionAt(1, "f")}.  Another example syntactic fact is \rcode{ EnclosingStmt(ln1,
+ln2, i)}, which denotes that the function at line \rcode{ ln1} has the statement
+at line \rcode{ ln2} as the \rcode{ i}-th statement in the function body.  For
+example, we can extract the following syntactic facts: \rcode{ EnclosingStmt(1, 2,
 0)}.
 
 In a sense, these syntactic facts serve as building blocks for the
@@ -60,28 +60,28 @@ without re-extracting them from the source code.
 The next step is to define rules to generate new facts out of known facts.
 This step corresponds to actually implementing the algorithm of a static
 analysis in a declarative style.  For example, we can define a dataflow
-analysis {\tt Flow(x, z)},  which denotes that there is a dataflow from {\tt x}
-to {\tt z}, where {\tt x} and {\tt z} represents a program entity that can hold
+analysis \rcode{ Flow(x, z)},  which denotes that there is a dataflow from \rcode{ x}
+to \rcode{ z}, where \rcode{ x} and \rcode{ z} represents a program entity that can hold
 a run-time value, such as a variable, a literal, and a function parameter.  We
 can define the rule for this fact as the transitive closure of the fact named
-{\tt Step}:
+\rcode{ Step}:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=mrule]
 Flow(x, z) :- Step(x, z)
 Flow(x, z) :- Step(x, y), Flow(y, z)
 \end{lstlisting}
 
 \noindent
-where {\tt Step(x, z)} denotes a direct data flow from {\tt x} to {\tt z}. The
-rule derives a new fact {\tt Flow(x, z)} if there is a fact {\tt Step(x, z)} or
-there are two facts {\tt Step(x, y)} and {\tt Flow(y, z)}.
+where \rcode{ Step(x, z)} denotes a direct data flow from \rcode{ x} to \rcode{ z}. The
+rule derives a new fact \rcode{ Flow(x, z)} if there is a fact \rcode{ Step(x, z)} or
+there are two facts \rcode{ Step(x, y)} and \rcode{ Flow(y, z)}.
 
 %The next step is to define rules to generate new facts out of known facts.
 %%This step corresponds to actually implementing the algorithm of a
 %%static analysis in a declarative style.
 %For example, recall that we can define a call graph
-%{\tt CallEdge(l1, l2)} using the facts
-%named {\tt FunctionAt} and {\tt CallAt}.
+%\rcode{ CallEdge(l1, l2)} using the facts
+%named \rcode{ FunctionAt} and \rcode{ CallAt}.
 %The defined rules are evaluated with declarative engines to finding all possible
 %facts that can be derived. The rules are usually evaluated in a bottom-up
 %and modular manner. Each rule is evaluated one-by-one, after every
