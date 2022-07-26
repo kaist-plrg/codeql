@@ -1,0 +1,37 @@
+\begin{table}[t]
+%  \vspace{2mm}
+  \caption{Analysis results of NativeFlowBench}
+  \label{table:RQ1-1}
+  \vspace*{-1em}
+  \centering
+%  \footnotesize
+\renewcommand{\arraystretch}{.9}
+  \begin{tabular}{l||c|c}
+\multicolumn{1}{c||}{\textbf{Benchmark}} & \textbf{\jnsaf} & \textbf{\ours}\\\hline\hline
+    icc\_javatonative                   & $\bigcirc$ & $\times$\\
+    icc\_nativetojava                   & $\bigcirc$ & $\times$\\
+    native\_complexdata                 & $\bigcirc$ & $\bigcirc$\\
+    native\_complexdata\_stringop       & $\times$ & $\times$\\
+    native\_dynamic\_register\_multiple & $\bigcirc$ & $\bigcirc$\\
+    native\_heap\_modify                & $\bigcirc$ & $\bigcirc$\\
+    native\_leak                        & $\bigcirc$ & $\bigcirc$\\
+    native\_leak\_array                 & $\bigcirc$ & $\times$\\
+    native\_leak\_dynamic\_register     & $\bigcirc$ & $\bigcirc$\\
+    native\_method\_overloading         & $\bigcirc$ & $\bigcirc$\\
+    native\_multiple\_interactions      & $\bigcirc$ & $\bigcirc$\\
+    native\_multiple\_libraries         & $\bigcirc$ & $\bigcirc$\\
+ native\_noleak                       & $\bigcirc$ & $\bigcirc$ \\
+ native\_noleak\_array                & $\times$ & $\bigcirc$  \\
+ native\_nosource                     & $\bigcirc$ & $\bigcirc$  \\
+ native\_pure                         & $\bigcirc$ & $\bigcirc$  \\
+ native\_pure\_direct                 & $\bigcirc$ & $\bigcirc$  \\
+ native\_pure\_direct\_customized     & $\bigcirc$ & $\bigcirc$  \\
+ native\_set\_field\_from\_arg        & $\bigcirc$ & $\bigcirc$  \\
+ native\_set\_field\_from\_arg\_field & $\bigcirc$ & $\bigcirc$  \\
+ native\_set\_field\_from\_native     & $\bigcirc$ & $\bigcirc$  \\
+ native\_source                       & $\bigcirc$ & $\bigcirc$  \\
+ native\_source\_clean                & $\bigcirc$ & $\bigcirc$
+  \end{tabular}
+\vspace*{-1em}
+\end{table}
+

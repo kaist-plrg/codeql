@@ -1,0 +1,32 @@
+\section{Conclusion}\label{sec:conclude}
+Declarative static analysis has become a widely-used analysis technique, but it
+has not supported multilingual programs actively developed in diverse
+application domains.
+In this paper, we present a practical extension methodology for a declarative static
+analyzer that supports multiple target languages to analyze multilingual programs.
+The first step is to create a merged database consisting of multiple logical language
+spaces. Each language space stores facts transformed from source code written in its
+corresponding language.
+Then, the second step is to define language-interoperation rules to derive facts
+across language boundaries.
+Our prototype implementation \ours built on top of CodeQL, tracks dataflows
+successfully over language boundaries in both Java-C and Python-C programs.
+Using \ours, we found 33 true bugs and vulnerabilities from real-world
+JNI applications, 12 of which are from applications that \lees failed to analyze.
+We believe that our approach is applicable to various multilingual programs,
+beyond Java-C and Python-C, and to multiple types of analyses.
+
+%In this paper, we suggested the methodology of extending a declarative style
+%anlyzer that targets multiple languages into a analyzer that can analyze the
+%multilingual programs. First we create the database of fact that can be divided
+%into multiple logical language spaces, where each language space consists of
+%original facts. Then we define additional language-interoperation rules that
+%will generate the facts that reflect interoperation semantics between languages.
+%Finally, we perform the original query to obtain the analysis result.
+%Based on this approach, we build our prototype implementation \ours on top of
+%CodeQL.  Using \ours, we could sucessfully perform dataflow analysis on various
+%benchmark suites of JNI programs and extension module programs.  Also, we find
+%33 true bugs and vulnerabilities from real-world applications, 12 of which are
+%from applications that \lees failed to detect.  We believe that our approach is
+%applicable to analysis for other kinds of multilingual programs beyond Java-C
+%or Python-C, and to various types of analysi beyond dataflow analysis.

@@ -1,0 +1,47 @@
+\begin{table}[t]
+%  \vspace{2mm}
+  \caption{Bug detection results of real-world Android JNI apps}
+  \label{table:RQ2}
+  \vspace*{-1em}
+  \centering
+%  \footnotesize
+\renewcommand{\arraystretch}{.9}
+  \begin{tabular}{@{}l@{}||r|r|r|r|r@{}}
+    \multirow{4}{*}{\textbf{Application}} &
+                                            \multicolumn{5}{c}{\textbf{Bug Kind}} \\\hhline{~||-----}
+                                          &
+                                            \multicolumn{2}{c|}{\textbf{Null
+                                            Deref.}}   &
+                                                         \multicolumn{1}{c|}{\textbf{Missing
+                                                         Fun.}} &
+                                                                  \multicolumn{1}{c|}{\textbf{Type
+                                                                  Mis.}}
+                                                                &
+                                                                  \multicolumn{1}{c}{\textbf{Wrong Sig.}} 
+%\\\hhline{~||~|~|~|~|~}
+                                          % & \multicolumn{2}{c|}{\textbf{Deref.}} & \multicolumn{1}{c|}{\textbf{Fun}} & \multicolumn{1}{c|}{\textbf{Mis.}} & \multicolumn{1}{c}{\textbf{\textbf{Sig.}}}  
+\\\hhline{~||-|-|-|-|-}
+                                          & \multicolumn{1}{c|}{\textbf{\# TP}}   & \multicolumn{1}{c|}{\textbf{\# FP}} & \multicolumn{1}{c|}{\textbf{\# TP}} & \multicolumn{1}{c|}{\textbf{\# TP}} & \multicolumn{1}{c}{\textbf{\textbf{\# TP}}}  \\\hhline{=#=|=|=|=|=}
+
+    APV PDF Viewer    & 0 & 1 & 0 & \cellcolor{\succcolor}2 & 0 \\ 
+    CrossWords        & \cellcolor{\succcolor}3 & 1 & 0 & 0 & 0 \\ 
+    Document Viewer   & 0 & 0 & 0 & \cellcolor{\succcolor}1 & 0 \\ 
+    DroidZebra        & 0 & 1 & 0 & 0 & 0 \\ 
+    FBReader          & 0 & 9 & 0 & \cellcolor{\succcolor}1 & 0 \\ 
+    Graph 89          & \cellcolor{\succcolor}1 & 0 & 0 & \cellcolor{\succcolor}3 & 0 \\ 
+    KeePassDroid      & \cellcolor{\succcolor}1 & 0 & 0 & 0 & 0 \\
+    Lumicall          & 0 & 0 & \cellcolor{\succcolor}3 & 0 & 0 \\ 
+    Lunary            & 0 & 1 & 0 & 0 & 0 \\
+    Ministro          & 0 & 0 & 0 & \cellcolor{\succcolor}1 & 0 \\ 
+    Navit             & 0 & 0 & 0 & \cellcolor{\succcolor}3 & 0 \\ 
+    Hacker's Keyboard & 0 & 1 & 0 & 0 & 0 \\ 
+    NetGuard          & 0 & 1 & 0 & 0 & 0 \\ 
+    ObscuraCam        & 0 & 0 & \cellcolor{\succcolor}2 & 0 & 0 \\ 
+    PrBoom            & 0 & 0 & 0 & 0 & \cellcolor{\succcolor}1 \\
+    Sipdroid          & 0 & 0 & \cellcolor{\succcolor}4 & 0 & 0 \\ 
+    Tileless Map      & 0 & 2 & 0 & \cellcolor{\succcolor}3 & 0 \\ 
+    Tux Paint         & 0 & 4 & 0 & \cellcolor{\succcolor}3 & 0 \\ 
+    VotAR             & 0 & 0 & 0 & 0 & \cellcolor{\succcolor}1 \\\hhline{=#=|=|=|=|=}
+    \textbf{Total}    & 5 & 21 & 9 & 17 & 2 \\
+  \end{tabular}
+\end{table}
