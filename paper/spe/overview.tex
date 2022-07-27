@@ -267,7 +267,7 @@ the logical language spaces in which the facts reside:
 
 The next step defines generalized rules to derive function call relation
 facts. We define them by composing language-specific rules for A,
-lanuguage-specific rules for B, and language-interoperation rules as follows:
+language-specific rules for B, and language-interoperation rules as follows:
 
 \begin{lstlisting}[style=mrule]
     CallEdge(ln1, ln2) :- CallEdge$_A$(ln1, ln2)
@@ -347,7 +347,7 @@ the interoperation rule from {\it B} to {\it A} as follows:
 Finally, when we make the same query \rcode{ ?- CallEdge(X, Y)}, the query system
 now produces \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), (8, 4)\}} as function call relation results,
 which include not only intraoperation call relations,
-but also interopreation call relations. 
+but also interopereation call relations. 
 
 This simple example shows what our extension for multilingual program analysis
 requires. Our extension reuses most components in an existing declarative static

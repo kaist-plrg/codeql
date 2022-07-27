@@ -4,7 +4,7 @@ for detecting bugs and security vulnerabilities in programs.
 It specifies ``what'' rather than ``how'' of program analysis and
 performs three steps:
 1) transforming program source code to a {\it database}
-of {\it facts}, 2) generating new facts from known facts via applying
+of {\it facts}, 2) generating new facts from known facts by applying
 {\it rules}, and 3) extracting information related to specific properties by
 applying {\it queries} to the facts via a query system.  DOOP~\cite{doop} is a
 declarative static analysis framework conducting points-to analysis for Java
@@ -16,7 +16,7 @@ information about code structures for JavaScript and Hack programs.
 
 Declarative static analyzers have broadened their analysis targets to diverse
 programming languages. To support a new language, one should consider
-three steps of declarative static analysis. Note that because the query
+the three steps of declarative static analysis. Note that because the query
 system is independent of analysis target languages, one can reuse the
 existing query system for the new language. Therefore, the first step
 is to define a new schema of the database containing facts for the new
@@ -46,7 +46,7 @@ intraoperation in widely-used open-source JNI programs such as OpenJ9 and VLC.
 
 In this paper, we propose a systematic methodology that extends a
 declarative static analyzer supporting multiple target languages to support
-multilingual program analysis as well. Our approach is to maximize the reuse of
+multilingual program analysis as well. Our goal is to maximize the reuse of
 already existing components. First, it generates a merged database of facts that can
 be separated into multiple logical language spaces.  Each language space
 consists of original facts from its corresponding language database, and existing
