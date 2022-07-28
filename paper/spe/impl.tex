@@ -1,7 +1,7 @@
 \begin{figure}[t]
   \centering
   \vspace{2mm}
-  \includegraphics[width=0.94\textwidth]{img/codeql.pdf}
+  \includegraphics[width=0.7\textwidth]{img/codeql.pdf}
   \caption{Overall structure of MultiQL for JNI programs}
   \label{fig:codeql}
 \end{figure}
@@ -65,7 +65,7 @@ class OneOrTwo extends int {
 A class defines a set of elements that satisfy the predicate called
 ``characteristic predicate.'' A class can also have ``member predicates''
 that relate itself with other elements. For more information, refer to
-\citet{ql2016}'s paper or the official document~\cite{codeql}.
+the paper of Avgustinov et al.\cite{ql2016} or the official document~\cite{codeql}.
 
 %Figure~\ref{fig:codeql} presents the overall structure of MultiQL for JNI programs.
 %First, it generates databases for both languages, C\footnote{
@@ -162,39 +162,65 @@ The same applies to the predicate \ccode{localFlowStep}.
 In other words, we can not use the class \ccode{Node} in C as an
 argument of the predicate \javacode{localFlowStep} in Java or vice versa.
 
-\begin{figure}[t]
+\begin{figure}[hbt!]
   \centering
 %  \vspace{2mm}
-  \begin{subfigure}[t]{0.5\textwidth}
+  \begin{subfigure}{0.94\textwidth}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+private newtype TNode =
+  TExprNode(Expr e) { ... } or
+  TExplicitParameterNode(Parameter p) { ... } or
+  ...
 class Node extends TNode { ... }
+
 predicate localFlowStep(Node from, Node to) {
   // Expr -> Expr
-  exprToExprStep_nocfg(from.asExpr(), to.asExpr())
-  or // Assignment -> LValue post-update node
+  exprToExprStep_nocfg(from.asExpr(), to.asExpr()) or
+  // Assignment -> LValue post-update node
   ...
 }
 \end{lstlisting}
     \vspace*{-.5em}
     \caption{c/dataflow/internal/DataFlowUtil.qll}
+    \label{fig:qll1}
   \end{subfigure}
-  \begin{subfigure}[t]{0.5\textwidth}
+  \begin{subfigure}{0.94\textwidth}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+private newtype TNode =
+  TExprNode(Expr e) { ... } or
+  TFieldValueNode(Filed f) { ... } or
+  ...
 class Node extends TNode { ... }
+
 predicate localFlowStep(Node node1, Node node2) {
-  // Flow through adjacent def-use and use-use pairs.
-  exists(SsaExplicitUpdate upd |
-    upd.getDefiningExpr().(VariableAssign).getSource()
-      = node1.asExpr() or
-    upd.getDefiningExpr().(AssignOp) = node1.asExpr()
-  | node2.asExpr() = upd.getAFirstUse()
-  )
-  or // Flow through this
+  // Variable flow steps through assignment expression
+  node2.asExpr().(AssignExpr).getSource() = node1.asExpr() or
+  // Variable flow steps through adjacent def-use and use-use pairs.
   ...
 }
 \end{lstlisting}
     \vspace*{-.5em}
     \caption{java/dataflow/internal/DataFlowUtil.qll}
+    \label{fig:qll2}
+  \end{subfigure}
+  \begin{subfigure}{0.94\textwidth}
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+private newtype TNode =
+  TJavaNode(JAVA::Node n) or
+  TCNode(C::Node n)
+class Node extends TNode {
+  JAVA::Node asJavaNode() { this = TJavaNode(result)}
+  C::Node asCNode() { this = TCNode(result) } ...
+}
+
+predicate localFlowStep(Node node1, Node node2) {
+  JAVA::localFlowStep(node1.asJavaNode(), node2.asJavaNode()) or
+  C::localFlowStep(node1.asCNode(), node2.asCNode())
+}
+\end{lstlisting}
+    \vspace*{-.5em}
+    \caption{jni/dataflow/internal/DataFlowUtil.qll}
+    \label{fig:qll3}
   \end{subfigure}
   \vspace*{-.5em}
   \caption{QL libraries for C and Java}
@@ -206,27 +232,16 @@ we lift each library to the common level.
 First, we encapsulate each of the original dataflows in a CodeQL
 module named C and JAVA so that we can distinguish the original
 classes and predicates by lifted ones.
+Lines from 1 to 7 of Figure~\ref{fig:qll3} demonstrate the lifted class.
 We can lift a class by first defining a sum type, denoting that
 the lifted class comes either from C or Java, and then making the
-lifted class be of that type.  We also implement two member predicates
-that can cast a lifted class into a C or Java class:
-\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
-private newtype TNode =
-  TJavaNode(JAVA::Node n) or TCNode(C::Node n)
-class Node extends TNode {
-  JAVA::Node asJava() { this = TJavaNode(result)}
-  C::Node asC() { this = TCNode(result) } ...
-}
-\end{lstlisting}
+lifted class be of that type.  We also implement two member predicates,
+\codeql{asCNode} and \codeql{asJavaNode},
+which can downcast a lifted class into a C or Java class.
+Lines from 9 to 12 of Figure~\ref{fig:qll3} demonstrate the lifted predicate.
 Similarly, we lift a predicate by combining two original predicates with
 the \codeql{or} connective. For each predicate, we cast down
-its arguments and return values to the class of its corresponding language:
-\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
-predicate localFlowStep(Node node1, Node node2) {
-  JAVA::localFlowStep(node1.asJava(), node2.asJava())
-  or C::localFlowStep(node1.asC(), node2.asC())
-}
-\end{lstlisting}
+its arguments and return values to the class of its corresponding language.
 After lifting, lifted predicates show the equivalent behaviors as the
 original ones if all the arguments are from the same language.
 
@@ -260,10 +275,10 @@ For example, the following shows how we extend the predicate
 named \codeql{viableCallable}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
-  result.asJava() = JAVA::viableCallable(c.asJava())
-  or result.asC() = C::viableCallable(c.asC())
-  or result.asC() = viableCallableJ2C(c.asJava())
-  or result.asJava() = viableCallableC2J(c.asC())
+  result.asJavaNode()    = JAVA::viableCallable(c.asJavaNode())
+  or result.asCNode()    = C::viableCallable(c.asCNode())
+  or result.asCNode()    = viableCallableJ2C(c.asJavaNode())
+  or result.asJavaNode() = viableCallableC2J(c.asCNode())
 }
 \end{lstlisting}
 %This predicate finds the call edge from the call expression to its
@@ -345,10 +360,10 @@ Python-C program analysis:
 
 \begin{lstlisting}[style=codeql,xleftmargin=-.5em,numbers=none]
 DataFlowCallable viableCallable(DataFlowCall c) {
-  result.asPython() = PYTHON::viableCallable(c.asPython())
-  or result.asC() = C::viableCallable(c.asC())
-  or result.asC() = viableCallableP2C(c.asPython())
-  or result.asPython() = viableCallableC2P(c.asC())
+  result.asPythonNode()    = PYTHON::viableCallable(c.asPythonNode())
+  or result.asCNode()      = C::viableCallable(c.asCNode())
+  or result.asCNode()      = viableCallableP2C(c.asPythonNode())
+  or result.asPythonNode() = viableCallableC2P(c.asCNode())
 }
 \end{lstlisting}
 

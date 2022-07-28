@@ -2,6 +2,8 @@
 
 \section{Evaluation}\label{sec:eval}
 
+\input{tableRQ1-1}
+
 To show the effectiveness of our approach, we evaluate
 \ours with the following two research questions:
 \begin{itemize}
@@ -33,8 +35,8 @@ The first column shows the benchmark names
 and the second and the third columns show 
 the analysis results of JN-SAF and \ours, respectively.
 If an analysis reports all data leakages correctly without any
-false positives or false negatives, it is a success ($\bigcirc$).
-Otherwise, it is a failure ($\times$).
+false positives or false negatives, it is a success (\cmark).
+Otherwise, it is a failure (\xmark).
 \ours finds data leakages correctly for 19 benchmarks but reports false
 negatives for four benchmarks, while JN-SAF analyzes 21 benchmarks correctly. 
 One common failure comes from string concatenation:
@@ -53,18 +55,26 @@ On the contrary, because CodeQL under-approximates dataflows on arrays,
 \ours analyzes {\it native\_noleak\_array} correctly but reports a false negative for
 {\it native\_leak\_array}.
 
-\input{tableRQ1-1}
-\input{tableRQ1-2}
-
 %\textbf{Real-world Java-C Programs.} 
 The second benchmark suite consists of real-world Java-C Android apps downloaded from
 F-Droid, a repository of open-source Android apps~\cite{fdroid}.  We first
 classified F-Droid apps into Java-C and non-Java-C apps. Then, we selected all 42
 apps that can be compiled without any errors as our analysis targets.
 
+\input{tableRQ1-2}
+
+\begin{figure}
+  \centering
+  \vspace{2mm}
+  \includegraphics[width=0.65\textwidth]{img/graph}
+  \vspace*{-.5em}
+  \caption{Analysis time of \ours and \lees}
+  \label{fig:graph}
+\vspace*{-1em}
+\end{figure}
+
 Table~\ref{table:RQ1-2} shows the analysis results of \ours on 25 apps that have
-interoperations from C to Java\footnote{We report the full analysis results in
-our supplementary material.}.
+interoperations from C to Java.
 The first column shows app names, the second to the fourth columns show
 database creation time of C, Java, and their merged database, respectively, the
 fifth shows query processing time, and the sixth shows the total analysis time.
@@ -84,24 +94,12 @@ In addition, 1,008 (86\%) resolved JNI uses are precise.
 such as arrays and function pointers, on which
 CodeQL does not track dataflows.
 
-\begin{figure}[t]
-  \centering
-  \vspace{2mm}
-  \includegraphics[width=0.9\textwidth]{img/graph}
-  \vspace*{-.5em}
-  \caption{Analysis time of \ours and \lees}
-  \label{fig:graph}
-\vspace*{-1em}
-\end{figure}
-
 On the contrary,
 \lees fails to analyze one app because of an error, four apps due to the lack
 of memory spaces, and three apps even in eight hours.  
 In the remaining 17 apps, \lees resolves 71\% JNI uses
 and precisely resolves 46\% of JNI uses,
 which shows significantly more imprecise results than \ours.
-
-
 
 \ours is scalable in that it can analyze large-scale programs. 
 The analysis time was 161.3 seconds on average for each app, including 103.8
@@ -146,14 +144,13 @@ In the failed benchmarks, C code changes the values of the fields in Python obje
 Because \ours does not handle such Python object modifications in C code, it
 reports false negatives for them.
 
-
 \input{tableRQ1-4}
 
 %\textbf{Github}
 %\textbf{Real-world Python-C Programs.}
 The second benchmark suite consists of six real-world Python-C programs
 collected from public GitHub repositories. They are analysis targets of
-\citet{cpython}.
+the work of ~Monat et al.\cite{sas2021}
 
 Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on six
 real-world Python-C programs. 
@@ -205,83 +202,6 @@ same as the targets of the client analysis of previous research~\cite{LeeASE20, 
 We implemented a checker to detect the bugs on top of \ours using the
 query language of CodeQL. 
 
-
-\begin{figure}[t]
-  \centering
-%  \vspace{2mm}
-  \begin{subfigure}[t]{1.0\textwidth}
-    \begin{lstlisting}[style=java,xleftmargin=2.5em]
-//EmulatorActivity.java
-String tmp = null;
-String folder = Util.GetInternalAppStorage(activity);
-if (folder != null) {
-  tmp = folder + "tmp";
-  Util.CreateDirectory(tmp);
-}
-EmulatorActivity.nativeInitGraph89(..., tmp);
-    \end{lstlisting}
-    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
-//wrappercommonjni.c
-void nativeInitGraph89(..., jstring tmp_dir) {
-   (*env)->GetStringUTFChars(env, tmp_dir, 0); ...
-}
-    \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{NullDeref}
-    \label{fig:bug1}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.97\textwidth}
-    \begin{lstlisting}[style=java,xleftmargin=2.5em]
-//JpegRedaction.java
-package org.witness.obscuracam.photo.jpegredaction;
-
-public class JpegRedaction {
-  private native void redactRegions(...); ...
-}
-    \end{lstlisting}
-    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
-//JpegRedaction.cpp
-void Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) { ... }
-    \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{MissingFun}
-    \label{fig:bug2}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.97\textwidth}
-    \begin{lstlisting}[style=java,xleftmargin=2.5em]
-//MuPdfPage.java
-private native static List<PageTextBox> search(...);
-    \end{lstlisting}
-    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
-//mupdfdroidbridge.c
-jobjectArray search(...){ ... }
-    \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{TypeMismatch}
-    \label{fig:bug3}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.97\textwidth}
-    \begin{lstlisting}[style=java,xleftmargin=2.5em]
-//PrBoomActivity.java
-void OnMessage(String text);
-    \end{lstlisting}
-    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
-//jni_doom.h
-#define CB_CLASS_MSG_SIG  "(Ljava/lang/String;I)V"
-//jni_doom.c
-mSendStr = (*env)->GetMethodID(env, jNativesCls,
-                       "OnMessage", CB_CLASS_MSG_SIG);
-    \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{WrongSig}
-    \label{fig:bug3}
-  \end{subfigure}
-  \vspace*{-.5em}
-  \caption{Four kinds of JNI interoperation bugs}
-  \label{fig:bugs}
-  \vspace*{-1em}
-\end{figure}
-
 Table~\ref{table:RQ2} summarizes the bug detection results of 19 out of 42
 apps, on which \ours reports possible bugs.  The first
 column shows app names, the second and the third columns show the
@@ -306,10 +226,87 @@ the variable may still have {\tt null} even after the conditional assignment.
 On the contrary, \lees fails to detect 12 out of 33 genuine bugs
 due to memory or scalability issues during analysis.
 
+\begin{figure}[ht!]
+  \centering
+%  \vspace{2mm}
+  \begin{subfigure}{0.8\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+//EmulatorActivity.java
+String tmp = null;
+String folder = Util.GetInternalAppStorage(activity);
+if (folder != null) {
+  tmp = folder + "tmp";
+  Util.CreateDirectory(tmp);
+}
+EmulatorActivity.nativeInitGraph89(..., tmp);
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//wrappercommonjni.c
+void nativeInitGraph89(..., jstring tmp_dir) {
+   (*env)->GetStringUTFChars(env, tmp_dir, 0); ...
+}
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{NullDeref}
+    \label{fig:bug1}
+  \end{subfigure}
+  \begin{subfigure}{0.8\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+//JpegRedaction.java
+package org.witness.obscuracam.photo.jpegredaction;
+
+public class JpegRedaction {
+  private native void redactRegions(...); ...
+}
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//JpegRedaction.cpp
+void Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) { ... }
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{MissingFun}
+    \label{fig:bug2}
+  \end{subfigure}
+  \begin{subfigure}{0.8\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+//MuPdfPage.java
+private native static List<PageTextBox> search(...);
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//mupdfdroidbridge.c
+jobjectArray search(...){ ... }
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{TypeMismatch}
+    \label{fig:bug3}
+  \end{subfigure}
+  \begin{subfigure}{0.8\textwidth}
+    \begin{lstlisting}[style=java,xleftmargin=2.5em]
+//PrBoomActivity.java
+void OnMessage(String text);
+    \end{lstlisting}
+    \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+//jni_doom.h
+#define CB_CLASS_MSG_SIG  "(Ljava/lang/String;I)V"
+
+//jni_doom.c
+mSendStr = (*env)->GetMethodID(env, jNativesCls,
+                       "OnMessage", CB_CLASS_MSG_SIG);
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{WrongSig}
+    \label{fig:bug4}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{Four kinds of JNI interoperation bugs}
+  \label{fig:bugs}
+  \vspace*{-1em}
+\end{figure}
+
 Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours
 detects from real-world apps using simplified code.
 
-Figure~\ref{fig:bugs}(a) shows a pattern in Graph 89 with the {\it NullDeref} bug.
+Figure~\ref{fig:bug1} shows a pattern in Graph 89 with the {\it NullDeref} bug.
 The Java code may call a C function {\tt nativeInitGraph89} with {\tt
 null} as its last argument, because the variable {\tt tmp} has {\tt
 null} when the method {\tt GetInternalAppStorage} returns {\tt null}.  The C
@@ -332,7 +329,7 @@ performance overhead~\cite{hwang2021justgen}.
   \endgroup
 }
 
-Figure~\ref{fig:bugs}(b) shows a pattern in ObscuraCam with the {\it MissingFun} bug.
+Figure~\ref{fig:bug2} shows a pattern in ObscuraCam with the {\it MissingFun} bug.
 As described in Section~\ref{sec:merging}, JNI has a C function
 naming convention for JVMs to link Java native methods to their corresponding C
 functions. While a Java class {\tt JpegRedaction} declaring a native method
@@ -343,7 +340,7 @@ function is named with a wrong package name
 method, JVM fails to link it because of the wrongly named C function.
 
 
-Figure~\ref{fig:bugs}(c) shows a pattern in Document Viewer with the {\it TypeMismatch} bug.
+Figure~\ref{fig:bug3} shows a pattern in Document Viewer with the {\it TypeMismatch} bug.
 While the return type of a Java native method {\tt search}
 is {\tt List<PageTextBox>}, the return type of the corresponding C function
 {\tt search} is {\tt jobjectArray} corresponding to the Java built-in array
@@ -353,7 +350,7 @@ the JNI specification, interoperations via such native methods may behave
 differently on different JVMs~\cite{LeeASE20}. 
 
 
-Figure~\ref{fig:bugs}(d) shows a pattern in PrBoom with the {\it WrongSig} bug.
+Figure~\ref{fig:bug4} shows a pattern in PrBoom with the {\it WrongSig} bug.
 The C code tries to get an ID of a Java method {\tt OnMessage} with a
 signature \texttt{(LJava/lang/String;I)V}, but the method has a different
 signature \texttt{(LJava/lang/String;)V} with one String argument. Because

@@ -15,7 +15,7 @@ encompassing language boundaries.
 \begin{figure}[t]
   \centering
   \vspace{2mm}
-  \includegraphics[width=0.94\textwidth]{img/ov2.pdf}
+  \includegraphics[width=0.9\textwidth]{img/ov2.pdf}
   \caption{Declarative analysis for multilingual programs}
   \label{fig:ov2}
 %\vspace*{-.5em}
@@ -33,7 +33,7 @@ analysis results.
 \begin{figure}[t]
   \centering
 %  \vspace{2mm}
-  \begin{subfigure}[t]{0.47\textwidth}
+  \begin{subfigure}[t]{0.3\textwidth}
     \begin{lstlisting}[style=mpython]
 import f
 def m1():
@@ -46,7 +46,7 @@ m1()
     \caption{Code in language A}
     \label{fig:exam:langA}
   \end{subfigure}
-  \begin{subfigure}[t]{0.47\textwidth}
+  \begin{subfigure}[t]{0.3\textwidth}
     \begin{lstlisting}[style=mcpp,firstnumber=7]
 void f() {
     CallMethod("m2");
@@ -78,7 +78,7 @@ An example declarative static analysis consists of the following facts, rules, a
 \[
   \begin{array}{llll}
     f & ::= & p(\overline{\embox{elem}\ |\ x}) & \text{\sc Fact}\\
-    r & ::= & f\ \mbox{:-}\ \overline{\neg^? f} & \text{\sc Rule}\\
+    r & ::= & f'\ \mbox{:-}\ \overline{\neg^? f} & \text{\sc Rule}\\
     q & ::= & \mbox{?-}\ \overline{f}\ &  \text{\sc Query}
 \end{array}
 \]
@@ -120,7 +120,7 @@ construction: \rcode{FunctionAt(ln, name)} denotes function definition
 information containing its line number \rcode{ln} and the function name \rcode{
 name}, and \rcode{CallAt(ln, name)} denotes callsite information
 containing the callsite line number \rcode{ln} and its target function name \rcode{
-name}. The initial facts for the code in Figure~\ref{fig:exam}(a) are as follows: 
+name}. The initial facts for the code in Figure~\ref{fig:exam:langA} are as follows: 
 
 %First, let's consider a hypothetical declarative style analyzer, that supports
 %language A.  As a first step, the database of facts are created from the source
@@ -185,7 +185,7 @@ following query produces \rcode{ (X, Y)\ $\in$ \{(6, 2)\}} as a result:
 
 
 Let us consider the language {\it B} case.
-The initial facts for the code in Figure~\ref{fig:exam}(b) are as follows: 
+The initial facts for the code in Figure~\ref{fig:exam:langB} are as follows: 
 %This time, let's look at how the analyzer is extended to support the analysis
 %of B. Similar to language A, the first step is to create database. For language
 %B, we can have the rules of FunctionAt, CallAt, and Argument as follows:
@@ -245,8 +245,8 @@ since it has no facts to satisfy the rule.
 
 The first step of our extension for multilingual program analysis creates a
 merged database that consists of two logical language spaces, {\it A} and {\it
-B}. Then, we store the initial facts of the code in Figure~\ref{fig:exam}(a) and
-Figure~\ref{fig:exam} (b) to
+B}. Then, we store the initial facts of the code in Figure~\ref{fig:exam:langA} and
+Figure~\ref{fig:exam:langB} to
 their corresponding language spaces, respectively. The following shows the merged
 database containing the initial facts, where the subscripts of the facts denote
 the logical language spaces in which the facts reside: 

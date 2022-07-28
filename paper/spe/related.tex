@@ -23,7 +23,7 @@ the Java Virtual Machine Language (JVML) and Jlint, a dataflow analyzer for
 Java bytecode, to compile both Java and C code to the extended JVML and analyze
 the integrated programs.  Since the modest extension of JVML cannot
 support the full C semantics like the C memory model, it extremely over-approximates C
-operations such as reads and writes through pointers.  \citet{LeeASE20}
+operations such as reads and writes through pointers.  Lee et al.~\cite{LeeASE20}
 proposed a general approach to analyzing multilingual programs written in both
 {\it host} and {\it guest} languages.  Their approach first uses a guest
 language analyzer to extract semantics summaries from the parts written in the
@@ -36,7 +36,7 @@ analysis using a host language analyzer.
 %redundant computation.
 
 Researchers also studied binaries rather than C/C++ source code
-for Java-C program analysis.  \citet{scanning} proposed a lightweight reverse engineering technique to
+for Java-C program analysis. Fourtounis et al.~\cite{scanning} proposed a lightweight reverse engineering technique to
 recover Java method calls from binaries instead of performing heavy analyses on
 binary code.  Their reverse engineering generates datafacts of Java method
 calls from binaries, which can be used in further declarative-style Java
@@ -59,9 +59,9 @@ JavaScript and device resource accessibility from Java.
 HybriDroid~\cite{hybridroid}, implemented on top of WALA~\cite{WALA}, analyzes
 Java and JavaScript code seamlessly to detect programmer errors on language
 interoperations and track data leakages across language boundaries.
-\citet{BaeICSE19} tackled the expensive analysis of HybriDroid and proposed
+Bae et al.~\cite{BaeICSE19} tackled the expensive analysis of HybriDroid and proposed
 a lightweight type system detecting the same kinds of programmer errors in
-Android hybrid apps.  \citet{jin2014code} proposed static detection
+Android hybrid apps. Jin et al.~\cite{jin2014code} proposed static detection
 of code injection attacks from JavaScript to Java.  They manually
 modeled Java frameworks and performed a taint analysis for JavaScript with the models.
 

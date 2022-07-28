@@ -10,15 +10,15 @@
     \textbf{Benchmark} & \textbf{Dataflow} & \textbf{Benchmark} & \textbf{Dataflow}
 %\\\hline\hline
 \\\hhline{=|=#=|=}
-    callback                    & $\bigcirc$  & multiple\_module             & $\bigcirc$  \\
-    cobject\_member             & $\bigcirc$  & noleak                       & $\bigcirc$  \\
-    cobject\_method             & $\bigcirc$  & noleak\_array                & $\bigcirc$  \\
-    complexdata                 & $\bigcirc$  & nosource                     & $\bigcirc$  \\
-    complexdata\_stringop       & $\times$    & parse\_arg                   & $\bigcirc$  \\
-    heap\_modify                & $\bigcirc$  & set\_field\_from\_arg        & $\times$    \\
-    import\_module              & $\bigcirc$  & set\_field\_from\_arg\_field & $\times$    \\
-    leak                        & $\bigcirc$  & set\_field\_from\_native     & $\times$    \\
-    leak\_array                 & $\times$    & source                       & $\bigcirc$  \\
-    multiple\_interactions      & $\bigcirc$  & source\_clean                & $\times$
+    callback                    & \cmark & multiple\_module             & \cmark \\
+    cobject\_member             & \cmark & noleak                       & \cmark \\
+    cobject\_method             & \cmark & noleak\_array                & \cmark \\
+    complexdata                 & \cmark & nosource                     & \cmark \\
+    complexdata\_stringop       & \xmark & parse\_arg                   & \cmark \\
+    heap\_modify                & \cmark & set\_field\_from\_arg        & \xmark \\
+    import\_module              & \cmark & set\_field\_from\_arg\_field & \xmark \\
+    leak                        & \cmark & set\_field\_from\_native     & \xmark \\
+    leak\_array                 & \xmark & source                       & \cmark \\
+    multiple\_interactions      & \cmark & source\_clean                & \xmark
   \end{tabular}
 \end{table}
