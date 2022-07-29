@@ -57,7 +57,7 @@ class OneOrTwo extends int {
   // characteristic predicate
   OneOrTwo() { this = 1 or this = 2 }
   // member predicate
-  int add(OneOrTwo that) { resut = this + that }
+  int add(OneOrTwo that) { result = this + that }
 }
 \end{lstlisting}
 
@@ -309,7 +309,7 @@ the additional \codeql{\_}, to the method name.
 For example, the target function name for a function call of \codeql{cfunction}
 would be \codeql{Java\_fully\_qualified\_class\_name\_cfunction}.
 With this convention, we can define \codeql{viableCallableJ2C} so that
-\codeql{f = viablaCallableJ2C(call)} holds when \codeql{f.toString() = "Java\_"
+\codeql{f = viableCallableJ2C(call)} holds when \codeql{f.toString() = "Java\_"
 + call.getTarget().className() + "\_" +} \\
 \codeql{call.getTarget().getName()} holds.
 
@@ -359,7 +359,7 @@ We extended them in a similar way to the calls from C to Java described above.
 
 To analyze Python-C programs, we extended predicates to model the
 interoperation semantics of Python Extension Module.
-The following shows the \codeql{viableCallable} predicate we extened for the
+The following shows the \codeql{viableCallable} predicate we extended for the
 Python-C program analysis: 
 
 \begin{lstlisting}[style=codeql,xleftmargin=-.5em,numbers=none]
@@ -408,9 +408,9 @@ importing and calling \ccode{cfunction} in Python code.
 To model the behavior, we define the CodeQL class \codeql{PyMethodDef}
 and the predicate \codeql{viableCallableP2C}. The class \codeql{PyMethodDef}
 corresponds to the C structure \ccode{PyMethodDef}. It has
-two member predicates \codeql{getName()} and \codeql{getFunc()} whose reuslts are
+two member predicates \codeql{getName()} and \codeql{getFunc()} whose results are
 the value of the field \ccode{ml_name} and \ccode{ml_meth}, respectively.  Then, we define
-\codeql{f = viablaCallableP2C(call)} holds when there exists \codeql{def}
+\codeql{f = viableCallableP2C(call)} holds when there exists \codeql{def}
 of type \codeql{PyMethodDef} such that \codeql{f = def.getFunc()} and
 \codeql{call.getTarget().toString()} \codeql{= def.getName()} holds.
 
@@ -424,7 +424,7 @@ objects by calling the \ccode{PyArg_ParseTuple} API.
 This means that the usual way of connecting arguments and parameters via their
 positions does not work, and we need another way.
 We modelled this behavior by defining \codeql{VirtualArgNode}, a subclass of \codeql{Node},
-that corrsponds to the Python tuple object. Then, we define some predicates
+that corresponds to the Python tuple object. Then, we define some predicates
 for representing flows in and out of this node. First, we define the store step
 from original argument nodes to virtual argument nodes. We then define
 a step from virtual argument nodes to a single parameter node in a C function.
