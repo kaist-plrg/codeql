@@ -39,7 +39,7 @@ parts and emphasize the Python-C program analysis in Section~\ref{sec:merging2}.
 
 CodeQL is a declarative static analysis engine that transforms source code into
 a database of facts and performs analyses by evaluating queries written in the
-declarative and object-oriented language called QL (Query Language).  In QL,
+declarative and object-oriented language called QL (Query Language). Using QL,
 one can define rules by defining ``predicates'' and ``classes.'' The following
 QL code defines the predicate \codeql{isOneOrTwo}:
 
@@ -96,8 +96,8 @@ the compiler to extract necessary information and creates a database with the
 extracted information. For script languages like Python, CodeQL uses its own
 extractor to directly extract necessary information from source code.
 CodeQL creates a database for a single language in two steps:
-1) it stores the extracted information in a trap
-file, a human readable file format, and 2) it finalizes trap files
+1) it stores the extracted information in a ``trap
+file'', a human readable file format, and 2) it finalizes trap files
 into databases in the binary format. For example, the
 following demonstrates a sample trap file:
 
@@ -109,11 +109,12 @@ primitives(#10002,"int")
 #10004=@"params;{#10003};0"
 params(#10004,#10002,0,#10003,#10004)
 paramName(#10004,"myParam")
+...
 \end{lstlisting}
 
 \noindent
 which describes the parameter information of the method \javacode{myMethod}.
-It also shows facts stored in tables:
+It also shows facts that will eventually be stored in tables:
 \javacode{primitives(...)}, \javacode{params(...)}, and
 \javacode{paramName(...)}.
 The database manages tables based on fact types. For example, it stores
@@ -205,6 +206,9 @@ predicate localFlowStep(Node node1, Node node2) {
   \end{subfigure}
   \begin{subfigure}{0.94\textwidth}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+module C { /* original classes and predicates from C lib */ }
+module JAVA { /* original classes and predicates from Java lib */ }
+
 private newtype TNode =
   TJavaNode(JAVA::Node n) or
   TCNode(C::Node n)
@@ -229,16 +233,16 @@ predicate localFlowStep(Node node1, Node node2) {
 
 To make classes and predicates in C and Java compatible,
 we lift each library to the common level.
-First, we encapsulate each of the original dataflows in a CodeQL
-module named C and JAVA so that we can distinguish the original
+First, as in lines 1 and 2 of Figure~\ref{fig:qll3}, we encapsulate each of the original dataflow libraries with a CodeQL
+module system and name each of them \codeql{C} and \codeql{JAVA} so that we can distinguish the original
 classes and predicates by lifted ones.
-Lines from 1 to 7 of Figure~\ref{fig:qll3} demonstrate the lifted class.
+Lines from 4 to 10 of Figure~\ref{fig:qll3} demonstrate the lifted class.
 We can lift a class by first defining a sum type, denoting that
 the lifted class comes either from C or Java, and then making the
 lifted class be of that type.  We also implement two member predicates,
 \codeql{asCNode} and \codeql{asJavaNode},
 which can downcast a lifted class into a C or Java class.
-Lines from 9 to 12 of Figure~\ref{fig:qll3} demonstrate the lifted predicate.
+Lines from 12 to 15 of Figure~\ref{fig:qll3} demonstrate the lifted predicate.
 Similarly, we lift a predicate by combining two original predicates with
 the \codeql{or} connective. For each predicate, we cast down
 its arguments and return values to the class of its corresponding language.
@@ -316,7 +320,7 @@ requires more careful implementation than the interaction from Java to C.
 The primary difference is that a method call from C to Java requires
 the runtime values of variables, which may not be always possible.
 First, C code calls the interface function \ccode{GetMethodID(name, sig)}
-to get the ``method ID'' of the method whose name matches the first argument
+to get the ``method ID'' of the Java method whose name matches the first argument
 and the type signature matches the second argument passed to this function.
 This method ID is stored at a variable, say \ccode{mid}, and
 an actual method call is invoked by another

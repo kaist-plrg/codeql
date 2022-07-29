@@ -31,7 +31,7 @@ parent-child relationships between nodes. For example, consider
 the following code:
 
 \begin{lstlisting}[style=mcpp]
-function f() {
+int f() {
   return 42;
 }
 \end{lstlisting}
@@ -94,7 +94,7 @@ one by one, after every rule it depends on is evaluated.
 \textbf{Step 3: Performing queries.}
 The final step is to perform the query via the query system.  A query consists
 of a set of facts where some of the arguments are variables, and the query system finds all variable
-assignments that make every fact in that set can be derived. This step corresponds
+assignments that make every substituted fact is included in the set of all derived factcs. This step corresponds
 to actually obtaining the final result of a static analysis in a declarative
 style. 
 
@@ -106,7 +106,8 @@ For example, one can make a specific query:
 
 which means finding all nodes that a specific value 42 can flow into.
 Then the query system will accept this query as an input, and give
-the query result as the output.
+the query result, which is the set of all possible value that the variable \rcode{ X}
+can be substitued with, as the output of the query.
 
 %The final step is to perform queries via query system.
 %The result of the query corresponds to actual result of client analysis.

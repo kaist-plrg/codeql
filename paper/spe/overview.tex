@@ -24,7 +24,7 @@ encompassing language boundaries.
 \subsection{Overview}
 Figure~\ref{fig:ov2} illustrates how we support multilingual analysis in a
 declarative style in the case of two languages as an example. The declarative
-language engine now gets two sets of syntactic facts extracted from different
+analyzer now gets two sets of syntactic facts extracted from different
 languages. In addition, new language-interoperation rules are defined on top of
 the original language-specific rules from different languages to take the
 interoperation semantics into account. Then, the same query is performed to get
@@ -87,26 +87,29 @@ An example declarative static analysis consists of the following facts, rules, a
 The fact $p(\overline{\embox{elem}\ |\ x})$ denotes a relation $p$ between elements
 $\overline{\embox{elem}}$ or variables $\overline{x}$. The elements are primitive
 values in the analysis, such as string and integer values.  The rule $f'\
-\mbox{:-}\ \overline{\neg^? f}$ denotes that a fact $f'$ is derived from other
-facts $\overline{f}$; $f'$ holds if all the facts $f \in \{\overline{\neg^?
+\mbox{:-}\ \overline{\neg^? f}$ consists of two parts: the head of the rule, $f'$,
+and the body of the rule, $\overline{\neg^? f}$.  It denotes that the head can be derived from the body;
+$f'$ holds if all the facts $f'' \in \{\overline{\neg^?
 f}\}$ hold. The optional prefix negation $\neg$ denotes
 the negative hold condition of a fact; 
 the negated fact $\neg f$ holds if the fact $f$ does not
-hold. The query $\mbox{?-}\ \overline{f}$ finds all possible elements that
+hold. The body of the rule can be empty, and in that case, the head of the rule vacuously holds.
+Such bodiless rules can be considered as the initial input facts for the analysis.
+The query $\mbox{?-}\ \overline{f}$ finds all possible variable assignments that
 make all facts in $\overline{f}$ hold if variables in $\overline{f}$ are
-replaced with the elements.
+replaced with the assigned elements.
 
 
 \subsection{Declarative Call Graph Construction for Monolingual Programs}\label{lab:ovmono}
 Figure~\ref{fig:exam} shows a multilingual code example written in (a)
-Python-like language {\it A} and (b) C-like language {\it B}. In {\it A}, there
+Python-like language {\it A} and (b) C-like language {\it B}. In {\it A} code, there
 are two functions, \rcode{m1} on line~2 and \rcode{m2} on line~4. The function \rcode{
-m1} calls the function \rcode{f} in {\it B} via language interoperation between
+m1} calls the function \rcode{f} in {\it B} code via language interoperation between
 {\it A} and {\it B}, and the function \rcode{m2} does nothing. On line~6 in {\it
 A}, the expression \rcode{m1()} calls the function \rcode{m1} defined on line~2 to
-invoke the function \rcode{f} in {\it B}.
-The function \rcode{f} in {\it B} calls the \rcode{CallMethod} function with a
-string value \rcode{"m2"} to invoke the function \rcode{m2} in {\it A}, using the
+invoke the function \rcode{f} in {\it B} code.
+The function \rcode{f} in {\it B} code calls the \rcode{CallMethod} function with a
+string value \rcode{"m2"} to invoke the function \rcode{m2} in {\it A} code, using the
 string value argument as the target function name.
 %Thus, the code example performs the bidirectional interoperation between {\it
 %A} and {\it B}, which calls the function {\tt f} written in {\it A} from {\it
@@ -243,7 +246,7 @@ since it has no facts to satisfy the rule.
 %logical language spaces. In this example, the merged database would look like
 %this:
 
-The first step of our extension for multilingual program analysis creates a
+The first step of our extension for multilingual program analysis is to create a
 merged database that consists of two logical language spaces, {\it A} and {\it
 B}. Then, we store the initial facts of the code in Figure~\ref{fig:exam:langA} and
 Figure~\ref{fig:exam:langB} to

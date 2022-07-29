@@ -8,7 +8,8 @@ of {\it facts}, 2) generating new facts from known facts by applying
 {\it rules}, and 3) extracting information related to specific properties by
 applying {\it queries} to the facts via a query system.  DOOP~\cite{doop} is a
 declarative static analysis framework conducting points-to analysis for Java
-programs. CodeQL~\cite{codeql} is a declarative semantic code analysis engine
+programs, which could achieve the performance gain thatnks to the nature
+of the declarative analysis. CodeQL~\cite{codeql} is a declarative semantic code analysis engine
 maintained by Github, which performs dataflow analysis to detect security
 vulnerabilities in Java programs.  Recently, Glean~\cite{glean}, an experimental
 declarative query system, has been developed by Meta, on which users can query
@@ -22,7 +23,7 @@ existing query system for the new language. Therefore, the first step
 is to define a new schema of the database containing facts for the new
 language and implement a
 front-end component that transforms programs written in the new target language into facts.
-Then the next step is to define new language-specific rules.  With these
+Then the next step is to define new language-specific rules for the new target language.  With these
 modifications, declarative analyzers can analyze programs written in the new
 target language, using the existing queries and the query system.  DOOP currently
 supports Python program analysis to detect tensor shape mismatching bugs in

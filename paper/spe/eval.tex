@@ -58,8 +58,8 @@ On the contrary, because CodeQL under-approximates dataflows on arrays,
 %\textbf{Real-world Java-C Programs.} 
 The second benchmark suite consists of real-world Java-C Android apps downloaded from
 F-Droid, a repository of open-source Android apps~\cite{fdroid}.  We first
-classified F-Droid apps into Java-C and non-Java-C apps. Then, we selected all 42
-apps that can be compiled without any errors as our analysis targets.
+downloaded all available apps from F-Droid, and classified downloaded apps into JNI and non-JNI apps.
+Then, we selected all 42 apps that can be compiled without any errors as our analysis targets.
 
 \input{tableRQ1-2}
 
@@ -222,7 +222,6 @@ use a code pattern that assigns a value to a variable only if the variable has
 the {\tt null} value. Because our analysis does not support
 path-sensitivity that analyzes each execution path separately, it reports that
 the variable may still have {\tt null} even after the conditional assignment.
-
 On the contrary, \lees fails to detect 12 out of 33 genuine bugs
 due to memory or scalability issues during analysis.
 

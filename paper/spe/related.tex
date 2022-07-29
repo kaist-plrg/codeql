@@ -53,11 +53,11 @@ language boundaries.
 %approach is scalable in that the query-based approach analyzes only necessary
 %dataflows when C source code is available.
 
-Android supports an FFI between Java and JavaScript.  Android hybrid apps are
+Android hybrid apps are
 written in both Java and JavaScript, taking advantage of the portability from
 JavaScript and device resource accessibility from Java.
 HybriDroid~\cite{hybridroid}, implemented on top of WALA~\cite{WALA}, analyzes
-Java and JavaScript code seamlessly to detect programmer errors on language
+Java and JavaScript code seamlessly to detect programmer errors on
 interoperations and track data leakages across language boundaries.
 Bae et al.~\cite{BaeICSE19} tackled the expensive analysis of HybriDroid and proposed
 a lightweight type system detecting the same kinds of programmer errors in
@@ -72,5 +72,4 @@ Recent work~\cite{sas2021} proposed a Python-C analyzer by reusing existing
 Python and C analyzers built on top of the same framework, MOPSA~\cite{Mopsa}.
 They leverage the full features of the analyzers within the same framework to
 perform precise context-sensitive value analyses. 
-On the contrary, our work focuses on declarative style dataflow analysis on
-multilingual programs. 
+On the contrary, our work focuses on declarative style dataflow analysis. 
