@@ -52,7 +52,7 @@ void f() {
     CallMethod("m2");
 }
     \end{lstlisting}
-    \vspace*{2.5em}
+    \vspace*{3.3em}
     \caption{Code in language B}
     \label{fig:exam:langB}
   \end{subfigure}
@@ -347,8 +347,8 @@ the interoperation rule from {\it B} to {\it A} as follows:
 %?- CallEdge(X, Y).
 %which will give us the output, (X, Y) = (7, 3), (4, 9), (10, 5)
 
-Finally, when we make the same query \rcode{ ?- CallEdge(X, Y)}, the query system
-now produces \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), (8, 4)\}} as function call relation results,
+Finally, when making the same query \rcode{ ?- CallEdge(X, Y)}, the query system
+now produces \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), } \rcode{(8, 4)\}} as function call relation results,
 which include not only intraoperation call relations,
 but also interopereation call relations. 
 

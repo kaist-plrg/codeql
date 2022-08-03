@@ -93,21 +93,20 @@ one by one, after every rule it depends on is evaluated.
 \smallskip
 \textbf{Step 3: Performing queries.}
 The final step is to perform the query via the query system.  A query consists
-of a set of facts where some of the arguments are variables, and the query system finds all variable
-assignments that make every substituted fact is included in the set of all derived facts. This step corresponds
-to actually obtaining the final result of a static analysis in a declarative
-style. 
-
+of a set of facts containing variables, and the query system finds all variable
+assignments that make every fact in that set can be derived from the rules and
+the previous set of facts.  This step corresponds to actually obtaining the
+final result of a static analysis in a declarative style.
 For example, one can make a specific query:
 
 \begin{lstlisting}[style=mrule]
 ?- Flow(42, X)
 \end{lstlisting}
 
-which means finding all nodes that a specific value 42 can flow into.
-Then the query system will accept this query as an input, and give
-the query result, which is the set of all possible value that the variable \rcode{ X}
-can be substituted with, as the output of the query.
+\noindent
+that queries all nodes into which the integer literal {\tt 42} flow.  
+When accepting the query as an input, the query system finds all values
+derivable from the current set of facts, for the variable \rcode{ X}.
 
 %The final step is to perform queries via query system.
 %The result of the query corresponds to actual result of client analysis.
