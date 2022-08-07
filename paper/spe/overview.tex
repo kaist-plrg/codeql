@@ -24,9 +24,9 @@ encompassing language boundaries.
 \subsection{Overview}
 Figure~\ref{fig:ov2} illustrates how we support multilingual analysis in a
 declarative style in the case of two languages as an example. The declarative
-analyzer now gets two sets of syntactic facts extracted from different
+analyzer now gets two sets of syntactic facts extracted from two different
 languages. In addition, new language-interoperation rules are defined on top of
-the original language-specific rules from different languages to take the
+the original language-specific rules from two languages to take the
 interoperation semantics into account. Then, the same query is performed to get
 analysis results.
 
@@ -43,7 +43,7 @@ def m2():
 m1()
     \end{lstlisting}
     \vspace*{-.5em}
-    \caption{Code in language A}
+    \caption{\normalsize Code in language A}
     \label{fig:exam:langA}
   \end{subfigure}
   \begin{subfigure}[t]{0.3\textwidth}
@@ -52,8 +52,8 @@ void f() {
     CallMethod("m2");
 }
     \end{lstlisting}
-    \vspace*{3.3em}
-    \caption{Code in language B}
+    \vspace*{3.5em}
+    \caption{\normalsize Code in language B}
     \label{fig:exam:langB}
   \end{subfigure}
   \vspace*{-.5em}
@@ -87,11 +87,11 @@ An example declarative static analysis consists of the following facts, rules, a
 The fact $p(\overline{\embox{elem}\ |\ x})$ denotes a relation $p$ between elements
 $\overline{\embox{elem}}$ or variables $\overline{x}$. The elements are primitive
 values in the analysis, such as string and integer values.  The rule $f'\
-\mbox{:-}\ \overline{\neg^? f}$ consists of two parts: the head of the rule, $f'$,
-and the body of the rule, $\overline{\neg^? f}$.  It denotes that the head can be derived from the body;
+\mbox{:-}\ \overline{\neg^? f}$ consists of two parts: the head of the rule $f'$
+and the body of the rule $\overline{\neg^? f}$.  It denotes that the head can be derived from the body:
 $f'$ holds if all the facts $f'' \in \{\overline{\neg^?
 f}\}$ hold. The optional prefix negation $\neg$ denotes
-the negative hold condition of a fact; 
+the negative hold condition of a fact: 
 the negated fact $\neg f$ holds if the fact $f$ does not
 hold. The body of the rule can be empty, and in that case, the head of the rule vacuously holds.
 Such bodiless rules can be considered as the initial input facts for the analysis.
@@ -143,8 +143,8 @@ name}. The initial facts for the code in Figure~\ref{fig:exam:langA} are as foll
 
 Then, the analysis requires rules for the initial facts to derive new facts
 about function call relations. In this example, one kind of facts, \rcode{
-CallEdge(ln1, ln2)}, denotes a call relation from a callsite at line \rcode{ ln1}
-to a function definition at line \rcode{ ln2}. To derive function call relation facts,
+CallEdge(ln1, ln2)}, denotes a call relation from a callsite on line \rcode{ ln1}
+to a function definition on line \rcode{ ln2}. To derive function call relation facts,
 we define a rule as follows: 
 
 %Next, there are rules that derice new facts from the known facts.  In this
@@ -165,9 +165,9 @@ we define a rule as follows:
 %get this new fact:
 
 \noindent
-The rule derives a new fact \rcode{ CallEdge(ln1, ln2)} when a callsite at line
+The rule derives a new fact \rcode{ CallEdge(ln1, ln2)} when a callsite on line
 \rcode{ ln1} has the same target function name as the name of a function defined
-at line \rcode{ ln2}. Therefore, a new fact can be derived from the initial facts
+on line \rcode{ ln2}. Therefore, a new fact can be derived from the initial facts
 as follows: 
 
 \begin{lstlisting}[style=mrule]
@@ -219,7 +219,7 @@ from the initial facts as follows:
 \end{lstlisting}
 
 \noindent
-This example shows a language-specific rule;
+This example shows a language-specific rule:
 the same fact \rcode{CallEdge} can be derived from different facts for
 different languages. When we make the query \rcode{ ?- CallEdge(X, Y)},
 the query system produces \rcode{ (X, Y)\ $\in$ \{\}} as a result
@@ -349,7 +349,7 @@ the interoperation rule from {\it B} to {\it A} as follows:
 
 Finally, when making the same query \rcode{ ?- CallEdge(X, Y)}, the query system
 now produces \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), } \rcode{(8, 4)\}} as function call relation results,
-which include not only intraoperation call relations,
+which include not only intraoperation call relations
 but also interopereation call relations. 
 
 This simple example shows what our extension for multilingual program analysis

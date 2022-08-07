@@ -31,8 +31,8 @@ versions for JN-SAF because it targets compiled JNI programs.
 
 Table~\ref{table:RQ1-1} summarizes the analysis
 results of \jnsaf and \ours on NativeFlowBench.
-The first column shows the benchmark names
-and the second and the third columns show 
+{\bf Benchmark} columns show the benchmark names
+and {\bf JN-SAF} and {\bf MultiQL} columns show 
 the analysis results of JN-SAF and \ours, respectively.
 If an analysis reports all data leakages correctly without any
 false positives or false negatives, it is a success (\cmark).
@@ -133,7 +133,7 @@ specific to Python Extension Module.
 
 Table~\ref{table:RQ1-3} summarizes the analysis results of \ours
 on 20 Python-C programs in ExtModuleFlowBench.
-The {\bf Benchmark} columns show the benchmark names and the {\bf Dataflow}
+{\bf Benchmark} columns show the benchmark names and {\bf Dataflow}
 columns show the analysis results.
 \ours analyzes dataflows correctly for 14 benchmarks, but reports false
 negatives for six benchmarks.
@@ -150,7 +150,7 @@ reports false negatives for them.
 %\textbf{Real-world Python-C Programs.}
 The second benchmark suite consists of six real-world Python-C programs
 collected from public GitHub repositories. They are analysis targets of
-the work of Monat et al.\cite{sas2021}
+Monat et al.\cite{sas2021}'s work.
 
 Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on six
 real-world Python-C programs. 
@@ -158,8 +158,8 @@ The first column shows repository names, the second to the fourth columns show
 database creation time of Python, C, and their merged database, respectively,
 the fifth shows query processing time, the sixth shows the total analysis time,
 and the last two columns denote analysis results.
-The {\bf Res.} column denotes the number of resolved API function calls in C code and
-the {\bf \#Total} column denotes the total number of Python Extension Module API function
+{\bf \#~Resolved} column denotes the number of resolved API function calls in C code and
+{\bf Total} column denotes the total number of Python Extension Module API function
 calls in C code. 
 Because all the API functions take a Python object as the first argument, we
 considered an API function call as resolved, when \ours finds its first argument
@@ -245,8 +245,8 @@ void nativeInitGraph89(..., jstring tmp_dir) {
    (*env)->GetStringUTFChars(env, tmp_dir, 0); ...
 }
     \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{NullDeref}
+%    \vspace*{-.5em}
+    \caption{\normalsize NullDeref}
     \label{fig:bug1}
   \end{subfigure}
   \begin{subfigure}{0.8\textwidth}
@@ -262,8 +262,8 @@ public class JpegRedaction {
 //JpegRedaction.cpp
 void Java_org_witness_securesmartcam_jpegredaction_ JpegRedaction_redactRegions(...) { ... }
     \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{MissingFun}
+%    \vspace*{-.5em}
+    \caption{\normalsize MissingFun}
     \label{fig:bug2}
   \end{subfigure}
   \begin{subfigure}{0.8\textwidth}
@@ -275,8 +275,8 @@ private native static List<PageTextBox> search(...);
 //mupdfdroidbridge.c
 jobjectArray search(...){ ... }
     \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{TypeMismatch}
+%    \vspace*{-.5em}
+    \caption{\normalsize TypeMismatch}
     \label{fig:bug3}
   \end{subfigure}
   \begin{subfigure}{0.8\textwidth}
@@ -292,14 +292,13 @@ void OnMessage(String text);
 mSendStr = (*env)->GetMethodID(env, jNativesCls,
                        "OnMessage", CB_CLASS_MSG_SIG);
     \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{WrongSig}
+%    \vspace*{-.5em}
+    \caption{\normalsize WrongSig}
     \label{fig:bug4}
   \end{subfigure}
-  \vspace*{-.5em}
+%  \vspace*{-.5em}
   \caption{Four kinds of JNI interoperation bugs}
   \label{fig:bugs}
-  \vspace*{-1em}
 \end{figure}
 
 Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours

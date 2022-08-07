@@ -93,11 +93,11 @@ analysis result.
 For compiled languages such as C and Java, CodeQL generates their databases by
 compiling source programs.  When a compiler compiles a program, CodeQL monitors
 the compiler to extract necessary information and creates a database with the
-extracted information. For script languages like Python, CodeQL uses its own
+extracted information. For scripting languages like Python, CodeQL uses its own
 extractor to directly extract necessary information from source code.
 CodeQL creates a database for a single language in two steps:
 1) it stores the extracted information in a ``trap
-file'', a human readable file format, and 2) it finalizes trap files
+file,'' a human readable file format, and 2) it finalizes trap files
 into databases in the binary format. For example, the
 following demonstrates a sample trap file:
 
@@ -182,7 +182,7 @@ predicate localFlowStep(Node from, Node to) {
 }
 \end{lstlisting}
     \vspace*{-.5em}
-    \caption{c/dataflow/internal/DataFlowUtil.qll}
+    \caption{\normalsize c/dataflow/internal/DataFlowUtil.qll}
     \label{fig:qll1}
   \end{subfigure}
   \begin{subfigure}{0.94\textwidth}
@@ -201,7 +201,7 @@ predicate localFlowStep(Node node1, Node node2) {
 }
 \end{lstlisting}
     \vspace*{-.5em}
-    \caption{java/dataflow/internal/DataFlowUtil.qll}
+    \caption{\normalsize java/dataflow/internal/DataFlowUtil.qll}
     \label{fig:qll2}
   \end{subfigure}
   \begin{subfigure}{0.94\textwidth}
@@ -223,7 +223,7 @@ predicate localFlowStep(Node node1, Node node2) {
 }
 \end{lstlisting}
     \vspace*{-.5em}
-    \caption{jni/dataflow/internal/DataFlowUtil.qll}
+    \caption{\normalsize jni/dataflow/internal/DataFlowUtil.qll}
     \label{fig:qll3}
   \end{subfigure}
   \vspace*{-.5em}
@@ -233,7 +233,7 @@ predicate localFlowStep(Node node1, Node node2) {
 
 To make classes and predicates in C and Java compatible,
 we lift each library to the common level.
-First, as in lines 1 and 2 of Figure~\ref{fig:qll3}, we encapsulate each of the original dataflow libraries with a CodeQL
+First, as on lines 1 and 2 of Figure~\ref{fig:qll3}, we encapsulate each of the original dataflow libraries with a CodeQL
 module system and name each of them \codeql{C} and \codeql{JAVA} so that we can distinguish the original
 classes and predicates by lifted ones.
 Lines from 4 to 10 of Figure~\ref{fig:qll3} demonstrate the lifted class.
@@ -334,7 +334,7 @@ what are the string values of \ccode{name} and \ccode{sig}?'' and
 ``When we call \ccode{Call<type>Method}, what is the method ID value of \ccode{mid}?''
 Answering these questions requires dataflow analysis;
 inter-language dataflow analysis is necessary to answer them soundly.
-However, in practice, intra-language dataflow analysis is enough in most cases.
+\inred{However, in practice, intra-language dataflow analysis is enough in most cases.}
 Therefore, we implemented two ``intra-flow'' analysis modules for C,
 which find 1) dataflows from string literals to the arguments of interface functions
 and 2) dataflows from interface function call results to the arguments of interface functions.
@@ -359,7 +359,7 @@ We extended them in a similar way to the calls from C to Java described above.
 
 To analyze Python-C programs, we extended predicates to model the
 interoperation semantics of Python Extension Module.
-The following shows the \codeql{viableCallable} predicate we extended for the
+The following shows \codeql{viableCallable} predicate we extended for the
 Python-C program analysis: 
 
 \begin{lstlisting}[style=codeql,xleftmargin=-.5em,numbers=none]
@@ -380,7 +380,7 @@ The only different parts from the Java-C program analysis are the predicates
 %\codeql{viableCallableP2C} and \codeql{viableCallableC2P}. 
 
 \textbf{Python to C.} Similar to the interactions from Java to C, one can make
-interactions from Python to C by importing and calling functions exported from
+interactions from Python to C by importing and calling functions from
 C. Python Extension Module provides a pre-defined C struct \ccode{PyMethodDef} to
 export a C function to Python: 
 %Similar to JNI programs,
@@ -409,10 +409,16 @@ To model the behavior, we define the CodeQL class \codeql{PyMethodDef}
 and the predicate \codeql{viableCallableP2C}. The class \codeql{PyMethodDef}
 corresponds to the C structure \ccode{PyMethodDef}. It has
 two member predicates \codeql{getName()} and \codeql{getFunc()} whose results are
-the value of the field \ccode{ml_name} and \ccode{ml_meth}, respectively.  Then, we define
-\codeql{f = viableCallableP2C(call)} holds when there exists \codeql{def}
-of type \codeql{PyMethodDef} such that \codeql{f = def.getFunc()} and
-\codeql{call.getTarget().toString()} \codeql{= def.getName()} holds.
+the values of the fields \ccode{ml_name} and \ccode{ml_meth}, respectively.
+\inred{Then, we make a rule that for \codeql{def} of type \codeql{PyMethodDef},
+if \codeql{def.getName() } \codeql{= call.getTarget().toString()}
+for some \codeql{call}, then \codeql{def.getFunc() } \codeql{= viableCallableP2C(call)} holds.}
+
+
+% Then, we define
+% \codeql{f = viableCallableP2C(call)} holds when there exists \codeql{def}
+% of type \codeql{PyMethodDef} such that \codeql{f = def.getFunc()} and
+% \codeql{call.getTarget().toString()} \codeql{= def.getName()} holds.
 
 In addition, we define rules that connect dataflows from arguments of
 a Python-to-C function call to parameters of its target C function.
@@ -425,13 +431,13 @@ This means that the usual way of connecting arguments and parameters via their
 positions does not work, and we need another way.
 We modelled this behavior by defining \codeql{VirtualArgNode}, a subclass of \codeql{Node},
 that corresponds to the Python tuple object. Then, we define some predicates
-for representing flows in and out of this node. First, we define the store step
-from original argument nodes to virtual argument nodes. We then define
-a step from virtual argument nodes to a single parameter node in a C function.
-By doing so, the flows form original argument nodes to use sites will be
+for representing flows in and out of this node. \inred{First, we define a
+step to store the values of original argument nodes to virtual argument nodes. We then define
+a step to store the values of virtual argument nodes to a single parameter node in a C function.
+By doing so, the flows from original argument nodes to use sites will be
 found in three steps: 1) from an argument node to a virtual argument node,
 2) from the virtual argument node to the parameter node of a C function,
-and 3) from the parameter node to the out node of \ccode{PyArg_ParseTuple} API function call.
+and 3) from the parameter node to the out node of \ccode{PyArg_ParseTuple} API function call.}
 
 
 %then the Python code can import cfunction and the call expression cfunction()
@@ -456,14 +462,15 @@ and 3) from the parameter node to the out node of \ccode{PyArg_ParseTuple} API f
 \textbf{C to Python.} The interaction from C to Python requires the runtime
 values of variables, similar to the interaction from C to Java. 
 To invoke Python functions in C, C code calls the interface function
-\ccode{PyObject_CallObject(func, args)}, where the \ccode{func} is a Python
-function object, and the \ccode{args} is a Python tuple object that contains
-each argument. 
-Because C code can get Python objects only propagated from Python code as
-function arguments of the Python-to-C interoperation, we define two
+\ccode{PyObject_CallObject(func, args)}, where \ccode{func} is a Python
+function object, and \ccode{args} is a Python tuple object that contains
+all arguments. 
+\inred{Because C code can get Python objects only as
+function arguments of the Python-to-C function calls,}
+we define two
 ``intra-flows'' analyses to identify Python objects assigned to \ccode{func}:
 1) dataflows from a Python function object to the argument of a C function call,
-and 2) dataflows from the parameters of a C function to the first argument of \ccode{PyObject_CallObject}. 
+and 2) dataflows from the parameters of a C function to the first argument of \ccode{PyObject_CallObject}.
 Using these intra-flow analyses, we can find actual targets that should be invoked
 for \ccode{PyObject_CallObject} API function calls.
 

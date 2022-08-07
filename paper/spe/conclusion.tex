@@ -1,5 +1,5 @@
 \section{Conclusion}\label{sec:conclude}
-Declarative static analysis has become a widely-used analysis technique, but it
+Declarative static analysis has become a widely-used analysis technique but
 has not supported multilingual programs actively developed in diverse
 application domains.
 In this paper, we present a practical extension methodology for a declarative static
@@ -9,10 +9,11 @@ spaces. Each language space stores facts transformed from source code written in
 corresponding language.
 Then, the second step is to define language-interoperation rules to derive facts
 across language boundaries.
-Our prototype implementation \ours built on top of CodeQL, tracks dataflows
-successfully over language boundaries in both Java-C and Python-C programs.
+Our prototype implementation, \ours built on top of CodeQL, successfully tracks dataflows
+over language boundaries in both Java-C and Python-C programs.
 Using \ours, we found 33 true bugs and vulnerabilities from real-world
-JNI applications, 12 of which are from applications that \lees failed to analyze.
+JNI applications, 12 of which are from the applications that \lees,
+the state-of-the-art Java-C program analyzer, failed to analyze.
 We believe that our approach is applicable to various multilingual programs,
 beyond Java-C and Python-C, and to multiple types of analyses.
 
