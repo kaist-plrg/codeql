@@ -25,41 +25,48 @@ consisting of 23 JNI Android applications (apps) that use various JNI interopera
 They contain sensitive data leakage from {\it sources} to {\it sinks}
 across language boundaries via JNI interoperations.
 We compare the analysis results of \ours to those of the state-of-the-art Java-C program
-analyzers, JN-Sum~\cite{LeeASE20} and JN-SAF~\cite{JN-SAF}. We use
-the benchmark source code for \ours and JN-Sum, but compiled
-versions for JN-SAF because it targets compiled JNI programs.
+dataflow analyzer, \jnsaf~\cite{JN-SAF}. We use
+compiled versions for \jnsaf because it targets compiled JNI programs.
 
 Table~\ref{table:RQ1-1} summarizes the analysis
 results of \jnsaf and \ours on NativeFlowBench.
 {\bf Benchmark} columns show the benchmark names
 and {\bf JN-SAF} and {\bf MultiQL} columns show 
-the analysis results of JN-SAF and \ours, respectively.
+the analysis results of \jnsaf and \ours, respectively.
 If an analysis reports all data leakages correctly without any
 false positives or false negatives, it is a success (\cmark).
 Otherwise, it is a failure (\xmark).
 \ours finds data leakages correctly for 19 benchmarks but reports false
-negatives for four benchmarks, while JN-SAF analyzes 21 benchmarks correctly. 
+negatives for four benchmarks, while \jnsaf analyzes 21 benchmarks correctly. 
 One common failure comes from string concatenation:
 {\it native\_complexdata\_stringop} generates a Java field name by
 concatenating two string values via a built-in function.
 Because \ours does not handle built-in functions, it fails to analyze the benchmark.
 {\it icc\_javatonative} and {\it icc\_nativetojava} leak data via the Android
 inter-component communication, which is beyond the scope of \ours.
-The remaining different failures of \ours and JN-SAF come from
+The remaining different failures of \ours and \jnsaf come from
 their different array analysis policies.
 While both {\it native\_leak\_array} and {\it native\_noleak\_array} store sensitive data in an array,
 the former leaks the data, but the latter does not.
-Because JN-SAF over-approximates dataflows on arrays,
+Because \jnsaf over-approximates dataflows on arrays,
 it analyzes {\it native\_leak\_array} correctly but reports a false positive for {\it native\_noleak\_array}.
 On the contrary, because CodeQL under-approximates dataflows on arrays,
 \ours analyzes {\it native\_noleak\_array} correctly but reports a false negative for
 {\it native\_leak\_array}.
+
+This result indicates that \ours can
+successfully perform dataflow analysis in the JNI programs with various JNI interoperations,
+and its correctness is comparable with that of \jnsaf.
 
 %\textbf{Real-world Java-C Programs.} 
 The second benchmark suite consists of real-world Java-C Android apps downloaded from
 F-Droid, a repository of open-source Android apps~\cite{fdroid}.  We first
 downloaded all available apps from F-Droid, and classified downloaded apps into JNI and non-JNI apps.
 Then, we selected all 42 apps that can be compiled without any errors as our analysis targets.
+For this real-world benchmark, we compare analysis result of \ours with \lees~\cite{LeeASE20},
+a state-of-art general purpose Java-C program analyzer.
+We choose \lees as a comparison target instead of \jnsaf,
+since \jnsaf is not scalable enough to analyze the real world benchmark.
 
 \input{tableRQ1-2}
 
@@ -75,9 +82,9 @@ Then, we selected all 42 apps that can be compiled without any errors as our ana
 
 Table~\ref{table:RQ1-2} shows the analysis results of \ours on 25 apps that have
 interoperations from C to Java.
-The first column shows app names, the second to the fourth columns show
-database creation time of C, Java, and their merged database, respectively, the
-fifth shows query processing time, and the sixth shows the total analysis time.
+The first column shows app names with indices, the second shows lines of codes,
+the third shows database creation time, the
+fourth shows query processing time, and the fifth shows the total analysis time.
 {\bf C->Java Function Call} and {\bf C->Java Field Access} show the numbers of
 C-to-Java function calls and C-to-Java field accesses, respectively. We
 collectively call them \emph{JNI uses}.
@@ -109,9 +116,8 @@ the DB creation time was almost linear to the code size.
 \ours took about 12 minutes at most to analyze {\it Tileless Map} having about
 one million lines of code.
 
-%\inred{(Maybe we don't need this paragraph?)}
 Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
-The x-axis denotes the labels of apps and the y-axis denotes the analysis time
+The x-axis denotes the indices of apps and the y-axis denotes the analysis time
 in seconds. We omit eight apps \lees fails to analyze.
 \lees analyzes 12 apps faster than \ours, but the difference is less than two
 minutes. 
@@ -119,7 +125,13 @@ On the other hand, \ours analyzes five apps faster than \lees, and \lees spends
 much time in summary generation for three apps among them. 
 In addition, while \lees fails to analyze all the large-scale apps that have
 more than about 400,000 lines of code in eight hours, \ours analyzes about
-three million lines of code in about ten minutes.
+three million lines of code in about twelve minutes.
+
+In summary, the result show that \ours can precisely analyze the real-world
+applications that include JNI uses, in that more than 4 out of 5 JNI uses can
+be resolved. In addition, the scalability of \ours is comparable with \lees, in that
+it takes similar amount of time to analyze the smaller apps for both analyzers,
+and \ours can analyze larger apps much faster than \lees.
 
 \subsubsection{Feasibility: Python-C}
 \input{tableRQ1-3}
@@ -140,9 +152,17 @@ negatives for six benchmarks.
 \ours fails in {\it complexdata\_stringop} and {\it leak\_array} due to the
 same reason for NativeFlowBench.
 For the other four benchmarks, \ours fails to track dataflows for the fields of Python objects. 
-In the failed benchmarks, C code changes the values of the fields in Python objects.
-Because \ours does not handle such Python object modifications in C code, it
+In the failed benchmarks, C code changes the values of the fields in Python objects that are passed
+to the parameter of C functions.
+\ours does not handle such case because
+the use of virtual argument node prevents the propagation of changed value
+back to the field of original Python object, and it
 reports false negatives for them.
+
+This result show that our approach is feasible for performing
+dataflow analysis not only in Java-C programs but also in Python-C programs,
+yet there are some specific Python-C interoperation features that
+\ours could not handle.
 
 \input{tableRQ1-4}
 
@@ -150,13 +170,13 @@ reports false negatives for them.
 %\textbf{Real-world Python-C Programs.}
 The second benchmark suite consists of six real-world Python-C programs
 collected from public GitHub repositories. They are analysis targets of
-Monat et al.\cite{sas2021}'s work.
+Monat et al.~\cite{sas2021}'s work.
 
 Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on six
 real-world Python-C programs. 
-The first column shows repository names, the second to the fourth columns show
-database creation time of Python, C, and their merged database, respectively,
-the fifth shows query processing time, the sixth shows the total analysis time,
+The first column shows repository names, the second shows lines of codes,
+the thrid show database creation time,
+the fourth shows query processing time, the fifth shows the total analysis time,
 and the last two columns denote analysis results.
 {\bf \#~Resolved} column denotes the number of resolved API function calls in C code and
 {\bf Total} column denotes the total number of Python Extension Module API function
@@ -181,6 +201,9 @@ code can register C functions as such implicitly called methods.
 Because \ours does not handle C functions implicitly called in Python, it
 fails to resolve API function calls in them.
 
+This result indicate that \ours could perform dataflow analysis on
+real world Python-C programs with high precision, and could
+successfully find the python object values that C variables can have.
 
 \input{tableRQ2}
 
@@ -357,3 +380,6 @@ instead of a method ID, and this example throws a Java exception. In
 addition, it may introduce errors in subsequent instructions when using the
 return value without null checking or calling JNI functions without handling the
 thrown Java exception~\cite{jniexcept}.
+
+As a result, we can conclude that \ours is useful enough
+to detect the various JNI interoperation bugs in the real-world JNI apps.

@@ -334,8 +334,14 @@ what are the string values of \ccode{name} and \ccode{sig}?'' and
 ``When we call \ccode{Call<type>Method}, what is the method ID value of \ccode{mid}?''
 Answering these questions requires dataflow analysis;
 inter-language dataflow analysis is necessary to answer them soundly.
-\inred{However, in practice, intra-language dataflow analysis is enough in most cases.}
-Therefore, we implemented two ``intra-flow'' analysis modules for C,
+However, using the final result of the inter-language dataflow analysis itself
+in implementation causes a non-monotonic recursion, a recursion with odd number of
+negations, which is inhibited in CodeQL.
+To avoid this problem, we use separate intra-language flow analysis  instead of
+using inter-language flow. It is sound unless the string
+value for or the method ID value is passed across the language boundary, which happens
+rarely in practice.
+We implemented two intra-flow analysis modules for C,
 which find 1) dataflows from string literals to the arguments of interface functions
 and 2) dataflows from interface function call results to the arguments of interface functions.
 Using these modules, we can implement the
@@ -402,7 +408,7 @@ struct PyMethodDef methods[] = {
 
 \noindent
 The member field \ccode{ml_name} has a visible name of a C function to Python,
-and the member field \ccode{ml_meth} has the actual name of the C function.
+and the member field \ccode{ml_meth} has the pointer to the actual C function.
 Thus, the function \ccode{cfunction_impl} defined in C code is invoked when
 importing and calling \ccode{cfunction} in Python code.
 To model the behavior, we define the CodeQL class \codeql{PyMethodDef}
@@ -410,9 +416,9 @@ and the predicate \codeql{viableCallableP2C}. The class \codeql{PyMethodDef}
 corresponds to the C structure \ccode{PyMethodDef}. It has
 two member predicates \codeql{getName()} and \codeql{getFunc()} whose results are
 the values of the fields \ccode{ml_name} and \ccode{ml_meth}, respectively.
-\inred{Then, we make a rule that for \codeql{def} of type \codeql{PyMethodDef},
+Then, we make a rule for \codeql{viableCallableP2C} such that for \codeql{def} of type \codeql{PyMethodDef},
 if \codeql{def.getName() } \codeql{= call.getTarget().toString()}
-for some \codeql{call}, then \codeql{def.getFunc() } \codeql{= viableCallableP2C(call)} holds.}
+for some \codeql{call}, then \codeql{def.getFunc() } \codeql{= viableCallableP2C(call)} holds.
 
 
 % Then, we define
@@ -431,13 +437,13 @@ This means that the usual way of connecting arguments and parameters via their
 positions does not work, and we need another way.
 We modelled this behavior by defining \codeql{VirtualArgNode}, a subclass of \codeql{Node},
 that corresponds to the Python tuple object. Then, we define some predicates
-for representing flows in and out of this node. \inred{First, we define a
-step to store the values of original argument nodes to virtual argument nodes. We then define
-a step to store the values of virtual argument nodes to a single parameter node in a C function.
+for representing flows in and out of this node. First, we define a
+step that represents the flow from values of original argument nodes to virtual argument nodes. We then define
+a step that represents flow from the values of virtual argument nodes to a single parameter node in a C function.
 By doing so, the flows from original argument nodes to use sites will be
 found in three steps: 1) from an argument node to a virtual argument node,
 2) from the virtual argument node to the parameter node of a C function,
-and 3) from the parameter node to the out node of \ccode{PyArg_ParseTuple} API function call.}
+and 3) from the parameter node to the out node of \ccode{PyArg_ParseTuple} API function call.
 
 
 %then the Python code can import cfunction and the call expression cfunction()
@@ -465,8 +471,8 @@ To invoke Python functions in C, C code calls the interface function
 \ccode{PyObject_CallObject(func, args)}, where \ccode{func} is a Python
 function object, and \ccode{args} is a Python tuple object that contains
 all arguments. 
-\inred{Because C code can get Python objects only as
-function arguments of the Python-to-C function calls,}
+Because C code can get Python objects as
+function arguments of the Python-to-C function calls,
 we define two
 ``intra-flows'' analyses to identify Python objects assigned to \ccode{func}:
 1) dataflows from a Python function object to the argument of a C function call,

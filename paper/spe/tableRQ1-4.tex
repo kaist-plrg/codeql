@@ -7,21 +7,21 @@
 %  \footnotesize
 \renewcommand{\arraystretch}{.9}
 \begin{tabular}{@{}l@{~}| %Repository
- @{~}r@{~}|@{~}r@{~}|@{~}r@{~}|@{~}r@{~}|@{~}r@{~}|@{~}r@{~}|@{~}r@{}}
+ @{~}r@{~}||@{~}r@{~}|@{~}r@{~}|@{~}r@{~}||@{~}r@{~}|@{~}r@{}}
 \multicolumn{1}{@{}l|@{~}}{\multirow{2}{*}{\textbf{Repository}}}
- & \multicolumn{3}{@{~}c|@{~}}{\textbf{DB Creation (sec.)}}
+ & \multicolumn{1}{@{~}c||@{~}}{\multirow{2}{*}{\textbf{LOC}}}
+ & \multicolumn{1}{@{~}c|@{~}}{\textbf{DB Creation}}
  & \multicolumn{1}{@{~}c|@{~}}{\textbf{Query}}
- & \multicolumn{1}{@{~}c|@{~}}{\textbf{Total}}
+ & \multicolumn{1}{@{~}c||@{~}}{\textbf{Total}}
  & \multicolumn{2}{@{~}c@{}}{\textbf{\# API calls}}
 %\\\hhline{~|---~|~|--}
 %\\\cline{2-4}\cline{7-8}
 \\
 \multicolumn{1}{@{}l|@{~}}{}
- & \multicolumn{1}{@{~}c|@{~}}{\textbf{Python}}
- & \multicolumn{1}{@{~}c|@{~}}{\textbf{C}}
- & \multicolumn{1}{@{~}c|@{~}}{\textbf{Merged}}
+ & \multicolumn{1}{@{~}c||@{~}}{}
  & \multicolumn{1}{@{~}c|@{~}}{\textbf{(sec.)}}
  & \multicolumn{1}{@{~}c|@{~}}{\textbf{(sec.)}}
+ & \multicolumn{1}{@{~}c||@{~}}{\textbf{(sec.)}}
  & \multicolumn{1}{@{~}c|@{~}}{\textbf{\# Resolved}}
  & \multicolumn{1}{c@{}}{\textbf{Total}}
 % %\\\hhline{=#*{4}{=|}=#=|=}
@@ -33,23 +33,24 @@
   % 5. python-Levenshtein & 17.187 & 3.144 & 12.686 & 153.95  & 186.967 & -  & -  \\
   % 6. python-llist       & 17.047 & 2.853 & 11.986 & 153.014 & 184.9   & 18 & 30 \\\hhline{=#*{4}{=}=#=|=}
 \multicolumn{1}{@{}l|@{~}}{bitarray}
-           & 19.378 & 3.082 & 13.537 & 197.556 & 233.553 & 38 & 50 \\
-\multicolumn{1}{@{}l|@{~}}{distance}
-           & 16.722 & 2.354 & 11.594 & 134.895 & 165.565 & -  & -  \\
-\multicolumn{1}{@{}l|@{~}}{noise}
-            & 18.790  & 2.430  & 12.222 & 148.021 & 181.463 & -  & -  \\
-\multicolumn{1}{@{}l|@{~}}{pyahocorasick}
-      & 19.179 & 2.620  & 13.118 & 172.620  & 207.537 & 33 & 43 \\
-\multicolumn{1}{@{}l|@{~}}{python-Levenshtein} & 17.187 & 3.144 & 12.686 & 153.950  & 186.967 & -  & -  \\
-\multicolumn{1}{@{}l|@{~}}{python-llist}       & 17.047 & 2.853 & 11.986 & 153.014 & 184.900   & 18 & 30
+  & 10,707 & 35.997 & 197.556 & 233.553 & 38 & 50 \\
+\multicolumn       {1}{@{}l|@{~}}{distance}
+  & 1,882  & 30.670 & 134.895 & 165.565 & -  & -  \\
+\multicolumn       {1}{@{}l|@{~}}{noise}
+  & 1,766  & 33.442 & 148.021 & 181.463 & -  & -  \\
+\multicolumn       {1}{@{}l|@{~}}{pyahocorasick}
+  & 7,767  & 34.917 & 172.620 & 207.537 & 33 & 43 \\
+\multicolumn       {1}{@{}l|@{~}}{python-Levenshtein}
+  & 5,718  & 33.017 & 153.950 & 186.967 & -  & -  \\
+\multicolumn       {1}{@{}l|@{~}}{python-llist}
+  & 5,411  & 31.886 & 153.014 & 184.900 & 18 & 30
 %\\\hhline{=#*{4}{=}=#=|=}
 \\\hline\hline
-\multicolumn{1}{@{}l|@{~}}{\textbf{Total}}
+\multicolumn{1}{@{}l@{~}}{\textbf{Total}}
+ & \multicolumn{1}{r||@{~}}{}
  & \multicolumn{1}{r}{}
  & \multicolumn{1}{r}{}
- & \multicolumn{1}{r}{}
- & \multicolumn{1}{r}{}
- & \multicolumn{1}{r|@{~}}{}
+ & \multicolumn{1}{r||@{~}}{}
  & 89                         & 123                          
   \end{tabular}
 \vspace*{-1em}
