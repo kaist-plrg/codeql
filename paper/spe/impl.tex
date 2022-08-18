@@ -332,13 +332,13 @@ To correctly handle this method call, we should be able to answer these
 questions: ``When we call \ccode{GetMethodID},
 what are the string values of \ccode{name} and \ccode{sig}?'' and
 ``When we call \ccode{Call<type>Method}, what is the method ID value of \ccode{mid}?''
-Answering these questions soundly requires inter-language dataflow analysis,
-because the string or method ID values may be passed across language boundary.
-However, we observed that such pattern rarely happens in practice,
+Soundly answering these questions requires inter-language dataflow analysis
+because the string or method ID values may be passed across language boundaries.
+However, we observed that such a pattern rarely happens in practice,
 and using only intra-language dataflow analysis within C code is enough for most cases.
 Therefore, we decided to sacrifice the precision
-by using intra-flow analysis instead of inter-flow analysis,
-as a trade-off for more lightweight and simpler implementation.
+by using intra-flow analysis instead of inter-flow analysis
+as a trade-off for a more lightweight and simpler implementation.
 We implemented two intra-flow analysis modules for C,
 which find 1) dataflows from string literals to the arguments of interface functions
 and 2) dataflows from interface function call results to the arguments of interface functions.
