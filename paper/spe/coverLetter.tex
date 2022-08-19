@@ -1,0 +1,58 @@
+\documentclass{letter}
+\usepackage{graphicx,fullpage}
+\pagestyle{empty}
+
+\signature{
+Dongjun Youn\\
+Ph.D Candidate\\
+School of Computing\\
+KAIST
+%Korea Advanced Institute of Science and Technology (KAIST)
+}
+\address{
+School of Computing\\
+Korea Advanced Institute of Science and Technology (KAIST)\\
+291 Daehak-ro, Yuseong-gu\\
+Daejeon, Republic of Korea 34141
+}
+\date{August 19, 2022}
+\begin{document}
+\begin{letter}{
+Software: Practice and Experience
+}
+
+\vspace*{-10em}
+\hspace*{-3em}
+\noindent
+\makebox[0pt][l]{%
+  \raisebox{-\totalheight}[0pt][0pt]{%
+    \includegraphics[width=1.1\textwidth]{socheader}}}
+\vspace*{10em}
+
+\opening{Dear Editors:}
+
+We are submitting a reserach article manuscript entitled: ``Declarative Static Program Analysis
+for Multilingual Programs'' for exclusive consideration of publication as an
+article in Software: Practice and Experience.
+This article presents a systematic methodology that extends a declarative static
+analyzer to support multilingual programs.  The first step is to create a
+merged database consisting of multiple logical language spaces. Each language
+space stores facts transformed from source code written in its corresponding
+language.  Then, the second step is to define language-interoperation rules to
+derive facts across language boundaries.  We develop a proof-of-concept
+declarative static analyzer for multilingual programs by extending CodeQL,
+which can track dataflows across language boundaries. Our evaluation shows that
+the analyzer successfully tracks dataflows across Java-C and Python-C language
+boundaries and detects genuine interoperation bugs in real-world multilingual
+programs.  We believe that our approach is applicable to various multilingual
+programs, beyond Java-C and Python-C, and to multiple types of analyses.
+
+\medskip
+
+Thank you for your consideration of our work.
+Please address all correspondence concerning this manuscript to Dongjun Youn at KAIST and
+feel free to correspond with him by e-mail ({\tt f52985@kaist.ac.kr}).
+
+\closing{Sincerely,}
+\end{letter}
+\end{document}

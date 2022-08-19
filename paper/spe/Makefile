@@ -12,6 +12,11 @@ $(FILE).pdf:  $(FILE).tex *.tex $(PACKAGE)-v2.cls  $(PACKAGE)-AMA.bst
 	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
 	  do pdflatex $<; done
 
+letter: coverLetter.pdf
+
+coverLetter.pdf: coverLetter.tex
+	pdflatex coverLetter.tex
+
 .PRECIOUS:  $(PACKAGE).cfg $(PACKAGE).cls
 
 clean:
