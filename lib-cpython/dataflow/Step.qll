@@ -127,7 +127,19 @@ predicate pyJumpStep(Node prev, Node next) {
     prev.asCppNode().asExpr() = call.getArgument(0)
     or
     call.toString().matches("%Py_BuildValue%") and
-    call.getArgument(0).toString() = ["O", "S"] and
+    call.getArgument(0).toString() = ["O", "S", "s"] and
     prev.asCppNode().asExpr() = call.getArgument(1)
+  )
+}
+
+predicate pyTypeCastStep(Node prev, Node next) {
+  exists(PYTHON::Call call |
+    call = next.asPythonNode().asExpr() |
+    call.getFunc().toString() = [
+      "int",
+      "float",
+      "str",
+    ] and
+    prev.asPythonNode().asExpr() = call.getArg(0)
   )
 }

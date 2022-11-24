@@ -408,6 +408,8 @@ predicate jumpStep(Node p0, Node p1) {
   p2cArgParamJumpStep(p0, p1)
   or
   pyJumpStep(p0,p1)
+  or
+  pyTypeCastStep(p0,p1)
 }
 predicate clearsContent(Node p0, Content p1) {
   PYTHON::clearsContent(p0.asPythonNode(), p1.asPythonContent())
