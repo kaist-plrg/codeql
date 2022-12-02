@@ -10,14 +10,14 @@
     \multicolumn{1}{c||}{\textbf{Benchmark}} & \textbf{\jnsaf} & \textbf{\ours} &
     \multicolumn{1}{c||}{\textbf{Benchmark}} & \textbf{\jnsaf} & \textbf{\ours}\\
     \hhline{=#=|=#=#=|=}
-    icc\_javatonative                   & \cmark & \xmark & native\_noleak                       & \cmark & \cmark\\
-    icc\_nativetojava                   & \cmark & \xmark & native\_noleak\_array                & \xmark & \cmark\\
+    icc\_javatonative                   & \cmark & \fn    & native\_noleak                       & \cmark & \cmark\\
+    icc\_nativetojava                   & \cmark & \fn    & native\_noleak\_array                & \fp    & \cmark\\
     native\_complexdata                 & \cmark & \cmark & native\_nosource                     & \cmark & \cmark\\
-    native\_complexdata\_stringop       & \xmark & \xmark & native\_pure                         & \cmark & \cmark\\
+    native\_complexdata\_stringop       & \fn    & \fn    & native\_pure                         & \cmark & \cmark\\
     native\_dynamic\_register\_multiple & \cmark & \cmark & native\_pure\_direct                 & \cmark & \cmark\\
     native\_heap\_modify                & \cmark & \cmark & native\_pure\_direct\_customized     & \cmark & \cmark\\
     native\_leak                        & \cmark & \cmark & native\_set\_field\_from\_arg        & \cmark & \cmark\\
-    native\_leak\_array                 & \cmark & \xmark & native\_set\_field\_from\_arg\_field & \cmark & \cmark\\
+    native\_leak\_array                 & \cmark & \fn    & native\_set\_field\_from\_arg\_field & \cmark & \cmark\\
     native\_leak\_dynamic\_register     & \cmark & \cmark & native\_set\_field\_from\_native     & \cmark & \cmark\\
     native\_method\_overloading         & \cmark & \cmark & native\_source                       & \cmark & \cmark\\
     native\_multiple\_interactions      & \cmark & \cmark & native\_source\_clean                & \cmark & \cmark\\

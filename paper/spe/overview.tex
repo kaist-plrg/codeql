@@ -39,7 +39,7 @@ import f
 def m1():
     f()
 def m2():
-    pass
+    return None
 m1()
     \end{lstlisting}
     \vspace*{-.5em}
@@ -73,31 +73,33 @@ void f() {
 %value "m2" to indicate the name of method.
 
 \subsection{Example Declarative Static Analysis}
-An example declarative static analysis consists of the following facts, rules, and queries:
+An example declarative static analysis consists of the following \inred{datalog-like} facts, rules, and queries:
 
 \[
   \begin{array}{llll}
-    f & ::= & p(\overline{\embox{elem}\ |\ x}) & \text{\sc Fact}\\
-    r & ::= & f'\ \mbox{:-}\ \overline{\neg^? f} & \text{\sc Rule}\\
+    f & ::= & p(\overline{\inred{v}\ |\ x}) & \text{\sc Fact}\\
+    r & ::= & f'\ \mbox{:-}\ \overline{\inred{f\ |\neg f}} & \text{\sc Rule}\\
     q & ::= & \mbox{?-}\ \overline{f}\ &  \text{\sc Query}
 \end{array}
 \]
 
 \noindent
-The fact $p(\overline{\embox{elem}\ |\ x})$ denotes a relation $p$ between elements
-$\overline{\embox{elem}}$ or variables $\overline{x}$. The elements are primitive
-values in the analysis, such as string and integer values.  The rule $f'\
-\mbox{:-}\ \overline{\neg^? f}$ consists of two parts: the head of the rule $f'$
-and the body of the rule $\overline{\neg^? f}$.  It denotes that the head can be derived from the body:
-$f'$ holds if all the facts $f'' \in \{\overline{\neg^?
-f}\}$ hold. The optional prefix negation $\neg$ denotes
-the negative hold condition of a fact: 
-the negated fact $\neg f$ holds if the fact $f$ does not
-hold. The body of the rule can be empty, and in that case, the head of the rule vacuously holds.
+\inred{We use the overline notation for indicating the 0 or more repetitions. For example,
+$\overline{x}$ is a shorthand for $x_1, x_2, ..., x_n$ for some $n \ge 0$. We use the }
+The fact $p(\overline{\inred{v}\ |\ x})$ denotes a relation $p$ between \inred{primitive values}
+$\overline{\inred{v}}$ \inred{such as string and integer values}, or variables $\overline{x}$. A rule $f'\
+\mbox{:-}\ \overline{\inred{f\ |\neg f}}$ consists of two parts: the head of the rule $f'$
+and the body of the rule \inred{$\overline{f\ |\neg f}$, where the optional prefix $\neg$ denotes
+the negation.\footnote{One restriction regarding negation is that there should not be
+any recursive rules with odd number of negations.}}
+It denotes that the head can be derived from the body:
+$f'$ \inred{can be derived if all the facts $f'' \in \{\overline{f}\}$ are included in the set of
+known facts, and the all the facts $f'' \in \{\overline{\neg f}\}$ are not included in the set of known facts}.
+The body of the rule can be empty, and in that case, the head of the rule can be vacuously added to the known facts.
 Such bodiless rules can be considered as the initial input facts for the analysis.
 The query $\mbox{?-}\ \overline{f}$ finds all possible variable assignments that
-make all facts in $\overline{f}$ hold if variables in $\overline{f}$ are
-replaced with the assigned elements.
+make all facts in $\overline{f}$ \inred{to be included in the set of known facts} if variables in $\overline{f}$ are
+replaced with the assigned \inred{values}.
 
 
 \subsection{Declarative Call Graph Construction for Monolingual Programs}\label{lab:ovmono}
@@ -119,10 +121,10 @@ string value argument as the target function name.
 A declarative static analysis first creates a database of facts for the
 code. Initial facts are just syntactic information extracted from the code.
 For example, there are two kinds of facts required for call graph
-construction: \rcode{FunctionAt(ln, name)} denotes function definition
-information containing its line number \rcode{ln} and the function name \rcode{
-name}, and \rcode{CallAt(ln, name)} denotes callsite information
-containing the callsite line number \rcode{ln} and its target function name \rcode{
+construction: \rcode{FunctionAt(lineNum, name)} denotes function definition
+information containing its line number \rcode{lineNum} and the function name \rcode{
+name}, and \rcode{CallAt(lineNum, name)} denotes callsite information
+containing the callsite line number \rcode{lineNum} and its target function name \rcode{
 name}. The initial facts for the code in Figure~\ref{fig:exam:langA} are as follows: 
 
 %First, let's consider a hypothetical declarative style analyzer, that supports
@@ -143,8 +145,8 @@ name}. The initial facts for the code in Figure~\ref{fig:exam:langA} are as foll
 
 Then, the analysis requires rules for the initial facts to derive new facts
 about function call relations. In this example, one kind of facts, \rcode{
-CallEdge(ln1, ln2)}, denotes a call relation from a callsite on line \rcode{ ln1}
-to a function definition on line \rcode{ ln2}. To derive function call relation facts,
+CallEdge(lineNum1, lineNum2)}, denotes a call relation from a callsite on line \rcode{ lineNum1}
+to a function definition on line \rcode{ lineNum2}. To derive function call relation facts,
 we define a rule as follows: 
 
 %Next, there are rules that derice new facts from the known facts.  In this
@@ -154,9 +156,9 @@ we define a rule as follows:
 %of MethodAt and CallAt, we can define the rule like folowing:
 
 \begin{lstlisting}[style=mrule]
-    CallEdge(ln1, ln2) :-
-      CallAt(ln1, name),
-      FunctionAt(ln2, name)
+    CallEdge(lineNum1, lineNum2) :-
+      CallAt(lineNum1, name),
+      FunctionAt(lineNum2, name)
 \end{lstlisting}
 
 %The meaning of this rule is straight forward. Whenever there is a method
@@ -165,9 +167,9 @@ we define a rule as follows:
 %get this new fact:
 
 \noindent
-The rule derives a new fact \rcode{ CallEdge(ln1, ln2)} when a callsite on line
-\rcode{ ln1} has the same target function name as the name of a function defined
-on line \rcode{ ln2}. Therefore, a new fact can be derived from the initial facts
+The rule derives a new fact \rcode{ CallEdge(lineNum1, lineNum2)} when a callsite on line
+\rcode{ lineNum1} has the same target function name as the name of a function defined
+on line \rcode{ lineNum2}. Therefore, a new fact can be derived from the initial facts
 as follows: 
 
 \begin{lstlisting}[style=mrule]
@@ -200,11 +202,11 @@ The initial facts for the code in Figure~\ref{fig:exam:langB} are as follows:
 \end{lstlisting}
 
 \noindent
-The fact \rcode{ ProcedureAt(ln, name)} denotes that a procedure of name
-\rcode{name} is defined on line \rcode{ln} similarly to
-\rcode{FunctionAt(ln, name)} for the language {\it A}.
-The fact \rcode{ Argument(ln, i, arg)} denotes that the value of
-the \rcode{i}-th argument of a function call on line \rcode{ ln} is \rcode{ arg}.
+The fact \rcode{ ProcedureAt(lineNum, name)} denotes that a procedure of name
+\rcode{name} is defined on line \rcode{lineNum} similarly to
+\rcode{FunctionAt(lineNum, name)} for the language {\it A}.
+The fact \rcode{ Argument(lineNum, i, arg)} denotes that the value of
+the \rcode{i}-th argument of a function call on line \rcode{ lineNum} is \rcode{ arg}.
 
 Then, we define a slightly different rule to derive a function call relation
 from the initial facts as follows: 
@@ -213,9 +215,9 @@ from the initial facts as follows:
 %similar manner:
 
 \begin{lstlisting}[style=mrule]
-    CallEdge(ln1, ln2) :-
-      CallAt(ln1, name),
-      ProcedureAt(ln2, name)
+    CallEdge(lineNum1, lineNum2) :-
+      CallAt(lineNum1, name),
+      ProcedureAt(lineNum2, name)
 \end{lstlisting}
 
 \noindent
@@ -273,10 +275,10 @@ facts. We define them by composing language-specific rules for A,
 language-specific rules for B, and language-interoperation rules as follows:
 
 \begin{lstlisting}[style=mrule]
-    CallEdge(ln1, ln2) :- CallEdge$_A$(ln1, ln2)
-    CallEdge(ln1, ln2) :- CallEdge$_B$(ln1, ln2)
-    CallEdge(ln1, ln2) :- CallEdge$_{AB}$(ln1, ln2)
-    CallEdge(ln1, ln2) :- CallEdge$_{BA}$(ln1, ln2)
+    CallEdge(lineNum1, lineNum2) :- CallEdge$_A$(lineNum1, lineNum2)
+    CallEdge(lineNum1, lineNum2) :- CallEdge$_B$(lineNum1, lineNum2)
+    CallEdge(lineNum1, lineNum2) :- CallEdge$_{AB}$(lineNum1, lineNum2)
+    CallEdge(lineNum1, lineNum2) :- CallEdge$_{BA}$(lineNum1, lineNum2)
 \end{lstlisting}
 
 %For language-specific rules for CallEdge\_A and CallEdge\_B can be defined same
@@ -291,14 +293,14 @@ derive the \rcode{ CallEdge$_A$} and \rcode{ CallEdge$_B$}:
 
 \begin{tabular}{ll}
   {\begin{lstlisting}[style=mrule]
-    CallEdge$_A$(ln1, ln2) :-
-      CallAt$_A$(ln1, name),
-      FunctionAt$_A$(ln2, name)
+    CallEdge$_A$(lineNum1, lineNum2) :-
+      CallAt$_A$(lineNum1, name),
+      FunctionAt$_A$(lineNum2, name)
   \end{lstlisting}} & 
   {\begin{lstlisting}[style=mrule]
-    CallEdge$_B$(ln1, ln2) :-
-      CallAt$_B$(ln1, name),
-      ProcedureAt$_B$(ln2, name)
+    CallEdge$_B$(lineNum1, lineNum2) :-
+      CallAt$_B$(lineNum1, name),
+      ProcedureAt$_B$(lineNum2, name)
   \end{lstlisting}}
 \end{tabular}
 
@@ -318,9 +320,9 @@ A} to {\it B} as follows:
 %defined in similar way:
 
 \begin{lstlisting}[style=mrule]
-    CallEdge$_{AB}$(ln1, ln2) :-
-      CallAt$_A$(ln1, name),
-      ProcedureAt$_B$(ln2, name)
+    CallEdge$_{AB}$(lineNum1, lineNum2) :-
+      CallAt$_A$(lineNum1, name),
+      ProcedureAt$_B$(lineNum2, name)
 \end{lstlisting}
 
 \noindent
@@ -335,10 +337,10 @@ the interoperation rule from {\it B} to {\it A} as follows:
 %semantics.
 
 \begin{lstlisting}[style=mrule]
-    CallEdge$_{BA}$(ln1, ln2) :-
-      CallAt$_B$(ln1, "CallMethod"),
-      Argument$_B$(ln1, 0, name),
-      FunctionAt$_A$(ln2, name)
+    CallEdge$_{BA}$(lineNum1, lineNum2) :-
+      CallAt$_B$(lineNum1, "CallMethod"),
+      Argument$_B$(lineNum1, 0, name),
+      FunctionAt$_A$(lineNum2, name)
 \end{lstlisting}
 
 %After fully defining the rule for CallEdge, then we can reuse the query system
@@ -347,7 +349,9 @@ the interoperation rule from {\it B} to {\it A} as follows:
 %?- CallEdge(X, Y).
 %which will give us the output, (X, Y) = (7, 3), (4, 9), (10, 5)
 
-Finally, when making the same query \rcode{ ?- CallEdge(X, Y)}, the query system
+Finally, when making the same query \rcode{ ?- CallEdge(X, Y)}
+\inred{as we did for the monolingual programs,}
+the query system
 now produces \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), } \rcode{(8, 4)\}} as function call relation results,
 which include not only intraoperation call relations
 but also interopereation call relations. 

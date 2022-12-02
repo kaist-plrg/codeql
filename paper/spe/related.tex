@@ -1,23 +1,4 @@
 \section{Related Work}\label{sec:related}
-
-\subsection{Declarative-Style Analysis}
-Declarative-style analysis alleviates the challenges in crafting a static program
-analyzer, and thus, Datalog~\cite{doop, allen2015D, allen2015stagedD, alpuente2010D,
-dawson1996D, naik2006D, reps1994D, smaragdakis2014D, whaley2005D} has
-become a promising Domain Specific Language for static analysis~\cite{scholz2016}.
-The \doop framework~\cite{doop} using Datalog showed
-dramatic speedups for the Java points-to analysis.  The
-modularity and declarativeness of Datalog rules are keys in performance
-improvement~\cite{doopWorkshop}.  Researchers also have improved static
-analysis backends using declarative language engines~\cite{whaley2005D,
-hoder2011muz, souffle, madsen2016}.  Avgustinov et al.~\cite{ql2016} proposed
-QL, a declarative and object-oriented query language that can be compiled into
-Datalog and runs on a relational database. Using QL, they developed a static
-analyzer that is scalable to large-size programs with millions of lines of
-code.  Our approach inherits the benefits from declarative-style analysis and
-extends analysis targets from monolingual to multilingual programs.
-
-\subsection{Static Analysis for Multilingual Programs}
 For Java-C program analysis, ILEA~\cite{ILEA} extends
 the Java Virtual Machine Language (JVML) and Jlint, a dataflow analyzer for
 Java bytecode, to compile both Java and C code to the extended JVML and analyze
@@ -72,4 +53,5 @@ Recent work~\cite{sas2021} proposed a Python-C analyzer by reusing existing
 Python and C analyzers built on top of the same framework, MOPSA~\cite{Mopsa}.
 They leverage the full features of the analyzers within the same framework to
 perform precise context-sensitive value analyses. 
-On the contrary, our work focuses on declarative style dataflow analysis. 
+\inred{Introducing Polycruise}
+\inred{In contrast}, our work focuses on declarative style dataflow analysis. 

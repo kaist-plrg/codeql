@@ -1,23 +1,44 @@
 \section{Introduction}
-Declarative static analysis has become one of the widely-used analysis techniques
+
+\inred{
+Declarative static analysis is a paradigm of static analysis
 for detecting bugs and security vulnerabilities in programs.
-It specifies ``what'' rather than ``how'' of program analysis and
-performs three steps:
-1) transforming program source code to a {\it database}
-of {\it facts}, 2) generating new facts from known facts by applying
-{\it rules}, and 3) extracting information related to specific properties by
-applying {\it queries} to the facts via a query system.  DOOP~\cite{doop} is a
-declarative static analysis framework conducting points-to analysis for Java
-programs, which could achieve the performance gain thanks to the nature
-of the declarative analysis. CodeQL~\cite{codeql} is a declarative semantic code analysis engine
-maintained by Github, which performs dataflow analysis to detect security
-vulnerabilities in Java programs.  Recently, Glean~\cite{glean}, an experimental
+It specifies
+``what'' the program analysis should result in, rather than ``how'' the analysis is performed or the result is calculated.
+A declarative static analysis performs three steps.
+First, it transforms a program source code to a \textit{database}
+of \textit{facts}, the ordered tuples of values. Second, it generates new facts from known facts by applying
+{\it rules}. Each rule specifies that when a certain set of facts satisfying a
+certain condition is included in the database, then a new certain fact also can be added to the database.
+Finally, it extracts information related to specific properties
+by applying {\it queries} to the known facts via a query system. The gathered information can then
+be interpreted as the final result of the analysis.
+
+Thanks to its declarative characteristic,
+declarative static analysis has become one of the widely-used techniques.
+for alleviating the challenges and burdens in crafting a static program analyzer.
+Datalog~\cite{doop, allen2015D, allen2015stagedD, alpuente2010D,
+dawson1996D, naik2006D, reps1994D, smaragdakis2014D, whaley2005D} has
+become a promising domain specific language for static analysis~\cite{scholz2016}.
+The \doop framework~\cite{doop} using Datalog showed
+dramatic speedups for the Java points-to analysis.  The
+modularity and declarativeness of Datalog rules are keys in performance
+improvement~\cite{doopWorkshop}.  Researchers also have improved static
+analysis backends using declarative language engines~\cite{whaley2005D,
+hoder2011muz, souffle, madsen2016}.  Avgustinov et al.~\cite{ql2016} proposed
+QL, a declarative and object-oriented query language that can be compiled into
+Datalog and runs on a relational database. CodeQL~\cite{codeql} is a declarative semantic code analysis engine
+based on QL, maintained by Github. It performs dataflow analysis to detect security
+vulnerabilities in Java programs, and is scalable to large-size programs with millions of lines of
+code. Recently, Glean~\cite{glean}, an experimental
 declarative query system, has been developed by Meta, on which users can query
 information about code structures for JavaScript and Hack programs.
+}
 
-Declarative static analyzers have broadened their analysis targets to diverse
-programming languages. To support a new language, one should consider
-the three steps of declarative static analysis. Note that because the query
+Declarative static analyzers have broadened their analysis targets
+\inred{from a single programming language}
+to diverse programming languages. To support a new language, one should consider
+the three steps of declarative static analysis. Because the query
 system is independent of analysis target languages, one can reuse the
 existing query system for the new language. Therefore, the first step
 is to define a new schema of the database containing facts for the new
@@ -27,14 +48,13 @@ Then the next step is to define new language-specific rules for the new target l
 modifications, declarative analyzers can analyze programs written in the new
 target language, using the existing queries and the query system.  DOOP currently
 supports Python program analysis to detect tensor shape mismatching bugs in
-TensorFlow-based Python ML models~\cite{lagouvardos2020static}. CodeQL was
-originally designed for Java program analysis, and now it can track dataflows not only
+TensorFlow-based Python ML models~\cite{lagouvardos2020static}. \inred{CodeQL now} can track dataflows not only
 in Java but also in C++, C\#, JavaScript, Ruby, and Python programs.
 Furthermore, Glean plans to support diverse target programming languages,
 including Python, Java, C++, Rust, and Haskell.
 
 While the analyzers support multiple programming languages, they do not directly
-support the analysis of multilingual programs written in two or more
+support the analysis of \inred{\textit{multilingual programs}, the programs} written in two or more
 programming languages. Multilingual programs are now widely developed in
 various application domains~\cite{kochhar2016large, mergendahlcross}. However,
 multilingual programs are often vulnerable to bugs or security issues more than
@@ -46,7 +66,7 @@ issues had been reported in the language interoperation than in the
 intraoperation in widely-used open-source JNI programs such as OpenJ9 and VLC.
 
 In this paper, we propose a systematic methodology that extends a
-declarative static analyzer supporting multiple target languages to support
+declarative static analyzer supporting multiple languages to support
 multilingual program analysis as well. Our goal is to maximize the reuse of
 already existing components. First, it generates a merged database of facts that can
 be separated into multiple logical language spaces.  Each language space
@@ -76,12 +96,12 @@ bugs in real-world multilingual programs.
 The contributions of this paper are as follows:
 \begin{itemize}
 \item We propose a systematic methodology that extends a declarative static analyzer
-supporting multiple target languages to support multilingual program analysis.
+supporting multiple languages to support multilingual program analysis.
 
-\item We implement a proof-of-concept declarative static dataflow analyzer for two
+\item We implement a proof-of-concept declarative static dataflow analyzer\inred{, \ours,} for two
 types of multilingual programs, Java-C and Python-C, by extending CodeQL.
 
-\item We show the practical usefulness of our analyzer in the sense that it detects
+\item We show the practical usefulness of \inred{\ours} in the sense that it detects
 dataflow-related bugs at language boundaries of real-world multilingual
 programs.
 \end{itemize}
