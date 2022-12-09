@@ -43,14 +43,14 @@ system is independent of analysis target languages, one can reuse the
 existing query system for the new language. Therefore, the first step
 is to define a new schema of the database containing facts for the new
 language and implement a
-front-end component that transforms programs written in the new target language into facts.
-Then the next step is to define new language-specific rules for the new target language.  With these
+front-end component that transforms programs written in the new language into facts.
+Then the next step is to define new language-specific rules for the new language.  With these
 modifications, declarative analyzers can analyze programs written in the new
-target language, using the existing queries and the query system.  DOOP currently
+language, using the existing queries and the query system.  DOOP currently
 supports Python program analysis to detect tensor shape mismatching bugs in
 TensorFlow-based Python ML models~\cite{lagouvardos2020static}. \inred{CodeQL now} can track dataflows not only
 in Java but also in C++, C\#, JavaScript, Ruby, and Python programs.
-Furthermore, Glean plans to support diverse target programming languages,
+Furthermore, Glean plans to support diverse programming languages,
 including Python, Java, C++, Rust, and Haskell.
 
 While the analyzers support multiple programming languages, they do not directly
@@ -82,16 +82,20 @@ Finally, the same query is evaluated under the same query system to get
 analysis results.
 
 To evaluate the practicality of our approach, we develop a proof-of-concept
-declarative static analyzer for multilingual programs by extending CodeQL. Our
-analyzer tracks dataflows across language boundaries for two types of
+declarative static analyzer, \inred{\ours,} for multilingual programs by extending CodeQL. \inred{\ours}
+tracks dataflows across language boundaries for two types of
 multilingual programs: Java-C programs written in Java and C and Python-C
 programs written in Python and C. The extension is simple enough in that
 it requires only a few lines of automated modifications of CodeQL and additional
 language-interoperation rules. We also implement a bug checker on top of
-the analyzer to detect dataflow-related interoperation bugs in real-world Java-C programs.
+\ours to detect dataflow-related interoperation bugs in real-world Java-C programs.
 The evaluation shows that our tool successfully tracks dataflows across
-Java-C and Python-C language boundaries and detects genuine interoperation
-bugs in real-world multilingual programs.
+Java-C and Python-C language boundaries. \inred{ The evaluation shows that
+\ours is scalabale enough to fully analyze three million lines of codes in 12 minutes,
+in contrast to the previous state-of-the-art analyzer fialed to analyze.
+Also, it detects 33 genuine interoperation
+bugs in real-world Java-C programs, including 12 brand-new bugs that were
+not detected by the previous analyzer.}
 
 The contributions of this paper are as follows:
 \begin{itemize}
@@ -101,7 +105,8 @@ supporting multiple languages to support multilingual program analysis.
 \item We implement a proof-of-concept declarative static dataflow analyzer\inred{, \ours,} for two
 types of multilingual programs, Java-C and Python-C, by extending CodeQL.
 
-\item We show the practical usefulness of \inred{\ours} in the sense that it detects
+\item We show that \inred{\ours can sucessfully detect}
 dataflow-related bugs at language boundaries of real-world multilingual
-programs.
+programs, \inred{including new bugs that the state-of-the-art analyzers could not find.}
+
 \end{itemize}

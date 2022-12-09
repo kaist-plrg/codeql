@@ -41,9 +41,9 @@ int val = f();
 \inred{The extractor can extract the syntactic facts} of the form \inred{\rcode{ FunctionAt(lineNum, name)}}, where
 \inred{\rcode{ lineNum}} denotes the line number and \rcode{ name} denotes the name of the function
 defined at line \inred{\rcode{ lineNum}}.  Therefore, we can extract the fact \rcode{
-FunctionAt(1, "f")}.  Another example syntactic fact is \inred{\rcode{ EnclosingStmt(lineNum1,
-lineNum2, i)}}, which denotes that the function at line \inred{\rcode{ lineNum1}} has the statement
-at line \inred{\rcode{ lineNum2}} as the \rcode{ i}-th statement in the function body.  For
+FunctionAt(1, "f")}.  Another example syntactic fact is \inred{\rcode{ EnclosingStmt(lineNumA,
+lineNumB, i)}}, which denotes that the function at line \inred{\rcode{ lineNumA}} has the statement
+at line \inred{\rcode{ lineNumB}} as the \rcode{ i}-th statement in the function body.  For
 example, we can extract the following syntactic fact: \rcode{ EnclosingStmt(1, 2,
 0)}.
 
@@ -122,7 +122,7 @@ When accepting the query as an input, the query system finds
 \inred{
 every value \rcode{ v} such that \rcode{ Flow(42, v)} is included in
 the set of know facts, generated in the previous step. In this example, the query would give the query result
-\rcode{ X = 42}, \rcode{ X = f()} and \rcode{ X = val}.}
+\rcode{ X\ $\in$ \{42, f(), val\}}}.
 
 %The final step is to perform queries via query system.
 %The result of the query corresponds to actual result of client analysis.

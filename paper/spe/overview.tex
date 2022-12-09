@@ -77,7 +77,7 @@ An example declarative static analysis consists of the following \inred{datalog-
 
 \[
   \begin{array}{llll}
-    f & ::= & p(\overline{\inred{v}\ |\ x}) & \text{\sc Fact}\\
+    f & ::= & p(\overline{\inred{k}\ |\ x}) & \text{\sc Fact}\\
     r & ::= & f'\ \mbox{:-}\ \overline{\inred{f\ |\neg f}} & \text{\sc Rule}\\
     q & ::= & \mbox{?-}\ \overline{f}\ &  \text{\sc Query}
 \end{array}
@@ -86,8 +86,8 @@ An example declarative static analysis consists of the following \inred{datalog-
 \noindent
 \inred{We use the overline notation for indicating the 0 or more repetitions. For example,
 $\overline{x}$ is a shorthand for $x_1, x_2, ..., x_n$ for some $n \ge 0$. We use the }
-The fact $p(\overline{\inred{v}\ |\ x})$ denotes a relation $p$ between \inred{primitive values}
-$\overline{\inred{v}}$ \inred{such as string and integer values}, or variables $\overline{x}$. A rule $f'\
+The fact $p(\overline{\inred{k}\ |\ x})$ denotes a relation $p$ between \inred{constant values}
+$\overline{\inred{k}}$ \inred{such as string and integer values}, or variables $\overline{x}$. A rule $f'\
 \mbox{:-}\ \overline{\inred{f\ |\neg f}}$ consists of two parts: the head of the rule $f'$
 and the body of the rule \inred{$\overline{f\ |\neg f}$, where the optional prefix $\neg$ denotes
 the negation.\footnote{One restriction regarding negation is that there should not be
@@ -145,8 +145,8 @@ name}. The initial facts for the code in Figure~\ref{fig:exam:langA} are as foll
 
 Then, the analysis requires rules for the initial facts to derive new facts
 about function call relations. In this example, one kind of facts, \rcode{
-CallEdge(lineNum1, lineNum2)}, denotes a call relation from a callsite on line \rcode{ lineNum1}
-to a function definition on line \rcode{ lineNum2}. To derive function call relation facts,
+CallEdge(lineNumCall, lineNumFunc)}, denotes a call relation from a callsite on line \rcode{ lineNumCall}
+to a function definition on line \rcode{ lineNumFunc}. To derive function call relation facts,
 we define a rule as follows: 
 
 %Next, there are rules that derice new facts from the known facts.  In this
@@ -156,9 +156,9 @@ we define a rule as follows:
 %of MethodAt and CallAt, we can define the rule like folowing:
 
 \begin{lstlisting}[style=mrule]
-    CallEdge(lineNum1, lineNum2) :-
-      CallAt(lineNum1, name),
-      FunctionAt(lineNum2, name)
+    CallEdge(lineNumCall, lineNumFunc) :-
+      CallAt(lineNumCall, name),
+      FunctionAt(lineNumFunc, name)
 \end{lstlisting}
 
 %The meaning of this rule is straight forward. Whenever there is a method
@@ -167,9 +167,9 @@ we define a rule as follows:
 %get this new fact:
 
 \noindent
-The rule derives a new fact \rcode{ CallEdge(lineNum1, lineNum2)} when a callsite on line
-\rcode{ lineNum1} has the same target function name as the name of a function defined
-on line \rcode{ lineNum2}. Therefore, a new fact can be derived from the initial facts
+The rule derives a new fact \rcode{ CallEdge(lineNumCall, lineNumFunc)} when a callsite on line
+\rcode{ lineNumCall} has the same target function name as the name of a function defined
+on line \rcode{ lineNumFunc}. Therefore, a new fact can be derived from the initial facts
 as follows: 
 
 \begin{lstlisting}[style=mrule]
@@ -177,17 +177,21 @@ as follows:
 \end{lstlisting}
 
 Finally, a query system extracts a set of function call relation facts when we
-make a query. Since the rule derives the fact \rcode{ CallEdge(6,2)}, the
-following query produces \rcode{ (X, Y)\ $\in$ \{(6, 2)\}} as a result:
-
-%Finally, there is a query system that is used for extracting certain sets of
-%facts that meet certain condition. For example, we can simply make a query to
-%find every calledge using following query:
+make a query. \inred{For example, the following query finds all the possible
+assignment of the values to the variable \rcode{ X} and \rcode{ Y}.}
 
 \begin{lstlisting}[style=mrule]
     ?- CallEdge(X, Y).
 \end{lstlisting}
+\noindent
+\inred{
+Since the rule derives the fact \rcode{ CallEdge(6,2)}, the
+query system produces \rcode{ (X, Y)\ $\in$ \{(6, 2)\}} as a result of the query.
+}
 
+%Finally, there is a query system that is used for extracting certain sets of
+%facts that meet certain condition. For example, we can simply make a query to
+%find every calledge using following query:
 
 Let us consider the language {\it B} case.
 The initial facts for the code in Figure~\ref{fig:exam:langB} are as follows: 
@@ -215,9 +219,9 @@ from the initial facts as follows:
 %similar manner:
 
 \begin{lstlisting}[style=mrule]
-    CallEdge(lineNum1, lineNum2) :-
-      CallAt(lineNum1, name),
-      ProcedureAt(lineNum2, name)
+    CallEdge(lineNumCall, lineNumFunc) :-
+      CallAt(lineNumCall, name),
+      ProcedureAt(lineNumFunc, name)
 \end{lstlisting}
 
 \noindent
@@ -275,10 +279,10 @@ facts. We define them by composing language-specific rules for A,
 language-specific rules for B, and language-interoperation rules as follows:
 
 \begin{lstlisting}[style=mrule]
-    CallEdge(lineNum1, lineNum2) :- CallEdge$_A$(lineNum1, lineNum2)
-    CallEdge(lineNum1, lineNum2) :- CallEdge$_B$(lineNum1, lineNum2)
-    CallEdge(lineNum1, lineNum2) :- CallEdge$_{AB}$(lineNum1, lineNum2)
-    CallEdge(lineNum1, lineNum2) :- CallEdge$_{BA}$(lineNum1, lineNum2)
+    CallEdge(lineNumCall, lineNumFunc) :- CallEdge$_A$(lineNumCall, lineNumFunc)
+    CallEdge(lineNumCall, lineNumFunc) :- CallEdge$_B$(lineNumCall, lineNumFunc)
+    CallEdge(lineNumCall, lineNumFunc) :- CallEdge$_{AB}$(lineNumCall, lineNumFunc)
+    CallEdge(lineNumCall, lineNumFunc) :- CallEdge$_{BA}$(lineNumCall, lineNumFunc)
 \end{lstlisting}
 
 %For language-specific rules for CallEdge\_A and CallEdge\_B can be defined same
@@ -293,14 +297,14 @@ derive the \rcode{ CallEdge$_A$} and \rcode{ CallEdge$_B$}:
 
 \begin{tabular}{ll}
   {\begin{lstlisting}[style=mrule]
-    CallEdge$_A$(lineNum1, lineNum2) :-
-      CallAt$_A$(lineNum1, name),
-      FunctionAt$_A$(lineNum2, name)
+    CallEdge$_A$(lineNumCall, lineNumFunc) :-
+      CallAt$_A$(lineNumCall, name),
+      FunctionAt$_A$(lineNumFunc, name)
   \end{lstlisting}} & 
   {\begin{lstlisting}[style=mrule]
-    CallEdge$_B$(lineNum1, lineNum2) :-
-      CallAt$_B$(lineNum1, name),
-      ProcedureAt$_B$(lineNum2, name)
+    CallEdge$_B$(lineNumCall, lineNumFunc) :-
+      CallAt$_B$(lineNumCall, name),
+      ProcedureAt$_B$(lineNumFunc, name)
   \end{lstlisting}}
 \end{tabular}
 
@@ -320,9 +324,9 @@ A} to {\it B} as follows:
 %defined in similar way:
 
 \begin{lstlisting}[style=mrule]
-    CallEdge$_{AB}$(lineNum1, lineNum2) :-
-      CallAt$_A$(lineNum1, name),
-      ProcedureAt$_B$(lineNum2, name)
+    CallEdge$_{AB}$(lineNumCall, lineNumFunc) :-
+      CallAt$_A$(lineNumCall, name),
+      ProcedureAt$_B$(lineNumFunc, name)
 \end{lstlisting}
 
 \noindent
@@ -337,10 +341,10 @@ the interoperation rule from {\it B} to {\it A} as follows:
 %semantics.
 
 \begin{lstlisting}[style=mrule]
-    CallEdge$_{BA}$(lineNum1, lineNum2) :-
-      CallAt$_B$(lineNum1, "CallMethod"),
-      Argument$_B$(lineNum1, 0, name),
-      FunctionAt$_A$(lineNum2, name)
+    CallEdge$_{BA}$(lineNumCall, lineNumFunc) :-
+      CallAt$_B$(lineNumCall, "CallMethod"),
+      Argument$_B$(lineNumCall, 0, name),
+      FunctionAt$_A$(lineNumFunc, name)
 \end{lstlisting}
 
 %After fully defining the rule for CallEdge, then we can reuse the query system
