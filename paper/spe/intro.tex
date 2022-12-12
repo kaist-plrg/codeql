@@ -1,19 +1,23 @@
 \section{Introduction}
 
-\inred{
-Declarative static analysis is a paradigm of static analysis
-for detecting bugs and security vulnerabilities in programs.
-It specifies
-``what'' the program analysis should result in, rather than ``how'' the analysis is performed or the result is calculated.
-A declarative static analysis performs three steps.
-First, it transforms a program source code to a \textit{database}
-of \textit{facts}, the ordered tuples of values. Second, it generates new facts from known facts by applying
-{\it rules}. Each rule specifies that when a certain set of facts satisfying a
-certain condition is included in the database, then a new certain fact also can be added to the database.
-Finally, it extracts information related to specific properties
-by applying {\it queries} to the known facts via a query system. The gathered information can then
-be interpreted as the final result of the analysis.
+Declarative static analysis is a paradigm of static analysis for detecting bugs
+and security vulnerabilities in programs.
+In the paradigm, analysts define rules for ``what'' the analysis results in,
+rather than algorithms for ``how'' results are calculated in the analysis.
+A declarative static analysis is typically performed in three steps.
+First, it transforms a program source code to a database containing
+\textit{facts} that are tuples of values. 
+Second, it derives new facts from known facts in the database by applying {\it
+rules}. 
+Each rule specifies a set of base facts and a derived fact that will be added
+to the database if satisfying all the base facts.
+%Each rule specifies that when a certain set of facts satisfying a certain
+%condition is included in the database, then a new certain fact also can be
+%added to the database.
+Finally, the analysis applies {\it queries} for specific properties via a query
+system and produces the results of the queries as its analysis results.
 
+\inred{
 Thanks to its declarative characteristic,
 declarative static analysis has become one of the widely-used techniques.
 for alleviating the challenges and burdens in crafting a static program analyzer.
