@@ -42,16 +42,15 @@ int val = f();
 \end{lstlisting}
 
 For function definitions, the Syntactic Fact Extractor can extract syntactic
-facts of a form \rcode{ FunctionAt(lineNum, name)}, where \rcode{lineNum}
-denotes the line number of a function definition and \rcode{name} denotes the
-name of the function defined on line \rcode{ lineNum}.  
-Therefore, the extractor can extract the fact \rcode{ FunctionAt(1, "f")} from
+facts of a form \rcode{ Returns(functionName, value)}, where \rcode{functionName}
+denotes the name of a function and \rcode{value} denotes the
+return value of that function.
+Therefore, the extractor can extract the fact \rcode{ Returns("f", 42)} from
 the code.  
-Another example syntactic fact is \rcode{ EnclosingStmt(lineNumA,
-lineNumB, i)}, which denotes that a function defined on line \rcode{
-  lineNumA} has a statement on line \rcode{ lineNumB} as the \rcode{ i}-th
-statement in the function body.  For example, the extractor can extract the
-following syntactic fact from the code: \rcode{ EnclosingStmt(1, 2, 0)}.
+Another example syntactic fact is \rcode{ Calls(call, functionName)}, which denotes that
+an expression \rcode{ call} is a call to the function named \rcode{ functionName}.
+For instatnce, the extractor can extract the
+following syntactic fact from the code: \rcode{ Calls(f(), "f")}.
 
 %\inred{
 %These syntactic facts serve as building blocks for the
@@ -80,12 +79,25 @@ found.
 %new facts is repeated, until no more new facts are found.
 
 
-For example, consider a fact \rcode{ Flow(x, z)} that denotes a dataflow from a
-node \rcode{ x} to a node \rcode{ z}. 
-Nodes represent program entities that can hold run-time values, such as
-variables, literals, and function parameters.  
-We can define rules for generating the fact as the transitive closure of the
-fact named \rcode{ Step}:
+For example, consider a fact \rcode{ Step(x, y)} that denotes a direct dataflow from a
+node \rcode{ x} to a node \rcode{ y}. 
+Here, nodes represent program entities that can hold run-time values, such as
+variables, literals, and function parameters. One way a direct dataflow
+is established is via function calls and returns, as represented by the following rule.
+\begin{lstlisting}[style=mrule]
+Step(ret, call) :- Calls(call, functionName), Returns(functinName, ret)
+\end{lstlisting}
+
+\noindent
+This rule indicates that when we have two syntactic facts, \rcode{ Calls(call, functionName)},
+and \rcode{ Returns(functinName, ret) }, then the new fact \rcode{ Step(ret, call) } can be derived.
+Since we already have \rcode{ Calls(f(), "f")} and \rcode{ Returns("f", 42) } as the base facts,
+we can derive the new fact, \rcode{ Step(42, f()) }.
+
+The newly derived facts \rcode{ Step} can also be used to derive new facts.
+For example, we can think of another \rcode{ Flow(x, z)} that denotes a dataflow from a
+node \rcode{ x} to a node \rcode{ z}.
+We can define rules for generating the fact as the transitive closure of \rcode{ Step}:
 
 \begin{lstlisting}[style=mrule]
 Flow(x, z) :- Step(x, z)
@@ -93,8 +105,6 @@ Flow(x, z) :- Step(x, y), Flow(y, z)
 \end{lstlisting}
 
 \noindent
-where \rcode{ Step(x, z)} denotes a unidirectional dataflow from \rcode{ x} to
-\rcode{ z}. 
 The first rule indicates that the fact \rcode{ Flow(x, z)} is derived if the
 fact \rcode{ Step(x, z)} belongs to known facts, and the second rule indicates
 that the fact \rcode{ Flow(x, z)} is also derived if the two facts \rcode{
@@ -138,7 +148,7 @@ When accepting the query as an input, the query system finds every value
 \rcode{ v} such that \rcode{ Flow(42, v)} belongs to known facts generated in
 the previous step. 
 In this example, the query would give the query result
-\rcode{ X\ $\in$ \{42, f(), val\}}.
+\rcode{ X\ $\in$ \{f(), val\}}.
 
 %The final step is to perform queries via query system.
 %The result of the query corresponds to actual result of client analysis.
