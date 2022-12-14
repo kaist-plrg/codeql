@@ -94,7 +94,7 @@ Step(retExpr, callExpr) :- Call(callExpr, functionName), Return(functionName, re
 
 \noindent
 \rcode{Step(retExpr, callExpr)} on the left-side of the rule is a derivable
-fact, and \rocde{Call(callExpr, functionName)} and \rcode{Return(functionName,
+fact, and \rcode{Call(callExpr, functionName)} and \rcode{Return(functionName,
 retExpr)} on the right-side of the rule are base facts.  
 This rule indicates that the new fact \rcode{Step(retExpr, callExpr)} is
 derivable if the two base facts are known.
