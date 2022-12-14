@@ -73,33 +73,41 @@ void f() {
 %value "m2" to indicate the name of method.
 
 \subsection{Example Declarative Static Analysis}
-An example declarative static analysis consists of the following \inred{datalog-like} facts, rules, and queries:
+An example declarative static analysis consists of the following Datalog-like facts, rules,
+and queries:
 
 \[
   \begin{array}{llll}
-    f & ::= & p(\overline{\inred{k}\ |\ x}) & \text{\sc Fact}\\
-    r & ::= & f'\ \mbox{:-}\ \overline{\inred{f\ |\neg f}} & \text{\sc Rule}\\
+    f & ::= & p(\overline{k\ |\ x}) & \text{\sc Fact}\\
+    r & ::= & f'\ \mbox{:-}\ \overline{f\ |\neg f} & \text{\sc Rule}\\
     q & ::= & \mbox{?-}\ \overline{f}\ &  \text{\sc Query}
 \end{array}
 \]
 
 \noindent
-\inred{We use the overline notation for indicating the 0 or more repetitions. For example,
-$\overline{x}$ is a shorthand for $x_1, x_2, ..., x_n$ for some $n \ge 0$. We use the }
-The fact $p(\overline{\inred{k}\ |\ x})$ denotes a relation $p$ between \inred{constant values}
-$\overline{\inred{k}}$ \inred{such as string and integer values}, or variables $\overline{x}$. A rule $f'\
-\mbox{:-}\ \overline{\inred{f\ |\neg f}}$ consists of two parts: the head of the rule $f'$
-and the body of the rule \inred{$\overline{f\ |\neg f}$, where the optional prefix $\neg$ denotes
-the negation.\footnote{One restriction regarding negation is that there should not be
+We use the overline notation to indicate 0 or more repetitions. 
+For example, $\overline{x}$ is a shorthand for $x_1, x_2, ..., x_n$ for some $n
+\ge 0$. 
+The fact $p(\overline{k\ |\ x})$ denotes a relation $p$ between constants
+$\overline{k}$ such as string and integer literals, or variables
+$\overline{x}$. 
+A rule $f'\
+\mbox{:-}\ \overline{f\ |\neg f}$ consists of two parts: the head of the rule
+$f'$ and the body of the rule $\overline{f\ |\neg f}$, where the
+optional prefix $\neg$ denotes the negation.
+\inred{\footnote{One restriction regarding negation is that there should not be
 any recursive rules with odd number of negations.}}
-It denotes that the head can be derived from the body:
-$f'$ \inred{can be derived if all the facts $f'' \in \{\overline{f}\}$ are included in the set of
-known facts, and the all the facts $f'' \in \{\overline{\neg f}\}$ are not included in the set of known facts}.
-The body of the rule can be empty, and in that case, the head of the rule can be vacuously added to the known facts.
-Such bodiless rules can be considered as the initial input facts for the analysis.
-The query $\mbox{?-}\ \overline{f}$ finds all possible variable assignments that
-make all facts in $\overline{f}$ \inred{to be included in the set of known facts} if variables in $\overline{f}$ are
-replaced with the assigned \inred{values}.
+It denotes that the head is derivable from the body:
+$f'$ is derivable if all the facts $f'' \in \{\overline{f}\}$ belong to known
+facts, and all the facts $f'' \in \{\overline{\neg f}\}$ do not belong to known
+facts.
+The body of the rule can be empty, and in that case, the head of the rule can
+be vacuously added to known facts.
+Such bodiless rules can be considered as the initial input facts for the
+analysis.
+The query $\mbox{?-}\ \overline{f}$ finds all possible variable assignments
+that make all facts in $\overline{f}$ belong to known facts if replacing
+variables in $\overline{f}$ with their corresponding constants.
 
 
 \subsection{Declarative Call Graph Construction for Monolingual Programs}\label{lab:ovmono}
@@ -111,8 +119,8 @@ m1} calls the function \rcode{f} in {\it B} code via language interoperation bet
 A}, the expression \rcode{m1()} calls the function \rcode{m1} defined on line~2 to
 invoke the function \rcode{f} in {\it B} code.
 The function \rcode{f} in {\it B} code calls the \rcode{CallMethod} function with a
-string value \rcode{"m2"} to invoke the function \rcode{m2} in {\it A} code, using the
-string value argument as the target function name.
+string literal \rcode{"m2"} to invoke the function \rcode{m2} in {\it A} code, using the
+string literal argument as the target function name.
 %Thus, the code example performs the bidirectional interoperation between {\it
 %A} and {\it B}, which calls the function {\tt f} written in {\it A} from {\it
 %B} and calls the function {\tt m2} written in {\it B} from {\it A}.
@@ -177,17 +185,17 @@ as follows:
 \end{lstlisting}
 
 Finally, a query system extracts a set of function call relation facts when we
-make a query. \inred{For example, the following query finds all the possible
-assignment of the values to the variable \rcode{ X} and \rcode{ Y}.}
+make a query. 
+For example, the following query finds all possible literals for the variables
+\rcode{ X} and \rcode{ Y}:
 
 \begin{lstlisting}[style=mrule]
     ?- CallEdge(X, Y).
 \end{lstlisting}
 \noindent
-\inred{
-Since the rule derives the fact \rcode{ CallEdge(6,2)}, the
-query system produces \rcode{ (X, Y)\ $\in$ \{(6, 2)\}} as a result of the query.
-}
+Since only one \rcode{ CallEdge} fact, \rcode{ CallEdge(6,2)}, belongs to known
+facts, the query system produces \rcode{ (X, Y)\ $\in$ \{(6, 2)\}} as a result
+of the query.
 
 %Finally, there is a query system that is used for extracting certain sets of
 %facts that meet certain condition. For example, we can simply make a query to
@@ -353,12 +361,10 @@ the interoperation rule from {\it B} to {\it A} as follows:
 %?- CallEdge(X, Y).
 %which will give us the output, (X, Y) = (7, 3), (4, 9), (10, 5)
 
-Finally, when making the same query \rcode{ ?- CallEdge(X, Y)}
-\inred{as we did for the monolingual programs,}
-the query system
-now produces \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), } \rcode{(8, 4)\}} as function call relation results,
-which include not only intraoperation call relations
-but also interopereation call relations. 
+Finally, when making the query \rcode{ ?- CallEdge(X, Y)} as the same for the
+monolingual programs, the query system now produces \rcode{ (X, Y) $\in$ \{(6,
+2), (3, 7), } \rcode{(8, 4)\}} as function call relation results, which include
+not only intraoperation call relations but also interoperation call relations. 
 
 This simple example shows what our extension for multilingual program analysis
 requires. Our extension reuses most components in an existing declarative static
