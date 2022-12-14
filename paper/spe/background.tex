@@ -29,8 +29,8 @@ the Datalog-like syntax.
 
 \textbf{Step 1: Extracting syntactic facts.}
 The first step is to extract syntactic facts from a given program source.
-Syntactic facts include facts about certain AST nodes and
-parent-child relationships between nodes. 
+Syntactic facts are the facts that can be statically determined
+from the syntax of the given program.
 For example, consider the following code:
 
 \begin{lstlisting}[style=mcpp]
@@ -43,12 +43,12 @@ int val = f();
 
 For function definitions, the Syntactic Fact Extractor can extract syntactic
 facts of a form \rcode{ Return(functionName, retExpr)}, where \rcode{Return}
-denotes the relation between two nodes, \rcode{functionName} denotes the name of a
+denotes the relation between a string and a expression. \rcode{functionName} denotes the name of a
 function, and \rcode{retExpr} denotes the return expression of the function.
 Therefore, the extractor can extract the fact \rcode{ Return("f", 42)} from
 the code.  
 Another example syntactic fact is \rcode{ Call(callExpr, functionName)}, which
-denotes that a node \rcode{ callExpr} is a call expression to a function named
+denotes that \rcode{ callExpr} is a call expression to a function named
 \rcode{ functionName}.
 For instatnce, the extractor can extract the following syntactic fact from the
 code: \rcode{ Call(f(), "f")}.
