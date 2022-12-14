@@ -42,9 +42,9 @@ int val = f();
 \end{lstlisting}
 
 For function definitions, the Syntactic Fact Extractor can extract syntactic
-facts of a form \rcode{ Return(functionName, value)}, where \rcode{Return}
+facts of a form \rcode{ Return(functionName, retExpr)}, where \rcode{Return}
 denotes the relation between two nodes, \rcode{functionName} denotes the name of a
-function, and \rcode{value} denotes the return value of the function.
+function, and \rcode{retExpr} denotes the return expression of the function.
 Therefore, the extractor can extract the fact \rcode{ Return("f", 42)} from
 the code.  
 Another example syntactic fact is \rcode{ Call(callExpr, functionName)}, which
@@ -69,9 +69,9 @@ code: \rcode{ Call(f(), "f")}.
 \smallskip
 \textbf{Step 2: Deriving new facts by applying rules.}
 The next step is to derive new facts from known facts by applying rules.
-A rule defines a relation of that a fact, called {\it derived fact}, can be
+A rule defines a relation of that a fact, called {\it derivable fact}, can be
 derived from a set of facts, called {\it base fact}. 
-If all the base facts belong to known facts, the derived fact is generated and
+If all the base facts belong to known facts, the derivable fact is derived and
 added to the known facts by the rule.
 This process of deriving new facts is repeated, until no more new facts are
 found.
@@ -82,24 +82,31 @@ found.
 
 For example, consider a fact \rcode{ Step(x, y)} that denotes a direct dataflow
 from a node \rcode{ x} to a node \rcode{ y}. 
-Here, nodes represent program entities that evaluates in to runtime values,
-such as variables, literals, and function parameters. 
+Here, nodes represent program entities that can hold runtime values,
+such as variables, literals, expressions, and function parameters. 
 A direct dataflow can be established via the relation between a function call
-expression and its callee's return, as represented by the following rule.
+expression and its callee function's return expression, because a function
+call expression evaluates to its callee function's return value on runtime.
+We can represent such dataflows as the following rule:
 \begin{lstlisting}[style=mrule]
-Step(ret, callExpr) :- Call(callExpr, functionName), Return(functionName, ret)
+Step(retExpr, callExpr) :- Call(callExpr, functionName), Return(functionName, retExpr)
 \end{lstlisting}
 
 \noindent
-This rule indicates that when we have two syntactic facts, \rcode{ Calls(callExpr, functionName)},
-and \rcode{ Returns(functinName, retVar) }, then the new fact \rcode{ Step(retVar, call) } can be derived.
-Since we already have \rcode{ Calls(f(), "f")} and \rcode{ Returns("f", 42) } as the base facts,
-we can derive the new fact, \rcode{ Step(42, f()) }.
+\rcode{Step(retExpr, callExpr)} on the left-side of the rule is a derivable
+fact, and \rocde{Call(callExpr, functionName)} and \rcode{Return(functionName,
+retExpr)} on the right-side of the rule are base facts.  
+This rule indicates that the new fact \rcode{Step(retExpr, callExpr)} is
+derivable if the two base facts are known.
+Since we already have \rcode{ Calls(f(), "f")} and \rcode{ Returns("f", 42) }
+as known facts, the rule derives a new fact \rcode{ Step(42, f()) }.
 
-The newly derived facts \rcode{ Step} can also be used to derive new facts.
-For example, we can think of another \rcode{ Flow(x, z)} that denotes a dataflow from a
-node \rcode{ x} to a node \rcode{ z}.
-We can define rules for generating the fact as the transitive closure of \rcode{ Step}:
+Derived facts by rules are also known facts being used to derive other new
+facts.
+For example, we can think of another, \rcode{ Flow(x, z)}, that denotes a
+dataflow from a node \rcode{ x} to a node \rcode{ z}.
+We can define rules for the dataflow fact as the transitive closure of \rcode{
+  Step}:
 
 \begin{lstlisting}[style=mrule]
 Flow(x, z) :- Step(x, z)
@@ -107,12 +114,13 @@ Flow(x, z) :- Step(x, y), Flow(y, z)
 \end{lstlisting}
 
 \noindent
-The first rule indicates that the fact \rcode{ Flow(x, z)} is derived if the
-fact \rcode{ Step(x, z)} belongs to known facts, and the second rule indicates
-that the fact \rcode{ Flow(x, z)} is also derived if the two facts \rcode{
-Step(x, y)} and \rcode{ Flow(y, z)} belong to known facts.
-When a new fact is derived by rules, the fact is added to the known facts and
-used as a base fact iteratively to derive other new facts.
+The first rule indicates that the fact \rcode{ Flow(x, z)} is derivable if the
+fact \rcode{ Step(x, z)} is known, and the second rule indicates
+that the fact \rcode{ Flow(x, z)} is also derivable if the two facts \rcode{
+  Step(x, y)} and \rcode{ Flow(y, z)} are known.
+Thus, the rules derive \rcode{ Flow(42, f())}, \rcode{ Flow(f(), val)}, and
+\rcode{ Flow(42, val)} from known facts, because \rcode{ Step(42, f())} and
+\rcode{ Step(val, f())} are known.
 %\inred{ \sout {
 %The rules are usually
 %evaluated in a bottom-up and modular manner, that is, each rule is evaluated
