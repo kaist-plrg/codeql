@@ -95,8 +95,9 @@ A rule $f'\
 \mbox{:-}\ \overline{f\ |\neg f}$ consists of two parts: the head of the rule
 $f'$ and the body of the rule $\overline{f\ |\neg f}$, where the
 optional prefix $\neg$ denotes the negation.
-\inred{\footnote{One restriction regarding negation is that there should not be
-any recursive rules with odd number of negations.}}
+\inred{\footnote{There is a syntactic restriction regarding negation and recursive rules:
+A fact should not be derived from a negation of it. For example, the rule $f(x) :-\ \neg f(x)$
+is not a syntactically valid rule, since $f$ is derived from the negation of itself.}}
 It denotes that the head is derivable from the body:
 $f'$ is derivable if all the facts $f'' \in \{\overline{f}\}$ belong to known
 facts, and all the facts $f'' \in \{\overline{\neg f}\}$ do not belong to known
