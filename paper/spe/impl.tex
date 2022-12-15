@@ -202,9 +202,9 @@ which predicates and queries are evaluated.
 CodeQL provides various libraries for C and Java, including
 pre-defined predicates and classes for users to implement their own analyses.
 A dataflow analysis library is such a library, which supports both C and Java.
-For example, Figure~\ref{fig:qll} shows sample QL libraries for C and Java,
-which use the same class name \ccode{Node} and the same predicate
-name \ccode{localFlowStep}.
+For example, Figure~\ref{fig:qll} (a) and (b) show sample QL libraries for C
+and Java respectively, which use the same class name \ccode{Node} and the same
+predicate name \ccode{localFlowStep}.
 However, even with the same name, the class \ccode{Node} in C and the
 class \javacode{Node} in Java are different classes, which are incompatible.
 The same applies to the predicate \ccode{localFlowStep}.
@@ -277,25 +277,37 @@ predicate localFlowStep(Node node1, Node node2) {
 
 To make classes and predicates in C and Java compatible,
 \ours lifts each library to the common level.
-First, as on lines 1 and 2 of Figure~\ref{fig:qll3},
-\ours encapsulate each of the original dataflow libraries with a CodeQL
-module system\footnote{https://codeql.github.com/docs/ql-language-reference/modules/}
-and name each of them \codeql{C} and \codeql{JAVA} so that it can distinguish the original
-classes and predicates by lifted ones. \inred{The original classes or predicates can later be referenced
-using using the syntax \codeql{::}. For example, \codeql{Java::Node} refers to the original class
-\codeql{Node} defined in the library for Java.}
-Lines from 4 to 11 of Figure~\ref{fig:qll3} demonstrate the lifted class.
-\ours can lift a class by first defining a sum type\footnote{https://codeql.github.com/docs/ql-language-reference/types/\#algebraic-datatypes},
+First, as on lines 1 and 2 of Figure~\ref{fig:qll3}, \ours encapsulates the
+original dataflow libraries for C and Java in separate modules named {\tt C}
+and {\tt Java},
+respectively.\footnote{https://codeql.github.com/docs/ql-language-reference/modules/}
+After the encapsulation, the original classes and predicates can be referenced
+via the module containing them. 
+%The encapsulation prevents the name collision between the original Java and C
+%libraries as well as between the original libraries and lifted ones \ours
+%defines.
+%\ours encapsulate each of the original dataflow libraries with a CodeQL
+%module system\footnote{https://codeql.github.com/docs/ql-language-reference/modules/}
+%and name each of them \codeql{C} and \codeql{JAVA} so that it can distinguish the original
+%classes and predicates by lifted ones. 
+For example, \codeql{Java::Node} refers to the original class \codeql{Node} in
+the module {\tt Java}.
+Lines from 4 to 11 of Figure~\ref{fig:qll3} demonstrate the lifted class of the
+original class {\tt Node}.
+\ours lifts a class by first defining a sum
+type\footnote{https://codeql.github.com/docs/ql-language-reference/types/\#algebraic-datatypes},
 denoting that the lifted class comes either from C or Java, and then making the
-lifted class be of that type.  It also defines two member predicates,
-\codeql{asCNode} and \codeql{asJavaNode},
-which can downcast a lifted class into a C or Java class.
-Lines from 13 to 17 of Figure~\ref{fig:qll3} demonstrate the lifted predicate.
-Similarly, \ours can lift a predicate by combining two original predicates with
-the \codeql{or} connective. For each predicate, arguments and return values are casted down
-to the class of their corresponding language.
-After lifting, lifted predicates show the equivalent behaviors as the
-original ones if all the arguments are from the same language.
+lifted class be of that type.  
+The lifted class defines two member predicates, \codeql{asCNode} and
+\codeql{asJavaNode}, that downcasts elements of the lifted class into elements
+of the original C or Java class.
+Lines from 13 to 17 of Figure~\ref{fig:qll3} demonstrate the lifted predicate
+of the original predicate {\tt localFlowStep}.
+Similarly, \ours lifts a predicate by combining two original predicates with
+the \codeql{or} connective. For each predicate, arguments and return values are
+downcasted to elements of the class of their corresponding language.
+After lifting, lifted predicates show the equivalent behaviors as the original
+ones if all the arguments are from the same language.
 
 \ours can fully automate the lifting process using QL compiler error
 messages. When compiling a query without importing the library, the QL compiler
