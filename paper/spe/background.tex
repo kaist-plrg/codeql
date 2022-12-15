@@ -43,10 +43,11 @@ int val = f();
 
 For function definitions, the Syntactic Fact Extractor can extract syntactic
 facts of a form \rcode{ Return(functionName, retExpr)}, where \rcode{Return}
-denotes the relation between a string and a expression. \rcode{functionName} denotes the name of a
-function, and \rcode{retExpr} denotes the return expression of the function.
-Therefore, the extractor can extract the fact \rcode{ Return("f", 42)} from
-the code.  
+denotes the relation between a string and a expression, \rcode{functionName}
+denotes the name of a function, and \rcode{retExpr} denotes the return
+expression of the function.
+Therefore, the extractor can extract the a \rcode{ Return("f", 42)} from the
+code.  
 Another example syntactic fact is \rcode{ Call(callExpr, functionName)}, which
 denotes that \rcode{ callExpr} is a call expression to a function named
 \rcode{ functionName}.
