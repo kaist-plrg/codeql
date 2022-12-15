@@ -40,7 +40,7 @@ parts and emphasize the Python-C program analysis in Section~\ref{sec:merging2}.
 CodeQL is a declarative static analysis engine that transforms source code into
 a database of facts and performs analyses by evaluating queries written in the
 declarative and object-oriented language called QL (Query Language). Using QL,
-one can \inred{represent} rules by defining ``predicates'' and ``classes.'' The following
+one can depict rules by defining ``predicates'' and ``classes.'' The following
 QL code defines the unary predicate \codeql{isOneOrTwo}:
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
@@ -48,37 +48,37 @@ predicate isOneOrTwo(int n) {
   n = 1 or n = 2
 }
 \end{lstlisting}
-\noindent
 
-\inred {
-which states that the fact \codeql{isOneOrTwo(n)} can be derived from either
-one of the two facts: \codeql{n = 1} or \codeql{n = 2}.
-Some predicates may have results, as in the following predicate \codeql{addOne}:
-}
+\noindent
+which states that the fact \codeql{isOneOrTwo(n)} is derivable from either one
+of the two facts, \codeql{n = 1} and \codeql{n = 2}.
+Some predicates may have a return type and a special variable named {\tt
+result}, as the following predicate \codeql{addOne}:
+
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 int addOne(int n) {
-  isOneOrTwo(n) and
-  result = n + 1
+  isOneOrTwo(n) and result = n + 1
 }
 \end{lstlisting}
 \noindent
-
-\inred {
-These kinds of predicates are syntactic sugars of the ordinary predicates. For example,
-\codeql{addOne} can be rewritten as the following binary predicate \codeql{addOnePred}:
-}
+The predicate is syntactic sugar equivalent to the following ordinary predicate:
+%For example,
+%\codeql{addOne} can be rewritten as the following binary predicate \codeql{addOnePred}:
+%
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate addOnePred(int n, int result) {
-  isOneOrTwo(n) and
-  result = n + 1
+  isOneOrTwo(n) and result = n + 1 
 }
 \end{lstlisting}
 \noindent
-\inred {
-and the formula \codeql{m = addOne(n)} is equivalent to \codeql{addOnePred(n, m)}
-}
+An equality formula \codeql{m = addOne(n)} is also syntactic sugar equivalent
+to \codeql{addOnePred(n, m)}.
+%\inred {
+%and the formula \codeql{m = addOne(n)} is equivalent to \codeql{addOnePred(n, m)}
+%}
 
-The following QL code defines the class \codeql{OneOrTwo}:
+In QL, defining classes is one way to define user-defined types. 
+The following QL code defines a class named \codeql{OneOrTwo}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneOrTwo extends int {
   // characteristic predicate
@@ -87,29 +87,32 @@ class OneOrTwo extends int {
   int add(OneOrTwo that) { result = this + that }
 }
 \end{lstlisting}
-
 \noindent
-A class defines a set of elements that satisfy the predicate called
-``characteristic predicate.'' \inred{For example, all possible values with type
-\codeql{OneOrTwo} are 1 and 2, because these are the only values that satisfy the
-characteristic predicate \codeql{OneOrTwo}}.
-A class can also have ``member predicates''
-that relate itself with other values.
-\inred{
-Fundamentally, member predicates are also
-a syntactic sugar for ordinary predicates. For example, the member predicate \codeql{add} can be
-rewritten as a ternary predicate \codeql{addPred}:
-}
+The class extends {\tt int}, which means that the class is a subtype of {\tt
+int}.
+Unlike other object-oriented languages, QL classes cannot be instantiated.
+Instead, a class defines a special predicate, called {\it characteristic
+predicate}, that has the same name to the class, and all values satisfying the
+predicate are deemed elements of the class.
+%A class defines a set of elements that satisfy the predicate called
+%``characteristic predicate.'' 
+For example, only two integer values, {\tt 1} and {\tt 2}, are elements of the
+class \codeql{OneOrTwo}, because its characteristic predicate is satisfied only
+when {\tt this} is {\tt 1} or {\tt 2}.
+A class can also have {\it member predicates} that relate itself with other
+values.
+Member predicates are also syntactic sugar of ordinary predicates. 
+For example, the member predicate \codeql{add} is equivalent to the following
+ternary predicate: 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate addPred(OneOrTwo this, OneOrTwo that, int result) {
   result = this + that
 }
 \end{lstlisting}
-\inred{
-and the formula \codeql{z = x.add(y)} is equivalent to \codeql{addPred(x, y, z)}.
-}
-For more detailed information about CodeQL, refer to
-the paper of Avgustinov et al.\cite{ql2016} or the official document~\cite{codeql}.
+Thus, an equality formula \codeql{z = x.add(y)} is equivalent to
+\codeql{addPred(x, y, z)}.
+For more detailed information about CodeQL, refer to the paper of Avgustinov et
+al.\cite{ql2016} or the official document~\cite{codeql}.
 
 %Figure~\ref{fig:codeql} presents the overall structure of \ours for JNI programs.
 %First, it generates databases for both languages, C\footnote{
@@ -127,7 +130,7 @@ programs.  First, it generates databases for both languages, C\footnote{ Even
 though \ours analyzes JNI programs written in Java and both C and C++, this
 paper refers to C only for presentation brevity.} and Java, and merges them into
 one database.  This corresponds to the step of extracting the initial syntactic
-facts from the source code.  Then, \inred{it merges} the common facts and rules in both
+facts from the source code.  Then, \ours~merges the common facts and rules in both
 languages, which are parts of their libraries that CodeQL provides, into one
 merged library.  Finally, using the merged database and merged library, a user
 can write a query to perform a client-analysis and evaluate it to produce its
