@@ -143,10 +143,10 @@ the compiler to extract necessary information and creates a database with the
 extracted information. For scripting languages like Python, CodeQL uses its own
 extractor to directly extract necessary information from source code.
 CodeQL creates a database for a single language in two steps:
-1) it stores the extracted information in a \inred{\textit{trap
-file}}, a human readable file format \inred{for database}, and 2) it \inred{transforms} trap files
-into databases in the binary format. For example, the
-following demonstrates a sample trap file:
+1) it stores the extracted information in a \textit{trap} file, a human
+readable format file for the CodeQL database, and 2) it transforms the trap
+file into a database in the binary format. 
+For example, the following demonstrates a sample trap file:
 
 \begin{lstlisting}[style=java,numbers=none]
 #10001=@"class;myClass.MyClass"
@@ -175,16 +175,16 @@ the fact \javacode{primitives(...)} in a table named \javacode{@primitives}, and
 %finally stored in each table of database.
 
 To create a single merged database for both C and Java, \ours maintains a
-separate trap file for each language and then merges them.  
-\inred{One problem is that if both trap files have tables with same name,
-then the transformation fails due to the name collision.
-To avoid this problem, \ours adds a language-specific prefix
-to each table before the transformation.  
-For example, if both trap files have tables named \codeql{@params},
-the table from C is renamed as \codeql{@c\_params}, and the table from Java is renamed as
-\codeql{@java\_params}.}
-After renaming such tables, \inred{\ours can safely transform} the trap files into
-databases on which queries can be evaluated.
+separate trap file for each language and then merges them into a trap file.
+One problem is that the mergence fails due to the name collision if a table
+with the same name exists in both trap files.
+To avoid the problem, \ours renames each table to a globally unique name, by
+appending a language-specific prefix to the table name before the mergence.
+For example, if a table named \codeql{@params} exists in both C and Java trap
+files, \ours renames the table in C to \codeql{@c\_params} and the table in
+Java to \codeql{@java\_params}.
+After renaming such tables, \ours merges the trap files into a database on
+which predicates and queries are evaluated.
 
 %To create a single database for both C and Java, \ours maintains
 %a separate trap file for each language and then merges them.
