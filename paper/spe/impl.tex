@@ -324,8 +324,8 @@ automatically synthesizes lifted classes and predicates.
 %manually searching for what are the required ones.
 
 \subsection{Merging Libraries: Java-C}\label{sec:merging}
-After lifting libraries for different languages, we \inred{manually} extend predicates to
-reflect the interoperation semantics between multiple languages.  
+After lifting libraries for different languages, we manually extend predicates
+to reflect the interoperation semantics between multiple languages.  
 For the Java-C program analysis, we identified various interactions from Java
 to C and vice versa via JNI, and extended predicates to model their
 behaviors.
@@ -397,7 +397,7 @@ because the string or method ID values may be passed across language boundaries.
 However, we observed that such a pattern rarely happens in practice,
 and using only intra-language dataflow analysis within C code is enough for most cases.
 Therefore, we decided to sacrifice the precision
-by using \inred{intra-language} analysis instead of \inred{inter-language} analysis
+by using intra-language analysis instead of inter-language analysis
 as a trade-off for a more lightweight and simpler implementation.
 We implemented two intra-flow analysis modules for C,
 which find 1) dataflows from string literals to the arguments of interface functions
