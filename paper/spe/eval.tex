@@ -18,12 +18,11 @@ To show the effectiveness of our approach, we evaluate
 \subsection{\req{1}: Feasibility}
 We evaluate the feasibility of \ours by dataflow analysis on
 two benchmark suites for each of Java-C and Python-C analyses.
-\inred{
-For Java-C analyses, we use NativeFlowBench~\cite{nativeflowbench, JN-SAF} and
-real world JNI Android apps downloaded from F-Droid~\cite{fdroid} as the benchmark suites.
-For Python-C analyses, we use ExtModuleFlowBench and
-real world C-Python programs downloaded from Github. 
-}
+For the Java-C analysis, we use NativeFlowBench~\cite{nativeflowbench, JN-SAF}
+and real-world JNI Android apps downloaded from F-Droid~\cite{fdroid} as the
+benchmark suites.
+For the Python-C analysis, we use ExtModuleFlowBench that we developed and
+real-world C-Python programs downloaded from Github. 
 
 \subsubsection{Feasibility: Java-C}
 The first benchmark suite for Java-C program analysis is NativeFlowBench~\cite{nativeflowbench, JN-SAF},
@@ -56,7 +55,7 @@ While both {\it native\_leak\_array} and {\it native\_noleak\_array} store sensi
 the former leaks the data, but the latter does not.
 Because \jnsaf over-approximates dataflows on arrays,
 it analyzes {\it native\_leak\_array} correctly but reports a false positive for {\it native\_noleak\_array}.
-\inred{By contrast}, because CodeQL under-approximates dataflows on arrays,
+By contrast, because CodeQL under-approximates dataflows on arrays,
 \ours analyzes {\it native\_noleak\_array} correctly but reports a false negative for
 {\it native\_leak\_array}.
 %
@@ -107,7 +106,7 @@ In addition, 1,008 (86\%) resolved JNI uses are precise.
 such as arrays and function pointers, on which
 CodeQL does not track dataflows.
 
-\inred{By contrast},
+By contrast,
 \lees fails to analyze one app because of an error, four apps due to the lack
 of memory spaces, and three apps even in eight hours.  
 In the remaining 17 apps, \lees resolves 71\% JNI uses
@@ -211,11 +210,11 @@ It can precisely analyze the Python object values that C variables can have.
 
 \subsection{RQ2: Usefulness}
 We evaluate the usefulness of \ours by detecting JNI interoperation bugs in
-42 real-world Android apps \inred{downloaded from the F-Droid.}.
+42 real-world Android apps downloaded from the F-Droid.
 Because no existing work reports interoperation bugs in Python-C programs
 to the best of our knowledge, we focus on detecting JNI interoperation bugs.
-\inred{We chose to explore the same JNI interoperation bugs using \ours as those
-reported in previous research~\cite{LeeASE20, ILEA}:}
+We chose to explore the same JNI interoperation bugs using \ours as those
+reported in previous research~\cite{LeeASE20, ILEA}:
 \begin{itemize}
   \item {\it NullDeref}: dereferencing the {\tt null} value of Java in C
   \item {\it MissingFun}: calling a missing Java method from C
@@ -233,8 +232,8 @@ column shows app names, the second and the third columns show the
 numbers of true and false positives for {\it NullDeref}, respectively, and
 the fourth to the sixth columns show the numbers of true positives for {\it
 MissingFun}, {\it TypeMismatch}, and {\it WrongSig}, respectively.
-\ours does not report any false positives for \inred{these three bugs, so we omitted
-columns for the number of false positives of these bugs in the table.}
+We omit the columns denoting false positivies for the three bugs in the table,
+because \ours does not report any false positivies for them.
 We confirmed the true and false positives by manual inspection of the source code.
 \inred{We color the each cell for the number of false positives with non-zero value,
 which indicates that the corresponding application had the corresponding kind of bug.}
@@ -250,7 +249,7 @@ use a code pattern that assigns a value to a variable only if the variable has
 the {\tt null} value. Because our analysis does not support
 path-sensitivity that analyzes each execution path separately, it reports that
 the variable may still have {\tt null} even after the conditional assignment.
-\inred{By contrast}, \lees fails to detect 12 out of 33 genuine bugs
+By contrast, \lees fails to detect 12 out of 33 genuine bugs
 due to memory or scalability issues during analysis.
 
 \begin{figure}[ht!]
@@ -330,9 +329,10 @@ mSendStr = (*env)->GetMethodID(env, jNativesCls,
 \end{figure}
 
 Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours
-detects from real-world apps. \inred{\sout{using simplified code}}
+detects from real-world apps. 
 
-Figure~\ref{fig:bug1}\inred{is an excerpt from Graph 89 demonstrating} {\it NullDeref} bug.
+Figure~\ref{fig:bug1} is an excerpt from the app, Graph 89, demonstrating {\it
+NullDeref} bug.
 The Java code may call a C function {\tt nativeInitGraph89} with {\tt
 null} as its last argument, because the variable {\tt tmp} has {\tt
 null} when the method {\tt GetInternalAppStorage} returns {\tt null}.  The C
@@ -355,7 +355,8 @@ performance overhead~\cite{hwang2021justgen}.
   \endgroup
 }
 
-Figure~\ref{fig:bug2} \inred{is an excerpt from ObscuraCam demonstrating} the {\it MissingFun} bug.
+Figure~\ref{fig:bug2} is an excerpt from the app, ObscuraCam, demonstrating the
+{\it MissingFun} bug.
 As described in Section~\ref{sec:merging}, JNI has a C function
 naming convention for JVMs to link Java native methods to their corresponding C
 functions. While a Java class {\tt JpegRedaction} declaring a native method
@@ -366,7 +367,8 @@ function is named with a wrong package name
 method, JVM fails to link it because of the wrongly named C function.
 
 
-Figure~\ref{fig:bug3} \inred{is an excerpt from Document Viewer demonstrating} the {\it TypeMismatch} bug.
+Figure~\ref{fig:bug3} is an excerpt from the app, Document Viewer,
+demonstrating the {\it TypeMismatch} bug.
 While the return type of a Java native method {\tt search}
 is {\tt List<PageTextBox>}, the return type of the corresponding C function
 {\tt search} is {\tt jobjectArray} corresponding to the Java built-in array
@@ -376,7 +378,8 @@ the JNI specification, interoperations via such native methods may behave
 differently on different JVMs~\cite{LeeASE20}. 
 
 
-Figure~\ref{fig:bug4} \inred {is an excerpt from PrBoom demonstrating} the {\it WrongSig} bug.
+Figure~\ref{fig:bug4} is an excerpt from the app, PrBoom, demonstrating the
+{\it WrongSig} bug.
 The C code tries to get an ID of a Java method {\tt OnMessage} with a
 signature \texttt{(LJava/lang/String;I)V}, but the method has a different
 signature \texttt{(LJava/lang/String;)V} with one String argument. Because
