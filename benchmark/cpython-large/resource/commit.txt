@@ -1,6 +1,13 @@
-a586d6a
-ad7f9dc
-bb32991
-6e19b2d
-07785f1
-221df4e
+bitarray a586d6a
+distance ad7f9dc
+noise bb32991
+pyahocorasick 6e19b2d
+python-Levenshtein 07785f1
+python-llist 221df4e
+bounter e6c56bd
+cvxopt 8e16f3b 
+immutables 7071a24
+japronto e73b76e
+numpy b19ad5b
+pyo 240ef6fb
+simplejson 4a22505

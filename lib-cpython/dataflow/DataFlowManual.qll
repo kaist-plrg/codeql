@@ -308,6 +308,7 @@ class CastNode extends Node {
 
   /* member predicates for CastNode */
 }
+pragma[inline]
 predicate compatibleTypes(DataFlowType p0, DataFlowType p1) {
   PYTHON::compatibleTypes(p0.asPythonDataFlowType(), p1.asPythonDataFlowType())
   or

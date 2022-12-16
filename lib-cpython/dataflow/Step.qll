@@ -47,6 +47,7 @@ predicate pythonTupleObjectReadStep(CPP::Node tup, PYTHON::TupleElementContent c
     (
       // PyArg_ParseTuple
       call.getTarget().toString().matches("%PyArg_ParseTuple%")
+      and not call.getTarget().toString().matches("%PyArg_ParseTupleAndKeywords%")
       and tup.asExpr() = call.getArgument(0)
       and elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(2 + c.getIndex())
     )

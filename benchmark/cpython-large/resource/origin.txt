@@ -4,3 +4,10 @@ git@github.com:caseman/noise.git
 git@github.com:WojciechMula/pyahocorasick.git
 git@github.com:ztane/python-Levenshtein.git
 git@github.com:ajakubek/python-llist.git
+git@github.com:RaRe-Technologies/bounter.git
+git@github.com:MagicStack/immutables.git
+git@github.com:simplejson/simplejson.git
+git@github.com:squeaky-pl/japronto.git
+git@github.com:cvxopt/cvxopt.git
+git@github.com:belangeo/pyo.git
+git@github.com:numpy/numpy.git
