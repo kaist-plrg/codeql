@@ -1,8 +1,9 @@
 while read line; do
-  tokens=($line)
-  app=${tokens[0]}
-  v=${tokens[1]}
+  set $line
+  app=$1
+  v=$2
   cd src/$app
+  git checkout -- .
   git checkout $v
   cd ../..
 done < resource/commit.txt
