@@ -68,10 +68,16 @@ predicate pythonTupleObjectReadStep(CPP::Node tup, PYTHON::TupleElementContent c
     )
     or
     (
-      // PyArg_ParseTupleAndKeywords
+      // imprecise PyArg_ParseTupleAndKeywords
+      // TODO: context using string
       call.getTarget().toString().matches("%PyArg_ParseTupleAndKeywords%")
       and tup.asExpr() = call.getArgument(0)
-      and elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(4 + c.getIndex())
+      and exists(int i |
+        elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(i)
+        and i >= 4
+      )
+      and c.getIndex() >= 0
+      //and elem.(CPP::PostUpdateNode).getPreUpdateNode().asExpr() = call.getArgument(4 + c.getIndex())
     )
   )
 }

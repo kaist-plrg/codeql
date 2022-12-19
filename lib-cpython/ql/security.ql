@@ -7,37 +7,14 @@ class MyConfig extends Configuration {
   MyConfig() { this = "MyConfig" }
 
   override predicate isSource(Node n) {
-    /*
-    is_input_file(n)
-    or
-    is_input_func(n)
-    */
-    (
-      exists(n.asPythonNode())
-      and not exists(Node p | simpleLocalFlowStep(p, n))
-    )
+    exists(n.asPythonNode())
+    and not exists(Node p | simpleLocalFlowStep(p, n))
   }
 
   override predicate isSink(Node n) {
-    exists(CPP::Call call, string funcName, int i |
-      funcName = [
-        "%memcpy%",
-        "%strcmp%",
-        "%strncmp%",
-        "%strcpy%",
-        "%strncpy%",
-        "%sprintf%",
-        "%malloc%",
-        "%calloc%"
-      ]
-      and
-      call.toString().matches(funcName)
-      and
-      (
-        n.asCppNode().(CPP::ArgumentNode).argumentOf(call, i)
-        or
-        call.getArgument(i) = n.asCppNode().asExpr().getParent()
-      )
+    exists(CPP::Call call |
+      isDangerCall(call)
+      and includesAsArg(call, n)
     )
   }
 
@@ -52,46 +29,6 @@ class MyConfig extends Configuration {
   override predicate isBarrier(Node n) {
     not is_my_node(n)
   }
-}
-
-predicate is_input_file(Node n) {
-  exists(PYTHON::Call call |
-    call.getFunc().toString() = "open"
-    and call.getArg(1).(PYTHON::StrConst).getText().matches("%r%") |
-    n.asPythonNode().asExpr() = call
-  )
-}
-
-predicate is_input_func(Node n) {
-  exists(string name |
-    name = [
-      "%getenv%",
-      "%fgetc%",
-      "%_IO_getc%",
-      "%fread%",
-      "%fgets%",
-      "%fscanf%",
-      "%getchar%",
-      "%receive%",
-      "%recv%",
-      "%Info%",
-      "%set_mode%",
-      "%load_image%",
-      "%get_fg%",
-      "read%"
-    ]
-    and (
-      exists(CPP::Call call | 
-        call.toString().matches(name)
-        and call = n.asCppNode().asExpr()
-      )
-      or
-      exists(PYTHON::Call call |
-        call = n.asPythonNode().asExpr()
-        and getFuncName(call).matches(name)
-      )
-    )
-  )
 }
 
 predicate is_my_node(Node n) {
@@ -133,10 +70,38 @@ predicate taintStep(Node obj, Node callNode) {
     and arg.argumentOf(call, 0)
     |
     call = callNode.asCppNode().asExpr() and
-    arg = reader.asCppNode() and
+    arg = obj.asCppNode()
   )
 }
 
-from Node a, Node b, MyConfig cfg
-where cfg.hasFlow(a, b)
-select a, b, b.getLocation()
+predicate isDangerCall(CPP::Call call) {
+  exists(string funcName |
+    funcName = [
+      "%memcpy%",
+      "%strcmp%",
+      "%strncmp%",
+      "%strcpy%",
+      "%strncpy%",
+      "%sprintf%",
+      "%malloc%",
+      "%calloc%"
+    ]
+    and call.toString().matches(funcName)
+  )
+}
+
+pragma[inline]
+predicate includesAsArg(CPP::Call call, Node n) {
+  exists(int i |
+    n.asCppNode().(CPP::ArgumentNode).argumentOf(call, i)
+    or
+    call.getArgument(i) = n.asCppNode().asExpr().getParent()
+  )
+}
+
+from CPP::Call call, Node b, MyConfig cfg
+where
+  isDangerCall(call)
+  and includesAsArg(call, b)
+  and cfg.hasFlow(_, b)
+select call.toString(), b.toString(), call.getLocation()

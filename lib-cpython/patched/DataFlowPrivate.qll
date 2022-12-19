@@ -746,7 +746,7 @@ class FunctionCall extends DataFlowCall, TFunctionCall {
 
   override string toString() { result = call.toString() }
 
-  override Node getArg(int n) { /* result = getArg(call, TNoShift(), callable.getCallableValue(), n) */ result = TCfgNode(call.getArg(n)) }
+  override Node getArg(int n) { /* result = getArg(call, TNoShift(), callable.getCallableValue(), n) */ result = TCfgNode(call.getArg(n)) or result = TCfgNode(call.getArgByName(_)) and n = 1 }
 
   override ControlFlowNode getNode() { result = call }
 
@@ -774,6 +774,8 @@ class MethodCall extends DataFlowCall, TMethodCall {
 
   override Node getArg(int n) {
     n > 0 and result = /*getArg(call, TShiftOneUp(), this.getCallableValue(), n)*/ TCfgNode(call.getArg(n - 1))
+    or
+    n = 1 and result = /*getArg(call, TShiftOneUp(), this.getCallableValue(), n)*/ TCfgNode(call.getArgByName(_))
     or
     n = 0 and result = TCfgNode(call.getFunction().(AttrNode).getObject())
   }
