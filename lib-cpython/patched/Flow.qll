@@ -15,8 +15,8 @@ private import semmle.python.pointsto.PointsTo
 private predicate augstore(ControlFlowNode load, ControlFlowNode store) {
   exists(Expr load_store | exists(AugAssign aa | aa.getTarget() = load_store) |
     toAst(load) = load_store and
-    toAst(store) = load_store and
-    load.strictlyDominates(store)
+    toAst(store) = load_store /*and
+    load.strictlyDominates(store)*/
   )
 }
 
@@ -326,7 +326,8 @@ class ControlFlowNode extends @python_py_flow_node {
   pragma[noinline]
   private ControlFlowNode getExprChild(BasicBlock dom) {
     this.getNode().(Expr).getAChildNode() = result.getNode() and
-    result.getBasicBlock().dominates(dom) and
+    //result.getBasicBlock().dominates(dom) and
+    result.getBasicBlock() = dom and
     not this instanceof UnaryExprNode
   }
 }
@@ -1052,7 +1053,8 @@ class BasicBlock extends @python_py_flow_node {
   //pragma[nomagic]
   pragma[inline]
   predicate dominates(BasicBlock other) {
-    this = other
+    any()
+    //this = other
     //or
     //this.strictlyDominates(other)
   }
@@ -1068,7 +1070,8 @@ class BasicBlock extends @python_py_flow_node {
    */
   pragma[noinline]
   predicate dominanceFrontier(BasicBlock other) {
-    this.dominates(other.getAPredecessor()) and not this.strictlyDominates(other)
+    //this.dominates(other.getAPredecessor()) and not this.strictlyDominates(other)
+    this = other
   }
 
   private ControlFlowNode firstNode() { result = this }
