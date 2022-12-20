@@ -12,9 +12,9 @@ class MyConfig extends Configuration {
   }
 
   override predicate isSink(Node n) {
-    exists(CPP::Call call |
-      isDangerCall(call)
-      and includesAsArg(call, n)
+    exists(CPP::Expr expr |
+      isDanger(expr)
+      and uses(expr, n)
     )
   }
 
@@ -64,17 +64,19 @@ predicate sizeStep(Node obj, Node size) {
   )
 }
 
-predicate taintStep(Node obj, Node callNode) {
+predicate taintStep(Node child, Node parent) {
   exists(CPP::Call call, CPP::ArgNode arg |
-    call.toString().matches("%Py%_Get%")
+    call.toString().matches(["%Py%_Get%", "%PyObject_Hash%"])
     and arg.argumentOf(call, 0)
     |
-    call = callNode.asCppNode().asExpr() and
-    arg = obj.asCppNode()
+    call = parent.asCppNode().asExpr() and
+    arg = child.asCppNode()
   )
+  or
+  parent.asCppNode().asExpr().(CPP::BinaryOperation).getAnOperand() = child.asCppNode().asExpr()
 }
 
-predicate isDangerCall(CPP::Call call) {
+predicate isDanger(CPP::Expr expr) {
   exists(string funcName |
     funcName = [
       "%memcpy%",
@@ -86,22 +88,26 @@ predicate isDangerCall(CPP::Call call) {
       "%malloc%",
       "%calloc%"
     ]
-    and call.toString().matches(funcName)
+    and expr.(CPP::Call).toString().matches(funcName)
   )
+  or
+  exists(expr.(CPP::ArrayExpr))
 }
 
 pragma[inline]
-predicate includesAsArg(CPP::Call call, Node n) {
+predicate uses(CPP::Expr expr, Node n) {
   exists(int i |
-    n.asCppNode().(CPP::ArgumentNode).argumentOf(call, i)
+    n.asCppNode().(CPP::ArgumentNode).argumentOf(expr, i)
     or
-    call.getArgument(i) = n.asCppNode().asExpr().getParent()
+    expr.(CPP::Call).getArgument(i) = n.asCppNode().asExpr().getParent()
   )
+  or
+  expr.(CPP::ArrayExpr).getArrayOffset() = n.asCppNode().asExpr()
 }
 
-from CPP::Call call, Node b, MyConfig cfg
+from CPP::Expr expr, Node b, MyConfig cfg
 where
-  isDangerCall(call)
-  and includesAsArg(call, b)
+  isDanger(expr)
+  and uses(expr, b)
   and cfg.hasFlow(_, b)
-select call.toString(), b.toString(), call.getLocation()
+select expr.toString(), b.toString(), expr.getLocation()
