@@ -10,8 +10,8 @@ To show the effectiveness of our approach, we evaluate
   \item \textbf{\req{1}: Feasibility.} Does \ours correctly analyze multilingual
     programs that use various interoperations?
 
-  \item \textbf{\req{2}: Usefulness.} Does \ours correctly detect dataflow-related
-    bugs?
+  \item \textbf{\req{2}: Usefulness.} \inred{Is \ours useful for detecting} dataflow-related
+    bugs in real-world multilingual programs?
 %that the state-of-the-art multilingual program analyzers detect?
 \end{itemize}
 
@@ -169,11 +169,12 @@ just like it can analyze JNI programs using various JNI interoperations.
 
 %\textbf{Github}
 %\textbf{Real-world Python-C Programs.}
-The second benchmark suite consists of six real-world Python-C programs
-collected from public GitHub repositories. They are analysis targets of
-Monat et al.~\cite{sas2021}'s work.
+The second benchmark suite consists of \inred{13} real-world Python-C programs
+collected from public GitHub repositories. \inred{Six of them} are analysis
+targets of Monat et al.~\cite{sas2021}'s work, and \inred{seven of them are
+subset of targets of Li et al.~\cite{polycruise}'s work, which were compilable}.
 
-Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on six
+Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on \inred{13}
 real-world Python-C programs. 
 The first column shows repository names, the second shows the lines of code,
 the third shows database creation time,
@@ -186,17 +187,18 @@ Because all the API functions take a Python object as the first argument, we
 considered an API function call as resolved, when \ours finds its first argument
 correctly. 
 
-
+\inred{
 Out of six programs, we exclude three programs from our evaluation targets.
 {\it python-Levenshtein} contains both Python and C code, but the Python code
 contains only a class that works as a wrapper for C code without any interoperations,
 making no meaningful interaction between Python and C Code.
 {\it distance} and {\it noise} contain too complicated Python code for CodeQL
 to handle.
+}
 
-In the remaining three programs, \ours resolves 89 out of 123 (72.4\%) total
+In the remaining three programs, \ours resolves \inred{89 out of 123 (72.4\%)} total
 API function calls. 
-It fails to resolve 34 API function calls due to implicit method calls in Python. 
+It fails to resolve \inred{34} API function calls due to implicit method calls in Python. 
 Python code can call some methods implicitly, a class destructor for example, and C
 code can register C functions as such implicitly called methods. 
 Because \ours does not handle C functions implicitly called in Python, it
@@ -209,11 +211,19 @@ It can precisely analyze the Python object values that C variables can have.
 \input{tableRQ2}
 
 \subsection{RQ2: Usefulness}
-We evaluate the usefulness of \ours by detecting JNI interoperation bugs in
-42 real-world Android apps downloaded from the F-Droid.
-Because no existing work reports interoperation bugs in Python-C programs
-to the best of our knowledge, we focus on detecting JNI interoperation bugs.
-We chose to explore the same JNI interoperation bugs using \ours as those
+\inred{
+We evaluate the usefulness of \ours for detecting interoperation bugs in
+real-world Java-C programs and Python-C programs.
+For Java-C programs, we detect the actual interoperation bugs from the
+real-world JNI android applicatons.
+For python-C programs, we show that \ours can extract the dataflow information
+that can be utilized by other bug detectors.
+}
+
+\subsubsection{Bugs in Java-C programs.}
+To show the usefulness of \ours in detecting bugs in Java-C programs,
+we search for interoperation bugs from the 42 real-world JNI android applications, downloaded from F-Droid.
+We chose to explore the same JNI interoperation bug as those
 reported in previous research~\cite{LeeASE20, ILEA}:
 \begin{itemize}
   \item {\it NullDeref}: dereferencing the {\tt null} value of Java in C
@@ -391,3 +401,74 @@ thrown Java exception~\cite{jniexcept}.
 
 The evaluation shows that \ours can detect various JNI interoperation bugs in
 real-world JNI apps better than \lees.
+
+\subsubsection{Bugs in Python-C programs.}
+
+\input{tableRQ2-2}
+
+\begin{figure}[ht!]
+  \centering
+  \vspace{2mm}
+  \begin{lstlisting}[style=cpp,xleftmargin=2.5em]
+// cvxopt/src/C/cholmod.c
+static PyObject* getfactor(PyObject *self, PyObject *args)
+{
+  if (!PyArg_ParseTuple(args, "O", &F)) return NULL;
+  ...
+  if (!PyCapsule_CheckExact(F) || !(descr = PyCapsule_GetName(F)))
+      err_CO("F");
+  if (strncmp(descr, "CHOLMOD FACTOR", 14))
+      PY_ERR_TYPE("F is not a CHOLMOD factor");
+  ...
+}
+  \end{lstlisting}
+    \vspace*{-.5em}
+  \caption{An example of danger-use}
+  \label{fig:cvxopt}
+\end{figure}
+
+\inred{
+To show the usefulness of \ours in detecting interoperation bugs in Python-C
+programs, we show that \ours can successfully extract a specfic dataflow
+information, which then can be utilized in detecting the actual bugs.  The bugs
+we targeted are those used in the work of Li et al.~\cite{polycruise}.  We
+observed that the bugs have certain patterns: the value orignated from Python
+code is passed to the C code, and then used as either (1) an argument to a
+\textit{dangerous} functions, including \ccode{strncpy}, \ccode{strncpm},
+\ccode{vsprintf} and \ccode{malloc}, or (2) an index to a array access.  We
+will denote these patterns as \textit{inter-uses}.  Note that, an inter-use
+itself is not necessarily a bug.  Among the inter-uses, only some of them will
+be capable of triggering bugs or security vulnerabilities.  We will denote such
+inter-uses as \textit{danger-uses}.  Based on this observation, we implemented
+a detector that finds all inter-use, on top of \ours.  Then, one can implement
+an actual bug detector by checkingg if a certain inter-use is a danger-use or
+not.  Implementing a precise danger-use detector is beyond scope of \ours, so
+we only present the result for detecting inter-uses, and check if every known
+danger-uses are included in the set of detected inter-uses.
+
+Table~\ref{table:RQ2-2} summarizes the pattern detection out of 12 Python-C
+programs that we could analyze.  The first column shows program names, the
+second column shows the total number of detected inter-uses, and the third /
+fourth columns show number of every detected / known danger-uses, if any. Among
+12 programs, total five programs are known to have the danger-uses.
+
+The result shows that out of all nine knwon danger-uses, \ours can corretly
+detect eight of them.  Figure~\ref{fig:cvxopt} depicts one danger-use from the
+program cvxopt that \ours could not detect.  The call to the \ccode{strncmp} at
+line 8 should be an inter-use, since the first argument \ccode{descr} in
+intedned to be originated from the Python code. Also, this call is a
+danger-use, because the call to \ccode{strncmp} may incorrectly conclude that
+the strings \ccode{descr} and \ccode{"CHOLMOD FACTOR"} are equal, even if they
+are not. This is because string terminator (\textquotesingle \textbackslash
+0\textquotesingle) is not considered. The correct code should use 15
+(\ccode{strlen("CHOLMODE FACTOR")+1}) as the last argument.  \ours could not
+detect this inter-use, simply because the function \ccode{getfactor} was
+unreachable.  There wasn't any python test files that was calling this
+function, so the \ours could not find any python value that \ccode{descr} can
+point to. When we manually added a python test file that calls \ccode{getfactor},
+\ours correctly reported the call to \ccode{strncmp} in this function as an inter-use.
+
+From the result, we could conclude that \ours is helpful for detecting bugs in
+real-world Python-C programs as well, by extrcating the necessary information
+required by bug detectors.
+}

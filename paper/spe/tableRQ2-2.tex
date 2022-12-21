@@ -1,0 +1,26 @@
+\begin{table}[t]
+\caption{Inter-use detection results of real-world Python-C programs}
+\label{table:RQ2-2}
+\vspace*{-.5em}
+\centering
+\begin{tabular}{l||r|r|r}
+\multirow{2}{*}{\textbf{Program}} & \multirow{2}{*}{\textbf{Inter-use}} & \multicolumn{2}{c}{\textbf{Danger-use}} \\
+\hhline{~||~|-|-}
+                                  &                                     & \textbf{Detected} & \textbf{Known}      \\
+\hhline{=#=|=|=}
+bitarray                          & 36                                  & -                 & -                   \\
+bounter                           & 11                                  & 1                 & 1                   \\
+cvxopt                            & 84                                  & 3                 & 4                   \\
+distance                          & 10                                  & -                 & -                   \\
+immutables                        & 41                                  & 1                 & 1                   \\
+japronto                          & 2                                   & 1                 & 1                   \\
+noise                             & 0                                   & -                 & -                   \\
+pyahocorasick                     & 5                                   & -                 & -                   \\
+pyo                               & 176                                 & 2                 & 2                   \\
+python-Levenshtein                & 11                                  & -                 & -                   \\
+python-llist                      & 0                                   & -                 & -                   \\
+simplejson                        & 1                                   & -                 & -                   \\
+\hhline{=#=|=|=}
+\textbf{Total}     & 377       & 8 & 9
+\end{tabular}
+\end{table}
