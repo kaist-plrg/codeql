@@ -58,7 +58,7 @@ it analyzes {\it native\_leak\_array} correctly but reports a false positive for
 By contrast, because CodeQL under-approximates dataflows on arrays,
 \ours analyzes {\it native\_noleak\_array} correctly but reports a false negative for
 {\it native\_leak\_array}.
-%
+
 The results show that \ours can successfully analyze JNI programs that
 use various JNI interoperations, and its correctness is comparable with that of \jnsaf.
 
@@ -172,7 +172,7 @@ just like it can analyze JNI programs using various JNI interoperations.
 The second benchmark suite consists of \inred{13} real-world Python-C programs
 collected from public GitHub repositories. \inred{Six of them} are analysis
 targets of Monat et al.~\cite{sas2021}'s work, and \inred{seven of them are
-subset of targets of Li et al.~\cite{polycruise}'s work, which were compilable}.
+compilable subset of targets of Li et al.~\cite{polycruise}'s work}.
 
 Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on \inred{13}
 real-world Python-C programs. 
@@ -188,19 +188,22 @@ considered an API function call as resolved, when \ours finds its first argument
 correctly. 
 
 \inred{
-Out of six programs, we exclude three programs from our evaluation targets.
-{\it python-Levenshtein} contains both Python and C code, but the Python code
-contains only a class that works as a wrapper for C code without any interoperations,
-making no meaningful interaction between Python and C Code.
-{\it distance} and {\it noise} contain too complicated Python code for CodeQL
-to handle.
+Out of 13 programs, all programs but one were analyzed within time limit of ?? hours.
+The only exception was {\it NumPy}, the largest program in the benchmark suite.
+We inspected the evaluation log, and figured out that the reason for the slow analysis for this
+program was the inefficeint query optimization of the CodeQL's query system.
 }
-
-In the remaining three programs, \ours resolves \inred{89 out of 123 (72.4\%)} total
+%{\it python-Levenshtein} contains both Python and C code, but the Python code
+%contains only a class that works as a wrapper for C code without any interoperations,
+%making no meaningful interaction between Python and C Code.
+%{\it distance} and {\it noise} contain too complicated Python code for CodeQL
+%to handle.
+%
+In the remaining three programs, \ours resolves \inred{8,082 out of 11,725 (68.9\%)} total
 API function calls. 
-It fails to resolve \inred{34} API function calls due to implicit method calls in Python. 
+\inred{The main for failing to resolve rest of API function calls was the implicit method calls in Python.}
 Python code can call some methods implicitly, a class destructor for example, and C
-code can register C functions as such implicitly called methods. 
+code can register C functions as such implicitly called methods.
 Because \ours does not handle C functions implicitly called in Python, it
 fails to resolve API function calls in them.
 
@@ -454,7 +457,7 @@ fourth columns show number of every detected / known danger-uses, if any. Among
 
 The result shows that out of all nine knwon danger-uses, \ours can corretly
 detect eight of them.  Figure~\ref{fig:cvxopt} depicts one danger-use from the
-program cvxopt that \ours could not detect.  The call to the \ccode{strncmp} at
+program {\it cvxopt} that \ours could not detect.  The call to the \ccode{strncmp} at
 line 8 should be an inter-use, since the first argument \ccode{descr} in
 intedned to be originated from the Python code. Also, this call is a
 danger-use, because the call to \ccode{strncmp} may incorrectly conclude that
@@ -471,4 +474,34 @@ point to. When we manually added a python test file that calls \ccode{getfactor}
 From the result, we could conclude that \ours is helpful for detecting bugs in
 real-world Python-C programs as well, by extrcating the necessary information
 required by bug detectors.
+}
+
+\subsubsection{Limitation}
+\inred{
+In this section, we summarize the limitation of \ours that we encountered during the evaluation.
+
+\textbf{Unsoundness} The dataflow steps that models the behavior of inter-language API functions
+are implemented by manually referring to the JNI specification and Python's extension module specification.
+We implemented a few selected API functions that were enough to practically analyze
+all of our benchmark suite, and did not fully covered all of the API functions.
+This indeed leads to the ineveitable unsoundness of the dataflow analysis.
+One breakthrough will be to use the mechanization specification approach, and
+automtically generate the modelling of such API functions automatically.
+
+\textbf{Support to explicit FFI only}
+The only way of interoperations between language such that \ours can detect, is via
+using explictly FFI calls. However, as (papers that reviewer 2 mentions)~\cite{reviewr2} suggest,
+FFI is not the only way of two languages can interact.
+Although the benchmarks we used only contains FFI as a method of the interoperation between languages,
+identifying other ways of interactions and handling those methods is required for \ours to support more general programs.
+
+\textbf{Dependnecy to underlying declarative analyzer}
+Since \ours is implemented on top of CodeQL, the precision and scalibity of \ours heavily depend on the
+underlying analyzer, CodeQL. We've encountered some cases where intra-language dataflow analysis is
+not precise enough to get the desired result. For example, CodeQL does not support the
+analysis of dataflow via variable arguments, so we had to implement on our own.
+In addition, we observed that there was one C-Python program, {\it NumPy}, that was not finished
+due to the query optimization of CodeQL. 
+In order to imporve the performance of \ours, the performance improvement of the
+baseline CodeQL should be preceeded.
 }
