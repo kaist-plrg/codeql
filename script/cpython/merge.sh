@@ -1,7 +1,10 @@
 root=${1:-"src"}
 db=${2:-"db-merged"}
 
-st=`date +%s`
+getTime="date +%s%3N"
+unit="ms"
+
+st=`$getTime`
 
 mkdir -p $db
 rm -rf $db
@@ -12,6 +15,6 @@ rm -rf db-python
 rm -rf db-cpp
 codeql database finalize --dbscheme="$CODEQL_HOME/lib-cpython/merged.dbscheme" $db
 
-fn=`date +%s`
+fn=`$getTime`
 took=$((fn - st))
-echo "Took $took s for merged"
+echo "Took $took $unit for merged"

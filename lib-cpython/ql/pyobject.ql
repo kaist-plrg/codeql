@@ -27,7 +27,7 @@ predicate isApiFunctionCall(CPP::Call call) {
 }
 predicate isPyArg(CPP::Expr e) {
   e = any(CPP::Call call | isApiFunctionCall(call)).getArgument(0)
-  and not e.getLocation().toString().matches("%/Library/%")
+  and e.getLocation().toString().matches("%cpython-large%")
   and not e instanceof CPP::AddressOfExpr
 }
 
@@ -50,7 +50,7 @@ class MyConfig extends Configuration {
   }
 
   override predicate isBarrier(Node n) {
-    n.getLocation().toString().matches("%/Library/%")
+    not n.getLocation().toString().matches("%/cpython-large/%")
   }
 }
 

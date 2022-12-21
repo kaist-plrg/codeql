@@ -23,5 +23,5 @@ apps=(
 
 for app in ${apps[@]}; do
   echo "========$app========"
-  $CODEQL_HOME/script/cpython/create-db.sh src/$app db/$app | grep "Took"
+  $CODEQL_HOME/script/cpython/create-db.sh src/$app db/$app | grep "Took" | tee time.txt
 done

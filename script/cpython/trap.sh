@@ -1,6 +1,9 @@
 root=${1:-"src"}
 
-st=`date +%s`
+getTime="date +%s%3N"
+unit="ms"
+
+st=`$getTime`
 
 echo '[Creating database for python]'
 rm -rf db-python
@@ -11,11 +14,11 @@ mv $root/setup.py $root/setup.py.bak
 codeql database trace-command --working-dir=$root db-python --index-traceless-dbs -j 0
 mv $root/setup.py.bak $root/setup.py
 
-fn=`date +%s`
+fn=`$getTime`
 took=$((fn - st))
-echo "Took $took s for python"
+echo "Took $took $unit for python"
 
-st=`date +%s`
+st=`$getTime`
 
 echo '[Creating database for cpp]'
 rm -rf db-cpp
@@ -25,6 +28,6 @@ echo '[trace-command]'
 (cd $root; make clean)
 codeql database trace-command --working-dir=$root db-cpp make -j 0
 
-fn=`date +%s`
+fn=`$getTime`
 took=$((fn - st))
-echo "Took $took s for cpp"
+echo "Took $took $unit for cpp"

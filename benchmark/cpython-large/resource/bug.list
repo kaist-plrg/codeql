@@ -1,0 +1,9 @@
+call to malloc()   | bounter/cbounter/cms_common.h:85
+call to strncmp()  | cvxopt/src/C/cholmod.c:491
+call to strncmp()  | cvxopt/src/C/cholmod.c:597
+call to strncmp()  | cvxopt/src/C/cholmod.c:977
+call to strncmp()  | cvxopt/src/C/cholmod.c:1035
+access to array    | immutables/immutables/_map.c:1783
+call to malloc()   | japronto/src/japronto/parser/cparser.c:558
+call to vsprintf() | pyo/src/engine/servermodule.c:188
+call to strncpy()  | pyo/src/engine/ad_jack.c:511
