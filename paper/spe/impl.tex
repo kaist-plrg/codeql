@@ -40,8 +40,8 @@ parts and emphasize the Python-C program analysis in Section~\ref{sec:merging2}.
 CodeQL is a declarative static analysis engine that transforms source code into
 a database of facts and performs analyses by evaluating queries written in the
 declarative and object-oriented language called QL (Query Language). Using QL,
-one can depict rules by defining ``predicates'' and ``classes.'' The following
-QL code defines the unary predicate \codeql{isOneOrTwo}:
+one can \inblue{depict} rules by defining ``predicates'' and ``classes.'' The following
+QL code defines the \inblue{unary} predicate \codeql{isOneOrTwo}:
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneOrTwo(int n) {
@@ -50,10 +50,10 @@ predicate isOneOrTwo(int n) {
 \end{lstlisting}
 
 \noindent
-which states that the fact \codeql{isOneOrTwo(n)} is derivable from either one
+\inblue{which states that the fact \codeql{isOneOrTwo(n)} is derivable from either one
 of the two facts, \codeql{n = 1} and \codeql{n = 2}.
 Some predicates may have a return type and a special variable named {\tt
-result}, as the following predicate \codeql{addOne}:
+result}, as the following predicate \codeql{addOne}:}
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 int addOne(int n) {
@@ -61,7 +61,7 @@ int addOne(int n) {
 }
 \end{lstlisting}
 \noindent
-The predicate is syntactic sugar equivalent to the following ordinary predicate:
+\inblue{The predicate is syntactic sugar equivalent to the following ordinary predicate:}
 %For example,
 %\codeql{addOne} can be rewritten as the following binary predicate \codeql{addOnePred}:
 %
@@ -71,14 +71,14 @@ predicate addOnePred(int n, int result) {
 }
 \end{lstlisting}
 \noindent
-An equality formula \codeql{m = addOne(n)} is also syntactic sugar equivalent
+\inblue{An equality formula \codeql{m = addOne(n)} is also syntactic sugar equivalent
 to \codeql{addOnePred(n, m)}.
 %\inred {
 %and the formula \codeql{m = addOne(n)} is equivalent to \codeql{addOnePred(n, m)}
 %}
 
 In QL, defining classes is one way to define user-defined types. 
-The following QL code defines a class named \codeql{OneOrTwo}:
+The following QL code defines a class named \codeql{OneOrTwo}:}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneOrTwo extends int {
   // characteristic predicate
@@ -88,7 +88,7 @@ class OneOrTwo extends int {
 }
 \end{lstlisting}
 \noindent
-The class extends {\tt int}, which means that the class is a subtype of {\tt
+\inblue{The class extends {\tt int}, which means that the class is a subtype of {\tt
 int}.
 Unlike other object-oriented languages, QL classes cannot be instantiated.
 Instead, a class defines a special predicate, called {\it characteristic
@@ -103,16 +103,16 @@ A class can also have {\it member predicates} that relate itself with other
 values.
 Member predicates are also syntactic sugar of ordinary predicates. 
 For example, the member predicate \codeql{add} is equivalent to the following
-ternary predicate: 
+ternary predicate:}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate addPred(OneOrTwo this, OneOrTwo that, int result) {
   result = this + that
 }
 \end{lstlisting}
-Thus, an equality formula \codeql{z = x.add(y)} is equivalent to
+\inblue{Thus, an equality formula \codeql{z = x.add(y)} is equivalent to
 \codeql{addPred(x, y, z)}.
 For more detailed information about CodeQL, refer to the paper of Avgustinov et
-al.\cite{ql2016} or the official document~\cite{codeql}.
+al.\cite{ql2016} or the official document~\cite{codeql}.}
 
 %Figure~\ref{fig:codeql} presents the overall structure of \ours for JNI programs.
 %First, it generates databases for both languages, C\footnote{
@@ -144,8 +144,8 @@ extracted information. For scripting languages like Python, CodeQL uses its own
 extractor to directly extract necessary information from source code.
 CodeQL creates a database for a single language in two steps:
 1) it stores the extracted information in a \textit{trap} file, a human
-readable format file for the CodeQL database, and 2) it transforms the trap
-file into a database in the binary format. 
+readable \inblue{format file for the CodeQL database, and 2) it transforms the trap
+file into a database in the binary format.}
 For example, the following demonstrates a sample trap file:
 
 \begin{lstlisting}[style=java,numbers=none]
@@ -175,7 +175,7 @@ the fact \javacode{primitives(...)} in a table named \javacode{@primitives}, and
 %finally stored in each table of database.
 
 To create a single merged database for both C and Java, \ours maintains a
-separate trap file for each language and then merges them into a trap file.
+separate trap file for each language and then merges them \inblue{into a trap file.
 One problem is that the mergence fails due to the name collision if a table
 with the same name exists in both trap files.
 To avoid the problem, \ours renames each table to a globally unique name, by
@@ -184,7 +184,7 @@ For example, if a table named \codeql{@params} exists in both C and Java trap
 files, \ours renames the table in C to \codeql{@c\_params} and the table in
 Java to \codeql{@java\_params}.
 After renaming such tables, \ours merges the trap files into a database on
-which predicates and queries are evaluated.
+which predicates and queries are evaluated. }
 
 %To create a single database for both C and Java, \ours maintains
 %a separate trap file for each language and then merges them.
@@ -202,9 +202,9 @@ which predicates and queries are evaluated.
 CodeQL provides various libraries for C and Java, including
 pre-defined predicates and classes for users to implement their own analyses.
 A dataflow analysis library is such a library, which supports both C and Java.
-For example, Figure~\ref{fig:qll} (a) and (b) show sample QL libraries for C
+\inblue{For example, Figure~\ref{fig:qll} (a) and (b) show sample QL libraries for C
 and Java respectively, which use the same class name \ccode{Node} and the same
-predicate name \ccode{localFlowStep}.
+predicate name \ccode{localFlowStep}.}
 However, even with the same name, the class \ccode{Node} in C and the
 class \javacode{Node} in Java are different classes, which are incompatible.
 The same applies to the predicate \ccode{localFlowStep}.
@@ -276,7 +276,7 @@ predicate localFlowStep(Node node1, Node node2) {
 \end{figure}
 
 To make classes and predicates in C and Java compatible,
-\ours lifts each library to the common level.
+\inblue{\ours lifts each library to the common level.
 First, as on lines 1 and 2 of Figure~\ref{fig:qll3}, \ours encapsulates the
 original dataflow libraries for C and Java in separate modules named {\tt C}
 and {\tt Java},
@@ -307,7 +307,7 @@ Similarly, \ours lifts a predicate by combining two original predicates with
 the \codeql{or} connective. For each predicate, arguments and return values are
 downcasted to elements of the class of their corresponding language.
 After lifting, lifted predicates show the equivalent behaviors as the original
-ones if all the arguments are from the same language.
+ones if all the arguments are from the same language.}
 
 \ours can fully automate the lifting process using QL compiler error
 messages. When compiling a query without importing the library, the QL compiler
@@ -324,7 +324,7 @@ automatically synthesizes lifted classes and predicates.
 %manually searching for what are the required ones.
 
 \subsection{Merging Libraries: Java-C}\label{sec:merging}
-After lifting libraries for different languages, we manually extend predicates
+After lifting libraries for different languages, we \inblue{manually} extend predicates
 to reflect the interoperation semantics between multiple languages.  
 For the Java-C program analysis, we identified various interactions from Java
 to C and vice versa via JNI, and extended predicates to model their
@@ -392,14 +392,14 @@ To correctly handle this method call, we should be able to answer these
 questions: ``When we call \ccode{GetMethodID},
 what are the string values of \ccode{name} and \ccode{sig}?'' and
 ``When we call \ccode{Call<type>Method}, what is the method ID value of \ccode{mid}?''
-Soundly answering these questions requires inter-language dataflow analysis
+\inblue{Soundly answering these questions requires inter-language dataflow analysis
 because the string or method ID values may be passed across language boundaries.
 However, we observed that such a pattern rarely happens in practice,
 and using only intra-language dataflow analysis within C code is enough for most cases.
 Therefore, we decided to sacrifice the precision
 by using intra-language analysis instead of inter-language analysis
 as a trade-off for a more lightweight and simpler implementation.
-We implemented two intra-flow analysis modules for C,
+We implemented two intra-flow analysis modules for C,}
 which find 1) dataflows from string literals to the arguments of interface functions
 and 2) dataflows from interface function call results to the arguments of interface functions.
 Using these modules, we can implement the
@@ -466,7 +466,7 @@ struct PyMethodDef methods[] = {
 
 \noindent
 The member field \ccode{ml_name} has a visible name of a C function to Python,
-and the member field \ccode{ml_meth} has the pointer to the actual C function.
+and the member field \ccode{ml_meth} has \inblue{the pointer to the actual C function.}
 Thus, the function \ccode{cfunction_impl} defined in C code is invoked when
 importing and calling \ccode{cfunction} in Python code.
 To model the behavior, we define the CodeQL class \codeql{PyMethodDef}
@@ -474,7 +474,7 @@ and the predicate \codeql{viableCallableP2C}. The class \codeql{PyMethodDef}
 corresponds to the C structure \ccode{PyMethodDef}. It has
 two member predicates \codeql{getName()} and \codeql{getFunc()} whose results are
 the values of the fields \ccode{ml_name} and \ccode{ml_meth}, respectively.
-Then, we make a rule for \codeql{viableCallableP2C} such that for some \codeql{def} of type \codeql{PyMethodDef},
+\inblue{Then, we make a rule for \codeql{viableCallableP2C} such that for some \codeql{def} of type \codeql{PyMethodDef},}
 if \codeql{def.getName() } \codeql{= call.getTarget().toString()}
 for some \codeql{call}, then \codeql{def.getFunc() } \codeql{= viableCallableP2C(call)} holds.
 
@@ -496,8 +496,8 @@ positions does not work, and we need another way.
 We modelled this behavior by defining \codeql{VirtualArgNode}, a subclass of \codeql{Node},
 that corresponds to the Python tuple object. Then, we define some predicates
 for representing flows in and out of this node. First, we define a
-step that represents the flow from values of original argument nodes to virtual argument nodes. We then define
-a step that represents the flow from the values of virtual argument nodes to a single parameter node in a C function.
+\inblue{step that represents the flow from values of original argument nodes to virtual argument nodes. We then define
+a step that represents the flow from the values of virtual argument nodes to a single parameter node in a C function.}
 By doing so, the flows from original argument nodes to use sites will be
 found in three steps: 1) from an argument node to a virtual argument node,
 2) from the virtual argument node to the parameter node of a C function,

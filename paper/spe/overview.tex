@@ -73,19 +73,19 @@ void f() {
 %value "m2" to indicate the name of method.
 
 \subsection{Example Declarative Static Analysis}
-An example declarative static analysis consists of the following Datalog-like facts, rules,
+An example declarative static analysis consists of the following \inblue{Datalog-like} facts, rules,
 and queries:
 
 \[
   \begin{array}{llll}
-    f & ::= & p(\overline{k\ |\ x}) & \text{\sc Fact}\\
-    r & ::= & f'\ \mbox{:-}\ \overline{f\ |\neg f} & \text{\sc Rule}\\
+    f & ::= & p(\overline{\inblue{k}\ |\ x}) & \text{\sc Fact}\\
+    r & ::= & f'\ \mbox{:-}\ \overline{\inblue{f\ |\neg f}} & \text{\sc Rule}\\
     q & ::= & \mbox{?-}\ \overline{f}\ &  \text{\sc Query}
 \end{array}
 \]
 
 \noindent
-We use the overline notation to indicate 0 or more repetitions. 
+\inblue{We use the overline notation to indicate 0 or more repetitions. 
 For example, $\overline{x}$ is a shorthand for $x_1, x_2, ..., x_n$ for some $n
 \ge 0$. 
 The fact $p(\overline{k\ |\ x})$ denotes a relation $p$ between constants
@@ -109,7 +109,7 @@ Such bodiless rules can be considered as the initial input facts for the
 analysis.
 The query $\mbox{?-}\ \overline{f}$ finds all possible variable assignments
 that make all facts in $\overline{f}$ belong to known facts if replacing
-variables in $\overline{f}$ with their corresponding constants.
+variables in $\overline{f}$ with their corresponding constants.}
 
 
 \subsection{Declarative Call Graph Construction for Monolingual Programs}\label{lab:ovmono}
@@ -121,8 +121,8 @@ m1} calls the function \rcode{f} in {\it B} code via language interoperation bet
 A}, the expression \rcode{m1()} calls the function \rcode{m1} defined on line~2 to
 invoke the function \rcode{f} in {\it B} code.
 The function \rcode{f} in {\it B} code calls the \rcode{CallMethod} function with a
-string literal \rcode{"m2"} to invoke the function \rcode{m2} in {\it A} code, using the
-string literal argument as the target function name.
+string \inblue{literal} \rcode{"m2"} to invoke the function \rcode{m2} in {\it A} code, using the
+string \inblue{literal} argument as the target function name.
 %Thus, the code example performs the bidirectional interoperation between {\it
 %A} and {\it B}, which calls the function {\tt f} written in {\it A} from {\it
 %B} and calls the function {\tt m2} written in {\it B} from {\it A}.
@@ -188,16 +188,17 @@ as follows:
 
 Finally, a query system extracts a set of function call relation facts when we
 make a query. 
-For example, the following query finds all possible literals for the variables
-\rcode{ X} and \rcode{ Y}:
+\inblue{For example, the following query finds all possible literals for the variables
+\rcode{ X} and \rcode{ Y}:}
 
 \begin{lstlisting}[style=mrule]
     ?- CallEdge(X, Y).
 \end{lstlisting}
 \noindent
+\inblue{
 Since only one \rcode{ CallEdge} fact, \rcode{ CallEdge(6,2)}, belongs to known
 facts, the query system produces \rcode{ (X, Y)\ $\in$ \{(6, 2)\}} as a result
-of the query.
+of the query.}
 
 %Finally, there is a query system that is used for extracting certain sets of
 %facts that meet certain condition. For example, we can simply make a query to
@@ -216,11 +217,12 @@ The initial facts for the code in Figure~\ref{fig:exam:langB} are as follows:
 \end{lstlisting}
 
 \noindent
+\inblue{
 The fact \rcode{ ProcedureAt(lineNum, name)} denotes that a procedure of name
 \rcode{name} is defined on line \rcode{lineNum} similarly to
 \rcode{FunctionAt(lineNum, name)} for the language {\it A}.
 The fact \rcode{ Argument(lineNum, i, arg)} denotes that the value of
-the \rcode{i}-th argument of a function call on line \rcode{ lineNum} is \rcode{ arg}.
+the \rcode{i}-th argument of a function call on line \rcode{ lineNum} is \rcode{ arg}.}
 
 Then, we define a slightly different rule to derive a function call relation
 from the initial facts as follows: 
@@ -363,11 +365,11 @@ the interoperation rule from {\it B} to {\it A} as follows:
 %?- CallEdge(X, Y).
 %which will give us the output, (X, Y) = (7, 3), (4, 9), (10, 5)
 
-Finally, when making the query \rcode{ ?- CallEdge(X, Y)} as the same for the
+\inblue{Finally, when making the query \rcode{ ?- CallEdge(X, Y)} as the same for the
 monolingual programs in Section~\ref{lab:ovmono}, the query system now produces
 \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), } \rcode{(8, 4)\}} as function call
 relation results, which include not only intraoperation call relations but also
-interoperation call relations. 
+interoperation call relations.}
 
 This simple example shows what our extension for multilingual program analysis
 requires. Our extension reuses most components in an existing declarative static
