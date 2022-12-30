@@ -55,5 +55,7 @@ They leverage the full features of the analyzers within the same framework to
 perform precise context-sensitive value analyses. 
 \inblue{Polycruise~\cite{polycruise} is a Python-C analyzer that enables an efficeint
 dynamic information flow analysis(DIFA).
-(...)
+The analysis is performed in two phases. The main idea is to compute the
+symbolic dependencies regarding dataflow sources and sinks, and use that
+information to make more efficeint instrumentations and peform dynamic analysis online.
 In contrast to these works}, our work focuses on declarative style dataflow analysis. 
