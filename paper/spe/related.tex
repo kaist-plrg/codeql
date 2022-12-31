@@ -53,9 +53,9 @@ Recent work~\cite{sas2021} proposed a Python-C analyzer by reusing existing
 Python and C analyzers built on top of the same framework, MOPSA~\cite{Mopsa}.
 They leverage the full features of the analyzers within the same framework to
 perform precise context-sensitive value analyses. 
-\inblue{Polycruise~\cite{polycruise} is a Python-C analyzer that enables an efficeint
-dynamic information flow analysis(DIFA).
-The analysis is performed in two phases. The main idea is to compute the
-symbolic dependencies regarding dataflow sources and sinks, and use that
-information to make more efficeint instrumentations and peform dynamic analysis online.
+\inblue{Polycruise~\cite{polycruise} is a Python-C analyzer that enables an efficient
+dynamic information flow analysis (DIFA).
+The analysis performs two phases: it first computes symbolic dependencies between
+sources and sinks, then uses that information to make efficient
+instrumentations for online dynamic analysis.
 In contrast to these works}, our work focuses on declarative style dataflow analysis. 
