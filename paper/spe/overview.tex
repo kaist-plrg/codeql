@@ -30,37 +30,6 @@ the original language-specific rules from two languages to take the
 interoperation semantics into account. Then, the same query is performed to get
 analysis results.
 
-\begin{figure}[t]
-  \centering
-%  \vspace{2mm}
-  \begin{subfigure}[t]{0.3\textwidth}
-    \begin{lstlisting}[style=mpython]
-import f
-def m1():
-    f()
-def m2():
-    return None
-m1()
-    \end{lstlisting}
-    \vspace*{-.5em}
-    \caption{\normalsize Code in language A}
-    \label{fig:exam:langA}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.3\textwidth}
-    \begin{lstlisting}[style=mcpp,firstnumber=7]
-void f() {
-    CallMethod("m2");
-}
-    \end{lstlisting}
-    \vspace*{3.5em}
-    \caption{\normalsize Code in language B}
-    \label{fig:exam:langB}
-  \end{subfigure}
-  \vspace*{-.5em}
-  \caption{Multilingual code example written in both A and B}
-  \label{fig:exam}
-\end{figure}
-
 %Let us consider a multilingual program written in a Python-like language A
 %and a C-like language B.
 %
@@ -89,23 +58,23 @@ and queries:
 For example, $\overline{x}$ is a shorthand for $x_1, x_2, ..., x_n$ for some $n
 \ge 0$. 
 The fact $p(\overline{k\ |\ x})$ denotes a relation $p$ between constants
-$\overline{k}$ such as string and integer literals, or variables
+$\overline{k}$, such as string and integer literals, or variables
 $\overline{x}$. 
 A rule $f'\
 \mbox{:-}\ \overline{f\ |\neg f}$ consists of two parts: the head of the rule
 $f'$ and the body of the rule $\overline{f\ |\neg f}$, where the
 optional prefix $\neg$ denotes the negation.
-\footnote{There is a syntactic restriction regarding negation and recursive
+\footnote{A syntactic restriction exists for negation and recursive
 rules: a fact should not be derived from its negation. For example, the rule
-$R(x, y)\ \mbox{:-}\ \neg R(x, y)$ is not a syntactically valid rule, since
+$R(x, y)\ \mbox{:-}\ \neg R(x, y)$ is not a syntactically valid rule since
 $R(x, y)$ cannot be derived from $\neg R(x, y)$.}
 It denotes that the head is derivable from the body:
 $f'$ is derivable if all the facts $f'' \in \{\overline{f}\}$ belong to known
 facts, and all the facts $f'' \in \{\overline{\neg f}\}$ do not belong to known
 facts.
-The body of the rule can be empty, and in that case, the head of the rule can
-be vacuously added to known facts.
-Such bodiless rules can be considered as the initial input facts for the
+The body of the rule can be empty; in that case, the head of the rule is
+vacuously added to known facts.
+Such bodiless rules are the initial input facts for the
 analysis.
 The query $\mbox{?-}\ \overline{f}$ finds all possible variable assignments
 that make all facts in $\overline{f}$ belong to known facts if replacing
@@ -113,7 +82,37 @@ variables in $\overline{f}$ with their corresponding constants.}
 
 
 \subsection{Declarative Call Graph Construction for Monolingual Programs}\label{lab:ovmono}
-Figure~\ref{fig:exam} shows a multilingual code example written in (a)
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.45\textwidth}
+    \begin{lstlisting}[style=mpython]
+import f
+def m1():
+    f()
+def m2():
+    return None
+m1()
+    \end{lstlisting}
+    \vspace*{-.5em}
+    \caption{Code in Python-like language A}
+    \label{fig:exam:langA}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.45\textwidth}
+    \begin{lstlisting}[style=mcpp,firstnumber=7]
+void f() {
+    CallMethod("m2");
+}
+    \end{lstlisting}
+    \vspace*{3.5em}
+    \caption{Code in C-like language B}
+    \label{fig:exam:langB}
+  \end{subfigure}
+  \vspace*{-.5em}
+  \caption{Multilingual code example written in both A and B}
+  \label{fig:exam}
+\end{figure}
+
+ Figure~\ref{fig:exam} shows a multilingual code example written in (a)
 Python-like language {\it A} and (b) C-like language {\it B}. In {\it A} code, there
 are two functions, \rcode{m1} on line~2 and \rcode{m2} on line~4. The function \rcode{
 m1} calls the function \rcode{f} in {\it B} code via language interoperation between
@@ -195,8 +194,7 @@ make a query.
     ?- CallEdge(X, Y).
 \end{lstlisting}
 \noindent
-\inblue{
-Since only one \rcode{ CallEdge} fact, \rcode{ CallEdge(6,2)}, belongs to known
+\inblue{Since only one \rcode{ CallEdge} fact, \rcode{ CallEdge(6,2)}, belongs to known
 facts, the query system produces \rcode{ (X, Y)\ $\in$ \{(6, 2)\}} as a result
 of the query.}
 
@@ -217,12 +215,11 @@ The initial facts for the code in Figure~\ref{fig:exam:langB} are as follows:
 \end{lstlisting}
 
 \noindent
-\inblue{
 The fact \rcode{ ProcedureAt(lineNum, name)} denotes that a procedure of name
 \rcode{name} is defined on line \rcode{lineNum} similarly to
 \rcode{FunctionAt(lineNum, name)} for the language {\it A}.
 The fact \rcode{ Argument(lineNum, i, arg)} denotes that the value of
-the \rcode{i}-th argument of a function call on line \rcode{ lineNum} is \rcode{ arg}.}
+the \rcode{i}-th argument of a function call on line \rcode{ lineNum} is \rcode{ arg}.
 
 Then, we define a slightly different rule to derive a function call relation
 from the initial facts as follows: 
@@ -242,28 +239,8 @@ the same fact \rcode{CallEdge} can be derived from different facts for
 different languages. When we make the query \rcode{ ?- CallEdge(X, Y)},
 the query system produces \rcode{ (X, Y)\ $\in$ \{\}} as a result
 since it has no facts to satisfy the rule.
-%Note that we can use the same query {\tt ?- CallEdge(X, Y)} to derive function
-%call relation facts for both language {\it A} code and {\it B} code, since the
-%kind of facts has the same relation name.  
-
-%It is important thing to note here is that, the same name of "CallEdge" is used
-%for this rule. The rationale for the developer of analyzers to use the same
-%name here, is that the exact same query can be reused. For example, we can use
-%the exact same query
-%
-%?- CallEdge(X, Y).
-
-%to find all possible set of call edges. In this case, the output would be empty
-%as the analyzer is not considering the source code from A.
 
 \subsection{Extension of Declarative Call Graph Construction for Multilingual Programs}
-%So far, we have seen how a declarative analyzer designed for one language can
-%be extended to support another language. Now, we can take aadvantage of this
-
-%Again, the first step is to create merged database that can separated into 2
-%logical language spaces. In this example, the merged database would look like
-%this:
-
 The first step of our extension for multilingual program analysis is to create a
 merged database that consists of two logical language spaces, {\it A} and {\it
 B}. Then, we store the initial facts of the code in Figure~\ref{fig:exam:langA} and
@@ -282,10 +259,6 @@ the logical language spaces in which the facts reside:
     Argument$_B$(8, 0, "m2")
 \end{lstlisting}
 
-%Then, the next step is to define the rule for CallEdge.  The new rule will be
-%composed of three parts: language-specific rule for A, lanuguage-specific rule
-%for B, and language-interoperations rules:
-
 The next step defines generalized rules to derive function call relation
 facts. We define them by composing language-specific rules for A,
 language-specific rules for B, and language-interoperation rules as follows:
@@ -296,12 +269,6 @@ language-specific rules for B, and language-interoperation rules as follows:
     CallEdge(lineNumCall, lineNumFunc) :- CallEdge$_{AB}$(lineNumCall, lineNumFunc)
     CallEdge(lineNumCall, lineNumFunc) :- CallEdge$_{BA}$(lineNumCall, lineNumFunc)
 \end{lstlisting}
-
-%For language-specific rules for CallEdge\_A and CallEdge\_B can be defined same
-%as before.  For language-interoperation rule, both call from A to B and B to A
-%should be considered. In our example language, call from A to B is similar to
-%normal method call from B to B, so the rule for CallEdge\_AB can be defined in
-%similar way:
 
 \noindent 
 We slightly modify the language-specific rules for {\it A} and {\it B} to
@@ -330,11 +297,6 @@ Since the function call semantics from {\it A} to {\it B} is the same as the
 normal function call semantics in {\it A}, we define the interoperation rule from {\it
 A} to {\it B} as follows: 
 
-%For language-interoperation rule, both call from A to
-%B and B to A should be considered. In our example language, call from A to B is
-%similar to normal method call from B to B, so the rule for CallEdge\_AB can be
-%defined in similar way:
-
 \begin{lstlisting}[style=mrule]
     CallEdge$_{AB}$(lineNumCall, lineNumFunc) :-
       CallAt$_A$(lineNumCall, name),
@@ -348,22 +310,12 @@ a function written in {\it A} by calling an interoperation API function \rcode{
 CallMethod} with a target function name as the first argument. Thus, we define
 the interoperation rule from {\it B} to {\it A} as follows: 
 
-%For the rule for CallEdge\_BA, the situation is a bit trickier.  Since the
-%method call is done via an api function call, we weill have to consider this
-%semantics.
-
 \begin{lstlisting}[style=mrule]
     CallEdge$_{BA}$(lineNumCall, lineNumFunc) :-
       CallAt$_B$(lineNumCall, "CallMethod"),
       Argument$_B$(lineNumCall, 0, name),
       FunctionAt$_A$(lineNumFunc, name)
 \end{lstlisting}
-
-%After fully defining the rule for CallEdge, then we can reuse the query system
-%just as before to findout every possible calledge:
-%
-%?- CallEdge(X, Y).
-%which will give us the output, (X, Y) = (7, 3), (4, 9), (10, 5)
 
 \inblue{Finally, when making the query \rcode{ ?- CallEdge(X, Y)} as the same for the
 monolingual programs in Section~\ref{lab:ovmono}, the query system now produces
@@ -378,15 +330,3 @@ language-specific rules are trivial, we can fully automate the modification
 process.  The only manual part in our extension is to define additional
 language-interoperation rules. We explain how we extend CodeQL to support
 multilingual program analysis for Java-C and Python-C programs in the next section.
-
-%It is interesting to see what is the only required task for this extension.
-%Most of the parts in original analyzers is reused, and the only requirements
-%are the additional language-interoperation rules, in this case,
-%language-interoperation rules for CallEdge\_AB and CallEdge\_BA. Rest of the
-%part can be constructed in automated way.
-
-%Starting?\tikzmark{}? from the next section, we formally present our approach to extend the
-%analyzer targeting multiple lanugaes to support multilingual analysis, specific
-%implementation details on extedning CodeQL to support Java-C programs and
-%Python-C programs, and demonstrate our experimental result with the
-%proof-of-concept implementation.
