@@ -10,9 +10,8 @@ To show the effectiveness of our approach, we evaluate
   \item \textbf{\req{1}: Feasibility.} Does \ours correctly analyze multilingual
     programs that use various interoperations?
 
-  \item \textbf{\req{2}: Usefulness.} \inblue{Is \ours useful for detecting} dataflow-related
-    bugs in real-world multilingual programs?
-%that the state-of-the-art multilingual program analyzers detect?
+  \item \textbf{\req{2}: Usefulness.} \inblue{Does \ours correctly analyze inter-language
+    flows to detect bugs in real-world multilingual programs?}
 \end{itemize}
 
 \subsection{\req{1}: Feasibility}
@@ -21,8 +20,8 @@ two benchmark suites for each of Java-C and Python-C analyses.
 \inblue{For the Java-C analysis, we use NativeFlowBench~\cite{nativeflowbench, JN-SAF}
 and real-world JNI Android apps downloaded from F-Droid~\cite{fdroid} as the
 benchmark suites.
-For the Python-C analysis, we use ExtModuleFlowBench that we developed and
-real-world C-Python programs downloaded from Github.}
+For the Python-C analysis, we use ExtModuleFlowBench, which we developed, and
+real-world C-Python programs downloaded from GitHub.}
 
 \subsubsection{Feasibility: Java-C}
 The first benchmark suite for Java-C program analysis is NativeFlowBench~\cite{nativeflowbench, JN-SAF},
@@ -134,7 +133,7 @@ three million lines of code in about \inblue{12 minutes.
 
 In summary, the evaluation with the second benchmark suite shows that
 \ours can analyze real-world JNI applications more precisely than \lees.
-In addition, the scalability of \ours is comparable with \lees in that
+In addition, \ours is more scalable than \lees in that
 it can analyze larger apps much faster than \lees.}
 
 \subsubsection{Feasibility: Python-C}
@@ -170,9 +169,9 @@ just like it can analyze JNI programs using various JNI interoperations.}
 %\textbf{Github}
 %\textbf{Real-world Python-C Programs.}
 The second benchmark suite consists of \inblue{13} real-world Python-C programs
-collected from public GitHub repositories. \inblue{Six of them} are analysis
+collected from public GitHub repositories. \inblue{Six of them} are the analysis
 targets of Monat et al.~\cite{sas2021}'s work, and \inblue{seven of them are
-compilable subset of targets of Li et al.~\cite{polycruise}'s work}.
+a compilable subset of the targets of Li et al.~\cite{polycruise}'s work}.
 
 Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on \inblue{13}
 real-world Python-C programs. 
@@ -188,20 +187,13 @@ considered an API function call as resolved, when \ours finds its first argument
 correctly. 
 
 \inblue{
-Out of 13 programs, all programs but one were analyzed within time limit of ?? hours.
-The only exception was {\it NumPy}, the largest program in the benchmark suite.
-We inspected the evaluation log, and figured out that the reason for the slow analysis for this
-program was the inefficeint query optimization of the CodeQL's query system.
-}
-%{\it python-Levenshtein} contains both Python and C code, but the Python code
-%contains only a class that works as a wrapper for C code without any interoperations,
-%making no meaningful interaction between Python and C Code.
-%{\it distance} and {\it noise} contain too complicated Python code for CodeQL
-%to handle.
-%
-In the remaining three programs, \ours resolves \inblue{8,082 out of 11,725 (68.9\%)} total
+Out of 13 programs, all programs but one were analyzed within the time limit of} \inred{?? hours.}
+\inblue{The only exception was {\it NumPy}, the largest program in the benchmark suite.
+We inspected the evaluation log and found that the analysis for NumPy
+was particularly slow because of the inefficient query optimization of CodeQL’s query system.}
+In the remaining \inblue{twelve} programs, \ours resolves \inblue{8,082 out of 11,725 (68.9\%)} total
 API function calls. 
-\inblue{The main for failing to resolve rest of API function calls was the implicit method calls in Python.}
+\inblue{The main reason for failing to resolve the rest of the API function calls was the implicit method calls in Python.}
 Python code can call some methods implicitly, a class destructor for example, and C
 code can register C functions as such implicitly called methods.
 Because \ours does not handle C functions implicitly called in Python, it
@@ -214,18 +206,12 @@ It can precisely analyze the Python object values that C variables can have.}
 \input{tableRQ2}
 
 \subsection{RQ2: Usefulness}
-\inblue{We evaluate the usefulness of \ours for detecting interoperation bugs in
+\inblue{We evaluate the usefulness of \ours by dataflow analysis involving interoperation bugs in
 real-world Java-C programs and Python-C programs.
-For Java-C programs, we detect the actual interoperation bugs from the
-real-world JNI android applicatons.
-For python-C programs, we show that \ours can extract the dataflow information
-that can be utilized by other bug detectors.
 
 \subsubsection{Bugs in Java-C programs.}
-To show the usefulness of \ours in detecting bugs in Java-C programs,
-we search for interoperation bugs from the 42 real-world JNI android applications, downloaded from F-Droid.
-We chose to explore the same JNI interoperation bug as those
-reported in previous research~\cite{LeeASE20, ILEA}:}
+For Java-C programs, we show that \ours can detect JNI interoperation bugs in 42 real-world Android apps.
+We chose to explore the same JNI interoperation bugs in our analysis as those used in previous research~\cite{LeeASE20, ILEA}:}
 \begin{itemize}
   \item {\it NullDeref}: dereferencing the {\tt null} value of Java in C
   \item {\it MissingFun}: calling a missing Java method from C
@@ -243,11 +229,11 @@ column shows app names, the second and the third columns show the
 numbers of true and false positives for {\it NullDeref}, respectively, and
 the fourth to the sixth columns show the numbers of true positives for {\it
 MissingFun}, {\it TypeMismatch}, and {\it WrongSig}, respectively.
-\inblue{We omit the columns denoting false positivies for the three bugs in the table,
-because \ours does not report any false positivies for them.
-We confirmed the true and false positives by manual inspection of the source code.
-We color the each cell for the number of true positives with non-zero value,
-which indicates that the corresponding application had the corresponding kind of bug.}
+\inblue{We omit the columns denoting false positives for the three bugs in the table
+because \ours does not report any false positives for them.
+We confirmed the true and false positives by manually inspecting the source code.
+We color each cell with non-zero true positives,
+indicating that the corresponding application had the corresponding bug kind.}
 
 \ours reports 33 genuine bugs and 21 false positives in 19 apps.
 It reports five true and 21 false alarms of {\it NullDeref} in 11 apps,
@@ -342,7 +328,7 @@ mSendStr = (*env)->GetMethodID(env, jNativesCls,
 Figure~\ref{fig:bugs} demonstrates four kinds of JNI interoperation bugs \ours
 detects from real-world apps. 
 
-\inblue{Figure~\ref{fig:bug1} is an excerpt from the app, Graph 89, demonstrating {\it
+\inblue{Figure~\ref{fig:bug1} is an excerpt from the app, Graph 89, demonstrating the {\it
 NullDeref} bug.}
 The Java code may call a C function {\tt nativeInitGraph89} with {\tt
 null} as its last argument, because the variable {\tt tmp} has {\tt
@@ -403,7 +389,11 @@ thrown Java exception~\cite{jniexcept}.
 \inblue{The evaluation shows that \ours can detect various JNI interoperation bugs in
 real-world JNI apps better than \lees.}
 
-\subsubsection{Bugs in Python-C programs.}
+\inblue{
+\subsubsection{Bugs in Python-C programs.}}
+
+% For Python-C programs, we show that \ours can extract the dataflow information
+% that can be utilized by other bug detectors.
 
 \input{tableRQ2-2}
 
