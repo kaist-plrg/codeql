@@ -123,18 +123,17 @@ one million lines of code.
 Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
 The x-axis denotes the \inblue{indices} of apps and the y-axis denotes the analysis time
 in seconds. We omit eight apps \lees fails to analyze.
-\lees analyzes 12 apps faster than \ours, but the difference is less than two
-minutes. 
+\lees analyzes 12 apps faster than \ours, but the difference is less than two minutes. 
 On the other hand, \ours analyzes five apps faster than \lees, and \lees spends
 much time in summary generation for three apps among them. 
 In addition, while \lees fails to analyze all the large-scale apps that have
 more than about 400,000 lines of code in eight hours, \ours analyzes about
 three million lines of code in about \inblue{12 minutes.
+\lees shows scalability issues due to its complex semantic summary extraction from C functions.
 
 In summary, the evaluation with the second benchmark suite shows that
 \ours can analyze real-world JNI applications more precisely than \lees.
-In addition, \ours is more scalable than \lees in that
-it can analyze larger apps much faster than \lees.}
+In addition, \ours is more scalable than \lees in that it can analyze larger apps much faster than \lees.}
 
 \subsubsection{Feasibility: Python-C}
 \input{tableRQ1-3}
@@ -209,7 +208,7 @@ It can precisely analyze the Python object values that C variables can have.}
 \inblue{We evaluate the usefulness of \ours by dataflow analysis involving interoperation bugs in
 real-world Java-C programs and Python-C programs.
 
-\subsubsection{Bugs in Java-C programs.}
+\subsubsection{Bugs in Java-C Programs}
 For Java-C programs, we show that \ours can detect JNI interoperation bugs in 42 real-world Android apps.
 We chose to explore the same JNI interoperation bugs in our analysis as those used in previous research~\cite{LeeASE20, ILEA}:}
 \begin{itemize}
@@ -389,12 +388,9 @@ thrown Java exception~\cite{jniexcept}.
 \inblue{The evaluation shows that \ours can detect various JNI interoperation bugs in
 real-world JNI apps better than \lees.}
 
+
 \inblue{
-\subsubsection{Bugs in Python-C programs.}}
-
-% For Python-C programs, we show that \ours can extract the dataflow information
-% that can be utilized by other bug detectors.
-
+\subsubsection{Bugs in Python-C Programs}}
 \input{tableRQ2-2}
 
 \begin{figure}[ht!]
@@ -414,80 +410,67 @@ static PyObject* getfactor(PyObject *self, PyObject *args)
 }
   \end{lstlisting}
     \vspace*{-.5em}
-  \caption{An example of danger-use}
+  \caption{One danger-use that \ours could not detect}
   \label{fig:cvxopt}
 \end{figure}
 
 \inblue{
-To show the usefulness of \ours in detecting interoperation bugs in Python-C
-programs, we show that \ours can successfully extract a specfic dataflow
-information, which then can be utilized in detecting the actual bugs.  The bugs
-we targeted are those used in the work of Li et al.~\cite{polycruise}.  We
-observed that the bugs have certain patterns: the value orignated from Python
-code is passed to the C code, and then used as either (1) an argument to a
-\textit{dangerous} functions, including \ccode{strncpy}, \ccode{strncpm},
-\ccode{vsprintf} and \ccode{malloc}, or (2) an index to a array access.  We
-will denote these patterns as \textit{inter-uses}.  Note that, an inter-use
-itself is not necessarily a bug.  Among the inter-uses, only some of them will
-be capable of triggering bugs or security vulnerabilities.  We will denote such
-inter-uses as \textit{danger-uses}.  Based on this observation, we implemented
-a detector that finds all inter-use, on top of \ours.  Then, one can implement
-an actual bug detector by checkingg if a certain inter-use is a danger-use or
-not.  Implementing a precise danger-use detector is beyond scope of \ours, so
-we only present the result for detecting inter-uses, and check if every known
-danger-uses are included in the set of detected inter-uses.
+For Python-C programs, we show that \ours can analyze inter-language flows
+to detect interoperation bugs in 12 real-world Python-C programs.
+We chose to explore the same interoperation bugs in our analysis as those used in Li et al.~\cite{polycruise}.
+The bugs involve two kinds of inter-language flows: a Python value is passed to C code and used as either
+(1) an argument to a ``dangerous'' functions, such as \ccode{strncpy}, \ccode{strncmp},
+\ccode{vsprintf}, and \ccode{malloc}, or (2) an index to array access.
+We call such flows \textit{inter-uses}.
+Among inter-uses, some flows can trigger bugs or security vulnerabilities, which we call \textit{danger-uses}.
+Because precisely detecting danger-uses is beyond the scope of \ours,
+we implemented a detector to find inter-uses on top of \ours
+and evaluate whether \ours can detect all the known danger-uses.
 
-Table~\ref{table:RQ2-2} summarizes the pattern detection out of 12 Python-C
-programs that we could analyze.  The first column shows program names, the
-second column shows the total number of detected inter-uses, and the third /
-fourth columns show number of every detected / known danger-uses, if any. Among
-12 programs, total five programs are known to have the danger-uses.
+Table~\ref{table:RQ2-2} summarizes the inter-uses detection results of 12 Python-C programs.
+The first column shows program names, the
+second column shows the total number of detected inter-uses, and the third and
+fourth columns show the numbers of detected and known danger-uses, if any.
+Out of 12 programs, five have known danger-uses.
 
-The result shows that out of all nine knwon danger-uses, \ours can corretly
-detect eight of them.  Figure~\ref{fig:cvxopt} depicts one danger-use from the
-program {\it cvxopt} that \ours could not detect.  The call to the \ccode{strncmp} at
-line 8 should be an inter-use, since the first argument \ccode{descr} in
-intedned to be originated from the Python code. Also, this call is a
-danger-use, because the call to \ccode{strncmp} may incorrectly conclude that
-the strings \ccode{descr} and \ccode{"CHOLMOD FACTOR"} are equal, even if they
-are not. This is because string terminator (\textquotesingle \textbackslash
-0\textquotesingle) is not considered. The correct code should use 15
-(\ccode{strlen("CHOLMODE FACTOR")+1}) as the last argument.  \ours could not
-detect this inter-use, simply because the function \ccode{getfactor} was
-unreachable.  There wasn't any python test files that was calling this
-function, so the \ours could not find any python value that \ccode{descr} can
-point to. When we manually added a python test file that calls \ccode{getfactor},
-\ours correctly reported the call to \ccode{strncmp} in this function as an inter-use.
+The result shows that \ours can correctly detect eight of the nine known danger-uses.
+Figure~\ref{fig:cvxopt} shows one danger-use from the program {\it cvxopt} that \ours could not detect.
+The call to \ccode{strncmp} on line 8 is an inter-use since the first
+argument \ccode{descr} comes from Python code.
+Also, this call is a danger-use because it may incorrectly conclude that
+the strings \ccode{descr} and \ccode{"CHOLMOD FACTOR"} are equal, even if they are not,
+since string terminator (\textquotesingle \textbackslash 0\textquotesingle) is not considered.
+The correct code should use 15 (\ccode{strlen("CHOLMODE FACTOR")+1}) rather than 14 as the last argument.
+\ours could not detect this inter-use simply because the function \ccode{getfactor} was unreachable.
+Because no Python test files call this function, \ours could not find any Python value
+that \ccode{descr} can point to. We confirmed that when we manually add a Python test file
+that calls \ccode{getfactor}, \ours correctly detects the previously missed danger-use.
 
-From the result, we could conclude that \ours is helpful for detecting bugs in
-real-world Python-C programs as well, by extrcating the necessary information
-required by bug detectors.
+The evaluation shows that \ours can precisely detect danger-uses that
+may trigger bugs or security vulnerabilities in real-world Python-C programs.
 
-\subsubsection{Limitation}
-In this section, we summarize the limitation of \ours that we encountered during the evaluation.
+\subsubsection{Future Work}
+We discuss possible future research directions to enhance \ours.
 
-\textbf{Unsoundness} The dataflow steps that models the behavior of inter-language API functions
-are implemented by manually referring to the JNI specification and Python's extension module specification.
-We implemented a few selected API functions that were enough to practically analyze
-all of our benchmark suite, and did not fully covered all of the API functions.
-This indeed leads to the ineveitable unsoundness of the dataflow analysis.
-One breakthrough will be to use the mechanization specification approach, and
-automtically generate the modelling of such API functions automatically.
+\textbf{Soundness} We manually implemented the dataflow steps that model
+the behaviors of the inter-language API functions by referring to
+the JNI specification~\cite{jnispec} and Python's extension module specification~\cite{pythoncspec}.
+We implemented a few selected API functions that are enough to practically analyze
+all of our benchmark suites and did not fully cover all the API functions.
+This may lead to the unsoundness of \ours.
+One breakthrough may use the mechanized specification approach~\cite{jiset,jest,jstar,jsaver,justgen} and
+automatically generate the modeling of such API functions from mechanized specifications.
 
-\textbf{Support to explicit FFI only}
-The only way of interoperations between language such that \ours can detect, is via
-using explictly FFI calls. However, as Li et al.~\cite{vulnerable-multi} suggests,
-explicit FFI is not the only way of two languages can interact.
-Although the benchmarks we used only contains FFI as a method of the interoperation between languages,
-identifying other ways of interactions and handling those methods is required for \ours to support more general programs.
+Another source of unsoundness may come from dynamically generated Python code.
+Because \ours is a purely static analyzer, it cannot analyze statically invisible code.
+A possible direction may take a hybrid approach leveraging dynamic analysis~\cite{polycruise}.
 
-\textbf{Dependnecy to underlying declarative analyzer}
-Since \ours is implemented on top of CodeQL, the precision and scalibity of \ours heavily depend on the
-underlying analyzer, CodeQL. We've encountered some cases where intra-language dataflow analysis is
-not precise enough to get the desired result. For example, CodeQL does not support the
-analysis of dataflow via variable arguments, so we had to implement on our own.
-In addition, we observed that there was one C-Python program, {\it NumPy}, that was not finished
-due to the query optimization of CodeQL. 
-In order to imporve the performance of \ours, the performance improvement of the
-baseline CodeQL should be preceeded.
+\textbf{Various interoperation mechanisms} \ours can analyze
+interoperations between multiple languages via explicit Foreign Function Interfaces (FFIs).
+Therefore, as long as the analysis target languages use FFIs, our
+approach can analyze interactions between more than two programming languages.
+However, as Li et al.~\cite{vulnerable-multi} explain, various
+interoperation mechanisms beyond explicit FFIs exist in real-world multi-language software systems.
+Although all the benchmarks we analyzed use only explicit FFIs,
+supporting other kinds of interoperation would be a promising future direction.
 }
