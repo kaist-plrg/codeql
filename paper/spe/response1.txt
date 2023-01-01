@@ -1,0 +1,224 @@
+Dear Editor and Reviewers,
+
+Thank you very much for the thoughtful and constructive comments. We did our best to address them all, and the comments have helped us improve the paper. We appreciate all your comments.
+
+Overall, this revision includes the following changes:
+
+1. We applied all suggestions for improving the presentation of the paper.
+2. We split Section 5.2 into Section 5.2.1 "Bugs in Java-C Programs" and Section 5.2.2 "Bugs in Python-C Programs" to discuss analsysis of PyCBench in Section 5.2.2.
+3. We added Section 5.2.3 "Future Work" and discussed possible future research directions.
+
+=================================================================
+
+* Reviewer 1
+
+1-1) Title: I wonder whether "Multilingual static program analysis using CodeQL" might attract more people to read the paper. Or even "Multilingual static program analysis: Declarative CodeQL vs <whatever>"?
+==> We revised the title to "Declarative Static Analysis for Multilingual Programs using CodeQL" to emphasize the use of CodeQL.
+
+1-2) Abstract [and many other places].  I  was brought up with compilers which have a source language, a target language and an implementation language.  While I agree that this distinction is less clear for interpreters and static analysers (which do not have target languages) I would argue that all your uses of "target language" should be "source language" for consistency. (By all means argue, but if you wish to keep "target" then please add a sentence or two justifying this.).
+==> We removed all our uses of "target language" except for one use of "analysis target languages" on page 2.
+
+1-3) Abstract: perhaps mention Datalog-style as this is generally well known.
+==> Thank you for the suggestion. We defer the mention of Datalog to the Introduction section to make the Abstract concise.
+
+1-4) Intro: please could you re-write this.  The first paragraph assumes I am an expert (but I did not know that DOOP was a declarative program analyser, nor exactly how it compared with Soufflé nor with CodeQL, or even Datalog).  It will put off many readers who would benefit from the paper and enjoy its results.
+p2: "CodeQL was originally designed for Java program analysis".  That's not what a reader needs to know.  What they need is words like: See: https://codeql.github.com/docs/ql-language-reference/about-the-ql-language/#:~:text=The%20syntax%20of%20QL%20is,in%20QL%20are%20logical%20operations.
+p2: "rules derive new facts".  There are just too many assumptions on the reader here, especially in an introduction.
+Section 1 and 6.  There is always a challenge in explaining related work.  Mostly the fine details need to go in Section 6, see e.g. above above CodeQL and Java.  But Section 1 (and indeed 2 and 4) need to draw the big picture, explaining Declarative -> Datalog -> QL with CodeQL as a commercial implementation.  As an example where you lose the "big picture", search for "rules" in your paper.  It's fine if you already know about the QL (or datalog) but otherwise your readers are left guessing.
+==> Thank you for the great suggestion. We restructured the Introduction section according to your comments. We introduce declarative static analysis first, discuss its commercial implementations, and illustrate the effectiveness of the declarative static analysis.
+
+1-5) p2: you mention Glean twice, and this just distracts -- section 6 is fine for it.  [Unless you want to say in the intro "increasing commercial interest" instead of its current context words]
+==> Because the purpose of the second paragraph is the extension of analysis targets, we rewrote its topic sentence to make it clearer:
+
+    "Declarative static analyzers have broadened their analysis targets from a single programming language to diverse programming languages."
+
+1-6) p2 ""We show the practical usefulness of our analyzer in the sense that it detects dataflow-related bugs at language boundaries of real-world multilingual programs." A bit weak! How about  "Evaluation of our analyser, MultiQL, [perhaps: at  finding dataflow-related bugs in] on benchmark programs involving cross-language calls shows it to be faster and more accurate than the established tool <whatever>".
+==> We revised the sentence to emphasize the debuggability of our analyzer as follows:
+
+    "We show that MultiQL can successfully detect dataflow-related bugs at language boundaries of real-world multilingual programs, including new bugs that the state-of-the-art analyzers could not detect due to the lack of scalability."
+
+1-7) Figure 1.  This figure is fine, but I'm not sure I like the "Facts" box.  Perhaps the accompanying text needs to clarify that we populate a database with facts derived from a program syntax, and then use rules to transitively close these/take a fixed point?
+==> We added such clarification in the first paragraph of Section 2.
+
+1-8) I thought there was in general a problem with forming a full database of facts when queries might only refer to a small subset of these.  Hence "exhaustive" vs "demand-driven" techniques, e.g. * https://link.springer.com/chapter/10.1007/3-540-45937-5_5 but there is more recent work. Perhaps you should clarify whether CodeQL is an "exhaustive" analysis -- the Facts database is fully populated before any query is accepted? [As a side-question, I believe that points-to (or alias) analysis can result in huge databases when exhaustive analysis is used; it is the case that your analyses produce sensibly-sized databases so that exhaustive analysis isn't a problem?]
+==> The dataflow analysis of CodeQL is "demand-driven": it does not generate facts that do not contribute to the final result of a given query. Thus, CodeQL can produce sensibly-sized databases in a reasonable time for real-world programs, as we showed in the Evaluation Section. While the demand-driven analysis is CodeQL's implementation-specific detail, this section provides a general background about declarative static analysis.
+
+1-9) p3.  I found "ln1" confusing.  I hadn't realised it was a variable rather than a shorthand for "line 1".  perhaps "lnA" and lnB" might work better?  Or even "LnVar1"? Partly the reason is that the syntactic conventions of QL/Datalog have not been established.
+==> We changed variable names to be more specific such as "lineNumA," "lineNumB," "lineNumCall," and "lineNumFunc." No syntactic conventions are used.
+
+1-10) p3. You talk about IR here, but elsewhere talk about source.   I agree this is not important, but it's helpful not to confuse the reader -- a footnote could clarify that by "source language" you also include IRs, perhaps JVM, Dalvik and the like? Can CodeQL extract facts equally from Java source and JVM code?
+==> Thank you for pointing it out. Because this paragraph is confusing and irrelevant to the primary goal of this section, we removed the paragraph.
+
+1-11) p3. "We can define a syntactic fact of the form FunctionAt(ln, name)".  Yes, fine. But we don't define its *instances* one-by-one for the database; they are automatically added.  But how is this related to you defining a "syntactic fact" above? THis is really the difference between defining a scheme and defining an instance.
+p3. "Step 2: Defining rules. The next step is to define rules to generate new facts out of known facts."  This isn't quite right.  The rules are *defined*  in advance but in step 2 these definitions are *used* to generate new facts.
+==> Thank you for pointing them out. We revised the paragraphs to describe each step more precisely.
+
+1-12) p3. "The rules are usually evaluated in a bottom-up and modular manner".  I'm not sure I understand "modular" here, and "bottom-up" here really just means "a rule fires when all the facts on its RHS hold, and adds a new fact to the database", and "rules are never combined with other rules only with facts", right? [The latter could happen in richer inference systems than Datalog]
+==> The terms "modular" and "bottom-up" in the sentence refer to CodeQL-specific implementation details:
+
+    https://codeql.github.com/docs/ql-language-reference/evaluation-of-ql-programs/#:~:text=organized%20into%20a%20number%20of%20layers
+
+Because they are a bit confusing and irrelevant to the primary goal of the paragraph, we removed the sentence.
+
+1-13) p3. ". When accepting the query as an input, the query system finds all 48 values derivable from the current set of facts for the variable X." Please be more precise about "current set of facts". Emphasising "exhaustive program analysis" [in that the DB is fully populated before any query] would help.
+==> To be more precise, we changed the phrase to "set of known facts" throughout Section 2.
+
+1-14) In general, section 2 is a good explanation of what happens in Datalog-like languages (but of course your paper hasn't even said "Datalog" yet).
+==> We changed Section 1 to introduce "Datalog" and added the following sentence in the first paragraph of Section 2:
+
+    "The following paragraphs explain each step in detail, with examples written in the Datalog-like syntax."
+
+1-15) Figure 2: This because clearer to me now I've convinced myself that you are doing exhaustive analysis and that "Facts" is the transitive closure of syntactic facts and the additional facts resulting from the three rule-sets.
+==> We revised Section 2 to make it more clear.
+
+1-16) Fig 3: The "subfigure annotation [\textbf{a}] is ugly, and doesn't correspond to your texts which says "(a) Python".  This applies to other subfigures too.
+==> We changed the captions to correspond to their relevant texts, but the boldface font is the LaTex style.
+
+1-17) Fig 3: please change "pass" to "return None" as this is more generally readable (and equivalent here).
+==> We changed "pass" to "return None".
+
+1-18) sec 3.2.  If you're using x for a variable, then why not use k for a constant (rather than "elem").   It's odd to have "x | elem".
+==> We changed "elem" to "k".
+
+1-19) Also remind the reader about the overbar = sequence convention.
+==> We added an explanation of the notation.
+
+1-20) Sec 3.2: I didn't understand the RHS of the "RULE" syntax.  Where does the negation symbol come in, and the question mark?  It would perhaps be simpler to write this out r :- A1, ... An where each A is either an f or a negated f (\neg f). 
+==> Thank you for the suggestion. We revised the syntax as suggested.
+
+1-21) You need to say something about not using negation inside recursion, perhaps as a footnote as it's not something you revisit.
+==> We added a footnote to describe the restriction.
+
+1-22) Sec 3.2 [perhaps the same point] "The optional prefix negation ¬ denotes the negative hold condition of a fact: the negated fact ¬𝑓 holds if the fact 𝑓 does not hold" I don't know what a "hold condition" is.
+==> We revised the phrase to "do not belong to known facts."
+
+1-23) page 5: the query "?- callEdge(X,Y)" suddenly appears.  What are X and Y?  How do they get named?  Are they variables (seemingly not)?
+==> We revised the sentence as follows:
+
+    "For example, the following query finds all possible literals for the variables X and Y:
+        ?- CallEdge(X, Y).
+    Since only one CallEdge fact, CallEdge(6,2), belongs to known facts, the query system produces (X, Y) ∈ {(6, 2)} as a result of the query."
+
+1-24) p6: "Finally, when making the same query ?- CallEdge(X, Y), the query system now produces (X, Y)∈ {(6, 2), (3, 7), (8, 4)} as function call relation results" Perhaps the word "same" really means "running example query" or similar (and maybe even a backwards reference to it).  Plain "Same" is unclear here.
+==> Thank you for the suggestion. We revised it as follows:
+
+    "Finally, when making the query ?- CallEdge(X, Y) as the same for the monolingual programs in Section 3.3, the query system now produces (X, Y) ∈  {(6, 2), (3, 7), (8, 4)} as function call relation results"
+
+1-25) Fig 6.  What are predicates?  Is "Merged DB" what you previously called "Facts"?  How does this refine fig 2?
+==> Thank you for pointing them out. We renamed predicates as facts. "Merged DB" is the initial syntactic facts. Unlike in Figure 2, where "Rules" and "Query System" are separated, in Figure 6, "Evaluator" serves as both "Rules" and "Query System."
+
+1-26) Section 4.1.  I did wonder whether a short intro to CodeQL syntax might work as a subsection of section 2.  My problem here is that I don't know QL, but I do know Datalog, and your intro to QL is too terse for me.  E.g. "CodeQL is a declarative static analysis engine that transforms source code into a database of facts and performs analyses by evaluating queries written in the declarative and object-oriented language called QL (Query Language). Using QL, one can define rules by defining “predicates” and “classes.” This needs relating to Datalog, and perhaps the essential parts of QL explained as a "subset".  Your text here is weak.  It says you "[define] the predicate isOneOrTwo:" but in the next sentence you say "defines the class OneOrTwo".  Perhaps this is clever overloading, but it confuses me, one of your readers.
+It's OK to refer to "Avgustinov et al", but this should be "for more details" but not to excuse a weak explanation.
+==> We added explanations of the CodeQL syntax in Section 4.1.
+
+1-27) Sec 4.2 "trap files". This seems a strange name.  Often it's a good convention to use italic for the first use of a definition \emph{trap files} rather than quotes to clarify it is a technical word rather than a simile.
+==> We changed it to use italic.
+
+1-28) p6: ". Note that both trap files may have tables with the same name. " Does this matter if it's just a debugging format?  Or are trap files a form of database (a representation of facts)?  Then you say "For example, if both trap files have tables named @params, ***we*** rename the table 14 from C as @c_params, and the table from Java as @java_params. " I'm happy with this.  But who is the "we".  Do you program this somehow -- does the MultiQL implementation say "if two languages create fact schema T then rename T as @lang1_T and @lang2_T"?
+==> Because trap files are not only for debugging but the actual representation of facts, name collisions do matter. We agree that the use of "we" is confusing here. We replaced "we" with "MultiQL" in the relevant texts to clarify that MultiQL does the renaming automatically.
+
+1-29) * p6.  I didn't understand the language in section 4.4.  Is it CodeQL? Maybe you need to be clearer that Section 4 just explains enough CodeQL (and also relates it to Datalog in section 2) so that the reader can understand the code in section 5?
+==> We added more explanation of CodeQL in Section 4.1.
+
+1-30) p10: I think spell out "inter-/intra-flow analysis" as "inter-/intra-language flow analysis".
+==> We fixed them as suggested.
+
+1-31) * Sect 4.5 I don't think you've summarised enough CodeQL for me to understand this. As I say, perhaps factoring your explanation of core CodeQL into "fundamental stuff" in section 2.2, and language modelling here, may help.
+==> Because Section 2 provides a general background about declarative static analysis, we added explanations of the details of CodeQL in Section 4.1.
+
+1-32) Table 1. I think you should distinguish the X's into "false positive" and "false negative" columns
+==> We fixed them as suggested.
+
+1-33) section 5.1: I'm very impressed at the serious benchmarking you did. But please augment " We evaluate the feasibility of MultiQL by dataflow analysis on two benchmark suites for each of Java-C and Python-C analyses"
+with the names of the benchmark suites and say you'll explore them in 5.1.1 and 5.1.2.
+==> We fixed them as suggested.
+
+1-34) sec 5.1.1 "On the contrary" -> "By contrast" here -- and I think elsewhere (do check).
+==> We fixed them as suggested.
+
+1-35) sec 5.1.1. "In addition, the scalability of MultiQL is comparable with JN-Sum in that it can analyze larger apps much faster than JN-Sum." seems a curious self-referential sentence.
+==> We revised the sentence as follows:
+
+    "In addition, MultiQL is more scalable than JN-Sum in that it can analyze larger apps much faster than JN-Sum."
+
+1-36) BTW, I'm happy you calling Benchmark Suites "Analysis Targets", it's just "target language" which felt wrong to me.
+==> As we answered to 1-2), we removed all our uses of "target language" except for one use of "analysis target languages" on page 2.
+
+1-37) 5.2. "We choose our target JNI interoperation bugs as the same as the targets of the client analysis of previous research14,16: " Clumsy sentence.  "We chose [past tense] to explore the same JNI interoperation bugs in our analysis as those use in previous research[...]"
+==> We revised it as suggested.
+
+1-38) I'm still a little unclear exactly how many benchmark suites you used.  3?  or 4? List them?
+==> We clearly explained our benchmarks at the beginning of Section 5.1 as follows:
+
+    "We evaluate the feasibility of MultiQL by dataflow analysis on two benchmark suites for each of Java-C and Python-C analyses. For the Java-C analysis, we use NativeFlowBench and real-world JNI Android apps downloaded from F-Droid as the benchmark suites. For the Python-C analysis, we use ExtModuleFlowBench, which we developed, and real-world C-Python programs downloaded from GitHub."
+
+1-39) Table 5.  Does this benchmark suite have a name?  Perhaps give it one so you can reference it multiple times?
+==> The benchmark does not have a name because they are a set of JNI apps downloaded from F-Droid. Because we do not refer to the benchmark multiple times, we did not give it a name.
+
+1-40) Also, what does colour denote?  Green = good?  why does Graph89 have two greens?
+Perhaps review the table.
+==> Green cells denote non-zero true positives. Graph89 has two greens because it has two kinds of bugs: NullDeref and TypeMismatch. We added the following sentence to explain the colors:
+
+    "We color each cell with non-zero true positives, indicating that the corresponding application had the corresponding bug kind."
+
+1-41) p15: "Figure 7a shows a pattern in Graph 89 with the NullDeref bug. " Here and elsewhere you mean [concrete] "an extract from" rather than [abstract] "a pattern in".
+It would be more readable to say "extract from the \emph{Graph 89} benchmark with..."
+==> We revised them as suggested.
+
+1-42) p15: "Figure 7 demonstrates four kinds of JNI interoperation bugs MultiQL detects from real-world apps using simplified code." Perhaps "Figure 7 demonstrates four kinds of JNI interoperation bugs MultiQL detects. It examines NN simplified bodies of code, each extracted from real-world apps."?
+==> The analysis and bug detection were on the original rather than any simplified code. Figure 7 shows simplified code for presentation brevity. To avoid any confusion, we removed "using simplified code."
+
+1-43) p17: patterns -> extracts again multiple times)
+==> We revised them as suggested.
+
+1-44) Section 6.  This tells me various things I'd have loved to know earlier in the paper. Please move tutorial stuff earlier, but keep detailed comparison with your work here. One issue, you've not said "CodeQL or MultiQL" e.g. ". Avgustinov et al.10  proposed QL, a declarative and object-oriented query language that can be compiled into Datalog and runs on a relational database. Using QL, they developed a static analyzer [Add: CodeQL] that is scalable to large-size programs with millions of lines of code. Our approach [Add: MultiQL] inherits the benefits from declarative-style analysis and extends analysis targets from monolingual to multilingual programs." Note my suggested additions to the wording.  I think *you* know that your analyser is called MultiQL, but it's important to teach the reader that too.
+==> Thank you for the great suggestion. We restructured the Introduction section according to your comments. We introduce declarative static analysis first, discuss its commercial implementations, and illustrate the effectiveness of the declarative static analysis. We also introduced the name MultiQL in the Introduction section.
+
+1-45) p18: ". Using MultiQL, we found 33 true bugs and vulnerabilities from real-world JNI applications, 12 of which are from the applications that JN-Sum, the state-of-the-art Java-C program analyzer, failed to analyze." Failed to analyse?  Or Failed to detect [false negative?]
+==> JN-Sum failed to analyze some real-world JNI applications, where MultiQL detected 12 new bugs due to scalability issues. We revised the sentence as follows:
+
+    "Using MultiQL, we found 33 true bugs and vulnerabilities from real-world JNI applications, 12 of which are from the applications that JN-Sum, the state-of-the-art Java-C program analyzer, failed to analyze due to the lack of scalability."
+
+1-46) 
+References:
+[14] "c code" -> "C code"
+[31] give volume number.  LNCS?
+[37] "html"->"HTML".
+[38] "van" is not a name, His family name is "van Rossum" [which sorts as "R", not "v"] and his given name is "Guido". [People often get this wrong].  See bibtex for how to fix this.
+==> We fixed them as suggested.
+
+=================================================================
+
+* Reviewer 2
+
+2-1) First, the proposed methodology may suffer from practical soundness issues. Take the language combination of Python and C, which is one of the two combinations considered in this paper, for example, Python has rich dynamic constructs causing oftentimes statically invisible code [1]. As a static analysis, the absence of this kind of code at compile time clearly causes unsoundness of the analysis, which should have but have not been addressed in this paper. Not only would this lead some syntactic facts and further rule-induced facts to be missing in individual language (Python) units, missing language interactions would also cause some language interoperations to be missing. Please refer to [1] for some illustrations and discussion.
+[1] "{PolyCruise}: A {Cross-Language} Dynamic Information Flow Analysis." In 31st USENIX Security Symposium (USENIX Security 22), pp. 2513-2530. 2022.
+==> Thank you for pointing it out. Because our approach is purely static, dynamically generated code is beyond the scope of this paper. A possible research direction may take a hybrid approach leveraging dynamic analysis like [1]. We added Section 5.2.3 "Future Work" and discussed the soundness issue.
+
+2-2) Second, as recent prior study [2] clearly shows, the multi-language world is vastly diverse, including hundreds of different languages and even greater numbers of possible language combinations in constructing multi-language software. How would the proposed methodology generalize to other languages and language combinations.
+[2] "Understanding language selection in multi-language software projects on GitHub." In 2021 IEEE/ACM 43rd International Conference on Software Engineering: Companion Proceedings (ICSE-Companion), pp. 256-257. IEEE, 2021.
+==> Our approach is applicable to two or more programming languages. Because it takes advantage of Foreign Function Interfaces (FFIs), as long as the languages have FFIs, our approach can analyze interactions between more than two programming languages. We discussed this in Section 5.2.3.
+
+2-3) Accordingly, a variety of language interaction mechanisms are present in real-world multi-language software systems, far from being limited to explicit (native/foreign) function invocations. Please see [3] for a taxonomy of such mechanisms.
+[3] "On the Vulnerability Proneness of Multilingual Code." In ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE). 2022.
+A key question here is how the proposed approach handles the variety of language interaction mechanism beyond those in Java-C and Python-C programs (mostly via explicit function invocations)? And how the language-interoperation rules could be defined to handle the other kinds of language interfaces and interoperability? To help see such diversity of interfaces and the interfacing mechanisms to facilitate the definition of those results, authors may find it helpful to use the PolyFax tool [4] to extract the mechanisms.
+[4] "PolyFax: A Toolkit for Characterizing Multi-Language Software." In ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE). 2022.
+==> Because our approach leverages explicit FFIs, the other kinds of interoperation are beyond the scope of this paper. However, even though all the benchmarks we analyzed use only explicit FFIs, supporting other kinds of interoperation would be a promising future direction. We discussed this in Section 5.2.3.
+
+2-4) One merit of using an IR like that in this paper is that they extract information useful for further analysis while not immediately specific to particular languages’ syntax or semantics. This idea has been proposed in [1], although implemented for Python-C but easily extensible for other languages. Please discuss how the IR in this paper is different from the PolyCruise-IR [1], in order to better justify the novelty of the proposed work.
+==> We discussed PolyCruise [1] in Section 6.
+
+2-5) The current static analysis is only for call graph construction. First, if this is the case, why have such a broad title ‘static analysis’; I would be more specific by just saying ‘declarative call graph construction’ or at most ‘declarative control flow analysis’ in the title.
+==> Because CodeQL is a declarative semantic code analysis engine,  we revised the title to "Declarative Static Analysis for Multilingual Programs using CodeQL" to emphasize the use of CodeQL. 
+
+2-6) Second, what would need to be done if a user wants to use MultiQL to implement other kinds of static analysis of multilingual programs? This is important to answer since after all this paper is extending CodeQL which does support a wide range of static analysis.
+==> Section 4 describes how a user can use MultiQL to implement other kinds of static analysis of multilingual programs. After briefly introducing CodeQL in Section 4.1, Section 4.2 and Section 4.3 explain how to create databases from source programs and lift libraries for multilingual programs, respectively. Then, Section 4.4 and Section 4.5 explain how to merge libraries of two different languages using the examples of Java-C and Python-C, respectively. Because the approach described in Section 4 is language-agnostic, one can easily use MultiQL to implement other kinds of static analysis of multilingual programs.
+
+2-7) For evaluation, the authors created a microbench called ExtModuleFlowBench for Python-C programs. This is much smaller than PyCBench in [1], not only in terms of #benchmarks but also in terms of static analysis relevant features (e.g., object sensitivity, dynamic invocation). Also, since this is an existing, previously published benchmark, it would be less biased to use this external benchmark (just like the NativeFlowBench in [12]) instead of (or at least in addition to) the one created by the authors themselves. The PyCBench comes with ground truth, allowing for evaluation of precision and recall.
+Finally, this paper evaluates the usefulness of the proposed analysis through call graph based interoperation bug detection, but only for Java-C programs. Since the analysis for Python-C has been implemented, why only evaluating the application against Java-C programs? Why not including Python-C programs? After all, the contribution is pitched as a framework extending CodeQL, supporting the application for just one language combination seems to be too skimp relative to a ‘framework’. I don’t see why “Because no existing work reports interoperation bugs in Python-C programs” justifies the decision of dismissing the Python-C application study.
+==> Thank you for the great suggestion. We split Section 5.2 into Section 5.2.1 "Bugs in Java-C Programs" and Section 5.2.2 "Bugs in Python-C Programs." We used PyCBench in Section 5.2.2.
+
+2-8) Compared to the authors’ prior work JN-Sum [14], it seems that MultiQL’s main merits lie in scalability and efficiency? Please discuss why this is the case. What makes JN-Sum so much worse?
+==> We added the following sentence in Section 5.1.1:
+
+    "JN-Sum shows scalability issues due to its complex semantic summary extraction from C functions."
