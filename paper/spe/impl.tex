@@ -186,9 +186,9 @@ which predicates and queries are evaluated. }
 CodeQL provides various libraries for C and Java, including
 pre-defined predicates and classes for users to implement their own analyses.
 A dataflow analysis library is such a library, which supports both C and Java.
-\inblue{For example, Figure~\ref{fig:qll} (a) and (b) show sample QL libraries for C
-and Java, respectively, which use the same class name \ccode{Node} and the same
-predicate name \ccode{localFlowStep}.}
+For example, \inblue{Figure~\ref{fig:qll} (a) and (b)} show sample QL libraries for C
+and Java\inblue{, respectively,} which use the same class name \ccode{Node} and the same
+predicate name \ccode{localFlowStep}.
 However, even with the same name, the class \ccode{Node} in C and the
 class \javacode{Node} in Java are different classes, which are incompatible.
 The same applies to the predicate \ccode{localFlowStep}.
@@ -260,37 +260,37 @@ predicate localFlowStep(Node node1, Node node2) {
 \end{figure}
 
 To make classes and predicates in C and Java compatible,
-\inblue{\ours lifts each library to the common level.
-First, as on lines 1 and 2 of Figure~\ref{fig:qll3}, \ours encapsulates the
-original dataflow libraries for C and Java in separate modules named {\tt C}
+\inblue{\ours lifts} each library to the common level.
+First, as on lines 1 and 2 of Figure~\ref{fig:qll3}, \inblue{\ours encapsulates} the
+original dataflow libraries \inblue{for C and Java in separate modules named {\tt C}
 and {\tt Java},
 respectively\footnote{https://codeql.github.com/docs/ql-language-reference/modules/}.
 After the encapsulation, the original classes and predicates can be referenced
 via the module containing them. 
 For example, \codeql{Java::Node} refers to the original class \codeql{Node} in
-the module {\tt Java}.
+the module {\tt Java}.}
 Lines 4 to 11 of Figure~\ref{fig:qll3} demonstrate the lifted class of the
 original class {\tt Node}.
-\ours lifts a class by first defining a sum
+\inblue{\ours lifts} a class by first defining a sum
 type\footnote{https://codeql.github.com/docs/ql-language-reference/types/\#algebraic-datatypes},
 denoting that the lifted class comes either from C or Java, and then making the
 lifted class of that type.  
-The lifted class defines two member predicates, \codeql{asCNode} and
-\codeql{asJavaNode}, that downcast the elements of the lifted class into the elements
-of the original C or Java class.
+\inblue{The lifted class defines} two member predicates, \codeql{asCNode} and
+\codeql{asJavaNode}, that \inblue{downcast the elements of the lifted class into the elements
+of the original} C or Java class.
 Lines 13 to 17 of Figure~\ref{fig:qll3} demonstrate the lifted predicate
-of the original predicate {\tt localFlowStep}.
-Similarly, \ours lifts a predicate by combining two original predicates with
-the \codeql{or} connective. For each predicate, arguments and return values are
-downcasted to the elements of the class of their corresponding language.
+\inblue{of the original predicate {\tt localFlowStep}}.
+Similarly, \inblue{\ours lifts} a predicate by combining two original predicates with
+the \codeql{or} connective. For each predicate, arguments and return values \inblue{are
+downcasted to} the elements of the class of their corresponding language.
 After lifting, lifted predicates show the equivalent behaviors as the original
-ones if all the arguments are from the same language.}
+ones if all the arguments are from the same language.
 
-\ours can fully automate the lifting process using QL compiler error
+\inblue{\ours can} fully automate the lifting process using QL compiler error
 messages. When compiling a query without importing the library, the QL compiler
 reports error messages containing required classes and predicates, and
-signatures of the predicates. Using the information, \ours
-automatically synthesizes lifted classes and predicates.
+signatures of the predicates. Using the information, \inblue{\ours
+automatically synthesizes} lifted classes and predicates.
 
 %The process of lifting could be effectively automated with the aid of
 %QL's compile message. First, try to compile a query without actually
@@ -369,14 +369,14 @@ To correctly handle this method call, we should be able to answer these
 questions: ``When we call \ccode{GetMethodID},
 what are the string values of \ccode{name} and \ccode{sig}?'' and
 ``When we call \ccode{Call<type>Method}, what is the method ID value of \ccode{mid}?''
-\inblue{Soundly answering these questions requires inter-language dataflow analysis
+Soundly answering these questions requires inter-language dataflow analysis
 because the string or method ID values may be passed across language boundaries.
 However, we observed that such a pattern rarely happens in practice,
 and using only intra-language dataflow analysis within C code is enough for most cases.
 Therefore, we decided to sacrifice the precision
-by using intra-language analysis instead of inter-language analysis
+by using \inblue{intra-language} analysis instead of \inblue{inter-language} analysis
 as a trade-off for a more lightweight and simpler implementation.
-We implemented two \inblue{intra-language flow} analysis modules for C,}
+We implemented two \inblue{intra-language flow} analysis modules for C,
 which find 1) dataflows from string literals to the arguments of interface functions
 and 2) dataflows from interface function call results to the arguments of interface functions.
 Using these modules, we can implement the
@@ -443,7 +443,7 @@ struct PyMethodDef methods[] = {
 
 \noindent
 The member field \ccode{ml_name} has a visible name of a C function to Python,
-and the member field \ccode{ml_meth} has \inblue{the pointer to the actual C function.}
+and the member field \ccode{ml_meth} has the pointer to the actual C function.
 Thus, the function \ccode{cfunction_impl} defined in C code is invoked when
 importing and calling \ccode{cfunction} in Python code.
 To model the behavior, we define the CodeQL class \codeql{PyMethodDef}
@@ -451,7 +451,7 @@ and the predicate \codeql{viableCallableP2C}. The class \codeql{PyMethodDef}
 corresponds to the C structure \ccode{PyMethodDef}. It has
 two member predicates \codeql{getName()} and \codeql{getFunc()} whose results are
 the values of the fields \ccode{ml_name} and \ccode{ml_meth}, respectively.
-\inblue{Then, we make a rule for \codeql{viableCallableP2C} such that for some \codeql{def} of type \codeql{PyMethodDef},}
+Then, we make a rule for \codeql{viableCallableP2C} such that for some \codeql{def} of type \codeql{PyMethodDef},
 if \codeql{def.getName() } \codeql{= call.getTarget().toString()}
 for some \codeql{call}, then \codeql{def.getFunc() } \codeql{= viableCallableP2C(call)} holds.
 
@@ -468,8 +468,8 @@ positions does not work, and we need another way.
 We modelled this behavior by defining \codeql{VirtualArgNode}, a subclass of \codeql{Node},
 that corresponds to the Python tuple object. Then, we define some predicates
 for representing flows in and out of this node. First, we define a
-\inblue{step that represents the flow from values of the original argument nodes to virtual argument nodes. We then define
-a step that represents the flow from the values of virtual argument nodes to a single parameter node in a C function.}
+step that represents the flow from values of the original argument nodes to virtual argument nodes. We then define
+a step that represents the flow from the values of virtual argument nodes to a single parameter node in a C function.
 By doing so, the flows from original argument nodes to use sites will be
 found in three steps: 1) from an argument node to a virtual argument node,
 2) from the virtual argument node to the parameter node of a C function,

@@ -28,7 +28,7 @@ Section 1 and 6.  There is always a challenge in explaining related work.  Mostl
 ==> Thank you for the great suggestion. We restructured the Introduction section according to your comments. We introduce declarative static analysis first, discuss its commercial implementations, and illustrate the effectiveness of the declarative static analysis.
 
 1-5) p2: you mention Glean twice, and this just distracts -- section 6 is fine for it.  [Unless you want to say in the intro "increasing commercial interest" instead of its current context words]
-==> Because the purpose of the second paragraph is the extension of analysis targets, we rewrote its topic sentence to make it clearer:
+==> Because the purpose of the paragraph is the extension of analysis targets, we rewrote its topic sentence to make it clearer:
 
     "Declarative static analyzers have broadened their analysis targets from a single programming language to diverse programming languages."
 
@@ -72,7 +72,7 @@ Because they are a bit confusing and irrelevant to the primary goal of the parag
 ==> We revised Section 2 to make it more clear.
 
 1-16) Fig 3: The "subfigure annotation [\textbf{a}] is ugly, and doesn't correspond to your texts which says "(a) Python".  This applies to other subfigures too.
-==> We changed the captions to correspond to their relevant texts, but the boldface font is the LaTex style.
+==> We changed the captions to correspond to their relevant texts.
 
 1-17) Fig 3: please change "pass" to "return None" as this is more generally readable (and equivalent here).
 ==> We changed "pass" to "return None".
@@ -215,10 +215,12 @@ A key question here is how the proposed approach handles the variety of language
 ==> Section 4 describes how a user can use MultiQL to implement other kinds of static analysis of multilingual programs. After briefly introducing CodeQL in Section 4.1, Section 4.2 and Section 4.3 explain how to create databases from source programs and lift libraries for multilingual programs, respectively. Then, Section 4.4 and Section 4.5 explain how to merge libraries of two different languages using the examples of Java-C and Python-C, respectively. Because the approach described in Section 4 is language-agnostic, one can easily use MultiQL to implement other kinds of static analysis of multilingual programs.
 
 2-7) For evaluation, the authors created a microbench called ExtModuleFlowBench for Python-C programs. This is much smaller than PyCBench in [1], not only in terms of #benchmarks but also in terms of static analysis relevant features (e.g., object sensitivity, dynamic invocation). Also, since this is an existing, previously published benchmark, it would be less biased to use this external benchmark (just like the NativeFlowBench in [12]) instead of (or at least in addition to) the one created by the authors themselves. The PyCBench comes with ground truth, allowing for evaluation of precision and recall.
-Finally, this paper evaluates the usefulness of the proposed analysis through call graph based interoperation bug detection, but only for Java-C programs. Since the analysis for Python-C has been implemented, why only evaluating the application against Java-C programs? Why not including Python-C programs? After all, the contribution is pitched as a framework extending CodeQL, supporting the application for just one language combination seems to be too skimp relative to a ‘framework’. I don’t see why “Because no existing work reports interoperation bugs in Python-C programs” justifies the decision of dismissing the Python-C application study.
-==> Thank you for the great suggestion. We split Section 5.2 into Section 5.2.1 "Bugs in Java-C Programs" and Section 5.2.2 "Bugs in Python-C Programs." We used PyCBench in Section 5.2.2.
+==> Thanks for the kind suggestion. We inspected the suggested benchmark, and applied our analyzer to the benchmark. Unfortunately, the benchmarks were not applicable for our analyzer. Our analyzer is a simple dataflow analyzer that only detects source-sink relation, and the benchmarks require the analyzer to handle more complex steps, which is beyond scope of our analyzer.
 
-2-8) Compared to the authors’ prior work JN-Sum [14], it seems that MultiQL’s main merits lie in scalability and efficiency? Please discuss why this is the case. What makes JN-Sum so much worse?
+2-8) Finally, this paper evaluates the usefulness of the proposed analysis through call graph based interoperation bug detection, but only for Java-C programs. Since the analysis for Python-C has been implemented, why only evaluating the application against Java-C programs? Why not including Python-C programs? After all, the contribution is pitched as a framework extending CodeQL, supporting the application for just one language combination seems to be too skimp relative to a ‘framework’. I don’t see why “Because no existing work reports interoperation bugs in Python-C programs” justifies the decision of dismissing the Python-C application study.
+==> We splitted Section 5.2 into Section 5.2.1 "Bugs in Java-C Programs" and Section 5.2.2 "Bugs in Python-C Programs," and discussed Python-C programs in Section 5.2.2.
+
+2-9) Compared to the authors’ prior work JN-Sum [14], it seems that MultiQL’s main merits lie in scalability and efficiency? Please discuss why this is the case. What makes JN-Sum so much worse?
 ==> We added the following sentence in Section 5.1.1:
 
     "JN-Sum shows scalability issues due to its complex semantic summary extraction from C functions."

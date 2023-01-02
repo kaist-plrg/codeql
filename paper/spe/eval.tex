@@ -29,8 +29,8 @@ consisting of 23 JNI Android applications (apps) that use various JNI interopera
 They contain sensitive data leakage from {\it sources} to {\it sinks}
 across language boundaries via JNI interoperations.
 We compare the analysis results of \ours to those of the state-of-the-art Java-C program
-\inblue{dataflow analyzer, \jnsaf~\cite{JN-SAF}. We use
-compiled versions for \jnsaf because it targets compiled JNI programs.}
+dataflow analyzer, \jnsaf~\cite{JN-SAF}. We use
+compiled versions for \jnsaf because it targets compiled JNI programs.
 
 Table~\ref{table:RQ1-1} summarizes the analysis
 results of \jnsaf and \ours on NativeFlowBench.
@@ -66,11 +66,11 @@ The second benchmark suite consists of real-world Java-C Android apps downloaded
 F-Droid, a repository of open-source Android apps~\cite{fdroid}.  We first
 downloaded all available apps from F-Droid, and classified downloaded apps into JNI and non-JNI apps.
 Then, we selected all 42 apps that can be compiled without any errors as our analysis targets.
-\inblue{For this real-world benchmark, we compare the analysis results of
+For this real-world benchmark, we compare the analysis results of
 \ours to those of \lees~\cite{LeeASE20},
 the state-of-the-art general-purpose Java-C program analyzer.
 We use \lees as a comparison target instead of \jnsaf,
-since \jnsaf is not scalable enough to analyze the real-world benchmark.}
+since \jnsaf is not scalable enough to analyze the real-world benchmark.
 
 \input{tableRQ1-2}
 
@@ -86,9 +86,9 @@ since \jnsaf is not scalable enough to analyze the real-world benchmark.}
 
 Table~\ref{table:RQ1-2} shows the analysis results of \ours on 25 apps that have
 interoperations from C to Java.
-\inblue{The first column shows app names with their indices, the second shows the lines of code,
+The first column shows app names with their indices, the second shows the lines of code,
 the third shows database creation time, the
-fourth shows query processing time, and the fifth shows the total analysis time.}
+fourth shows query processing time, and the fifth shows the total analysis time.
 {\bf C->Java Function Call} and {\bf C->Java Field Access} show the numbers of
 C-to-Java function calls and C-to-Java field accesses, respectively. We
 collectively call them \emph{JNI uses}.
@@ -121,19 +121,19 @@ the DB creation time was almost linear to the code size.
 one million lines of code.
 
 Figure~\ref{fig:graph} shows the analysis time of \ours compared to \lees.
-The x-axis denotes the \inblue{indices} of apps and the y-axis denotes the analysis time
+The x-axis denotes the indices of apps and the y-axis denotes the analysis time
 in seconds. We omit eight apps \lees fails to analyze.
 \lees analyzes 12 apps faster than \ours, but the difference is less than two minutes. 
 On the other hand, \ours analyzes five apps faster than \lees, and \lees spends
 much time in summary generation for three apps among them. 
 In addition, while \lees fails to analyze all the large-scale apps that have
 more than about 400,000 lines of code in eight hours, \ours analyzes about
-three million lines of code in about \inblue{12 minutes.
-\lees shows scalability issues due to its complex semantic summary extraction from C functions.
+three million lines of code in about 12 minutes.
+\inblue{\lees shows scalability issues due to its complex semantic summary extraction from C functions.}
 
 In summary, the evaluation with the second benchmark suite shows that
 \ours can analyze real-world JNI applications more precisely than \lees.
-In addition, \ours is more scalable than \lees in that it can analyze larger apps much faster than \lees.}
+\inblue{In addition, \ours is more scalable than \lees in that it can analyze larger apps much faster than \lees.}
 
 \subsubsection{Feasibility: Python-C}
 \input{tableRQ1-3}
@@ -154,12 +154,13 @@ negatives for six benchmarks.
 \ours fails in {\it complexdata\_stringop} and {\it leak\_array} due to the
 same reason for NativeFlowBench.
 For the other four benchmarks, \ours fails to track dataflows for the fields of Python objects. 
-\inblue{In the failed benchmarks, the C code changes the values of the fields in Python objects that are passed
+In the failed benchmarks, the C code changes the values of the fields in Python objects that are passed
 to the parameters of C functions.
 \ours does not handle such cases because
 the use of a virtual argument node prevents the propagation of changed values
-back to the field of the original Python object,} and it
+back to the field of the original Python object, and it
 reports false negatives for them.
+
 \inblue{The results show that our approach can analyze Python-C programs using various interoperations,
 just like it can analyze JNI programs using various JNI interoperations.}
 
@@ -174,9 +175,9 @@ a compilable subset of the targets of Li et al.~\cite{polycruise}'s work}.
 
 Table~\ref{table:RQ1-4} summarizes the dataflow analysis results on \inblue{13}
 real-world Python-C programs. 
-\inblue{The first column shows repository names, the second shows the lines of code,
+The first column shows repository names, the second shows the lines of code,
 the third shows database creation time,
-the fourth shows query processing time, the fifth shows the total analysis time,}
+the fourth shows query processing time, the fifth shows the total analysis time,
 and the last two columns denote analysis results.
 {\bf \#~Resolved} column denotes the number of resolved API function calls in C code and
 {\bf Total} column denotes the total number of Python Extension Module API function
@@ -186,8 +187,8 @@ considered an API function call as resolved, when \ours finds its first argument
 correctly. 
 
 \inblue{
-Out of 13 programs, all programs but one were analyzed within the time limit of} \inred{?? hours.}
-\inblue{The only exception was {\it NumPy}, the largest program in the benchmark suite.
+Out of 13 programs, all programs but one were analyzed within the time limit of 300 hours.
+The only exception was {\it NumPy}, the largest program in the benchmark suite.
 We inspected the evaluation log and found that the analysis for NumPy
 was particularly slow because of the inefficient query optimization of CodeQL’s query system.}
 In the remaining \inblue{twelve} programs, \ours resolves \inblue{8,082 out of 11,725 (68.9\%)} total
@@ -198,9 +199,9 @@ code can register C functions as such implicitly called methods.
 Because \ours does not handle C functions implicitly called in Python, it
 fails to resolve API function calls in them.
 
-\inblue{In summary, the evaluation with the second benchmark suite shows that
+In summary, the evaluation with the second benchmark suite shows that
 \ours can analyze real-world Python-C programs with high precision.
-It can precisely analyze the Python object values that C variables can have.}
+It can precisely analyze the Python object values that C variables can have.
 
 \input{tableRQ2}
 
@@ -385,9 +386,8 @@ addition, it may introduce errors in subsequent instructions when using the
 return value without null checking or calling JNI functions without handling the
 thrown Java exception~\cite{jniexcept}.
 
-\inblue{The evaluation shows that \ours can detect various JNI interoperation bugs in
-real-world JNI apps better than \lees.}
-
+The evaluation shows that \ours can detect various JNI interoperation bugs in
+real-world JNI apps better than \lees.
 
 \inblue{
 \subsubsection{Bugs in Python-C Programs}}
@@ -417,7 +417,7 @@ static PyObject* getfactor(PyObject *self, PyObject *args)
 \inblue{
 For Python-C programs, we show that \ours can analyze inter-language flows
 to detect interoperation bugs in 12 real-world Python-C programs.
-We chose to explore the same interoperation bugs in our analysis as those used in Li et al.~\cite{polycruise}.
+We chose to explore the same interoperation bugs in our analysis as those used in Li et al.~\cite{polycruise}'s work.
 The bugs involve two kinds of inter-language flows: a Python value is passed to C code and used as either
 (1) an argument to a ``dangerous'' functions, such as \ccode{strncpy}, \ccode{strncmp},
 \ccode{vsprintf}, and \ccode{malloc}, or (2) an index to array access.
