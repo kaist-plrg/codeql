@@ -5,7 +5,7 @@ Thank you very much for the thoughtful and constructive comments. We did our bes
 Overall, this revision includes the following changes:
 
 1. We applied all suggestions for improving the presentation of the paper.
-2. We split Section 5.2 into Section 5.2.1 "Bugs in Java-C Programs" and Section 5.2.2 "Bugs in Python-C Programs" to discuss analsysis of PyCBench in Section 5.2.2.
+2. We split Section 5.2 into Section 5.2.1 "Bugs in Java-C Programs" and Section 5.2.2 "Bugs in Python-C Programs" to discuss analsysis of real-world Python-C programs in Section 5.2.2.
 3. We added Section 5.2.3 "Future Work" and discussed possible future research directions.
 
 =================================================================
@@ -19,7 +19,7 @@ Overall, this revision includes the following changes:
 ==> We removed all our uses of "target language" except for one use of "analysis target languages" on page 2.
 
 1-3) Abstract: perhaps mention Datalog-style as this is generally well known.
-==> Thank you for the suggestion. We defer the mention of Datalog to the Introduction section to make the Abstract concise.
+==> Thank you for the suggestion. Because of the word limit of the Abstract, we defer the mention of Datalog to the Introduction section.
 
 1-4) Intro: please could you re-write this.  The first paragraph assumes I am an expert (but I did not know that DOOP was a declarative program analyser, nor exactly how it compared with Soufflé nor with CodeQL, or even Datalog).  It will put off many readers who would benefit from the paper and enjoy its results.
 p2: "CodeQL was originally designed for Java program analysis".  That's not what a reader needs to know.  What they need is words like: See: https://codeql.github.com/docs/ql-language-reference/about-the-ql-language/#:~:text=The%20syntax%20of%20QL%20is,in%20QL%20are%20logical%20operations.
@@ -41,10 +41,10 @@ Section 1 and 6.  There is always a challenge in explaining related work.  Mostl
 ==> We added such clarification in the first paragraph of Section 2.
 
 1-8) I thought there was in general a problem with forming a full database of facts when queries might only refer to a small subset of these.  Hence "exhaustive" vs "demand-driven" techniques, e.g. * https://link.springer.com/chapter/10.1007/3-540-45937-5_5 but there is more recent work. Perhaps you should clarify whether CodeQL is an "exhaustive" analysis -- the Facts database is fully populated before any query is accepted? [As a side-question, I believe that points-to (or alias) analysis can result in huge databases when exhaustive analysis is used; it is the case that your analyses produce sensibly-sized databases so that exhaustive analysis isn't a problem?]
-==> The dataflow analysis of CodeQL is "demand-driven": it does not generate facts that do not contribute to the final result of a given query. Thus, CodeQL can produce sensibly-sized databases in a reasonable time for real-world programs, as we showed in the Evaluation Section. While the demand-driven analysis is CodeQL's implementation-specific detail, this section provides a general background about declarative static analysis.
+==> The dataflow analysis of CodeQL is "demand-driven": it does not generate facts that do not contribute to the final result of a given query. Thus, CodeQL can produce sensibly-sized databases in a reasonable time for real-world programs, as we showed in the Evaluation section. While the demand-driven analysis is CodeQL's implementation-specific detail, this section provides a general background about declarative static analysis.
 
 1-9) p3.  I found "ln1" confusing.  I hadn't realised it was a variable rather than a shorthand for "line 1".  perhaps "lnA" and lnB" might work better?  Or even "LnVar1"? Partly the reason is that the syntactic conventions of QL/Datalog have not been established.
-==> We changed variable names to be more specific such as "lineNumA," "lineNumB," "lineNumCall," and "lineNumFunc." No syntactic conventions are used.
+==> We changed variable names to be more specific such as "lineNumA," "lineNumB," "lineNumCall," and "lineNumFunc." QL/Dataglog doesn't have any syntactic conventions.
 
 1-10) p3. You talk about IR here, but elsewhere talk about source.   I agree this is not important, but it's helpful not to confuse the reader -- a footnote could clarify that by "source language" you also include IRs, perhaps JVM, Dalvik and the like? Can CodeQL extract facts equally from Java source and JVM code?
 ==> Thank you for pointing it out. Because this paragraph is confusing and irrelevant to the primary goal of this section, we removed the paragraph.
@@ -129,8 +129,7 @@ It's OK to refer to "Avgustinov et al", but this should be "for more details" bu
 1-32) Table 1. I think you should distinguish the X's into "false positive" and "false negative" columns
 ==> We fixed them as suggested.
 
-1-33) section 5.1: I'm very impressed at the serious benchmarking you did. But please augment " We evaluate the feasibility of MultiQL by dataflow analysis on two benchmark suites for each of Java-C and Python-C analyses"
-with the names of the benchmark suites and say you'll explore them in 5.1.1 and 5.1.2.
+1-33) section 5.1: I'm very impressed at the serious benchmarking you did. But please augment " We evaluate the feasibility of MultiQL by dataflow analysis on two benchmark suites for each of Java-C and Python-C analyses" with the names of the benchmark suites and say you'll explore them in 5.1.1 and 5.1.2.
 ==> We fixed them as suggested.
 
 1-34) sec 5.1.1 "On the contrary" -> "By contrast" here -- and I think elsewhere (do check).
@@ -157,7 +156,7 @@ with the names of the benchmark suites and say you'll explore them in 5.1.1 and 
 
 1-40) Also, what does colour denote?  Green = good?  why does Graph89 have two greens?
 Perhaps review the table.
-==> Green cells denote non-zero true positives. Graph89 has two greens because it has two kinds of bugs: NullDeref and TypeMismatch. We added the following sentence to explain the colors:
+==> Green cells denote non-zero true positives. Graph89 has two greens because it has two kinds of bugs: NullDeref and TypeMismatch. We added the following sentence to explain the color:
 
     "We color each cell with non-zero true positives, indicating that the corresponding application had the corresponding bug kind."
 
@@ -175,7 +174,7 @@ It would be more readable to say "extract from the \emph{Graph 89} benchmark wit
 ==> Thank you for the great suggestion. We restructured the Introduction section according to your comments. We introduce declarative static analysis first, discuss its commercial implementations, and illustrate the effectiveness of the declarative static analysis. We also introduced the name MultiQL in the Introduction section.
 
 1-45) p18: ". Using MultiQL, we found 33 true bugs and vulnerabilities from real-world JNI applications, 12 of which are from the applications that JN-Sum, the state-of-the-art Java-C program analyzer, failed to analyze." Failed to analyse?  Or Failed to detect [false negative?]
-==> JN-Sum failed to analyze some real-world JNI applications, where MultiQL detected 12 new bugs due to scalability issues. We revised the sentence as follows:
+==> JN-Sum failed to analyze some real-world JNI applications, where MultiQL detected 12 new bugs, due to scalability issues. We revised the sentence as follows:
 
     "Using MultiQL, we found 33 true bugs and vulnerabilities from real-world JNI applications, 12 of which are from the applications that JN-Sum, the state-of-the-art Java-C program analyzer, failed to analyze due to the lack of scalability."
 
@@ -203,7 +202,7 @@ References:
 [3] "On the Vulnerability Proneness of Multilingual Code." In ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE). 2022.
 A key question here is how the proposed approach handles the variety of language interaction mechanism beyond those in Java-C and Python-C programs (mostly via explicit function invocations)? And how the language-interoperation rules could be defined to handle the other kinds of language interfaces and interoperability? To help see such diversity of interfaces and the interfacing mechanisms to facilitate the definition of those results, authors may find it helpful to use the PolyFax tool [4] to extract the mechanisms.
 [4] "PolyFax: A Toolkit for Characterizing Multi-Language Software." In ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE). 2022.
-==> Because our approach leverages explicit FFIs, the other kinds of interoperation are beyond the scope of this paper. However, even though all the benchmarks we analyzed use only explicit FFIs, supporting other kinds of interoperation would be a promising future direction. We discussed this in Section 5.2.3.
+==> Because our approach leverages explicit FFIs, the other kinds of interoperation are beyond the scope of this paper. Even though all the benchmarks we analyzed use only explicit FFIs, supporting other kinds of interoperation would be a promising future direction. We discussed this in Section 5.2.3.
 
 2-4) One merit of using an IR like that in this paper is that they extract information useful for further analysis while not immediately specific to particular languages’ syntax or semantics. This idea has been proposed in [1], although implemented for Python-C but easily extensible for other languages. Please discuss how the IR in this paper is different from the PolyCruise-IR [1], in order to better justify the novelty of the proposed work.
 ==> We discussed PolyCruise [1] in Section 6.
@@ -218,7 +217,7 @@ A key question here is how the proposed approach handles the variety of language
 ==>  Thank you for the suggestion. Because MultiQL's primary purpose is to track dataflows across language boundaries, its intra-language dataflow analysis purely relies on the underlying static analyzer, CodeQL. Since CodeQL does not support analysis of features like object sensitivity and dynamic invocation, PyCBench is not applicable to MultiQL.
 
 2-8) Finally, this paper evaluates the usefulness of the proposed analysis through call graph based interoperation bug detection, but only for Java-C programs. Since the analysis for Python-C has been implemented, why only evaluating the application against Java-C programs? Why not including Python-C programs? After all, the contribution is pitched as a framework extending CodeQL, supporting the application for just one language combination seems to be too skimp relative to a ‘framework’. I don’t see why “Because no existing work reports interoperation bugs in Python-C programs” justifies the decision of dismissing the Python-C application study.
-==> Thank you for the great suggestion. We split Section 5.2 into Section 5.2.1 "Bugs in Java-C Programs" and Section 5.2.2 "Bugs in Python-C Programs," and discussed Python-C programs in Section 5.2.2.
+==> Thank you for the great suggestion. We split Section 5.2 into Section 5.2.1 "Bugs in Java-C Programs" and Section 5.2.2 "Bugs in Python-C Programs," and discussed the analysis of Python-C programs in Section 5.2.2.
 
 2-9) Compared to the authors’ prior work JN-Sum [14], it seems that MultiQL’s main merits lie in scalability and efficiency? Please discuss why this is the case. What makes JN-Sum so much worse?
 ==> We added the following sentence in Section 5.1.1:
