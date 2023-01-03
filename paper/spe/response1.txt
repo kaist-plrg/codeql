@@ -19,7 +19,7 @@ Overall, this revision includes the following changes:
 ==> We removed all our uses of "target language" except for one use of "analysis target languages" on page 2.
 
 1-3) Abstract: perhaps mention Datalog-style as this is generally well known.
-==> Thank you for the suggestion. Because of the word limit of the Abstract, we defer the mention of Datalog to the Introduction section.
+==> Thank you for the suggestion. Because of the word limit of the Abstract section, we defer the mention of Datalog to the Introduction section.
 
 1-4) Intro: please could you re-write this.  The first paragraph assumes I am an expert (but I did not know that DOOP was a declarative program analyser, nor exactly how it compared with Soufflé nor with CodeQL, or even Datalog).  It will put off many readers who would benefit from the paper and enjoy its results.
 p2: "CodeQL was originally designed for Java program analysis".  That's not what a reader needs to know.  What they need is words like: See: https://codeql.github.com/docs/ql-language-reference/about-the-ql-language/#:~:text=The%20syntax%20of%20QL%20is,in%20QL%20are%20logical%20operations.
@@ -44,7 +44,7 @@ Section 1 and 6.  There is always a challenge in explaining related work.  Mostl
 ==> The dataflow analysis of CodeQL is "demand-driven": it does not generate facts that do not contribute to the final result of a given query. Thus, CodeQL can produce sensibly-sized databases in a reasonable time for real-world programs, as we showed in the Evaluation section. While the demand-driven analysis is CodeQL's implementation-specific detail, this section provides a general background about declarative static analysis.
 
 1-9) p3.  I found "ln1" confusing.  I hadn't realised it was a variable rather than a shorthand for "line 1".  perhaps "lnA" and lnB" might work better?  Or even "LnVar1"? Partly the reason is that the syntactic conventions of QL/Datalog have not been established.
-==> We changed variable names to be more specific such as "lineNumA," "lineNumB," "lineNumCall," and "lineNumFunc." QL/Dataglog doesn't have any syntactic conventions.
+==> We changed variable names to be more specific such as "lineNumA," "lineNumB," "lineNumCall," and "lineNumFunc." QL/Datalog doesn't have any syntactic conventions.
 
 1-10) p3. You talk about IR here, but elsewhere talk about source.   I agree this is not important, but it's helpful not to confuse the reader -- a footnote could clarify that by "source language" you also include IRs, perhaps JVM, Dalvik and the like? Can CodeQL extract facts equally from Java source and JVM code?
 ==> Thank you for pointing it out. Because this paragraph is confusing and irrelevant to the primary goal of this section, we removed the paragraph.
