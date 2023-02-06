@@ -1,61 +1,50 @@
 \section{Related Work}\label{sec:related}
-For Java-C program analysis, ILEA~\cite{ILEA} extends
-the Java Virtual Machine Language (JVML) and Jlint, a dataflow analyzer for
-Java bytecode, to compile both Java and C code to the extended JVML and analyze
-the integrated programs.  Since the modest extension of JVML cannot
-support the full C semantics like the C memory model, it extremely over-approximates C
-operations such as reads and writes through pointers.  Lee et al.~\cite{LeeASE20}
-proposed a general approach to analyzing multilingual programs written in both
-{\it host} and {\it guest} languages.  Their approach first uses a guest
-language analyzer to extract semantics summaries from the parts written in the
-guest language, C in their implementation, translates and integrates the
-summaries into a host language, Java, and then performs the whole-program
-analysis using a host language analyzer. 
-%While their approach leverages the
-%full features of existing static analyzers, \ours inherits the query-based
-%analysis and can compute target properties effectively without expensive and
-%redundant computation.
+For Java-C program analysis, ILEA~\cite{ILEA} extends the Java Virtual Machine
+Language (JVML) and Jlint, a dataflow analyzer for Java bytecode, to compile
+both Java and C code to the extended JVML and analyze the integrated programs.
+Since the modest extension of JVML cannot support the full C semantics like the
+C memory model, it extremely over-approximates C operations such as reads and
+writes through pointers.  Lee et al.~\cite{LeeASE20} proposed a general
+approach to analyzing multilingual programs written in both {\it host} and {\it
+guest} languages.  Their approach first uses a guest language analyzer to
+extract semantics summaries from the parts written in the guest language, C in
+their implementation, translates and integrates the summaries into a host
+language, Java, and then performs the whole-program analysis using a host
+language analyzer.
 
-Researchers also studied binaries rather than C/C++ source code
-for Java-C program analysis. Fourtounis et al.~\cite{scanning} proposed a lightweight reverse engineering technique to
-recover Java method calls from binaries instead of performing heavy analyses on
-binary code.  Their reverse engineering generates datafacts of Java method
-calls from binaries, which can be used in further declarative-style Java
-analyses. While the approach is lightweight but targets only Java method call
-identification in binaries, our approach seamlessly analyzes dataflows across language
-boundaries between Java and C.  JN-SAF~\cite{JN-SAF} defines a
-unified dataflow summary to represent dataflows in both Java bytecode and
-binary.  It extracts summaries from each Java method with a Java static
-analyzer and from each native function with a binary symbolic execution, and
-composes the summaries in a bottom-up manner to find data leakages over
-language boundaries.
-%It sacrifices the performance to analyze every possible
-%dataflow from binaries using the expensive symbolic execution. On the contrary, our
-%approach is scalable in that the query-based approach analyzes only necessary
-%dataflows when C source code is available.
+Researchers also studied binaries rather than C/C++ source code for Java-C
+program analysis. Fourtounis et al.~\cite{scanning} proposed a lightweight
+reverse engineering technique to recover Java method calls from binaries
+instead of performing heavy analyses on binary code.  Their reverse engineering
+generates datafacts of Java method calls from binaries, which can be used in
+further declarative-style Java analyses. While the approach is lightweight but
+targets only Java method call identification in binaries, our approach
+seamlessly analyzes dataflows across language boundaries between Java and C.
+JN-SAF~\cite{JN-SAF} defines a unified dataflow summary to represent dataflows
+in both Java bytecode and binary.  It extracts summaries from each Java method
+with a Java static analyzer and from each native function with a binary
+symbolic execution, and composes the summaries in a bottom-up manner to find
+data leakages over language boundaries.
 
-Android hybrid apps are
-written in both Java and JavaScript, taking advantage of the portability from
-JavaScript and device resource accessibility from Java.
+Android hybrid apps are written in both Java and JavaScript, taking advantage
+of the portability from JavaScript and device resource accessibility from Java.
 HybriDroid~\cite{hybridroid}, implemented on top of WALA~\cite{WALA}, analyzes
 Java and JavaScript code seamlessly to detect programmer errors on
-interoperations and track data leakages across language boundaries.
-Bae et al.~\cite{BaeICSE19} tackled the expensive analysis of HybriDroid and proposed
+interoperations and track data leakages across language boundaries.  Bae et
+al.~\cite{BaeICSE19} tackled the expensive analysis of HybriDroid and proposed
 a lightweight type system detecting the same kinds of programmer errors in
-Android hybrid apps. Jin et al.~\cite{jin2014code} proposed static detection
-of code injection attacks from JavaScript to Java.  They manually
-modeled Java frameworks and performed a taint analysis for JavaScript with the models.
-
+Android hybrid apps. Jin et al.~\cite{jin2014code} proposed static detection of
+code injection attacks from JavaScript to Java.  They manually modeled Java
+frameworks and performed a taint analysis for JavaScript with the models.
 
 Python supports an interoperability mechanism with C~\cite{PythonC}.
 Developers often import performance-critical C code to high-level Python code.
 Recent work~\cite{sas2021} proposed a Python-C analyzer by reusing existing
 Python and C analyzers built on top of the same framework, MOPSA~\cite{Mopsa}.
 They leverage the full features of the analyzers within the same framework to
-perform precise context-sensitive value analyses. 
-\inblue{Polycruise~\cite{polycruise} is a Python-C analyzer that enables an efficient
-dynamic information flow analysis (DIFA).
-The analysis performs two phases: it first computes symbolic dependencies between
-sources and sinks, then uses that information to make efficient
-instrumentations for online dynamic analysis.
-In contrast to these works}, our work focuses on declarative style dataflow analysis. 
+perform precise context-sensitive value analyses.  Polycruise~\cite{polycruise}
+is a Python-C analyzer that enables an efficient dynamic information flow
+analysis (DIFA).  The analysis performs two phases: it first computes symbolic
+dependencies between sources and sinks, then uses that information to make
+efficient instrumentations for online dynamic analysis.  In contrast to these
+works, our work focuses on declarative style dataflow analysis.

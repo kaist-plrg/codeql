@@ -1,111 +1,105 @@
 \section{Introduction}
-\inblue{Advances in modern declarative logical specification languages
-such as Souffl\'{e}~\cite{souffle} and QL~\cite{ql2016} have facilitated \emph{declarative static analyses.}
-A declarative static analysis specifies rules for ``what'' the analysis results in
-rather than defining algorithms for ``how'' the analysis is performed.
-Typically, it completes three steps. 
+Advances in modern declarative logical specification languages such as
+Souffl\'{e}~\cite{souffle} and QL~\cite{ql2016} have facilitated
+\emph{declarative static analyses.} A declarative static analysis specifies
+rules for ``what'' the analysis results in rather than defining algorithms for
+``how'' the analysis is performed.  Typically, it completes three steps.
 First, it transforms a program source code into a database containing
-\textit{facts} that are tuples of values. 
-Second, it derives new facts from known facts in the database by applying {\it
-rules}. 
-Each rule specifies a set of base facts and a derived fact that will be added
-to the database if satisfying all the base facts.
-Finally, the analysis applies {\it queries} for specific properties via a query
-system and produces the results of the queries as its analysis results.
+\textit{facts} that are tuples of values.  Second, it derives new facts from
+known facts in the database by applying {\it rules}.  Each rule specifies a set
+of base facts and a derived fact that will be added to the database if
+satisfying all the base facts.  Finally, the analysis applies {\it queries} for
+specific properties via a query system and produces the results of the queries
+as its analysis results.
 
 Thanks to its declarative characteristic, declarative static analysis has
-become one of the widely-used techniques.
-Datalog has become a promising domain-specific language for static
-analysis~\cite{doop, allen2015D, allen2015stagedD, alpuente2010D, dawson1996D,
-naik2006D, reps1994D, smaragdakis2014D, whaley2005D, scholz2016} by
-alleviating challenges and burdens in crafting a static program analyzer.
-For example, \doop~\cite{doop}, a static program analyzer using Datalog, shows
-remarkable scalability for the Java points-to analysis, and the scalability
-comes from the modularity and declarativeness of Datalog~\cite{doopWorkshop}.
-A declarative semantic code analysis engine maintained by Github, called
-CodeQL~\cite{codeql}, is scalable enough to detect
-security vulnerabilities in Java programs of over millions of lines of code.
-Recently, Meta developed Glean~\cite{glean}, an experimental declarative query system
-on which users can query information about code
+become one of the widely-used techniques.  Datalog has become a promising
+domain-specific language for static analysis~\cite{doop, allen2015D,
+allen2015stagedD, alpuente2010D, dawson1996D, naik2006D, reps1994D,
+smaragdakis2014D, whaley2005D, scholz2016} by alleviating challenges and
+burdens in crafting a static program analyzer.  For example, \doop~\cite{doop},
+a static program analyzer using Datalog, shows remarkable scalability for the
+Java points-to analysis, and the scalability comes from the modularity and
+declarativeness of Datalog~\cite{doopWorkshop}.  A declarative semantic code
+analysis engine maintained by Github, called CodeQL~\cite{codeql}, is scalable
+enough to detect security vulnerabilities in Java programs of over millions of
+lines of code.  Recently, Meta developed Glean~\cite{glean}, an experimental
+declarative query system on which users can query information about code
 structures on a large-scale codebase for JavaScript and Hack programs.
 
-
 Declarative static analyzers have broadened their analysis targets from a
-single programming language to diverse programming languages.}
-To support a new language, one should consider
-the three steps of declarative static analysis. Because the query
-system is independent of analysis target languages, one can reuse the
-existing query system for the new language. Therefore, the first step
-is to define a new schema of the database containing facts for the new
-language and implement a
-front-end component that transforms programs written in the new language into facts.
-Then the next step is to define new language-specific rules for the new language.  With these
-modifications, declarative analyzers can analyze programs written in the new
-language, using the existing queries and the query system.  \doop~currently
-supports Python program analysis to detect tensor shape mismatching bugs in
-TensorFlow-based Python ML models~\cite{lagouvardos2020static}. 
-CodeQL now can track dataflows not only in Java but also in C++, C\#,
-JavaScript, Ruby, and Python programs.  Furthermore, Glean plans to support
-diverse programming languages, including Python, Java, C++, Rust, and Haskell.
+single programming language to diverse programming languages.  To support a new
+language, one should consider the three steps of declarative static analysis.
+Because the query system is independent of analysis target languages, one can
+reuse the existing query system for the new language. Therefore, the first step
+is to define a new schema of the database containing facts for the new language
+and implement a front-end component that transforms programs written in the new
+language into facts.  Then the next step is to define new language-specific
+rules for the new language.  With these modifications, declarative analyzers
+can analyze programs written in the new language, using the existing queries
+and the query system.  \doop~currently supports Python program analysis to
+detect tensor shape mismatching bugs in TensorFlow-based Python ML
+models~\cite{lagouvardos2020static}.  CodeQL now can track dataflows not only
+in Java but also in C++, C\#, JavaScript, Ruby, and Python programs.
+Furthermore, Glean plans to support diverse programming languages, including
+Python, Java, C++, Rust, and Haskell.
 
 While the analyzers support multiple programming languages, they do not
 directly support the analysis of \textit{multilingual programs} written in two
-or more programming languages. 
-Multilingual programs are now widely developed in various application
-domains~\cite{kochhar2016large, mergendahlcross}. However, multilingual
-programs are often vulnerable to bugs or security issues more than monolingual
-programs. A large-scale study on the code quality of multilingual
-programs~\cite{kochhar2016large} reported that using multiple languages
-together correlates with higher error-proneness. Moreover, Grichi et
+or more programming languages.  Multilingual programs are now widely developed
+in various application domains~\cite{kochhar2016large, mergendahlcross}.
+However, multilingual programs are often vulnerable to bugs or security issues
+more than monolingual programs. A large-scale study on the code quality of
+multilingual programs~\cite{kochhar2016large} reported that using multiple
+languages together correlates with higher error-proneness. Moreover, Grichi et
 al.~\cite{grichi2020impact} showed that two or three times more bugs and
 security issues had been reported in the language interoperation than in the
 intraoperation in widely-used open-source JNI programs such as OpenJ9 and VLC.
 
-In this paper, we propose a systematic methodology that extends a
-declarative static analyzer supporting multiple languages to support
-multilingual program analysis as well. Our goal is to maximize the reuse of
-already existing components. First, it generates a merged database of facts that can
-be separated into multiple logical language spaces.  Each language space
-consists of original facts from its corresponding language database, and existing
+In this paper, we propose a systematic methodology that extends a declarative
+static analyzer supporting multiple languages to support multilingual program
+analysis as well. Our goal is to maximize the reuse of already existing
+components. First, it generates a merged database of facts that can be
+separated into multiple logical language spaces.  Each language space consists
+of original facts from its corresponding language database, and existing
 language-specific rules derive new facts from the facts in the corresponding
 language space. Then, to handle the language interoperation semantics in
-multilingual programs, we define language-interoperation rules referring to
-the language interoperation semantics. The language-interoperation rules derive new
-facts from the facts across language spaces. The extensions enable the query system
-to extract facts in multilingual programs, taking the language
-interoperation semantics into account.
-Finally, the same query is evaluated under the same query system to get
-analysis results.
+multilingual programs, we define language-interoperation rules referring to the
+language interoperation semantics. The language-interoperation rules derive new
+facts from the facts across language spaces. The extensions enable the query
+system to extract facts in multilingual programs, taking the language
+interoperation semantics into account.  Finally, the same query is evaluated
+under the same query system to get analysis results.
 
 To evaluate the practicality of our approach, we develop a proof-of-concept
 declarative static analyzer, called \ours, for multilingual programs by
 extending CodeQL. \ours tracks dataflows across language boundaries for two
-types of
-multilingual programs: Java-C programs written in Java and C and Python-C
-programs written in Python and C. The extension is simple enough in that
-it requires only a few lines of automated modifications of CodeQL and additional
-language-interoperation rules. We also implement a bug checker on top of
-\ours to detect dataflow-related interoperation bugs in real-world Java-C programs.
-The evaluation shows that our tool successfully tracks dataflows across
-Java-C and Python-C language boundaries. 
-\inblue{The evaluation shows that \ours is scalable; it takes
-only about 12 minutes to analyze multilingual programs of three million
-lines of code, which the state-of-the-art analyzer fails to analyze in eight hours.
-Also, it detects 33 genuine interoperation bugs in real-world Java-C programs,
-including 12 new bugs that the existing analyzer could not detect due to the
-lack of scalability.}
+types of multilingual programs: Java-C programs written in Java and C and
+Python-C programs written in Python and C. The extension is simple enough in
+that it requires only a few lines of automated modifications of CodeQL and
+additional language-interoperation rules. We also implement a bug checker on
+top of \ours to detect dataflow-related interoperation bugs in real-world
+Java-C programs.  The evaluation shows that our tool successfully tracks
+dataflows across Java-C and Python-C language boundaries.  The evaluation shows
+that \ours is scalable; it takes only about 12 minutes to analyze multilingual
+programs of three million lines of code, which the state-of-the-art analyzer
+fails to analyze in eight hours.  Also, it detects 33 genuine interoperation
+bugs in real-world Java-C programs, including 12 new bugs that the existing
+analyzer could not detect due to the lack of scalability.
 
 The contributions of this paper are as follows:
 \begin{itemize}
-\item We propose a systematic methodology that extends a declarative static analyzer
-supporting multiple languages to support multilingual program analysis.
+\item We propose a systematic methodology that extends a declarative static
+analyzer supporting multiple languages to support multilingual program
+analysis.
 
 \item We implement a proof-of-concept declarative static dataflow analyzer,
 called \ours, for two types of multilingual programs, Java-C and Python-C, by
 extending CodeQL.
 
-\item \inblue{We show that \ours can successfully detect dataflow-related bugs at
+\item We show that \ours can successfully detect dataflow-related bugs at
 language boundaries of real-world multilingual programs, including new bugs
-that the state-of-the-art analyzers could not detect due to the lack of scalability.}
+that the state-of-the-art analyzers could not detect due to the lack of
+scalability.
 
 \end{itemize}
