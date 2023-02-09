@@ -19,8 +19,8 @@ emphasize the Python-C program analysis in Section~\ref{sec:merging2}.
 CodeQL is a declarative static analysis engine that transforms source code into
 a database of facts and performs analyses by evaluating queries written in the
 declarative and object-oriented language called QL (Query Language). Using QL,
-one can depict rules by defining ``predicates'' and ``classes.'' The following
-QL code defines the unary predicate \codeql{isOneOrTwo}:
+one can depict rules by defining \textit{ predicates} and \textit{ classes}. The following
+QL code defines the \inblue{classical Datalog-style} unary predicate \codeql{isOneOrTwo}:
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneOrTwo(int n) {
@@ -31,8 +31,11 @@ predicate isOneOrTwo(int n) {
 \noindent
 which states that the fact \codeql{isOneOrTwo(n)} is derivable from either
 of the two facts, \codeql{n = 1} and \codeql{n = 2}.
-Some predicates may have a return type and a special variable named {\tt
-result} as the following predicate \codeql{addOne}:
+
+\inblue{ QL allows syntactic definitions of predicates which, like C functions,
+can have return types. These are desugared into classical predicates
+by adding an additional argument named \codeql{result}.
+For example, consider} the following predicate \codeql{addOne}:
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 int addOne(int n) {
@@ -40,18 +43,31 @@ int addOne(int n) {
 }
 \end{lstlisting}
 \noindent
-The predicate is a syntactic sugar equivalent to the following ordinary predicate:
+The predicate is a syntactic sugar equivalent to the following \inblue{classical} predicate:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate addOnePred(int n, int result) {
   isOneOrTwo(n) and result = n + 1
 }
 \end{lstlisting}
 \noindent
-An equality formula \codeql{m = addOne(n)} is also a syntactic sugar equivalent
+\inblue{
+Then, every use site of the original predicate can be rewritten to
+use the desugared predicates.
+For example, an equality formula \codeql{m = addOne(n)} is desugared to
 to \codeql{addOnePred(n, m)}.
 
-In QL, defining classes is one way to define user-defined types.
-The following QL code defines a class named \codeql{OneOrTwo}:
+One charateristic feature of QL is that it supports syntax of class similar to object-oriented
+programing languages like Java. A QL class should be extended from another type,
+and should define a special predicate inside the class, called {\it
+characteristic predicate}. The characteristic predicates
+resemble the syntax of the traditional constructors in other object-oriented languages;
+it has the same name to the class and does not have return type.
+Also, a QL class allows defining member predicates, as if defineing the methods of class.
+These kinds of syntax allows the user to write intuitive QL codes in objected-oriented manner.
+}
+The following QL code defines a class named \codeql{OneOrTwo} \inblue{that extends \codeql{int}
+with the characterisct predicate and one member predicate.}
+:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneOrTwo extends int {
   // characteristic predicate
@@ -61,25 +77,35 @@ class OneOrTwo extends int {
 }
 \end{lstlisting}
 \noindent
-The class extends {\tt int}, which means that the class is a subtype of {\tt
-int}.  Unlike other object-oriented languages, QL classes cannot be
-instantiated.  Instead, a class defines a special predicate, called {\it
-characteristic predicate}, that has the same name to the class, and all values
-satisfying the predicate are deemed elements of the class.  For example, only
-two integer values, {\tt 1} and {\tt 2}, are elements of the class
-\codeql{OneOrTwo}, because its characteristic predicate is satisfied only when
-{\tt this} is {\tt 1} or {\tt 2}.  A class can also have {\it member
-predicates} that relate itself with other values.  Member predicates are also
-syntactic sugar of ordinary predicates.  For example, the member predicate
-\codeql{add} is equivalent to the following ternary predicate:
+
+\inblue{
+Despite its syntax, QL class is also a syntactic sugar of classical
+predicates.  For example, the characterstic predicate \codeql{OneOrTwo} can be
+desugared into a unary predicate, \codeql{isOneOrTwo} Note that the type of the
+argument \codeql{this} is \codeql{int}, which the class \codeql{OneOrTwo} is
+extending.
+}
+\begin{lstlisting}[style=codeql,xleftmargin=2.5em]
+predicate isOneOrTwo(int this) {
+  this = 1 or this = 2
+}
+\end{lstlisting}
+\inblue{
+\noindent
+Similarly, The member predicate \codeql{add} can be desugared into a ternary predicate
+by introducing two more arguments, \codeql{this} and \codeql{result}.
+}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate addPred(OneOrTwo this, OneOrTwo that, int result) {
   result = this + that
 }
 \end{lstlisting}
-Thus, an equality formula \codeql{z = x.add(y)} is equivalent to
-\codeql{addPred(x, y, z)}.
-For more detailed information about CodeQL, refer to the paper of Avgustinov et
+\inblue{
+Then, every use site of the class can also be transforemd to use the desugared predicates.
+For example, \codeql{z = x.add(y)} where x has a type of class \codeql{OneOrTwo}
+can be desugared into \codeql{isOneOrTwo(x) and addPred(x, y, z)}.
+}
+For more detailed information about CodeQL \inblue{and its language QL}, refer to the paper of Avgustinov et
 al.\cite{ql2016} or the official document~\cite{codeql}.
 
 Figure~\ref{fig:codeql} presents the overall structure of \ours for JNI
@@ -100,7 +126,7 @@ the compiler to extract necessary information and creates a database with the
 extracted information. For scripting languages like Python, CodeQL uses its own
 extractor to directly extract necessary information from source code.  CodeQL
 creates a database for a single language in two steps: 1) it stores the
-extracted information in a \textit{trap} file, a human-readable format file for
+extracted information in a \inblue{single} \textit{trap} file, a human-readable format file for
 the CodeQL database, and 2) it transforms the trap file into a database in
 binary format.  For example, the following demonstrates a sample trap file:
 
@@ -248,7 +274,7 @@ After lifting libraries for different languages, we manually extend predicates
 to reflect the interoperation semantics between multiple languages.  For the
 Java-C program analysis, we identified various interactions from Java to C and
 vice versa via JNI, and extended predicates to model their behaviors.  For
-example, the following shows how we extend the predicate
+example, the following shows how we extend the \inblue{CodeQL} predicate
 named \codeql{viableCallable}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
@@ -301,8 +327,12 @@ requires inter-language dataflow analysis because the string or method ID
 values may be passed across language boundaries.  However, we observed that
 such a pattern rarely happens in practice, and using only intra-language
 dataflow analysis within C code is enough for most cases.  Therefore, we
-decided to sacrifice the precision by using intra-language analysis instead of
-inter-language analysis as a trade-off for a more lightweight and simpler
+decided to sacrifice the \inblue{soundness} by using intra-language analysis instead of
+inter-language analysis.
+\inblue{
+This may result in missing some call edges in rare cases,
+}
+as a trade-off for a more lightweight and simpler
 implementation.  We implemented two intra-language flow analysis modules for C,
 which find 1) dataflows from string literals to the arguments of interface
 functions and 2) dataflows from interface function call results to the

@@ -50,11 +50,13 @@ more new facts are found.
 
 
 For example, consider a fact \rcode{ Step(x, y)} that denotes a direct dataflow
-from node \rcode{ x} to node \rcode{ y}.  Here, nodes represent program
-entities that can hold runtime values, such as variables, literals,
-expressions, and function parameters.  For instance, \rcode{Step(f(), val)}
-denotes a direct flow from the result of \rcode{f()} to  \rcode{val}.  A direct
-dataflow can also be established via the relation between a function call
+from node \rcode{ x} to node \rcode{ y}.  Here, nodes represent
+program entities that can hold runtime values, such as variables, literals,
+expressions, and function parameters.  For instance, \inblue{the literal \rcode{ 42} at
+line 2, the function call \rcode { f()} at line 5 and the variable \rcode{ val} at
+line 5 are all examples of nodes.}
+
+A direct dataflow can be established via the relation between a function call
 expression and its callee function's return expression because a function call
 expression evaluates to its callee function's return value on runtime.  We can
 represent such dataflows as the following rule:
@@ -70,6 +72,14 @@ that the new fact \rcode{Step(retExpr, callExpr)} is derivable if the two base
 facts are known.  Since we already have \rcode{ Calls(f(), "f")} and \rcode{
 Return("f", 42) } as known facts, the rule derives a new fact \rcode{ Step(42,
 f()) }.
+
+\inblue{
+Similarly, there is an assignment expression at line 5,
+which will make the value of right hand side flow into the variable at left hand side.
+We should be able to define an approprriate rule regarding such assigment expression syntax,
+and derive the fact \rcode{Step(f(), val)}, which denotes a direct flow of value
+from the node \rcode{f()} to the node \rcode{val}.
+}
 
 Derived facts by rules are also known facts used to derive new facts.  For
 example, we can think of another, \rcode{ Flow(x, z)}, that denotes a dataflow
@@ -93,7 +103,8 @@ fact \rcode{ Step(x, z)} is known, and the second rule indicates that the fact
 \textbf{Step 3: Performing queries.}
 The final step is to perform the query via the query system.  A query is a set
 of facts containing variables, and the query system finds every variable
-assignment that makes the facts in the query belong to known facts.  This step
+assignment that makes \inblue{every fact in the query belongs to known facts,
+after substituting all free variables in queries with the assigned constants}.  This step
 corresponds to actually obtaining the final result of a static analysis in a
 declarative style.  For example, one can make a specific query:
 
@@ -103,7 +114,7 @@ declarative style.  For example, one can make a specific query:
 
 \noindent
 that queries all nodes into which the integer literal {\tt 42} flows.  When
-accepting the query as an input, the query system finds every value \rcode{ v}
-such that \rcode{ Flow(42, v)} belongs to known facts generated in the previous
+accepting the query as an input, the query system finds every \inblue{node} \rcode{ n}
+such that \rcode{ Flow(42, n)} belongs to known facts generated in the previous
 step.  In this example, the query would give the query result \rcode{ X\ $\in$
 \{f(), val\}}.

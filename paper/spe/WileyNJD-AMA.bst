@@ -220,7 +220,7 @@ FUNCTION {format.names}
   numnames 'namesleft :=
   { namesleft #0 > }
 
-  {s nameptr "{ll }{v}{f{}}" format.name$ 't :=
+  {s nameptr "{ll}{v}{ f{}}" format.name$ 't :=
     namesleft #1 >
     {t * ", " * }
     {t}

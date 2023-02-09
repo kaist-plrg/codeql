@@ -387,7 +387,7 @@ static PyObject* getfactor(PyObject *self, PyObject *args)
 }
   \end{lstlisting}
     \vspace*{-.5em}
-  \caption{One danger-use that \ours could not detect}
+  \caption{One danger-use that \ours did not detect}
   \label{fig:cvxopt}
 \end{figure}
 
@@ -397,7 +397,7 @@ detect interoperation bugs in 12 real-world Python-C programs.  We chose to
 explore the same interoperation bugs in our analysis as those used in Li et
 al.~\cite{polycruise}'s work.  The bugs involve two kinds of inter-language
 flows: a Python value is passed to C code and used as either (1) an argument to
-a ``dangerous'' functions, such as \ccode{strncpy}, \ccode{strncmp},
+a ``dangerous'' \inblue{function}, such as \ccode{strncpy}, \ccode{strncmp},
 \ccode{vsprintf}, and \ccode{malloc}, or (2) an index to array access.  We call
 such flows \textit{inter-uses}.  Among inter-uses, some flows can trigger bugs
 or security vulnerabilities, which we call \textit{danger-uses}.  Because
@@ -413,20 +413,20 @@ programs, five have known danger-uses.
 
 The result shows that \ours can correctly detect eight of the nine known
 danger-uses.  Figure~\ref{fig:cvxopt} shows one danger-use from the program
-{\it cvxopt} that \ours could not detect.  The call to \ccode{strncmp} on line
+{\it cvxopt} that \ours \inblue{ did} not detect.  The call to \ccode{strncmp} on line
 8 is an inter-use since the first argument \ccode{descr} comes from Python
 code.  Also, this call is a danger-use because it may incorrectly conclude that
 the strings \ccode{descr} and \ccode{"CHOLMOD FACTOR"} are equal, even if they
 are not, since string terminator (\textquotesingle \textbackslash
 0\textquotesingle) is not considered.  The correct code should use 15
 (\ccode{strlen("CHOLMODE FACTOR")+1}) rather than 14 as the last argument.
-\ours could not detect this inter-use simply because the function
+\ours \inblue{ did} not detect this inter-use simply because the function
 \ccode{getfactor} was unreachable.  Because no Python test files call this
 function, \ours could not find any Python value that \ccode{descr} can point
 to. We confirmed that when we manually add a Python test file that calls
 \ccode{getfactor}, \ours correctly detects the previously missed danger-use.
 
-The evaluation shows that \ours can precisely detect danger-uses that may
+The evaluation shows that \ours can detect danger-uses that may
 trigger bugs or security vulnerabilities in real-world Python-C programs.
 
 \subsubsection{Future Work}
@@ -451,7 +451,9 @@ dynamic analysis~\cite{polycruise}.
 between multiple languages via explicit Foreign Function Interfaces (FFIs).
 Therefore, as long as the analysis target languages use FFIs, our approach can
 analyze interactions between more than two programming languages.  However, as
-Li et al.~\cite{vulnerable-multi} explain, various interoperation mechanisms
-beyond explicit FFIs exist in real-world multi-language software systems.
+Li et al.~\cite{vulnerable-multi} explain, \inblue{there are various interoperation mechanisms
+beyond explicit FFIs, such as implicit interaction between languages using interprocess communication
+(e.g., socket-based message passing) or a language totally emobodying another langauge
+(e.g., web browser engines),} in real-world multi-language software systems.
 Although all the benchmarks we analyzed use only explicit FFIs, supporting
 other kinds of interoperation would be a promising future direction.

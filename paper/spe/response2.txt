@@ -1,0 +1,70 @@
+Reviewing: 1
+
+Comments to the Author
+The revised version considered and addressed some of the previously raised concerns, such as the soundness issue --- the authors now discussed about this critical matter only in the end of paper when talking about future work. I would suggest this be discussed as part of the technical approach presentation since the fact that the proposed approach is not sound should be clarified up front. Similarly, for another issue, regarding language interfacing mechanisms, only brief discussion is provided in the end, again as part of the future work. I am not sure why the authors could use tools like PolyFax to detect the interfacing and handle it differently --- please at least discuss the difficulties or infeasibility. Note that FFI, although the most obvious and readily-handling type of interfacing, is not the most prevalent, which means the proposed tool would only work with a relatively small portion of the real-world multilingual (e.g., Python-C) programs. At least, discuss the path forward for dealing with this issues, practically and responsibly, rather than simply casting them into future work with brief mentions by passing.
+
+It is applaudable that the revision now included an experiment to demonstrate the usefulness of the proposed technique for Python-C programs. Not comparing the technique in this evaluation is understandable given the lack of ‘static’ tools of similar purposes for Python-C programs (PolyCruise is a dynamic analyzer..)
+
+The other comments are, unfortunately, either only minimally touched upon (without being substantially addressed)---e.g., the benchmark choice, or entirely dismissed (e.g., novelty of the IR, discussion about extensibility to support other analysis or languages with respect to the diversity of the multi-language world).
+
+Reviewing: 2
+
+2-1) p1L14. Summary: add "currently" to "do not [currently] support".
+[After your paper then they *will* support it!]
+==> We revised the abstract as suggeseted.
+
+2-2) p2L5. "Datalog has become".   This feels wrong.  Datalog was more important than this, with its bottom-up evaluation and its basis in seminal works [as your citations suggest].
+Note the paper "codeQuest: Scalable Source Code Queries with Datalog", which shows this (and I think you should cite).
+Perhaps here (or early) clarify that Datalog was the formal basis which was adapted into various query languages such as CodeQL, QL and Soufflé [personally I still don't know the difference between QL and CodeQL].  Maybe CodeQL is the language most adapted for real-world program analysis, with its richer syntax.  But it's your job to tell the reader, not mine to guess!    Sorry, I didn't mean to sound rude there.
+==> We emphasized the importance and the role of Datalog as suggested. Also, we clarified the difference between CodeQL (which is the engine) and QL (which is the language) in section 4.1.
+
+2-3) p2 "step 3".  You say "queries are facts which may contain variables".  I agree.  And clearly rules can contain variables.  But (in contrast to Prolog), I suspect all your facts (and derived facts) should *not* contain variables.  If this is true you should state it explicitly.  E.g. p3, line 19 says "replacing variables with their corresponding constants" suggests this.  Please could you review your text to see if this is clear, e.g. that the "facts" box in Fig 1 and Fig 2 are (CodeQL) variable free? -- Clearly they can contain information about program variables, but these are constants from the viewpoint of CodeQL.
+==> We emphasied that the derived facts does not have free variables as suggested.
+
+2-4) P2, line 32.  It would be nice to add a sentence to the effect that "In practical use (and later in the paper) both f() and val would be terms which include line numbers".
+==> We added the explanation that `f()` and `val` are "nodes" we defined, and added their line numbers.
+
+2-5) p4, L28: "as the same" is not English.  Do you mean "The query calledge(X,Y) is valid in multilingual programs as well as monolingual ones, and has the expected meaning"?
+==> We revised that part as suggested.
+
+2-6) p4L30: interoperation -> interlanguage?
+==> We changed it as suggested.
+
+2-7) p4 section 4.1. Please review your explanation of "predicates".  The current explanation seems a little schizophrenic.  "predicates" are well known from Prolog and Datalog
+and indeed logic.   The predicate IsOneOrTwo has a different syntax but is clearly a predicate.  However, you then say (last line): "[Some] predicates may have a return type and a special variable result".  I think you mean "CodeQL allows syntactic definitions of predicates which, like C functions, can have return types; however these are de-sugared into classical datalog-style predicates by adding an additional argument"?
+It sort-of says this on the next page, but the explanation is not clear.  Please clarify.
+Please could you review the introduction to CodeQL?  'Everyone' knows Prolog/Datalog but knowledge of CodeQL is much less widespread.
+==> We revised the explanation about CodeQL predicates and classes to be more clear.
+
+2-8) p5 line 9:  "into a *single* trap file"
+==> We revised it as suggested.
+
+2-9) p5, sec 4.4: "predicate named viableCallable".  Hmm at the very least please say this is a 'CodeQL predicate' [not a "predicate" as well-known and used in your model in Fig 2].
+==> We revised it as suggested.
+
+2-10) p11, line 19.  "precision".  Sorry I did not pick this up on my first review.
+Precision can refer to both Soundness and Completeness.  For program analysis soundness is vital, but completeness is generally only relative as precise program analyses is uncomputable.  When you say "sacrifice precision", do you mean sacrifice soundness?  Perhaps talk about false positives and false negatives to questions such as
+"can the indirect call at line 6 invoke function f() defined at line 96"?
+Lint-style program analysis tools are typically unsound and incomplete.
+==> We changed it to "sacrifice soundness", and added more detailed explanation about the meaning of it.
+
+2-11) p19, line 20: "a dangerous functions" -> "a dangerous function"
+==> We corrected it as suggested.
+
+2-12) line 28: could not detect -> did not detect [or cannot detect]
+==> We revised it as suggested.
+
+2-13) line 36: "can precisely detect".  Really?  Perhaps remove the word "precisely" or clarify its meaning (see above).  Please review all your uses of "precise".
+==> We removed the word precisely for there. For any other use of "precise" (i.e. explanation about Table 2), since we have clearly defined meaning of "precise", we left them as they are.
+
+2-14) line  -3:  "... various interoperation mechanisms ... exist ... [38]".  Please insert "(such as XXX)" after "mechanisms".  I don't want to read another whole paper to get a feeling for what these might be.
+==> We added the examples of various interaction mechanisms in the paaper.
+
+2-15) Reference 1 has a misplaced "." in the "In:" field.
+Several references have a strange "<space>." in the author field.  Delete the space.
+Reference 32 has garbled text and no URL.
+==> We revised the references as suggested.
+
+2-16) Finally "Is the abstract concise?" (reviewers are asked this question).
+The abstract is certainly complete.  On the other hand, it feels rather longer (perhaps 50%) longer than it might be.  I'm happy with the current text but the query-to-reviewers above made me wonder if I should be.  I don't have any immediate suggestions as how to change the abstract, sorry.
+==> We agree that the abstact may feel a bit longer. We believe that the reason is that the abstract consists of two paragraphs. The first paragraph explains about the context and background of the apaer, and the second paragraph explains what we actually did and the result. We'd like to maintain the current abstract, as the both of them are important. Therefore, we would like to suggest to consider the second paragraph as more concise version of abstract.

@@ -1,6 +1,6 @@
 \section{Introduction}
 Advances in modern declarative logical specification languages such as
-Souffl\'{e}~\cite{souffle} and QL~\cite{ql2016} have facilitated
+\inblue{Datalog,} Souffl\'{e}~\cite{souffle} and QL~\cite{ql2016} have facilitated
 \emph{declarative static analyses.} A declarative static analysis specifies
 rules for ``what'' the analysis results in rather than defining algorithms for
 ``how'' the analysis is performed.  Typically, it completes three steps.
@@ -13,14 +13,17 @@ specific properties via a query system and produces the results of the queries
 as its analysis results.
 
 Thanks to its declarative characteristic, declarative static analysis has
-become one of the widely-used techniques.  Datalog has become a promising
-domain-specific language for static analysis~\cite{doop, allen2015D,
+become one of the widely-used techniques.  Datalog \inblue{is} a promising
+domain-specific language for static analysis~\cite{doop, codequest, allen2015D,
 allen2015stagedD, alpuente2010D, dawson1996D, naik2006D, reps1994D,
-smaragdakis2014D, whaley2005D, scholz2016} by alleviating challenges and
+smaragdakis2014D, whaley2005D, scholz2016} \inblue{as it can alleviate} challenges and
 burdens in crafting a static program analyzer.  For example, \doop~\cite{doop},
 a static program analyzer using Datalog, shows remarkable scalability for the
 Java points-to analysis, and the scalability comes from the modularity and
-declarativeness of Datalog~\cite{doopWorkshop}.  A declarative semantic code
+declarativeness of Datalog~\cite{doopWorkshop}.
+\inblue{As a result of successful declarative static analysis using Datalog,
+various declarative static analyzers that are inspired by or based on Datalog
+have emerged.} A declarative semantic code
 analysis engine maintained by Github, called CodeQL~\cite{codeql}, is scalable
 enough to detect security vulnerabilities in Java programs of over millions of
 lines of code.  Recently, Meta developed Glean~\cite{glean}, an experimental
