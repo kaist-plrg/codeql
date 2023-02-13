@@ -8,12 +8,19 @@
 
 \section{\ours: Extension of CodeQL for multilingual program analysis}\label{sec:impl}
 In this section, we present \ours, a prototype extension of
-CodeQL~\cite{codeql} for multilingual program analysis.  \ours tracks dataflows
+CodeQL~\cite{codeql} for multilingual program analysis.
+\inblue{
+As being a prototype implementation, \ours does not aim for a sound or complete
+analyzer, yet it can effectively track dataflow in practical multilingual
+programs using the simple approach explained in previous section.
+}
+\ours tracks dataflows
 across language boundaries in two types of multilingual programs: 1) Java-C
 programs interoperating via Java Native Interface(JNI)~\cite{jnispec} and 2)
 Python-C programs interoperating via Python Extension Module~\cite{pyext}.  For
 simplicity, we use the Java-C program analysis to explain the common parts and
 emphasize the Python-C program analysis in Section~\ref{sec:merging2}.
+
 
 \subsection{CodeQL}
 CodeQL is a declarative static analysis engine that transforms source code into
@@ -56,17 +63,17 @@ use the desugared predicates.
 For example, an equality formula \codeql{m = addOne(n)} is desugared to
 to \codeql{addOnePred(n, m)}.
 
-One charateristic feature of QL is that it supports syntax of class similar to object-oriented
-programing languages like Java. A QL class should be extended from another type,
+One characteristic feature of QL is that it supports syntax of class similar to object-oriented
+programming languages like Java. A QL class should be extended from another type,
 and should define a special predicate inside the class, called {\it
 characteristic predicate}. The characteristic predicates
 resemble the syntax of the traditional constructors in other object-oriented languages;
 it has the same name to the class and does not have return type.
-Also, a QL class allows defining member predicates, as if defineing the methods of class.
+Also, a QL class allows defining member predicates, as if defining the methods of class.
 These kinds of syntax allows the user to write intuitive QL codes in objected-oriented manner.
 }
 The following QL code defines a class named \codeql{OneOrTwo} \inblue{that extends \codeql{int}
-with the characterisct predicate and one member predicate.}
+with the characteristic predicate and one member predicate.}
 :
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneOrTwo extends int {
@@ -80,7 +87,7 @@ class OneOrTwo extends int {
 
 \inblue{
 Despite its syntax, QL class is also a syntactic sugar of classical
-predicates.  For example, the characterstic predicate \codeql{OneOrTwo} can be
+predicates.  For example, the characteristic predicate \codeql{OneOrTwo} can be
 desugared into a unary predicate, \codeql{isOneOrTwo} Note that the type of the
 argument \codeql{this} is \codeql{int}, which the class \codeql{OneOrTwo} is
 extending.
@@ -101,7 +108,7 @@ predicate addPred(OneOrTwo this, OneOrTwo that, int result) {
 }
 \end{lstlisting}
 \inblue{
-Then, every use site of the class can also be transforemd to use the desugared predicates.
+Then, every use site of the class can also be transformed to use the desugared predicates.
 For example, \codeql{z = x.add(y)} where x has a type of class \codeql{OneOrTwo}
 can be desugared into \codeql{isOneOrTwo(x) and addPred(x, y, z)}.
 }

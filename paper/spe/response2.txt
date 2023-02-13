@@ -1,17 +1,21 @@
 Reviewing: 1
 
-Comments to the Author
-The revised version considered and addressed some of the previously raised concerns, such as the soundness issue --- the authors now discussed about this critical matter only in the end of paper when talking about future work. I would suggest this be discussed as part of the technical approach presentation since the fact that the proposed approach is not sound should be clarified up front. Similarly, for another issue, regarding language interfacing mechanisms, only brief discussion is provided in the end, again as part of the future work. I am not sure why the authors could use tools like PolyFax to detect the interfacing and handle it differently --- please at least discuss the difficulties or infeasibility. Note that FFI, although the most obvious and readily-handling type of interfacing, is not the most prevalent, which means the proposed tool would only work with a relatively small portion of the real-world multilingual (e.g., Python-C) programs. At least, discuss the path forward for dealing with this issues, practically and responsibly, rather than simply casting them into future work with brief mentions by passing.
+1-1) The revised version considered and addressed some of the previously raised concerns, such as the soundness issue --- the authors now discussed about this critical matter only in the end of paper when talking about future work. I would suggest this be discussed as part of the technical approach presentation since the fact that the proposed approach is not sound should be clarified up front.
+==> We clarified the soundness issue upfront at the start of section 4.
 
-It is applaudable that the revision now included an experiment to demonstrate the usefulness of the proposed technique for Python-C programs. Not comparing the technique in this evaluation is understandable given the lack of ‘static’ tools of similar purposes for Python-C programs (PolyCruise is a dynamic analyzer..)
 
-The other comments are, unfortunately, either only minimally touched upon (without being substantially addressed)---e.g., the benchmark choice, or entirely dismissed (e.g., novelty of the IR, discussion about extensibility to support other analysis or languages with respect to the diversity of the multi-language world).
+1-2) Similarly, for another issue, regarding language interfacing mechanisms, only brief discussion is provided in the end, again as part of the future work. I am not sure why the authors could use tools like PolyFax to detect the interfacing and handle it differently --- please at least discuss the difficulties or infeasibility. Note that FFI, although the most obvious and readily-handling type of interfacing, is not the most prevalent, which means the proposed tool would only work with a relatively small portion of the real-world multilingual (e.g., Python-C) programs. At least, discuss the path forward for dealing with this issues, practically and responsibly, rather than simply casting them into future work with brief mentions by passing.
+==> We added more detailed explanation about difficulties in supporting other method of interactions, and a way to resolve this issue at section 5.2.3.
+
+
+1-3) The other comments are, unfortunately, either only minimally touched upon (without being substantially addressed)---e.g., the benchmark choice, or entirely dismissed (e.g., novelty of the IR, discussion about extensibility to support other analysis or languages with respect to the diversity of the multi-language world).
+==> Regarding the benchmark choice, as we mentioned in the previous response, the existing benchmark such as PyCBench was not applicable to our tools, since our underlying analyzer, CodeQL, could not support it. Regarding IR, we removed the part of Section 2 that illustrating syntactic facts as an IR from Section 2, since that was misleading. Regarding extensibility, we added more explanation at section 5.2.3.
 
 Reviewing: 2
 
 2-1) p1L14. Summary: add "currently" to "do not [currently] support".
 [After your paper then they *will* support it!]
-==> We revised the abstract as suggeseted.
+==> We revised the abstract as suggested.
 
 2-2) p2L5. "Datalog has become".   This feels wrong.  Datalog was more important than this, with its bottom-up evaluation and its basis in seminal works [as your citations suggest].
 Note the paper "codeQuest: Scalable Source Code Queries with Datalog", which shows this (and I think you should cite).
@@ -19,7 +23,7 @@ Perhaps here (or early) clarify that Datalog was the formal basis which was adap
 ==> We emphasized the importance and the role of Datalog as suggested. Also, we clarified the difference between CodeQL (which is the engine) and QL (which is the language) in section 4.1.
 
 2-3) p2 "step 3".  You say "queries are facts which may contain variables".  I agree.  And clearly rules can contain variables.  But (in contrast to Prolog), I suspect all your facts (and derived facts) should *not* contain variables.  If this is true you should state it explicitly.  E.g. p3, line 19 says "replacing variables with their corresponding constants" suggests this.  Please could you review your text to see if this is clear, e.g. that the "facts" box in Fig 1 and Fig 2 are (CodeQL) variable free? -- Clearly they can contain information about program variables, but these are constants from the viewpoint of CodeQL.
-==> We emphasied that the derived facts does not have free variables as suggested.
+==> We emphasized that the derived facts does not have free variables as suggested.
 
 2-4) P2, line 32.  It would be nice to add a sentence to the effect that "In practical use (and later in the paper) both f() and val would be terms which include line numbers".
 ==> We added the explanation that `f()` and `val` are "nodes" we defined, and added their line numbers.
@@ -67,4 +71,4 @@ Reference 32 has garbled text and no URL.
 
 2-16) Finally "Is the abstract concise?" (reviewers are asked this question).
 The abstract is certainly complete.  On the other hand, it feels rather longer (perhaps 50%) longer than it might be.  I'm happy with the current text but the query-to-reviewers above made me wonder if I should be.  I don't have any immediate suggestions as how to change the abstract, sorry.
-==> We agree that the abstact may feel a bit longer. We believe that the reason is that the abstract consists of two paragraphs. The first paragraph explains about the context and background of the apaer, and the second paragraph explains what we actually did and the result. We'd like to maintain the current abstract, as the both of them are important. Therefore, we would like to suggest to consider the second paragraph as more concise version of abstract.
+==> We agree that the abstract may feel a bit longer. We believe that the reason is that the abstract consists of two paragraphs. The first paragraph explains about the context and background of the paper, and the second paragraph explains what we actually did and the result. We'd like to maintain the current abstract, as the both of them are important. Therefore, we would like to suggest to consider the second paragraph as more concise version of abstract.
