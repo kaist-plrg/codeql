@@ -9,11 +9,9 @@
 \section{\ours: Extension of CodeQL for multilingual program analysis}\label{sec:impl}
 In this section, we present \ours, a prototype extension of
 CodeQL~\cite{codeql} for multilingual program analysis.
-\inblue{
-As being a prototype implementation, \ours does not aim for a sound or complete
-analyzer, yet it can effectively track dataflow in practical multilingual
-programs using the simple approach explained in previous section.
-}
+\inblue{As a prototype implementation, \ours does not aim for a sound or complete
+analyzer, yet it can effectively track dataflows in practical multilingual
+programs using the simple approach explained in the previous section.}
 \ours tracks dataflows
 across language boundaries in two types of multilingual programs: 1) Java-C
 programs interoperating via Java Native Interface(JNI)~\cite{jnispec} and 2)
@@ -39,8 +37,8 @@ predicate isOneOrTwo(int n) {
 which states that the fact \codeql{isOneOrTwo(n)} is derivable from either
 of the two facts, \codeql{n = 1} and \codeql{n = 2}.
 
-\inblue{ QL allows syntactic definitions of predicates which, like C functions,
-can have return types. These are desugared into classical predicates
+\inblue{QL allows syntactic definitions of predicates which, like C functions,
+can have return types, which are desugared into classical predicates
 by adding an additional argument named \codeql{result}.
 For example, consider} the following predicate \codeql{addOne}:
 
@@ -57,24 +55,19 @@ predicate addOnePred(int n, int result) {
 }
 \end{lstlisting}
 \noindent
-\inblue{
-Then, every use site of the original predicate can be rewritten to
-use the desugared predicates.
-For example, an equality formula \codeql{m = addOne(n)} is desugared to
+\inblue{Then, every use site of the original predicate is rewritten to
+use the desugared predicate.
+For example, an equality formula \codeql{m = addOne(n)} is desugared
 to \codeql{addOnePred(n, m)}.
 
-One characteristic feature of QL is that it supports syntax of class similar to object-oriented
-programming languages like Java. A QL class should be extended from another type,
-and should define a special predicate inside the class, called {\it
-characteristic predicate}. The characteristic predicates
-resemble the syntax of the traditional constructors in other object-oriented languages;
-it has the same name to the class and does not have return type.
-Also, a QL class allows defining member predicates, as if defining the methods of class.
-These kinds of syntax allows the user to write intuitive QL codes in objected-oriented manner.
-}
+One characteristic feature of QL is class definitions similar to the ones in object-oriented
+languages like Java. A QL class should extend another type
+and define a special predicate called a {\it characteristic predicate}.
+It is similar to a constructor in object-oriented languages;
+it has the same name as its enclosing class and does not have any return type.
+A QL class can define member predicates like methods in Java.}
 The following QL code defines a class named \codeql{OneOrTwo} \inblue{that extends \codeql{int}
-with the characteristic predicate and one member predicate.}
-:
+with the characteristic predicate and one member predicate}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneOrTwo extends int {
   // characteristic predicate
@@ -86,12 +79,9 @@ class OneOrTwo extends int {
 \noindent
 
 \inblue{
-Despite its syntax, QL class is also a syntactic sugar of classical
-predicates.  For example, the characteristic predicate \codeql{OneOrTwo} can be
-desugared into a unary predicate, \codeql{isOneOrTwo} Note that the type of the
-argument \codeql{this} is \codeql{int}, which the class \codeql{OneOrTwo} is
-extending.
-}
+Despite its syntax, a QL class is also a syntactic sugar of classical
+predicates.  For example, the characteristic predicate \codeql{OneOrTwo} is
+desugared into the following unary predicate, \codeql{isOneOrTwo}:}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneOrTwo(int this) {
   this = 1 or this = 2
@@ -99,19 +89,17 @@ predicate isOneOrTwo(int this) {
 \end{lstlisting}
 \inblue{
 \noindent
-Similarly, The member predicate \codeql{add} can be desugared into a ternary predicate
-by introducing two more arguments, \codeql{this} and \codeql{result}.
-}
+Note that the type of the argument \codeql{this} is \codeql{int}, which the class \codeql{OneOrTwo}
+extends. Similarly, The member predicate \codeql{add} is desugared into a ternary predicate
+as follows by introducing two more arguments, \codeql{this} and \codeql{result}:}
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate addPred(OneOrTwo this, OneOrTwo that, int result) {
   result = this + that
 }
 \end{lstlisting}
-\inblue{
-Then, every use site of the class can also be transformed to use the desugared predicates.
-For example, \codeql{z = x.add(y)} where x has a type of class \codeql{OneOrTwo}
-can be desugared into \codeql{isOneOrTwo(x) and addPred(x, y, z)}.
-}
+\inblue{Then, every use site of the class is rewritten to use the desugared predicates.
+For example, \codeql{z = x.add(y)} where x has type \codeql{OneOrTwo}
+can be desugared into addPred(x, y, z).}
 For more detailed information about CodeQL \inblue{and its language QL}, refer to the paper of Avgustinov et
 al.\cite{ql2016} or the official document~\cite{codeql}.
 
@@ -336,9 +324,7 @@ such a pattern rarely happens in practice, and using only intra-language
 dataflow analysis within C code is enough for most cases.  Therefore, we
 decided to sacrifice the \inblue{soundness} by using intra-language analysis instead of
 inter-language analysis.
-\inblue{
-This may result in missing some call edges in rare cases,
-}
+\inblue{In rare cases, this may result in missing some call edges}
 as a trade-off for a more lightweight and simpler
 implementation.  We implemented two intra-language flow analysis modules for C,
 which find 1) dataflows from string literals to the arguments of interface
@@ -438,3 +424,37 @@ parameters of a C function to the first argument of
 \ccode{PyObject_CallObject}.  Using these intra-language flow analyses, we can
 find actual targets that should be invoked for \ccode{PyObject_CallObject} API
 function calls.
+
+\subsection{Discussion}
+We discuss possible future research directions to enhance \ours.
+
+\textbf{Soundness} We manually implemented the dataflow steps that model the
+behaviors of the inter-language API functions by referring to the JNI
+specification~\cite{jnispec} and Python's extension module
+specification~\cite{pythoncspec}.  We implemented a few selected API functions
+that are enough to practically analyze all of our benchmark suites and did not
+fully cover all the API functions.  This may lead to the unsoundness of \ours.
+One breakthrough may use the mechanized specification
+approach~\cite{jiset,jest,jstar,jsaver,justgen} and automatically generate the
+modeling of such API functions from mechanized specifications.
+
+Another source of unsoundness may come from dynamically generated Python code.
+Because \ours is a purely static analyzer, it cannot analyze statically
+invisible code.  A possible direction may take a hybrid approach leveraging
+dynamic analysis~\cite{polycruise}.
+
+\textbf{\inblue{Extension}} \ours can analyze interoperations
+between multiple languages via explicit Foreign Function Interfaces (FFIs).
+Therefore, as long as analysis target languages use FFIs, our approach can
+analyze interactions \inblue{ between languages other than Java-C or Python-C
+and even interactions} between more than two programming languages
+\inblue{since providing inter-language FFI call relations enables CodeQL dataflow analysis.}
+However, as Li et al.~\cite{vulnerable-multi} explain, \inblue{various interoperation mechanisms
+beyond explicit FFIs, such as implicit interactions between languages using interprocess communications
+(e.g., socket-based message passing) or languages embodying other languages
+(e.g., web browser engines),} exist in real-world multi-language software systems.
+Supporting these kinds of interoperation would be a promising future direction.
+\inblue{One possible approach could be dynamically collecting various kinds of language interactions,
+simulating the interactions as explicit FFIs, and analyzing them using \ours. 
+Even though dynamically collecting behaviors is unsound and costly,
+such a hybrid analysis may be able to analyze more language interactions than \ours.}

@@ -42,7 +42,7 @@ We use the overline notation to indicate 0 or more repetitions.  For example,
 $\overline{x}$ is a shorthand for $x_1, x_2, ..., x_n$ for some $n \ge 0$.  The
 fact $p(\overline{k\ |\ x})$ denotes a relation $p$ between constants
 $\overline{k}$, such as string and integer literals, or variables
-$\overline{x}$.  A fact A rule $f'\ \mbox{:-}\ \overline{f\ |\neg f}$ consists of two
+$\overline{x}$.  A rule $f'\ \mbox{:-}\ \overline{f\ |\neg f}$ consists of two
 parts: the head of the rule $f'$ and the body of the rule $\overline{f\ |\neg
 f}$, where the optional prefix $\neg$ denotes the negation.  \footnote{A
 syntactic restriction exists for negation and recursive rules: a fact should
@@ -51,8 +51,8 @@ not be derived from its negation. For example, the rule $R(x, y)\ \mbox{:-}\
 derived from $\neg R(x, y)$.} It denotes that the head is derivable from the
 body: $f'$ is derivable if all the facts $f'' \in \{\overline{f}\}$ belong to
 known facts, and all the facts $f'' \in \{\overline{\neg f}\}$ do not belong to
-known facts. \inblue{ Note that the derived facts should not contain
-free variable as the argument.}
+known facts. \inblue{Note that a derived fact should not contain
+any free variables as its argument.}
 The body of the rule can be empty; in that case, the head of the
 rule is vacuously added to known facts.  Such bodiless rules are the initial
 input facts for the analysis.  The query $\mbox{?-}\ \overline{f}$ finds all
@@ -264,11 +264,11 @@ Thus, we define the interoperation rule from {\it B} to {\it A} as follows:
       FunctionAt$_A$(lineNumFunc, name)
 \end{lstlisting}
 
-Finally, \inblue{we can make the exact same query} \rcode{ ?- CallEdge(X, Y)} \inblue{as we did for both of} the
-monolingual programs in Section~\ref{lab:ovmono}. \inblue{Note that this query is valid
-for the multilingual program as well, since we specifically defined the new rule to derive the fact having
+Finally, \inblue{we can make the same query} \rcode{ ?- CallEdge(X, Y)} \inblue{as we did for} the
+monolingual programs in Section~\ref{lab:ovmono}. \inblue{Note that this query is also valid
+for the multilingual program since we specifically defined the new rule to derive the fact having
 the same name,} \rcode{ CallEdge}. The query system now produces
-\rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), } \rcode{(8, 4)\}} as function call
+\rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), } \rcode{(8, 4)\}} as the function call
 relation results, which include not only \inblue{intra-language} call relations but also
 \inblue{inter-language} call relations.
 
