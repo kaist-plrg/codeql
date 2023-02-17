@@ -19,7 +19,13 @@ Thank you for your constructive comments. We did our best to address them all as
 * Reviewer 2
 
 2-1) Other comments remain unaddressed. I hope the authors consider addressing them in the final version of the paper.
-==>
-* the benchmark choice: The existing benchmarks, such as PyCBench, do not apply to our tool because our underlying analyzer, CodeQL, cannot support them.
-* novelty of the IR: Because IR is not one of the contributions of our work and is irrelevant to the paper's primary goal, we revised Section 2 to remove misunderstandings about IRs.
-* discussion about extensibility: We added more discussion about extensibility and moved the old Section 5.2.3 Future Work to Section 4.6 Discussion.
+==> We addressed the comments as follows:
+
+* Benchmark choice
+We explained our benchmark choice discussing PyCBench at the beginning of Section 5.1.2
+
+* Novelty of the IR
+Because IR is not one of the contributions of our work and is irrelevant to the paper's primary goal, we revised Section 2 to remove misunderstandings about IRs.
+
+* Discussion about extensibility
+We included discussion about extensibility in Section 4.6 Discussion.

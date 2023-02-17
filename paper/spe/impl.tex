@@ -441,11 +441,11 @@ Because \ours is a purely static analyzer, it cannot analyze statically
 invisible code.  A possible direction may take a hybrid approach leveraging
 dynamic analysis~\cite{polycruise}.
 
-\textbf{Extension} \ours can analyze interoperations
+\textbf{\inblue{Extension}} \inblue{\ours can analyze interoperations
 between multiple languages via explicit Foreign Function Interfaces (FFIs).
-Therefore, as long as analysis target languages use FFIs, \inblue{our approach can
+Therefore, as long as analysis target languages use FFIs, our approach can
 be easily extended to analyze interactions between languages other than Java-C or Python-C
-and even interactions between three or more programming languages}
+and even interactions between three or more programming languages
 since providing inter-language FFI call relations enables CodeQL dataflow analysis.
 However, as Li et al.~\cite{vulnerable-multi} explain, various interoperation mechanisms
 beyond explicit FFIs, such as implicit interactions between languages using interprocess communications
@@ -455,4 +455,4 @@ Supporting these kinds of interoperation would be a promising future direction.
 One possible approach could be dynamically collecting various kinds of language interactions,
 simulating the interactions as explicit FFIs, and analyzing them using \ours. 
 Even though dynamically collecting behaviors is unsound and costly,
-such a hybrid analysis may be able to analyze more language interactions than \ours.
+such a hybrid analysis may be able to analyze more language interactions than \ours.}
