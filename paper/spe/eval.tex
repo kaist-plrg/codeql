@@ -129,8 +129,14 @@ faster than \lees.
 \subsubsection{Feasibility: Python-C}
 \input{tableRQ1-3}
 
-The first benchmark suite for Python-C program analysis is ExtModuleFlowBench
-we developed, consisting of 20 Python-C programs.  We converted each Java-C
+\inblue{ Similar to previous section, we evaluate our analyzer for Python-C
+programs with two benchmark suites where one of them is hand-crafted and the
+other consists of real-world programs.  There are several good hand-crafted
+Python-C benchmarks, such as PyCBench which was used for
+PolyCruise~\cite{polycruise}, but we observed that they do not apply to our
+tool because our underlying analyzer, CodeQL, cannot support them. Therefore,
+we developed ExtModuleFlowBench, our own benchmark suite consisting of 20
+Python-C programs, and used it as our first benchmark suite.} We converted each Java-C
 benchmark in NativeFlowBench into a corresponding Python-C program, except for
 eight apps containing JNI-specific interoperation features. Additionally, we
 made five Python-C programs that contain interoperations specific to Python

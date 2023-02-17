@@ -443,9 +443,9 @@ dynamic analysis~\cite{polycruise}.
 
 \textbf{Extension} \ours can analyze interoperations
 between multiple languages via explicit Foreign Function Interfaces (FFIs).
-Therefore, as long as analysis target languages use FFIs, our approach can
-analyze interactions between languages other than Java-C or Python-C
-and even interactions between more than two programming languages
+Therefore, as long as analysis target languages use FFIs, \inblue{our approach can
+be easily extended to analyze interactions between languages other than Java-C or Python-C
+and even interactions between three or more programming languages}
 since providing inter-language FFI call relations enables CodeQL dataflow analysis.
 However, as Li et al.~\cite{vulnerable-multi} explain, various interoperation mechanisms
 beyond explicit FFIs, such as implicit interactions between languages using interprocess communications
