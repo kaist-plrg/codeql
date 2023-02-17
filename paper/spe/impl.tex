@@ -9,9 +9,9 @@
 \section{\ours: Extension of CodeQL for multilingual program analysis}\label{sec:impl}
 In this section, we present \ours, a prototype extension of
 CodeQL~\cite{codeql} for multilingual program analysis.
-\inblue{As a prototype implementation, \ours does not aim for a sound or complete
+As a prototype implementation, \ours does not aim for a sound or complete
 analyzer, yet it can effectively track dataflows in practical multilingual
-programs using the simple approach explained in the previous section.}
+programs using the simple approach explained in the previous section.
 \ours tracks dataflows
 across language boundaries in two types of multilingual programs: 1) Java-C
 programs interoperating via Java Native Interface(JNI)~\cite{jnispec} and 2)
@@ -25,7 +25,7 @@ CodeQL is a declarative static analysis engine that transforms source code into
 a database of facts and performs analyses by evaluating queries written in the
 declarative and object-oriented language called QL (Query Language). Using QL,
 one can depict rules by defining \textit{ predicates} and \textit{ classes}. The following
-QL code defines the \inblue{classical Datalog-style} unary predicate \codeql{isOneOrTwo}:
+QL code defines the classical Datalog-style unary predicate \codeql{isOneOrTwo}:
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneOrTwo(int n) {
@@ -37,10 +37,10 @@ predicate isOneOrTwo(int n) {
 which states that the fact \codeql{isOneOrTwo(n)} is derivable from either
 of the two facts, \codeql{n = 1} and \codeql{n = 2}.
 
-\inblue{QL allows syntactic definitions of predicates which, like C functions,
+QL allows syntactic definitions of predicates which, like C functions,
 can have return types, which are desugared into classical predicates
 by adding an additional argument named \codeql{result}.
-For example, consider} the following predicate \codeql{addOne}:
+For example, consider the following predicate \codeql{addOne}:
 
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 int addOne(int n) {
@@ -48,14 +48,14 @@ int addOne(int n) {
 }
 \end{lstlisting}
 \noindent
-The predicate is a syntactic sugar equivalent to the following \inblue{classical} predicate:
+The predicate is a syntactic sugar equivalent to the following classical predicate:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate addOnePred(int n, int result) {
   isOneOrTwo(n) and result = n + 1
 }
 \end{lstlisting}
 \noindent
-\inblue{Then, every use site of the original predicate is rewritten to
+Then, every use site of the original predicate is rewritten to
 use the desugared predicate.
 For example, an equality formula \codeql{m = addOne(n)} is desugared
 to \codeql{addOnePred(n, m)}.
@@ -65,9 +65,9 @@ languages like Java. A QL class should extend another type
 and define a special predicate called a {\it characteristic predicate}.
 It is similar to a constructor in object-oriented languages;
 it has the same name as its enclosing class and does not have any return type.
-A QL class can define member predicates like methods in Java.}
-The following QL code defines a class named \codeql{OneOrTwo} \inblue{that extends \codeql{int}
-with the characteristic predicate and one member predicate}:
+A QL class can define member predicates like methods in Java.
+The following QL code defines a class named \codeql{OneOrTwo} that extends \codeql{int}
+with the characteristic predicate and one member predicate:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 class OneOrTwo extends int {
   // characteristic predicate
@@ -78,29 +78,27 @@ class OneOrTwo extends int {
 \end{lstlisting}
 \noindent
 
-\inblue{
 Despite its syntax, a QL class is also a syntactic sugar of classical
 predicates.  For example, the characteristic predicate \codeql{OneOrTwo} is
-desugared into the following unary predicate, \codeql{isOneOrTwo}:}
+desugared into the following unary predicate, \codeql{isOneOrTwo}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate isOneOrTwo(int this) {
   this = 1 or this = 2
 }
 \end{lstlisting}
-\inblue{
 \noindent
 Note that the type of the argument \codeql{this} is \codeql{int}, which the class \codeql{OneOrTwo}
 extends. Similarly, The member predicate \codeql{add} is desugared into a ternary predicate
-as follows by introducing two more arguments, \codeql{this} and \codeql{result}:}
+as follows by introducing two more arguments, \codeql{this} and \codeql{result}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 predicate addPred(OneOrTwo this, OneOrTwo that, int result) {
   result = this + that
 }
 \end{lstlisting}
-\inblue{Then, every use site of the class is rewritten to use the desugared predicates.
+Then, every use site of the class is rewritten to use the desugared predicates.
 For example, \codeql{z = x.add(y)} where x has type \codeql{OneOrTwo}
-can be desugared into addPred(x, y, z).}
-For more detailed information about CodeQL \inblue{and its language QL}, refer to the paper of Avgustinov et
+can be desugared into addPred(x, y, z).
+For more detailed information about CodeQL and its language QL, refer to the paper of Avgustinov et
 al.\cite{ql2016} or the official document~\cite{codeql}.
 
 Figure~\ref{fig:codeql} presents the overall structure of \ours for JNI
@@ -121,7 +119,7 @@ the compiler to extract necessary information and creates a database with the
 extracted information. For scripting languages like Python, CodeQL uses its own
 extractor to directly extract necessary information from source code.  CodeQL
 creates a database for a single language in two steps: 1) it stores the
-extracted information in a \inblue{single} \textit{trap} file, a human-readable format file for
+extracted information in a single \textit{trap} file, a human-readable format file for
 the CodeQL database, and 2) it transforms the trap file into a database in
 binary format.  For example, the following demonstrates a sample trap file:
 
@@ -269,7 +267,7 @@ After lifting libraries for different languages, we manually extend predicates
 to reflect the interoperation semantics between multiple languages.  For the
 Java-C program analysis, we identified various interactions from Java to C and
 vice versa via JNI, and extended predicates to model their behaviors.  For
-example, the following shows how we extend the \inblue{CodeQL} predicate
+example, the following shows how we extend the CodeQL predicate
 named \codeql{viableCallable}:
 \begin{lstlisting}[style=codeql,xleftmargin=2.5em]
 DataFlowCallable viableCallable(DataFlowCall c) {
@@ -322,9 +320,9 @@ requires inter-language dataflow analysis because the string or method ID
 values may be passed across language boundaries.  However, we observed that
 such a pattern rarely happens in practice, and using only intra-language
 dataflow analysis within C code is enough for most cases.  Therefore, we
-decided to sacrifice the \inblue{soundness} by using intra-language analysis instead of
+decided to sacrifice soundness by using intra-language analysis instead of
 inter-language analysis.
-\inblue{In rare cases, this may result in missing some call edges}
+In rare cases, this may result in missing some call edges
 as a trade-off for a more lightweight and simpler
 implementation.  We implemented two intra-language flow analysis modules for C,
 which find 1) dataflows from string literals to the arguments of interface
@@ -443,18 +441,18 @@ Because \ours is a purely static analyzer, it cannot analyze statically
 invisible code.  A possible direction may take a hybrid approach leveraging
 dynamic analysis~\cite{polycruise}.
 
-\textbf{\inblue{Extension}} \ours can analyze interoperations
+\textbf{Extension} \ours can analyze interoperations
 between multiple languages via explicit Foreign Function Interfaces (FFIs).
 Therefore, as long as analysis target languages use FFIs, our approach can
-analyze interactions \inblue{ between languages other than Java-C or Python-C
-and even interactions} between more than two programming languages
-\inblue{since providing inter-language FFI call relations enables CodeQL dataflow analysis.}
-However, as Li et al.~\cite{vulnerable-multi} explain, \inblue{various interoperation mechanisms
+analyze interactions between languages other than Java-C or Python-C
+and even interactions between more than two programming languages
+since providing inter-language FFI call relations enables CodeQL dataflow analysis.
+However, as Li et al.~\cite{vulnerable-multi} explain, various interoperation mechanisms
 beyond explicit FFIs, such as implicit interactions between languages using interprocess communications
 (e.g., socket-based message passing) or languages embodying other languages
-(e.g., web browser engines),} exist in real-world multi-language software systems.
+(e.g., web browser engines), exist in real-world multi-language software systems.
 Supporting these kinds of interoperation would be a promising future direction.
-\inblue{One possible approach could be dynamically collecting various kinds of language interactions,
+One possible approach could be dynamically collecting various kinds of language interactions,
 simulating the interactions as explicit FFIs, and analyzing them using \ours. 
 Even though dynamically collecting behaviors is unsound and costly,
-such a hybrid analysis may be able to analyze more language interactions than \ours.}
+such a hybrid analysis may be able to analyze more language interactions than \ours.

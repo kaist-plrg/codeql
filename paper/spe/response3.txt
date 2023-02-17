@@ -1,0 +1,25 @@
+Dear Editor and Reviewers,
+
+Thank you for your constructive comments. We did our best to address them all as follows.
+
+=================================================================
+
+* Reviewer 1
+
+1-1) "Note that a derived fact should not contain any free variables as its argument." ->
+"Note that a derived fact should not contain any free variables in its arguments".
+==> We revised the sentence as suggested.
+
+1-2) "Therefore, we decided to sacrifice the soundness"  ->
+"Therefore, we decided to sacrifice soundness"
+==> We revised the sentence as suggested.
+
+=================================================================
+
+* Reviewer 2
+
+2-1) Other comments remain unaddressed. I hope the authors consider addressing them in the final version of the paper.
+==>
+* the benchmark choice: The existing benchmarks, such as PyCBench, do not apply to our tool because our underlying analyzer, CodeQL, cannot support them.
+* novelty of the IR: Because IR is not one of the contributions of our work and is irrelevant to the paper's primary goal, we revised Section 2 to remove misunderstandings about IRs.
+* discussion about extensibility: We added more discussion about extensibility and moved the old Section 5.2.3 Future Work to Section 4.6 Discussion.

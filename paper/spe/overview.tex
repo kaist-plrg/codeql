@@ -51,8 +51,8 @@ not be derived from its negation. For example, the rule $R(x, y)\ \mbox{:-}\
 derived from $\neg R(x, y)$.} It denotes that the head is derivable from the
 body: $f'$ is derivable if all the facts $f'' \in \{\overline{f}\}$ belong to
 known facts, and all the facts $f'' \in \{\overline{\neg f}\}$ do not belong to
-known facts. \inblue{Note that a derived fact should not contain
-any free variables as its argument.}
+known facts. Note that a derived fact should not contain
+any free variables \inblue{in} its argument.
 The body of the rule can be empty; in that case, the head of the
 rule is vacuously added to known facts.  Such bodiless rules are the initial
 input facts for the analysis.  The query $\mbox{?-}\ \overline{f}$ finds all
@@ -264,13 +264,13 @@ Thus, we define the interoperation rule from {\it B} to {\it A} as follows:
       FunctionAt$_A$(lineNumFunc, name)
 \end{lstlisting}
 
-Finally, \inblue{we can make the same query} \rcode{ ?- CallEdge(X, Y)} \inblue{as we did for} the
-monolingual programs in Section~\ref{lab:ovmono}. \inblue{Note that this query is also valid
+Finally, we can make the same query \rcode{ ?- CallEdge(X, Y)} as we did for the
+monolingual programs in Section~\ref{lab:ovmono}. Note that this query is also valid
 for the multilingual program since we specifically defined the new rule to derive the fact having
-the same name,} \rcode{ CallEdge}. The query system now produces
+the same name, \rcode{ CallEdge}. The query system now produces
 \rcode{ (X, Y) $\in$ \{(6, 2), (3, 7), } \rcode{(8, 4)\}} as the function call
-relation results, which include not only \inblue{intra-language} call relations but also
-\inblue{inter-language} call relations.
+relation results, which include not only intra-language call relations but also
+inter-language call relations.
 
 This simple example shows what our extension for multilingual program analysis
 requires. Our extension reuses most components in an existing declarative
